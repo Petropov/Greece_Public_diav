@@ -1,14 +1,7 @@
-# Python
 .venv/
 __pycache__/
 *.pyc
-*.pyo
-*.pyd
-.Python
-.env
-# OS
 .DS_Store
-Thumbs.db
-# Project
-diavgeia_docs/
 output/
+artifacts/
+diavgeia_docs/
