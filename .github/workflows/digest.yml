@@ -8,18 +8,26 @@ jobs:
   digest:
     runs-on: ubuntu-latest
     steps:
-     - uses: actions/checkout@v4
-         with:
-           ref: ${{ github.sha }}
-            fetch-depth: 0
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+
       - run: |
           python -m pip install --upgrade pip
           python -m pip install pandas requests
+
+      # 👇 Added this sanity check step
+      - name: Sanity check (syntax/indent)
+        run: python -m compileall -q .
+
       - name: Build digest (overall)
         run: python digest_monthly.py
+
       - name: Email digest
         env:
           SMTP_HOST: ${{ secrets.SMTP_HOST }}
@@ -30,8 +38,10 @@ jobs:
           DIGEST_FROM: 'digest@yourdomain'
           DIGEST_SUBJ: 'Diavgeia Digest — Monthly'
         run: python send_email.py
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: digest-artifacts
           path: artifacts/**
+
