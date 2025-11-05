@@ -2,6 +2,22 @@
 import os, sys, json, math, requests, pandas as pd
 from datetime import date, datetime, timedelta
 
+# Decision type labels (short)
+decision_map = {
+    "Α.1": "Regulatory act",
+    "Α.2": "Internal regulation",
+    "Β.1.1": "Budget commitment",
+    "Β.1.2": "Budget amendment",
+    "Β.1.3": "Payment warrant",
+    "Β.2.1": "Expenditure approval",
+    "Β.2.2": "Payment finalization",
+    "Γ.2":   "Personnel change",
+    "Δ.1":   "Procurement assignment",
+    "Δ.2.2": "Contract award",
+    "2.4.7.1": "Other administrative act",
+}
+
+
 BASE = "https://diavgeia.gov.gr/luminapi/api/search/export"
 OUT = "artifacts"
 
