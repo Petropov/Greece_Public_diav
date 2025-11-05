@@ -92,9 +92,12 @@ def render_html(ctx):
     html.append("</table>")
 
     if mix:
-        html.append("<h3>Decision type mix (month)</h3><ul>")
-        for t,p in mix.items(): html.append(f"<li><b>{t}</b>: {p}%</li>")
-        html.append("</ul>")
+      html.append("<h3>Decision type mix (month)</h3><ul>")
+      for code, label, pct in mix:
+        label_txt = f" — {label}" if label else ""
+        html.append(f"<li><b>{code}</b>{label_txt}: {pct}%</li>")
+      html.append("</ul>")
+
 
     if not outliers.empty:
         html.append("<h3>Slowest decisions (top 10)</h3><ol>")
