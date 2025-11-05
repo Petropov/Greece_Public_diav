@@ -2,36 +2,22 @@ name: Diavgeia Monthly Digest
 
 on:
   schedule:
-    - cron: '15 6 1 * *'     # 06:15 UTC on the 1st
-  workflow_dispatch:
+    - cron: '15 6 1 * *'      # 06:15 UTC on the 1st
+  workflow_dispatch:           # allow manual trigger
 
 permissions:
   contents: read
 
-concurrency:
-  group: digest-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   digest:
     runs-on: ubuntu-latest
-    env:
-      PYTHONUNBUFFERED: "1"
     steps:
-      - name: Checkout exact commit
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          ref: ${{ github.sha }}   # ← pin code to the triggering commit
+          ref: ${{ github.sha }}
           fetch-depth: 0
 
-      - name: Show files (debug)
-        run: |
-          pwd
-          git rev-parse --short HEAD
-          ls -la
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           cache: 'pip'
@@ -39,7 +25,7 @@ jobs:
       - name: Install deps
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt || python -m pip install pandas requests
+          python -m pip install -r requirements.txt
 
       - name: Sanity check (syntax/indent)
         run: python -m compileall -q .
@@ -53,8 +39,8 @@ jobs:
           SMTP_PORT: ${{ secrets.SMTP_PORT }}
           SMTP_USER: ${{ secrets.SMTP_USER }}
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
-          DIGEST_TO:  ${{ secrets.DIGEST_TO }}
-          DIGEST_FROM: 'digest@yourdomain'
+          DIGEST_TO:   ${{ secrets.DIGEST_TO }}
+          DIGEST_FROM: ${{ secrets.DIGEST_FROM }}   # same as SMTP_USER for Gmail
           DIGEST_SUBJ: 'Diavgeia Digest — Monthly'
         run: python send_email.py
 
@@ -63,4 +49,3 @@ jobs:
         with:
           name: digest-artifacts
           path: artifacts/**
-          if-no-files-found: error
