@@ -139,10 +139,16 @@ def main():
             parse_dates(df)
 
     mk = kpis(cur); pk = kpis(prv); yk = kpis(ytd); ypk = kpis(ypr); ymk = kpis(ymo)
-    mix = (cur["decisionTypeUid"].value_counts(normalize=True).head(5)*100).round(1).to_dict() if not cur.empty else {}
-    outliers = (cur.sort_values("delay_days", ascending=False)[
-        ["ada","organizationUid","organizationName","decisionTypeUid","issueDate","submissionTimestamp","documentUrl","delay_days","subject"]
-    ].head(10)) if not cur.empty else pd.DataFrame()
+    # Decision mix (top 5) with labels
+    raw_mix = (cur["decisionTypeUid"].value_counts(normalize=True).head(5)*100).round(1) if not cur.empty else pd.Series(dtype=float)
+    mix = [(code, decision_map.get(code, ""), pct) for code, pct in raw_mix.items()]  # list of (code, label, pct)
+
+# Outliers (dedup by ADA)
+cols = ["ada","organizationUid","organizationName","decisionTypeUid","issueDate","submissionTimestamp","documentUrl","delay_days","subject"]
+outliers = (cur.sort_values("delay_days", ascending=False)
+              .drop_duplicates(subset=["ada"])
+              [cols].head(10)) if not cur.empty else pd.DataFrame()
+
 
     os.makedirs(OUT, exist_ok=True)
     html = render_html({
