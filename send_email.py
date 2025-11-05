@@ -1,18 +1,27 @@
 #!/usr/bin/env python3
-import os, smtplib, sys
+import os, smtplib
 from email.mime.text import MIMEText
+from email.header import Header
 from datetime import date
 
-to = os.environ["DIGEST_TO"]            # comma-separated addresses
-sender = os.environ.get("DIGEST_FROM", "diav-digest@yourdomain")
+to = os.environ["DIGEST_TO"]  # comma-separated addresses
+sender = os.environ.get("DIGEST_FROM", os.environ.get("SMTP_USER"))
 subj = os.environ.get("DIGEST_SUBJ") or f"Diavgeia Digest — {date.today().strftime('%B %Y')}"
-path = "artifacts/digest.html"
 
-with open(path, "r", encoding="utf-8") as f:
-    html = f.read()
+digest_path = "artifacts/digest.html"
+tpl_path = "templates/newsletter_template.html"
+
+with open(digest_path, "r", encoding="utf-8") as f:
+    digest_html = f.read()
+
+if os.path.exists(tpl_path):
+    with open(tpl_path, "r", encoding="utf-8") as f:
+        html = f.read().replace("{{DIGEST_HTML}}", digest_html)
+else:
+    html = digest_html
 
 msg = MIMEText(html, "html", "utf-8")
-msg["Subject"] = subj
+msg["Subject"] = str(Header(subj, "utf-8"))
 msg["From"] = sender
 msg["To"] = to
 
