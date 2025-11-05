@@ -93,7 +93,7 @@ def render_html(ctx):
 
     if mix:
       html.append("<h3>Decision type mix (month)</h3><ul>")
-      for code, label, pct in mix:
+      for code, label, p in mix:
         label_txt = f" — {label}" if label else ""
         html.append(f"<li><b>{code}</b>{label_txt}: {pct}%</li>")
       html.append("</ul>")
@@ -146,20 +146,20 @@ def main():
     raw_mix = (cur["decisionTypeUid"].value_counts(normalize=True).head(5)*100).round(1) if not cur.empty else pd.Series(dtype=float)
     mix = [(code, decision_map.get(code, ""), pct) for code, pct in raw_mix.items()]  # list of (code, label, pct)
 
-# Outliers (dedup by ADA)
-cols = ["ada","organizationUid","organizationName","decisionTypeUid","issueDate","submissionTimestamp","documentUrl","delay_days","subject"]
-outliers = (cur.sort_values("delay_days", ascending=False)
-              .drop_duplicates(subset=["ada"])
-              [cols].head(10)) if not cur.empty else pd.DataFrame()
+    # Outliers (dedup by ADA)
+    cols = ["ada","organizationUid","organizationName","decisionTypeUid","issueDate","submissionTimestamp","documentUrl","delay_days","subject"]
+    outliers = (cur.sort_values("delay_days", ascending=False)
+    .drop_duplicates(subset=["ada"])
+    [cols].head(10)) if not cur.empty else pd.DataFrame()
 
 
     os.makedirs(OUT, exist_ok=True)
     html = render_html({
-        "labels": (mo_start.strftime("%B %Y"), prev_start.strftime("%B %Y"),
-                   f"{ytd_start} → {mo_end}", f"{ytd_prev_start} → {ytd_prev_end}", yoy_mo_start.strftime("%B %Y")),
-        "kpi": (mk, pk, yk, ypk, ymk),
-        "mix": mix,
-        "outliers": outliers
+    "labels": (mo_start.strftime("%B %Y"), prev_start.strftime("%B %Y"),
+    f"{ytd_start} → {mo_end}", f"{ytd_prev_start} → {ytd_prev_end}", yoy_mo_start.strftime("%B %Y")),
+    "kpi": (mk, pk, yk, ypk, ymk),
+    "mix": mix,
+    "outliers": outliers
     })
     with open(os.path.join(OUT,"digest.html"), "w", encoding="utf-8") as f:
         f.write(html)
