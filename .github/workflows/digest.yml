@@ -1,27 +1,46 @@
 name: Diavgeia Monthly Digest
+
 on:
   schedule:
-    - cron: '15 6 1 * *' # 06:15 UTC on the 1st; ~07:15 Europe/Paris
+    - cron: '15 6 1 * *'     # 06:15 UTC on the 1st
   workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: digest-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   digest:
     runs-on: ubuntu-latest
+    env:
+      PYTHONUNBUFFERED: "1"
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout exact commit
+        uses: actions/checkout@v4
         with:
-          ref: ${{ github.sha }}
+          ref: ${{ github.sha }}   # ← pin code to the triggering commit
           fetch-depth: 0
 
-      - uses: actions/setup-python@v5
+      - name: Show files (debug)
+        run: |
+          pwd
+          git rev-parse --short HEAD
+          ls -la
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          cache: 'pip'
 
-      - run: |
+      - name: Install deps
+        run: |
           python -m pip install --upgrade pip
-          python -m pip install pandas requests
+          python -m pip install -r requirements.txt || python -m pip install pandas requests
 
-      # 👇 Added this sanity check step
       - name: Sanity check (syntax/indent)
         run: python -m compileall -q .
 
@@ -44,4 +63,4 @@ jobs:
         with:
           name: digest-artifacts
           path: artifacts/**
-
+          if-no-files-found: error
