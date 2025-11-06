@@ -40,7 +40,7 @@ jobs:
           SMTP_USER: ${{ secrets.SMTP_USER }}
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
           DIGEST_TO:   ${{ secrets.DIGEST_TO }}
-          DIGEST_FROM: ${{ secrets.DIGEST_FROM }}   # same as SMTP_USER for Gmail
+          DIGEST_FROM: ${{ secrets.SMTP_USER }}   # same as SMTP_USER for Gmail
           DIGEST_SUBJ: 'Diavgeia Digest — Monthly'
         run: python send_email.py
 
