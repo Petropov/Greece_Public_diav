@@ -17,6 +17,13 @@ decision_map = {
     "2.4.7.1": "Other administrative act",
 }
 
+LABELS_FILE = "decision_labels.json"
+try:
+    with open(LABELS_FILE, "r", encoding="utf-8") as f:
+        decision_map.update(json.load(f))
+except FileNotFoundError:
+    pass
+
 BASE = "https://diavgeia.gov.gr/luminapi/api/search/export"
 OUT = "artifacts"
 
@@ -186,18 +193,33 @@ def main():
             parse_dates(df)
 
     # KPIs
-    mk, pk, yk, ypk, ymk = kpis(cur), kpis(prv), kpis(ytd), kpis(ypr), kpis(ymo)
+mk, pk, yk, ypk, ymk = kpis(cur), kpis(prv), kpis(ytd), kpis(ypr), kpis(ymo)
 
-    # Mix (top 5) as (code, label, pct)
-    if not cur.empty and "decisionTypeUid" in cur.columns:
-        mix_series = (cur["decisionTypeUid"].value_counts(normalize=True)
-                      .head(5).mul(100).round(1))
-        mix = [(code, decision_map.get(code, ""), float(p))
-               for code, p in mix_series.items()]
-    else:
-        mix = []
+# Mix (top 5) as (code, label, pct)
+if not cur.empty and "decisionTypeUid" in cur.columns:
+    mix_series = (
+        cur["decisionTypeUid"]
+            .value_counts(normalize=True)
+            .head(5).mul(100).round(1)
+    )
+    mix = [(code, decision_map.get(code, ""), float(p))
+           for code, p in mix_series.items()]
+else:
+    mix = []
 
-    # Trend & recent months from YTD
+# Write unmapped codes → artifacts/unmapped_codes.csv
+unknown_codes = [code for (code, label, _) in mix if not label]
+if unknown_codes:
+    os.makedirs(OUT, exist_ok=True)
+    (
+        pd.Series(unknown_codes, name="unmapped_code")
+          .value_counts()
+          .rename_axis("code")
+          .reset_index(name="mentions")
+          .to_csv(os.path.join(OUT, "unmapped_codes.csv"), index=False)
+    )
+
+# Trend & recent months from YTD
     recent = []
     trend  = {"count": {}, "median": {}}
     if not ytd.empty:
