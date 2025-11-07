@@ -1,16 +1,30 @@
 #!/usr/bin/env python3
-#!/usr/bin/env python3
 import argparse, csv, json, os, sys, time
 from datetime import datetime
 from typing import Dict, List, Optional
+
 import requests
 from dateutil import tz
+from requests.adapters import HTTPAdapter
 from tqdm import tqdm
+from urllib3.util.retry import Retry
 
 BASE = "https://diavgeia.gov.gr"
 SEARCH_URL = f"{BASE}/opendata/search"
 DECISION_URL = f"{BASE}/opendata/decisions"
 DOC_URL = f"{BASE}/doc"
+
+SESSION = requests.Session()
+RETRY_STRATEGY = Retry(
+    total=3,
+    status_forcelist=(429, 500, 502, 503, 504),
+    allowed_methods=frozenset(["GET"]),
+    backoff_factor=0.5,
+)
+ADAPTER = HTTPAdapter(max_retries=RETRY_STRATEGY)
+SESSION.mount("https://", ADAPTER)
+SESSION.mount("http://", ADAPTER)
+DEFAULT_HEADERS = {"User-Agent": "diavgeia-fetch/1.0"}
 
 def build_query(org: Optional[str], dtype: Optional[str], keyword: Optional[str],
                 date_from: Optional[str], date_to: Optional[str]) -> str:
@@ -37,7 +51,7 @@ def _get(url: str, params: Dict = None, retries: int = 3, timeout: int = 30):
     params = params or {}
     for attempt in range(1, retries + 1):
         try:
-            r = requests.get(url, params=params, timeout=timeout)
+            r = SESSION.get(url, params=params, timeout=timeout, headers=DEFAULT_HEADERS)
             r.raise_for_status()
             return r
         except requests.RequestException:
@@ -60,8 +74,16 @@ def download_pdf(ada: str, out_dir: str):
 
 def to_csv(rows: List[Dict], path: str):
     if not rows: return
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    keys = sorted({k for row in rows for k in row.keys()})
+    directory = os.path.dirname(path)
+    if directory:
+        os.makedirs(directory, exist_ok=True)
+    keys = list(rows[0].keys())
+    seen = set(keys)
+    for row in rows[1:]:
+        for k in row.keys():
+            if k not in seen:
+                keys.append(k)
+                seen.add(k)
     with open(path, "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=keys); w.writeheader()
         for row in rows: w.writerow({k: row.get(k, "") for k in keys})
@@ -110,8 +132,13 @@ def main():
     with open("output/decisions.jsonl", "w", encoding="utf-8") as jf:
         for hit in tqdm(hits, desc="Processing", unit="decision"):
             ada = hit.get("ada")
-            try: merged = {**hit, **fetch_metadata(ada)}
-            except Exception: merged = hit
+            if ada:
+                try:
+                    merged = {**hit, **fetch_metadata(ada)}
+                except Exception:
+                    merged = hit
+            else:
+                merged = hit
             flat = flatten(merged)
             jf.write(json.dumps(flat, ensure_ascii=False) + "\n")
             rows.append(flat)
@@ -119,7 +146,6 @@ def main():
                 try: download_pdf(ada, "diavgeia_docs")
                 except Exception as e:
                     if args.verbose: print(f"PDF download failed for {ada}: {e}", file=sys.stderr)
-            time.sleep(0.15)
 
     if not args.no_csv: to_csv(rows, "output/decisions.csv")
     print(f"Done. {len(rows)} decisions written to output/decisions.jsonl")
