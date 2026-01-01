@@ -68,6 +68,12 @@ def kpis(df):
         "miss_org": float(df["organizationLabel"].isna().mean()*100 if "organizationLabel" in df else math.nan),
     }
 
+
+def safe_kpis(df):
+    if df is None or getattr(df, "empty", True):
+        return kpis(pd.DataFrame())
+    return kpis(df)
+
 def pct(cur, prev):
     if prev in (None, 0) or pd.isna(prev): return math.nan
     return (cur - prev) / prev * 100.0
@@ -179,11 +185,38 @@ def main():
     yoy_mo_start, yoy_mo_end = month_bounds(last_year, month)
 
     # Fetch
-    cur = fetch_export(dtfmt(mo_start), dtfmt(mo_end), args.org)
-    prv = fetch_export(dtfmt(prev_start), dtfmt(prev_end), args.org)
-    ytd = fetch_export(dtfmt(ytd_start), dtfmt(mo_end), args.org)
-    ypr = fetch_export(dtfmt(ytd_prev_start), dtfmt(ytd_prev_end), args.org)
-    ymo = fetch_export(dtfmt(yoy_mo_start), dtfmt(yoy_mo_end), args.org)
+    cur = prv = ytd = ypr = ymo = pd.DataFrame()
+    debug = os.getenv("DEBUG")
+    try:
+        cur = fetch_export(dtfmt(mo_start), dtfmt(mo_end), args.org)
+    except Exception as e:
+        if debug:
+            print(f"[DEBUG] Failed to fetch current month: {e}")
+    try:
+        prv = fetch_export(dtfmt(prev_start), dtfmt(prev_end), args.org)
+    except Exception as e:
+        if debug:
+            print(f"[DEBUG] Failed to fetch previous month: {e}")
+    try:
+        ytd = fetch_export(dtfmt(ytd_start), dtfmt(mo_end), args.org)
+    except Exception as e:
+        if debug:
+            print(f"[DEBUG] Failed to fetch YTD: {e}")
+    try:
+        ypr = fetch_export(dtfmt(ytd_prev_start), dtfmt(ytd_prev_end), args.org)
+    except Exception as e:
+        if debug:
+            print(f"[DEBUG] Failed to fetch YTD previous year: {e}")
+    try:
+        ymo = fetch_export(dtfmt(yoy_mo_start), dtfmt(yoy_mo_end), args.org)
+    except Exception as e:
+        if debug:
+            print(f"[DEBUG] Failed to fetch YoY month: {e}")
+
+    if debug:
+        for name, df in ("cur", cur), ("prv", prv), ("ytd", ytd), ("ypr", ypr), ("ymo", ymo):
+            rows = len(df) if isinstance(df, pd.DataFrame) else 0
+            print(f"[DEBUG] {name} populated: {isinstance(df, pd.DataFrame)} rows={rows}")
 
     # Normalize & compute delays BEFORE aggregations
     for df in (cur, prv, ytd, ypr, ymo):
@@ -193,7 +226,7 @@ def main():
             parse_dates(df)
 
     # KPIs
-mk, pk, yk, ypk, ymk = kpis(cur), kpis(prv), kpis(ytd), kpis(ypr), kpis(ymo)
+mk, pk, yk, ypk, ymk = safe_kpis(cur), safe_kpis(prv), safe_kpis(ytd), safe_kpis(ypr), safe_kpis(ymo)
 
 # Mix (top 5) as (code, label, pct)
 if not cur.empty and "decisionTypeUid" in cur.columns:
