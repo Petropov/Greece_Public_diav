@@ -74,6 +74,24 @@ def safe_kpis(df):
         return kpis(pd.DataFrame())
     return kpis(df)
 
+def build_scopes(cur=None, prv=None, ytd=None, ypr=None, ymo=None):
+    """Ensure all period scopes exist as DataFrames and are easy to access.
+
+    The fetch step may fail or return None per period, so this helper guarantees
+    each scope key is present and mapped to a DataFrame (possibly empty).
+    """
+    scopes = {
+        "cur": cur,
+        "prv": prv,
+        "ytd": ytd,
+        "ypr": ypr,
+        "ymo": ymo,
+    }
+    for key, df in scopes.items():
+        if df is None or not isinstance(df, pd.DataFrame):
+            scopes[key] = pd.DataFrame()
+    return scopes
+
 def pct(cur, prev):
     if prev in (None, 0) or pd.isna(prev): return math.nan
     return (cur - prev) / prev * 100.0
@@ -213,50 +231,60 @@ def main():
         if debug:
             print(f"[DEBUG] Failed to fetch YoY month: {e}")
 
+    # Collect all period DataFrames in one place so downstream code always has
+    # access to the same scope keys (month, previous month, YTD, etc.).
+    scopes = build_scopes(cur, prv, ytd, ypr, ymo)
+
     if debug:
-        for name, df in ("cur", cur), ("prv", prv), ("ytd", ytd), ("ypr", ypr), ("ymo", ymo):
+        for name, df in scopes.items():
             rows = len(df) if isinstance(df, pd.DataFrame) else 0
             print(f"[DEBUG] {name} populated: {isinstance(df, pd.DataFrame)} rows={rows}")
 
     # Normalize & compute delays BEFORE aggregations
-    for df in (cur, prv, ytd, ypr, ymo):
+    for df in scopes.values():
         if not df.empty:
             if "organizationLabel" in df.columns and "organizationName" not in df.columns:
                 df.rename(columns={"organizationLabel": "organizationName"}, inplace=True)
             parse_dates(df)
 
-    # KPIs
-mk, pk, yk, ypk, ymk = safe_kpis(cur), safe_kpis(prv), safe_kpis(ytd), safe_kpis(ypr), safe_kpis(ymo)
+    # KPIs (guaranteed to have all scope keys)
+    mk = safe_kpis(scopes["cur"])
+    pk = safe_kpis(scopes["prv"])
+    yk = safe_kpis(scopes["ytd"])
+    ypk = safe_kpis(scopes["ypr"])
+    ymk = safe_kpis(scopes["ymo"])
 
-# Mix (top 5) as (code, label, pct)
-if not cur.empty and "decisionTypeUid" in cur.columns:
-    mix_series = (
-        cur["decisionTypeUid"]
-            .value_counts(normalize=True)
-            .head(5).mul(100).round(1)
-    )
-    mix = [(code, decision_map.get(code, ""), float(p))
-           for code, p in mix_series.items()]
-else:
-    mix = []
+    # Mix (top 5) as (code, label, pct)
+    cur_scope = scopes["cur"]
+    if not cur_scope.empty and "decisionTypeUid" in cur_scope.columns:
+        mix_series = (
+            cur_scope["decisionTypeUid"]
+                .value_counts(normalize=True)
+                .head(5).mul(100).round(1)
+        )
+        mix = [(code, decision_map.get(code, ""), float(p))
+               for code, p in mix_series.items()]
+    else:
+        mix = []
 
-# Write unmapped codes → artifacts/unmapped_codes.csv
-unknown_codes = [code for (code, label, _) in mix if not label]
-if unknown_codes:
-    os.makedirs(OUT, exist_ok=True)
-    (
-        pd.Series(unknown_codes, name="unmapped_code")
-          .value_counts()
-          .rename_axis("code")
-          .reset_index(name="mentions")
-          .to_csv(os.path.join(OUT, "unmapped_codes.csv"), index=False)
-    )
+    # Write unmapped codes → artifacts/unmapped_codes.csv
+    unknown_codes = [code for (code, label, _) in mix if not label]
+    if unknown_codes:
+        os.makedirs(OUT, exist_ok=True)
+        (
+            pd.Series(unknown_codes, name="unmapped_code")
+              .value_counts()
+              .rename_axis("code")
+              .reset_index(name="mentions")
+              .to_csv(os.path.join(OUT, "unmapped_codes.csv"), index=False)
+        )
 
-# Trend & recent months from YTD
+    # Trend & recent months from YTD
     recent = []
     trend  = {"count": {}, "median": {}}
-    if not ytd.empty:
-        df = ytd.copy()
+    ytd_scope = scopes["ytd"]
+    if not ytd_scope.empty:
+        df = ytd_scope.copy()
         df["month_key"] = df["issue_dt"].dt.strftime("%Y-%m")
         monthly = (df.groupby("month_key")
                    .agg(count=("ada", "count"),
@@ -289,9 +317,9 @@ if unknown_codes:
     # Outliers (dedup by ADA)
     cols = ["ada","organizationUid","organizationName","decisionTypeUid",
             "issueDate","submissionTimestamp","documentUrl","delay_days","subject"]
-    outliers = (cur.sort_values("delay_days", ascending=False)
+    outliers = (cur_scope.sort_values("delay_days", ascending=False)
                   .drop_duplicates(subset=["ada"])
-                  [cols].head(10)) if not cur.empty else pd.DataFrame()
+                  [cols].head(10)) if not cur_scope.empty else pd.DataFrame()
 
     # Render & write
     os.makedirs(OUT, exist_ok=True)
@@ -309,7 +337,7 @@ if unknown_codes:
     })
     with open(os.path.join(OUT, "digest.html"), "w", encoding="utf-8") as f:
         f.write(html)
-    cur.to_csv(os.path.join(OUT, "raw_month.csv"), index=False)
+    cur_scope.to_csv(os.path.join(OUT, "raw_month.csv"), index=False)
     outliers.to_csv(os.path.join(OUT, "outliers.csv"), index=False)
     print(f"Wrote {os.path.join(OUT,'digest.html')}")
 
