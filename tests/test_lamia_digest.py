@@ -888,6 +888,206 @@ class LamiaDigestSemanticQualityTests(unittest.TestCase):
         self.assertEqual(by_count[0]["decision_count"], 1)
         self.assertEqual(by_count[0]["adas"], ["SUP2"])
 
+    def test_signer_unit_aliases_are_populated_from_detail_json(self):
+        item = {
+            "amount": None,
+            "signer": None,
+            "unit": None,
+            "signer_name": None,
+            "unit_name": None,
+            "signer_ids": [],
+            "unit_ids": [],
+            "organization_id": "6166",
+        }
+        detail = {
+            "finalSigner": {"firstName": "ΜΑΡΙΑ", "lastName": "ΠΑΠΑ"},
+            "organizationalUnit": {"name": "Διεύθυνση Οικονομικών"},
+        }
+
+        apply_detail_enrichment(item, detail, DummySession(), 1, {})
+
+        self.assertEqual(item["signer_name"], "ΜΑΡΙΑ ΠΑΠΑ")
+        self.assertEqual(item["unit_name"], "Διεύθυνση Οικονομικών")
+        self.assertEqual(item["signer"], item["signer_name"])
+        self.assertEqual(item["unit"], item["unit_name"])
+        self.assertEqual(item["raw_detail"], detail)
+
+
+class LamiaDigestGovernanceLifecycleTests(unittest.TestCase):
+    def test_top_procurements_marks_inclusion_and_exclusion_reasons(self):
+        waste_payment = normalize_decision(
+            {
+                "ada": "Ρ91ΝΩΛΚ-ΒΥ8",
+                "subject": "Πληρωμή υπηρεσιών αποκομιδής απορριμμάτων",
+                "issueDate": "2026-04-10",
+                "decisionTypeUid": "Β.2.1",
+                "amountWithVAT": "108.694,00",
+                "supplierName": "ΑΝΑΔΟΧΟΣ ΑΕ",
+            }
+        )
+        non_procurement = normalize_decision(
+            {
+                "ada": "OTHER1",
+                "subject": "Απόφαση συγκρότησης επιτροπής",
+                "issueDate": "2026-04-11",
+                "decisionTypeUid": "Α.1",
+            }
+        )
+        missing_amount = normalize_decision(
+            {
+                "ada": "NOAMOUNT",
+                "subject": "Ανάθεση προμήθειας ειδών",
+                "issueDate": "2026-04-12",
+                "decisionTypeUid": "Δ.1",
+                "supplierName": "ACME ΕΠΕ",
+            }
+        )
+        decisions = [waste_payment, non_procurement, missing_amount]
+        assign_procurement_groups(decisions)
+
+        top = build_top_procurements(decisions)
+
+        self.assertEqual(top[0]["ada"], "Ρ91ΝΩΛΚ-ΒΥ8")
+        self.assertEqual(top[0]["amount"], 108694.0)
+        self.assertIsNone(waste_payment["top_procurement_exclusion_reason"])
+        self.assertEqual(
+            non_procurement["top_procurement_exclusion_reason"],
+            "not_procurement_lifecycle",
+        )
+        self.assertEqual(
+            missing_amount["top_procurement_exclusion_reason"], "missing_amount"
+        )
+
+    def test_lifecycle_grouping_links_commitment_invoice_payment_and_contract(self):
+        rows = [
+            normalize_decision(
+                {
+                    "ada": "CONTRACT1",
+                    "subject": "Σύμβαση για προμήθεια κάδων απορριμμάτων",
+                    "issueDate": "2026-04-01",
+                    "decisionTypeUid": "Δ.2.3",
+                    "amountWithVAT": "5000,00",
+                    "supplierName": "ΚΑΔΟΙ ΑΕ",
+                    "supplierAFM": "111222333",
+                }
+            ),
+            normalize_decision(
+                {
+                    "ada": "COMMIT1",
+                    "subject": "Ανάληψη υποχρέωσης για προμήθεια κάδων απορριμμάτων",
+                    "issueDate": "2026-04-05",
+                    "decisionTypeUid": "Β.1.1",
+                    "amountWithVAT": "5.000,00",
+                    "supplierName": "ΚΑΔΟΙ ΑΕ",
+                    "supplierAFM": "111222333",
+                }
+            ),
+            normalize_decision(
+                {
+                    "ada": "INVOICE1",
+                    "subject": "Τιμολόγιο για προμήθεια κάδων απορριμμάτων",
+                    "issueDate": "2026-04-15",
+                    "decisionTypeUid": "Β.2.1",
+                    "amountWithVAT": "5000.00",
+                    "supplierName": "ΚΑΔΟΙ ΑΕ",
+                    "supplierAFM": "111222333",
+                }
+            ),
+            normalize_decision(
+                {
+                    "ada": "PAY1",
+                    "subject": "Πληρωμή για προμήθεια κάδων απορριμμάτων",
+                    "issueDate": "2026-04-20",
+                    "decisionTypeUid": "Β.1.3",
+                    "amountWithVAT": "5000,00",
+                    "supplierName": "ΚΑΔΟΙ ΑΕ",
+                    "supplierAFM": "111222333",
+                }
+            ),
+        ]
+
+        summary = assign_procurement_groups(rows)
+        top = build_top_procurements(rows)
+
+        self.assertEqual(summary["procurement_lifecycle_groups"], 1)
+        self.assertEqual({row["canonical_procurement_id"] for row in rows}, {rows[0]["canonical_procurement_id"]})
+        self.assertEqual(
+            {row["procurement_lifecycle_role"] for row in rows},
+            {"contract", "commitment", "payment", "payment_order"},
+        )
+        self.assertEqual(top[0]["lifecycle_decision_count"], 4)
+        self.assertEqual(set(top[0]["related_adas"]), {"CONTRACT1", "COMMIT1", "INVOICE1", "PAY1"})
+
+    def test_revocation_decision_sets_bidirectional_fields(self):
+        original = normalize_decision(
+            {
+                "ada": "ΑΒΓΔ-123",
+                "subject": "Ανάθεση προμήθειας",
+                "issueDate": "2026-04-01",
+                "decisionTypeUid": "Δ.1",
+                "amountWithVAT": "100,00",
+                "supplierName": "ACME ΕΠΕ",
+            }
+        )
+        revocation = normalize_decision(
+            {
+                "ada": "ΖΗΘΙ-456",
+                "subject": "Ανάκληση απόφασης ΑΒΓΔ-123 περί ανάθεσης προμήθειας",
+                "issueDate": "2026-04-07",
+                "decisionTypeUid": "Δ.2.4",
+                "amountWithVAT": "100,00",
+                "supplierName": "ACME ΕΠΕ",
+            }
+        )
+
+        summary = assign_procurement_groups([original, revocation])
+        build_top_procurements([original, revocation])
+
+        self.assertTrue(revocation["is_revocation"])
+        self.assertEqual(revocation["revokes_ada"], "ΑΒΓΔ-123")
+        self.assertEqual(original["revoked_by"], "ΖΗΘΙ-456")
+        self.assertEqual(summary["revocation_links"], 1)
+        self.assertEqual(
+            revocation["top_procurement_exclusion_reason"], "revocation_decision"
+        )
+
+    def test_normalization_amount_safety_and_unique_adas_end_to_end(self):
+        self.assertIsNone(normalize_amount({"amount": "1.000,00"}))
+        self.assertIsNone(normalize_amount(["1.000,00"]))
+        self.assertIsNone(normalize_amount(True))
+        self.assertEqual(normalize_amount("1.234.567,89"), 1234567.89)
+
+        duplicate_rows = [
+            normalize_decision(
+                {
+                    "ada": "UNIQ1",
+                    "subject": "Ανάθεση προμήθειας",
+                    "issueDate": "2026-04-01",
+                    "decisionTypeUid": "Δ.1",
+                    "supplierName": "ACME ΕΠΕ",
+                    "amountWithVAT": "10,00",
+                    "extraFieldValues": {"debug": "kept"},
+                }
+            ),
+            normalize_decision(
+                {
+                    "ada": "UNIQ1",
+                    "subject": "Ανάθεση προμήθειας",
+                    "issueDate": "2026-04-01",
+                    "decisionTypeUid": "Δ.1",
+                    "protocolNumber": "99",
+                }
+            ),
+        ]
+
+        unique, summary = deduplicate_decisions_by_ada(duplicate_rows)
+        assert_unique_adas(unique)
+
+        self.assertEqual(summary["unique_rows"], 1)
+        self.assertEqual(unique[0]["raw_decision"]["extraFieldValues"], {"debug": "kept"})
+        self.assertEqual(unique[0]["raw_duplicate_decisions"][0]["protocolNumber"], "99")
+        self.assertEqual(unique[0]["protocol_number"], "99")
+
 
 if __name__ == "__main__":
     unittest.main()

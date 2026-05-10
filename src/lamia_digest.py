@@ -370,6 +370,45 @@ RECURRING_SERVICE_TOKENS = (
     "recurring service",
 )
 
+PROCUREMENT_SERVICE_TOKENS = (
+    "υπηρεσια",
+    "υπηρεσιων",
+    "εργασια",
+    "εργασιων",
+    "μισθωση",
+    "συντηρηση",
+    "επισκευη",
+    "καθαρισμ",
+    "αποκομιδ",
+    "απορριμματ",
+)
+
+REVOCATION_TOKENS = (
+    "ανακληση",
+    "ανακαλει",
+    "ανακλητικη",
+    "ακυρωση",
+    "ακυρωνει",
+    "ματαίωση",
+    "ματαιωση",
+    "revocation",
+    "cancellation",
+)
+
+DECISION_LIFECYCLE_ROLES = {
+    "Β.1.1": "commitment",
+    "Β.1.3": "payment_order",
+    "Β.2.1": "payment",
+    "Β.2.2": "payment_correction_or_revocation",
+    "Δ.1": "assignment",
+    "Δ.2.1": "notice",
+    "Δ.2.2": "award",
+    "Δ.2.3": "contract",
+    "Δ.2.4": "procurement_revocation",
+}
+
+ADA_REFERENCE_RE = re.compile(r"(?<![0-9A-ZΑ-Ω])([0-9A-ZΑ-Ω]{4,}[-–][0-9A-ZΑ-Ω]{3,})(?![0-9A-ZΑ-Ω])", re.IGNORECASE)
+
 
 def previous_month_bounds(today: date | None = None) -> tuple[date, date]:
     """Return the first and last date of the previous calendar month."""
@@ -1076,21 +1115,131 @@ def title_similarity(left: Any, right: Any) -> float:
     return SequenceMatcher(None, left_text, right_text).ratio()
 
 
-def is_procurement_decision(item: dict[str, Any]) -> bool:
+def text_tokens(value: Any) -> set[str]:
+    return {token for token in canonical_text(value).split() if len(token) >= 4}
+
+
+def decision_lifecycle_role(item: dict[str, Any]) -> str | None:
+    raw_type = normalize_text(item.get("decision_type_raw"))
+    if raw_type in DECISION_LIFECYCLE_ROLES:
+        return DECISION_LIFECYCLE_ROLES[raw_type]
+
+    text = canonical_text(
+        " ".join(
+            str(part)
+            for part in (item.get("title"), item.get("subject"), item.get("decision_type"))
+            if part
+        )
+    )
+    if "τιμολογ" in text or "invoice" in text:
+        return "invoice"
+    if "ενταλμα" in text or "πληρωμη" in text or "payment" in text:
+        return "payment"
+    if "δεσμευση" in text or "αναληψη υποχρεωσης" in text or "commitment" in text:
+        return "commitment"
+    if "συμβαση" in text or "contract" in text:
+        return "contract"
+    if "αναθεση" in text or "award" in text:
+        return "assignment"
+    return None
+
+
+def date_distance_days(left: Any, right: Any) -> int | None:
+    try:
+        if not left or not right:
+            return None
+        return abs((datetime.strptime(str(left), "%Y-%m-%d").date() - datetime.strptime(str(right), "%Y-%m-%d").date()).days)
+    except ValueError:
+        return None
+
+
+def subject_overlap(left: Any, right: Any) -> float:
+    left_tokens = text_tokens(left)
+    right_tokens = text_tokens(right)
+    if not left_tokens or not right_tokens:
+        return 0.0
+    return len(left_tokens & right_tokens) / len(left_tokens | right_tokens)
+
+
+def extract_referenced_adas(*values: Any) -> list[str]:
+    refs: list[str] = []
+    for value in values:
+        if value in (None, "", []):
+            continue
+        text = str(value).upper().replace("–", "-")
+        for match in ADA_REFERENCE_RE.findall(text):
+            ref = match.replace("–", "-")
+            if ref not in refs:
+                refs.append(ref)
+    return refs
+
+
+def detect_revocation_fields(item: dict[str, Any]) -> None:
     text = canonical_text(
         " ".join(
             str(part)
             for part in (
                 item.get("title"),
-                item.get("category"),
+                item.get("subject"),
                 item.get("decision_type"),
                 item.get("decision_type_raw"),
             )
             if part
         )
     )
+    role = decision_lifecycle_role(item)
+    is_revocation = role in {"procurement_revocation", "payment_correction_or_revocation"} or any(
+        canonical_text(token) in text for token in REVOCATION_TOKENS
+    )
+    refs = extract_referenced_adas(item.get("title"), item.get("subject"), item.get("protocol_number"))
+    self_ada = str(item.get("ada") or "").upper()
+    refs = [ref for ref in refs if ref != self_ada]
+    item["is_revocation"] = bool(is_revocation)
+    item["revokes_ada"] = refs[0] if is_revocation and refs else None
+    item["revoked_by"] = item.get("revoked_by") or None
+
+
+def apply_revocation_links(decisions: list[dict[str, Any]]) -> dict[str, int]:
+    by_ada = {str(item.get("ada") or "").upper(): item for item in decisions if item.get("ada")}
+    revocation_count = 0
+    linked_count = 0
+    for item in decisions:
+        detect_revocation_fields(item)
+        if item.get("is_revocation"):
+            revocation_count += 1
+        target_ada = item.get("revokes_ada")
+        if target_ada and str(target_ada).upper() in by_ada:
+            by_ada[str(target_ada).upper()]["revoked_by"] = item.get("ada")
+            linked_count += 1
+    return {"revocation_decisions": revocation_count, "revocation_links": linked_count}
+
+
+def is_procurement_decision(item: dict[str, Any]) -> bool:
+    text = canonical_text(
+        " ".join(
+            str(part)
+            for part in (
+                item.get("title"),
+                item.get("subject"),
+                item.get("category"),
+                item.get("decision_type"),
+                item.get("decision_type_raw"),
+                item.get("budget_source"),
+            )
+            if part
+        )
+    )
     raw_type = item.get("decision_type_raw")
+    role = decision_lifecycle_role(item)
     if raw_type and str(raw_type).startswith("Δ."):
+        return True
+    if role in {"assignment", "award", "contract", "notice", "invoice", "commitment", "payment_order"}:
+        return True
+    if role == "payment" and (
+        item.get("supplier_key")
+        or any(canonical_text(token) in text for token in PROCUREMENT_SERVICE_TOKENS)
+        or is_recurring_service_decision(item)
+    ):
         return True
     if is_recurring_service_decision(item):
         return True
@@ -1377,6 +1526,9 @@ def apply_detail_enrichment(
     if not isinstance(detail, dict):
         return
 
+    if not item.get("raw_detail"):
+        item["raw_detail"] = detail
+
     amount, source = extract_amount(detail)
     if has_amount(amount) and not has_amount(item.get("amount")):
         item["amount"] = amount
@@ -1471,7 +1623,13 @@ def apply_detail_enrichment(
         item["signer"] = signer
     if unit and not item.get("unit"):
         item["unit"] = unit
+    if signer and not item.get("signer_name"):
+        item["signer_name"] = signer
+    if unit and not item.get("unit_name"):
+        item["unit_name"] = unit
 
+    item["procurement_lifecycle_role"] = decision_lifecycle_role(item)
+    detect_revocation_fields(item)
     apply_supplier_normalization(item)
 
 
@@ -1660,6 +1818,8 @@ def normalize_decision(hit: dict[str, Any]) -> dict[str, Any]:
         "decision_type_label": decision_type,
         "signer": signer,
         "unit": unit,
+        "signer_name": signer,
+        "unit_name": unit,
         "signer_ids": extract_ids(hit, SIGNER_ID_KEYS),
         "unit_ids": extract_ids(hit, UNIT_ID_KEYS),
         "organization_id": organization_id,
@@ -1676,6 +1836,8 @@ def normalize_decision(hit: dict[str, Any]) -> dict[str, Any]:
         ),
         "raw_extra_fields": hit.get("extraFieldValues"),
         "raw_detail_extra_fields": None,
+        "raw_decision": hit,
+        "raw_duplicate_decisions": [],
         "enriched_from_full_record": False,
         "url": decision_url(ada, hit),
         "category": categorize(hit, decision_type_raw, decision_type_label),
@@ -1685,7 +1847,15 @@ def normalize_decision(hit: dict[str, Any]) -> dict[str, Any]:
         "duplicate_flag": False,
         "duplicate_of": None,
         "duplicate_group_size": 1,
+        "procurement_lifecycle_role": None,
+        "canonical_procurement_id": None,
+        "top_procurement_exclusion_reason": None,
+        "is_revocation": False,
+        "revokes_ada": None,
+        "revoked_by": None,
     }
+    normalized["procurement_lifecycle_role"] = decision_lifecycle_role(normalized)
+    detect_revocation_fields(normalized)
     apply_supplier_normalization(normalized)
     return normalized
 
@@ -1729,6 +1899,14 @@ def decision_richness_score(item: dict[str, Any]) -> tuple[int, int, int, int]:
 
 def merge_decision_records(primary: dict[str, Any], duplicate: dict[str, Any]) -> None:
     """Keep one row per ADA while preserving fields found on duplicate hits."""
+    raw_duplicates = primary.setdefault("raw_duplicate_decisions", [])
+    duplicate_raw = duplicate.get("raw_decision")
+    if duplicate_raw not in (None, "", []) and duplicate_raw not in raw_duplicates:
+        raw_duplicates.append(duplicate_raw)
+    for nested_raw in duplicate.get("raw_duplicate_decisions") or []:
+        if nested_raw not in raw_duplicates:
+            raw_duplicates.append(nested_raw)
+
     for key, value in duplicate.items():
         if value in (None, "", []):
             continue
@@ -1827,8 +2005,66 @@ def likely_duplicate(left: dict[str, Any], right: dict[str, Any]) -> bool:
     )
 
 
+def lifecycle_related(left: dict[str, Any], right: dict[str, Any]) -> bool:
+    if not (is_procurement_decision(left) and is_procurement_decision(right)):
+        return False
+
+    left_supplier = supplier_group_key(left)
+    right_supplier = supplier_group_key(right)
+    if left_supplier and right_supplier and left_supplier != right_supplier:
+        return False
+
+    days = date_distance_days(left.get("decision_date"), right.get("decision_date"))
+    if days is None or days > 90:
+        return False
+
+    same_amount = (
+        has_amount(left.get("amount"))
+        and has_amount(right.get("amount"))
+        and amount_bucket(left.get("amount")) == amount_bucket(right.get("amount"))
+    )
+    similarity = title_similarity(left.get("title"), right.get("title"))
+    overlap = subject_overlap(left.get("title"), right.get("title"))
+    left_role = decision_lifecycle_role(left)
+    right_role = decision_lifecycle_role(right)
+    complementary_roles = bool(left_role and right_role and left_role != right_role)
+
+    if same_amount and (similarity >= 0.35 or overlap >= 0.18 or complementary_roles):
+        return True
+    if left_supplier and right_supplier and complementary_roles and days <= 45 and (
+        similarity >= 0.25 or overlap >= 0.12
+    ):
+        return True
+    return False
+
+
+def procurement_canonical_basis(group_items: list[dict[str, Any]]) -> dict[str, Any]:
+    role_priority = {
+        "contract": 0,
+        "award": 1,
+        "assignment": 2,
+        "notice": 3,
+        "commitment": 4,
+        "invoice": 5,
+        "payment_order": 6,
+        "payment": 7,
+        "payment_correction_or_revocation": 8,
+        "procurement_revocation": 9,
+    }
+    return sorted(
+        group_items,
+        key=lambda item: (
+            role_priority.get(str(item.get("procurement_lifecycle_role") or ""), 99),
+            str(item.get("decision_date") or ""),
+            amount_bucket(item.get("amount")),
+            compact_text(item.get("title")),
+            str(item.get("ada") or ""),
+        ),
+    )[0]
+
+
 def assign_procurement_groups(decisions: list[dict[str, Any]]) -> dict[str, Any]:
-    """Mark probable republications/duplicates and assign stable event ids."""
+    """Link procurement lifecycle rows and mark probable republications/duplicates."""
     parent = list(range(len(decisions)))
 
     def find(index: int) -> int:
@@ -1843,21 +2079,42 @@ def assign_procurement_groups(decisions: list[dict[str, Any]]) -> dict[str, Any]
         if left_root != right_root:
             parent[right_root] = left_root
 
-    buckets: dict[tuple[str, str], list[int]] = {}
+    for item in decisions:
+        apply_supplier_normalization(item)
+        item["procurement_lifecycle_role"] = decision_lifecycle_role(item)
+        item["procurement_flag"] = is_procurement_decision(item)
+        item.setdefault("canonical_procurement_id", None)
+        item.setdefault("top_procurement_exclusion_reason", None)
+        detect_revocation_fields(item)
+
+    duplicate_buckets: dict[tuple[str, str], list[int]] = {}
+    lifecycle_buckets: dict[str, list[int]] = {}
     for index, item in enumerate(decisions):
-        if not is_procurement_decision(item):
+        if not item.get("procurement_flag"):
             continue
-        key = (str(item.get("decision_date") or ""), amount_bucket(item.get("amount")))
-        if key[0] and key[1] != "noamount":
-            buckets.setdefault(key, []).append(index)
+        duplicate_key = (str(item.get("decision_date") or ""), amount_bucket(item.get("amount")))
+        if duplicate_key[0] and duplicate_key[1] != "noamount":
+            duplicate_buckets.setdefault(duplicate_key, []).append(index)
+
+        supplier = supplier_group_key(item) or "unknown-supplier"
+        month = str(item.get("decision_date") or "")[:7]
+        lifecycle_buckets.setdefault(f"{supplier}|{month}", []).append(index)
 
     duplicate_pair_count = 0
-    for indexes in buckets.values():
+    for indexes in duplicate_buckets.values():
         for offset, left_index in enumerate(indexes):
             for right_index in indexes[offset + 1 :]:
                 if likely_duplicate(decisions[left_index], decisions[right_index]):
                     union(left_index, right_index)
                     duplicate_pair_count += 1
+
+    lifecycle_pair_count = 0
+    for indexes in lifecycle_buckets.values():
+        for offset, left_index in enumerate(indexes):
+            for right_index in indexes[offset + 1 :]:
+                if lifecycle_related(decisions[left_index], decisions[right_index]):
+                    union(left_index, right_index)
+                    lifecycle_pair_count += 1
 
     groups: dict[int, list[int]] = {}
     for index in range(len(decisions)):
@@ -1865,22 +2122,28 @@ def assign_procurement_groups(decisions: list[dict[str, Any]]) -> dict[str, Any]
 
     duplicate_groups = 0
     duplicate_rows = 0
+    lifecycle_groups = 0
     for indexes in groups.values():
         group_items = [decisions[index] for index in indexes]
-        procurement_group = any(is_procurement_decision(item) for item in group_items)
-        canonical_basis = sorted(
-            group_items,
-            key=lambda item: (
-                str(item.get("decision_date") or ""),
-                amount_bucket(item.get("amount")),
-                compact_text(item.get("title")),
-                str(item.get("ada") or ""),
-            ),
-        )[0]
+        procurement_group = any(item.get("procurement_flag") for item in group_items)
+        canonical_basis = (
+            procurement_canonical_basis(group_items)
+            if procurement_group
+            else sorted(
+                group_items,
+                key=lambda item: (
+                    str(item.get("decision_date") or ""),
+                    amount_bucket(item.get("amount")),
+                    compact_text(item.get("title")),
+                    str(item.get("ada") or ""),
+                ),
+            )[0]
+        )
         canonical_id = stable_id(
             LAMIA_ORG_UID,
             canonical_basis.get("decision_date"),
             amount_bucket(canonical_basis.get("amount")),
+            supplier_group_key(canonical_basis),
             compact_text(canonical_basis.get("title")),
             prefix="lamia-procurement" if procurement_group else "lamia-decision",
         )
@@ -1888,28 +2151,36 @@ def assign_procurement_groups(decisions: list[dict[str, Any]]) -> dict[str, Any]
 
         for item in group_items:
             item["canonical_id"] = canonical_id
+            item["canonical_procurement_id"] = canonical_id if procurement_group else None
             item["duplicate_group_size"] = len(group_items)
             item["duplicate_flag"] = (
-                len(group_items) > 1 and item is not canonical_basis
+                len(group_items) > 1 and likely_duplicate(item, canonical_basis) and item is not canonical_basis
             )
             item["duplicate_of"] = canonical_ada if item["duplicate_flag"] else None
             item["procurement_flag"] = procurement_group
 
-        if len(group_items) > 1:
+        if len(group_items) > 1 and any(item.get("duplicate_flag") for item in group_items):
             duplicate_groups += 1
-            duplicate_rows += len(group_items) - 1
+            duplicate_rows += sum(1 for item in group_items if item.get("duplicate_flag"))
+        if procurement_group and len(group_items) > 1:
+            lifecycle_groups += 1
+
+    revocation_summary = apply_revocation_links(decisions)
 
     return {
         "duplicate_pair_matches": duplicate_pair_count,
+        "lifecycle_pair_matches": lifecycle_pair_count,
         "duplicate_groups": duplicate_groups,
         "duplicate_rows": duplicate_rows,
+        "procurement_lifecycle_groups": lifecycle_groups,
         "procurement_events": len(
             {
-                item.get("canonical_id")
+                item.get("canonical_procurement_id")
                 for item in decisions
-                if item.get("procurement_flag")
+                if item.get("procurement_flag") and item.get("canonical_procurement_id")
             }
         ),
+        **revocation_summary,
     }
 
 
@@ -2016,32 +2287,54 @@ def build_top_suppliers(
     return by_amount, by_count
 
 
+def top_procurement_exclusion_reason(item: dict[str, Any]) -> str | None:
+    if not is_procurement_decision(item):
+        return "not_procurement_lifecycle"
+    if not has_amount(item.get("amount")):
+        return "missing_amount"
+    if item.get("is_revocation"):
+        return "revocation_decision"
+    return None
+
+
 def build_top_procurements(
     decisions: list[dict[str, Any]], limit: int = TOP_PROCUREMENTS_LIMIT
 ) -> list[dict[str, Any]]:
     grouped: dict[str, list[dict[str, Any]]] = {}
     for item in decisions:
-        if is_procurement_decision(item) and has_amount(item.get("amount")):
-            grouped.setdefault(str(item.get("canonical_id")), []).append(item)
+        reason = top_procurement_exclusion_reason(item)
+        item["top_procurement_exclusion_reason"] = reason
+        if reason is None:
+            canonical_id = item.get("canonical_procurement_id") or item.get("canonical_id")
+            grouped.setdefault(str(canonical_id), []).append(item)
 
     summaries: list[dict[str, Any]] = []
     for canonical_id, items in grouped.items():
         primary = sorted(
             items,
             key=lambda item: (
+                -float(item.get("amount") or 0),
                 bool(item.get("duplicate_flag")),
                 str(item.get("decision_date") or ""),
                 str(item.get("ada") or ""),
             ),
         )[0]
+        amount_items = [item for item in items if has_amount(item.get("amount"))]
+        lifecycle_roles = sorted(
+            {str(item.get("procurement_lifecycle_role")) for item in items if item.get("procurement_lifecycle_role")}
+        )
         summaries.append(
             {
                 "canonical_id": canonical_id,
+                "canonical_procurement_id": canonical_id,
                 "decision_date": primary.get("decision_date"),
                 "ada": primary.get("ada"),
                 "title": primary.get("title"),
                 "amount": primary.get("amount"),
                 "decision_type": primary.get("decision_type"),
+                "decision_type_raw": primary.get("decision_type_raw"),
+                "procurement_lifecycle_role": primary.get("procurement_lifecycle_role"),
+                "lifecycle_roles": lifecycle_roles,
                 "budget_source": primary.get("budget_source"),
                 "supplier_name": primary.get("supplier_name"),
                 "supplier_name_raw": primary.get("supplier_name_raw"),
@@ -2052,19 +2345,30 @@ def build_top_procurements(
                 "supplier_key": primary.get("supplier_key"),
                 "supplier_tax_id": primary.get("supplier_tax_id"),
                 "url": primary.get("url"),
-                "tags": procurement_tags(primary),
-                "duplicate_count": max(0, len(items) - 1),
+                "tags": sorted({tag for item in items for tag in procurement_tags(item)}),
+                "duplicate_count": max(0, sum(1 for item in items if item.get("duplicate_flag"))),
+                "lifecycle_decision_count": len(items),
+                "amount_decision_count": len(amount_items),
+                "related_adas": [item.get("ada") for item in items if item.get("ada")],
+                "exclusion_reason": None,
             }
         )
 
-    return sorted(
+    ranked = sorted(
         summaries,
         key=lambda item: (
             float(item.get("amount") or 0),
             str(item.get("decision_date") or ""),
         ),
         reverse=True,
-    )[:limit]
+    )
+    included_ids = {item["canonical_id"] for item in ranked[:limit]}
+    for item in decisions:
+        if item.get("top_procurement_exclusion_reason") is None:
+            canonical_id = str(item.get("canonical_procurement_id") or item.get("canonical_id"))
+            if canonical_id not in included_ids:
+                item["top_procurement_exclusion_reason"] = f"outside_top_{limit}"
+    return ranked[:limit]
 
 
 def write_json(path: Path, payload: dict[str, Any]) -> None:
