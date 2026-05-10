@@ -214,6 +214,7 @@ def fetch_export(
     query: str, limit: int, page_size: int, timeout: int
 ) -> list[dict[str, Any]]:
     decisions: list[dict[str, Any]] = []
+    seen_adas: set[str] = set()
     page = 0
     remaining = limit
 
@@ -232,7 +233,20 @@ def fetch_export(
             batch = extract_decisions(response.json())
             if not batch:
                 break
-            decisions.extend(batch[:remaining])
+
+            new_rows: list[dict[str, Any]] = []
+            for item in batch:
+                ada = normalize_text(first_present(item, ("ada", "ADA")))
+                if ada:
+                    if ada in seen_adas:
+                        continue
+                    seen_adas.add(ada)
+                new_rows.append(item)
+
+            if not new_rows:
+                break
+
+            decisions.extend(new_rows[:remaining])
             remaining = limit - len(decisions)
             if len(batch) < size:
                 break
@@ -969,6 +983,32 @@ def missing_required_fields(item: dict[str, Any]) -> list[str]:
     return [field for field in REQUIRED_DECISION_FIELDS if not item.get(field)]
 
 
+def decision_richness_score(item: dict[str, Any]) -> tuple[int, int, int, int]:
+    """Rank duplicate ADA rows so the most complete row becomes canonical."""
+    priority_fields = (
+        "subject",
+        "title",
+        "issue_date",
+        "decision_date",
+        "decision_type",
+        "decision_type_raw",
+        "protocol_number",
+        "amount",
+        "budget_source",
+        "signer",
+        "unit",
+        "organization_id",
+        "url",
+    )
+    priority_count = sum(
+        1 for field in priority_fields if item.get(field) not in (None, "", [])
+    )
+    populated_count = sum(1 for value in item.values() if value not in (None, "", []))
+    list_items = sum(len(value) for value in item.values() if isinstance(value, list))
+    enriched = 1 if item.get("enriched_from_full_record") else 0
+    return priority_count, populated_count, list_items, enriched
+
+
 def merge_decision_records(primary: dict[str, Any], duplicate: dict[str, Any]) -> None:
     """Keep one row per ADA while preserving fields found on duplicate hits."""
     for key, value in duplicate.items():
@@ -990,7 +1030,7 @@ def merge_decision_records(primary: dict[str, Any], duplicate: dict[str, Any]) -
 def deduplicate_decisions_by_ada(
     decisions: list[dict[str, Any]],
 ) -> tuple[list[dict[str, Any]], dict[str, int]]:
-    """Return normalized decisions with exact ADA duplicates collapsed."""
+    """Return decisions with exact ADA duplicates collapsed to the richest row."""
     unique: list[dict[str, Any]] = []
     seen: dict[str, dict[str, Any]] = {}
     duplicate_rows = 0
@@ -1008,8 +1048,14 @@ def deduplicate_decisions_by_ada(
             seen[ada] = item
             unique.append(item)
             continue
+
         duplicate_rows += 1
-        merge_decision_records(existing, item)
+        if decision_richness_score(item) > decision_richness_score(existing):
+            merge_decision_records(item, existing)
+            seen[ada] = item
+            unique[unique.index(existing)] = item
+        else:
+            merge_decision_records(existing, item)
 
     return unique, {
         "input_rows": len(decisions),
@@ -1229,6 +1275,7 @@ def write_markdown(path: Path, payload: dict[str, Any]) -> None:
                 "",
                 f"- Empty subjects before detail enrichment: {enrichment_summary.get('subjects_missing_before_enrichment', '—')}",
                 f"- Empty subjects after detail enrichment: {enrichment_summary.get('subjects_missing_after_enrichment', '—')}",
+                f"- Exact duplicate ADA rows removed: {duplicate_summary.get('duplicate_ada_rows_removed', '—')}",
                 f"- Likely duplicate/republication groups: {duplicate_summary.get('duplicate_groups', '—')}",
                 f"- Duplicate rows flagged: {duplicate_summary.get('duplicate_rows', '—')}",
                 "",
@@ -1417,13 +1464,13 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     normalized_decisions = [normalize_decision(item) for item in raw_decisions]
-    decisions, ada_dedup_summary = deduplicate_decisions_by_ada(normalized_decisions)
     enrichment_summary = enrich_missing_amounts(
-        decisions,
+        normalized_decisions,
         enabled=args.enrich_details,
         timeout=args.detail_timeout,
         max_fetches=args.max_detail_fetches,
     )
+    decisions, ada_dedup_summary = deduplicate_decisions_by_ada(normalized_decisions)
     decisions, malformed_decisions = split_malformed_decisions(decisions)
     assert_unique_adas(decisions)
     duplicate_summary = assign_procurement_groups(decisions)

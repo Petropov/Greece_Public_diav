@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch
 
 from src.lamia_digest import (
     apply_detail_enrichment,
@@ -8,6 +9,7 @@ from src.lamia_digest import (
     deduplicate_decisions_by_ada,
     extract_amount,
     extract_budget_source,
+    fetch_export,
     format_amount,
     has_amount,
     normalize_amount,
@@ -16,6 +18,35 @@ from src.lamia_digest import (
     write_json,
     write_markdown,
 )
+
+
+class FakeExportResponse:
+    def __init__(self, decisions):
+        self._decisions = decisions
+
+    def raise_for_status(self):
+        return None
+
+    def json(self):
+        return {"decisions": self._decisions}
+
+
+class FakeExportSession:
+    pages = []
+    requested_pages = []
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        return None
+
+    def get(self, url, params, timeout):
+        self.requested_pages.append(params["page"])
+        page = params["page"]
+        if page < len(self.pages):
+            return FakeExportResponse(self.pages[page])
+        return FakeExportResponse([])
 
 
 class DummySession:
@@ -190,7 +221,7 @@ class LamiaDigestSemanticQualityTests(unittest.TestCase):
         self.assertEqual(item["title_source"], "full_record:subject")
         self.assertFalse(item["missing_subject"])
 
-    def test_deduplicates_by_ada_before_final_json(self):
+    def test_deduplicates_by_ada_for_final_json(self):
         decisions = [
             normalize_decision(
                 {
@@ -225,6 +256,52 @@ class LamiaDigestSemanticQualityTests(unittest.TestCase):
         self.assertEqual(summary["duplicate_ada_rows_removed"], 1)
         self.assertEqual(unique[0]["protocol_number"], "42")
         assert_unique_adas(unique)
+
+    def test_deduplication_keeps_richest_duplicate_row_after_enrichment(self):
+        sparse = normalize_decision(
+            {
+                "ada": "DUP-RICH",
+                "issueDate": "2026-04-01",
+                "decisionTypeUid": "Δ.1",
+            }
+        )
+        rich = normalize_decision(
+            {
+                "ada": "DUP-RICH",
+                "subject": "Enriched subject",
+                "issueDate": "2026-04-01",
+                "decisionTypeUid": "Δ.1",
+                "protocolNumber": "99/2026",
+                "amountWithVAT": "123,45",
+            }
+        )
+        rich["signer"] = "Final Signer"
+        rich["unit"] = "Finance Unit"
+        rich["enriched_from_full_record"] = True
+
+        unique, summary = deduplicate_decisions_by_ada([sparse, rich])
+
+        self.assertEqual(len(unique), 1)
+        self.assertEqual(summary["duplicate_ada_rows_removed"], 1)
+        self.assertEqual(unique[0]["title"], "Enriched subject")
+        self.assertEqual(unique[0]["amount"], 123.45)
+        self.assertEqual(unique[0]["signer"], "Final Signer")
+        self.assertTrue(unique[0]["enriched_from_full_record"])
+        assert_unique_adas(unique)
+
+    def test_fetch_export_does_not_append_repeated_pages(self):
+        FakeExportSession.pages = [
+            [{"ada": "ADA1"}, {"ada": "ADA2"}],
+            [{"ada": "ADA1"}, {"ada": "ADA2"}],
+            [{"ada": "ADA3"}],
+        ]
+        FakeExportSession.requested_pages = []
+
+        with patch("src.lamia_digest.requests.Session", FakeExportSession):
+            decisions = fetch_export("q", limit=10, page_size=2, timeout=1)
+
+        self.assertEqual([item["ada"] for item in decisions], ["ADA1", "ADA2"])
+        self.assertEqual(FakeExportSession.requested_pages, [0, 1])
 
     def test_write_json_asserts_duplicate_ada_entries(self):
         from tempfile import TemporaryDirectory
