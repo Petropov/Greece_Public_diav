@@ -31,7 +31,7 @@ jobs:
           python -m pip install -r requirements.txt
 
       - name: Sanity check (syntax/indent)
-        run: python -m compileall -q .
+        run: git ls-files '*.py' | xargs python -m py_compile
 
       - name: Build digest (overall)
         run: python digest_monthly.py
