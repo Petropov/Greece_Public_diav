@@ -567,16 +567,34 @@ def is_generic_tax_id_key(value: Any) -> bool:
 
 
 def normalize_tax_id(value: Any) -> str | None:
+    """Normalize a Greek supplier VAT/tax id to its 9-digit AFM form.
+
+    Greek VAT identifiers are represented as a 9-digit AFM, sometimes prefixed
+    with the country code ``EL``.  Do not keep malformed tokens such as a bare
+    country code as supplier tax ids, because that would incorrectly group
+    unrelated suppliers under ``tax:EL``.
+    """
     text = normalize_text(value)
     if not text:
         return None
-    compact = re.sub(r"[^0-9A-Za-zΑ-Ωα-ω]", "", text)
-    digits = re.sub(r"\D", "", compact)
-    if len(digits) == 9:
-        return digits
-    if digits and 7 <= len(digits) <= 15 and len(digits) >= len(compact) - 2:
-        return digits
-    return compact or None
+
+    compact = re.sub(r"[^0-9A-Za-z]", "", text).upper()
+    if not compact or compact == "EL":
+        return None
+
+    full_match = re.fullmatch(r"(?:EL)?(\d{9})", compact)
+    if full_match:
+        return full_match.group(1)
+
+    el_match = re.search(r"EL(\d{9})(?!\d)", compact)
+    if el_match:
+        return el_match.group(1)
+
+    digit_sequences = re.findall(r"\d+", text)
+    if len(digit_sequences) == 1 and len(digit_sequences[0]) == 9:
+        return digit_sequences[0]
+
+    return None
 
 
 def canonical_supplier_name(value: Any) -> str | None:
@@ -678,18 +696,25 @@ def apply_supplier_normalization(item: dict[str, Any]) -> None:
     normalized_name = canonical_supplier_name(raw_name) or supplier_normalized_name(
         item
     )
+    normalized_tax_id = normalize_tax_id(item.get("supplier_tax_id"))
+    item["supplier_tax_id"] = normalized_tax_id
     item["supplier_name_raw"] = raw_name
     item["supplier_name_normalized"] = normalized_name
     # Backward-compatible alias retained for existing downstream consumers.
     item["supplier_normalized_name"] = normalized_name
     item["supplier_type"] = classify_supplier(
-        raw_name or normalized_name, item.get("supplier_tax_id")
+        raw_name or normalized_name, normalized_tax_id
     )
-    item["supplier_key"] = item.get("supplier_key") or supplier_key(
-        normalized_name or raw_name, item.get("supplier_tax_id")
-    )
+    computed_key = supplier_key(normalized_name or raw_name, normalized_tax_id)
+    existing_key = item.get("supplier_key")
+    if normalized_tax_id or not (
+        isinstance(existing_key, str) and existing_key.startswith("tax:")
+    ):
+        item["supplier_key"] = existing_key or computed_key
+    else:
+        item["supplier_key"] = computed_key
     item["normalization_confidence"] = item.get("normalization_confidence") or (
-        1.0 if item.get("supplier_tax_id") else 0.9 if normalized_name else 0.0
+        1.0 if normalized_tax_id else 0.9 if normalized_name else 0.0
     )
 
 

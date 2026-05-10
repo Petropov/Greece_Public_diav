@@ -17,6 +17,7 @@ from src.lamia_digest import (
     has_amount,
     normalize_amount,
     normalize_decision,
+    normalize_tax_id,
     canonical_supplier_name,
     split_malformed_decisions,
     write_json,
@@ -201,6 +202,66 @@ class LamiaDigestAmountTests(unittest.TestCase):
         self.assertEqual(generic_nested_in_supplier["supplier_tax_id"], "987654321")
         self.assertEqual(generic_nested_in_supplier["supplier_key"], "tax:987654321")
 
+    def test_supplier_tax_id_rejects_bare_el_country_code(self):
+        self.assertIsNone(normalize_tax_id("EL"))
+        self.assertEqual(normalize_tax_id("EL 123456789"), "123456789")
+
+        decision = normalize_decision(
+            {
+                "ada": "ELONLY",
+                "subject": "Ανάθεση έργου",
+                "issueDate": "2026-04-01",
+                "decisionTypeUid": "Δ.1",
+                "supplierName": "Λ. ΚΙΤΣΟΣ Α.Τ.Ε.",
+                "supplierAFM": "EL",
+            }
+        )
+
+        self.assertIsNone(decision["supplier_tax_id"])
+        self.assertEqual(decision["supplier_name_normalized"], "ΛΟΥΚΑΣ ΚΙΤΣΟΣ")
+        self.assertEqual(decision["supplier_key"], "name:λουκας κιτσος")
+
+    def test_bare_el_tax_id_kitso_rows_collapse_by_normalized_name(self):
+        decisions = [
+            normalize_decision(
+                {
+                    "ada": "KIT-EL-1",
+                    "subject": "Ανάθεση έργου",
+                    "issueDate": "2026-04-01",
+                    "decisionTypeUid": "Δ.1",
+                    "amountWithVAT": "100,00",
+                    "supplierName": "Λ. ΚΙΤΣΟΣ Α.Τ.Ε.",
+                    "supplierAFM": "EL",
+                }
+            ),
+            normalize_decision(
+                {
+                    "ada": "KIT-EL-2",
+                    "subject": "Ανάθεση έργου",
+                    "issueDate": "2026-04-02",
+                    "decisionTypeUid": "Δ.1",
+                    "amountWithVAT": "200,00",
+                    "supplierName": "ΛΟΥΚΑΣ ΚΙΤΣΟΣ",
+                    "supplierAFM": "EL",
+                }
+            ),
+        ]
+
+        by_amount, _ = build_top_suppliers(decisions)
+
+        self.assertEqual(
+            {decision["supplier_tax_id"] for decision in decisions}, {None}
+        )
+        self.assertEqual(
+            {decision["supplier_key"] for decision in decisions},
+            {"name:λουκας κιτσος"},
+        )
+        self.assertEqual(len(by_amount), 1)
+        self.assertEqual(by_amount[0]["supplier_name_normalized"], "ΛΟΥΚΑΣ ΚΙΤΣΟΣ")
+        self.assertEqual(by_amount[0]["supplier_key"], "name:λουκας κιτσος")
+        self.assertEqual(by_amount[0]["decision_count"], 2)
+        self.assertEqual(by_amount[0]["total_amount"], 300.0)
+
     def test_missing_tax_id_supplier_key_collapses_by_normalized_name(self):
         decisions = [
             normalize_decision(
@@ -229,7 +290,9 @@ class LamiaDigestAmountTests(unittest.TestCase):
 
         by_amount, _ = build_top_suppliers(decisions)
 
-        self.assertEqual({decision["supplier_tax_id"] for decision in decisions}, {None})
+        self.assertEqual(
+            {decision["supplier_tax_id"] for decision in decisions}, {None}
+        )
         self.assertEqual(
             {decision["supplier_key"] for decision in decisions},
             {"name:λουκας κιτσος"},
