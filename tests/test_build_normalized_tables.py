@@ -79,6 +79,7 @@ class BuildNormalizedTablesTest(unittest.TestCase):
             self.assertEqual(first["subject"], "Ανάθεση προμήθειας υλικών")
             self.assertEqual(first["url"], "https://example.test/ADA-1.pdf")
             self.assertAlmostEqual(first["amount"], 1234.56)
+            self.assertEqual(first["amount_source"], "detail:amountWithVAT")
             self.assertEqual(first["supplier_name"], "Acme Supplies ΑΕ")
             self.assertEqual(first["supplier_tax_id"], "123456789")
             self.assertEqual(first["signer"], "Maria Signer")
@@ -106,6 +107,142 @@ class BuildNormalizedTablesTest(unittest.TestCase):
             self.assertEqual(summary["decision_count"], 2)
             self.assertAlmostEqual(summary["amount_total"], 1234.56)
             self.assertEqual(summary["supplier_count"], 1)
+            self.assertEqual(summary["amount_known_count"], 1)
+            self.assertEqual(summary["amount_missing_count"], 1)
+            self.assertEqual(summary["supplier_known_count"], 1)
+            self.assertEqual(summary["supplier_missing_count"], 1)
+            self.assertEqual(summary["detail_enriched_decision_count"], 1)
+            self.assertEqual(summary["search_only_decision_count"], 1)
+
+    def test_text_numbers_in_subjects_are_not_parsed_as_amounts(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            raw_root = Path(tmp) / "raw"
+            month_dir = raw_root / "organization_uid=6166" / "year=2026" / "month=01"
+            write_json(
+                month_dir / "search_export.json",
+                {
+                    "decisionResultList": [
+                        {
+                            "ada": "TEXT-NUMBER-1",
+                            "issueDate": "2026-01-03",
+                            "subject": "Έγκριση πρακτικού 784963597095 για προμήθεια υλικών",
+                        }
+                    ]
+                },
+            )
+
+            tables = build_normalized_tables.build_tables(
+                build_normalized_tables.load_decisions(raw_root, "6166")
+            )
+
+            decision = tables["decisions"].iloc[0]
+            self.assertTrue(pd.isna(decision["amount"]))
+            self.assertIsNone(decision["amount_source"])
+            summary = tables["monthly_summary"].iloc[0]
+            self.assertEqual(summary["amount_known_count"], 0)
+            self.assertEqual(summary["amount_missing_count"], 1)
+
+    def test_structured_amount_fields_are_parsed_correctly(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            raw_root = Path(tmp) / "raw"
+            month_dir = raw_root / "organization_uid=6166" / "year=2026" / "month=02"
+            write_json(
+                month_dir / "search_export.json",
+                {
+                    "decisionResultList": [
+                        {
+                            "ada": "STRUCTURED-AMOUNT-1",
+                            "issueDate": "2026-02-03",
+                            "subject": "Προμήθεια με δομημένο ποσό",
+                            "amountWithVAT": "2.345,67",
+                        }
+                    ]
+                },
+            )
+
+            tables = build_normalized_tables.build_tables(
+                build_normalized_tables.load_decisions(raw_root, "6166")
+            )
+
+            decision = tables["decisions"].iloc[0]
+            self.assertAlmostEqual(decision["amount"], 2345.67)
+            self.assertEqual(decision["amount_source"], "search_export:amountWithVAT")
+            self.assertAlmostEqual(tables["monthly_summary"].iloc[0]["amount_total"], 2345.67)
+
+    def test_monthly_summary_coverage_fields_are_populated(self):
+        tables = build_normalized_tables.build_tables(
+            [
+                {
+                    "org": "6166",
+                    "year": 2026,
+                    "month": 3,
+                    "ada": "KNOWN-1",
+                    "issue_date": "2026-03-01",
+                    "decision_type": "Procurement assignment",
+                    "subject": "Προμήθεια",
+                    "url": None,
+                    "amount": 100.0,
+                    "amount_source": "detail:amount",
+                    "supplier_name": "Known Supplier",
+                    "supplier_tax_id": "123456789",
+                    "signer": None,
+                    "unit": None,
+                    "_detail_enriched": True,
+                },
+                {
+                    "org": "6166",
+                    "year": 2026,
+                    "month": 3,
+                    "ada": "MISSING-1",
+                    "issue_date": "2026-03-02",
+                    "decision_type": "Regulatory act",
+                    "subject": "Χωρίς ποσό ή ανάδοχο",
+                    "url": None,
+                    "amount": None,
+                    "amount_source": None,
+                    "supplier_name": None,
+                    "supplier_tax_id": None,
+                    "signer": None,
+                    "unit": None,
+                    "_detail_enriched": False,
+                },
+            ]
+        )
+
+        summary = tables["monthly_summary"].iloc[0]
+        self.assertEqual(summary["amount_known_count"], 1)
+        self.assertEqual(summary["amount_missing_count"], 1)
+        self.assertEqual(summary["supplier_known_count"], 1)
+        self.assertEqual(summary["supplier_missing_count"], 1)
+        self.assertEqual(summary["detail_enriched_decision_count"], 1)
+        self.assertEqual(summary["search_only_decision_count"], 1)
+
+    def test_data_quality_warnings_include_suspicious_totals_missing_suppliers_and_low_coverage(self):
+        tables = {
+            "monthly_summary": pd.DataFrame(
+                [
+                    {
+                        "year": 2026,
+                        "month": 4,
+                        "decision_count": 3,
+                        "amount_total": 10_000_001.0,
+                        "supplier_count": 0,
+                        "amount_known_count": 1,
+                        "amount_missing_count": 2,
+                        "supplier_known_count": 0,
+                        "supplier_missing_count": 3,
+                        "detail_enriched_decision_count": 0,
+                        "search_only_decision_count": 3,
+                    }
+                ]
+            )
+        }
+
+        warnings = build_normalized_tables.data_quality_warnings(tables)
+
+        self.assertTrue(any("suspicious amount_total" in warning for warning in warnings))
+        self.assertTrue(any("supplier_count is 0" in warning for warning in warnings))
+        self.assertTrue(any("low amount coverage" in warning for warning in warnings))
 
     def test_procurement_classification_uses_canonical_tokens(self):
         decision = {
