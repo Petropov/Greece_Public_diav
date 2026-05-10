@@ -2,6 +2,8 @@ import unittest
 
 from src.lamia_digest import (
     apply_detail_enrichment,
+    assign_procurement_groups,
+    build_top_procurements,
     extract_amount,
     extract_budget_source,
     format_amount,
@@ -58,8 +60,12 @@ class LamiaDigestAmountTests(unittest.TestCase):
                     "decision_date": "2026-04-01",
                     "ada": "TEST",
                     "category": "Other",
+                    "decision_type": "Other",
+                    "decision_type_raw": "RAW",
                     "decision_type_label": "Other",
                     "title": "Title",
+                    "canonical_id": "lamia-decision-test",
+                    "duplicate_flag": False,
                     "amount": None,
                     "budget_source": "Πρόγραμμα Δημοσίων Επενδύσεων",
                     "url": "https://example.test",
@@ -74,7 +80,7 @@ class LamiaDigestAmountTests(unittest.TestCase):
             write_markdown(path, payload)
             lines = path.read_text(encoding="utf-8").splitlines()
 
-        self.assertIn("| 2026-04-01 | [TEST](https://example.test) | Other | Other | Title | — | — | Πρόγραμμα Δημοσίων Επενδύσεων | https://example.test |", lines)
+        self.assertIn("| 2026-04-01 | [TEST](https://example.test) | lamia-decision-test | no | Other | Other | RAW | Title | — | — | Πρόγραμμα Δημοσίων Επενδύσεων | https://example.test |", lines)
 
 
 class LamiaDigestSignerUnitTests(unittest.TestCase):
@@ -104,6 +110,83 @@ class LamiaDigestSignerUnitTests(unittest.TestCase):
         self.assertEqual(item["signer_ids"], ["1"])
         self.assertEqual(item["unit_ids"], ["2"])
         self.assertEqual(item["budget_source"], "Τακτικός Προϋπολογισμός")
+
+
+class LamiaDigestSemanticQualityTests(unittest.TestCase):
+    def test_decision_type_raw_and_normalized_are_preserved(self):
+        normalized = normalize_decision(
+            {
+                "ada": "TYPE1",
+                "decisionTypeUid": "Β.2.1",
+                "subject": "Έγκριση δαπάνης",
+                "issueDate": "2026-04-02T10:00:00",
+            }
+        )
+
+        self.assertEqual(normalized["decision_type_raw"], "Β.2.1")
+        self.assertEqual(normalized["decision_type"], "Payment / expenditure approval")
+        self.assertEqual(normalized["title_source"], "subject")
+        self.assertFalse(normalized["missing_subject"])
+
+    def test_full_record_enrichment_fills_empty_subject(self):
+        item = {
+            "amount": None,
+            "signer": None,
+            "unit": None,
+            "signer_ids": [],
+            "unit_ids": [],
+            "organization_id": "6166",
+            "title": None,
+            "missing_subject": True,
+        }
+        detail = {"subject": "Προμήθεια υλικών", "amountWithVAT": {"amount": "50,00"}}
+
+        apply_detail_enrichment(item, detail, DummySession(), 1, {})
+
+        self.assertEqual(item["title"], "Προμήθεια υλικών")
+        self.assertEqual(item["title_source"], "full_record:subject")
+        self.assertFalse(item["missing_subject"])
+
+    def test_duplicate_procurements_share_canonical_id(self):
+        decisions = [
+            normalize_decision(
+                {
+                    "ada": "ADA1",
+                    "decisionTypeUid": "Δ.1",
+                    "subject": "Ανάθεση προμήθειας γραφικής ύλης",
+                    "issueDate": "2026-04-03T09:00:00",
+                    "amountWithVAT": "1.000,00",
+                }
+            ),
+            normalize_decision(
+                {
+                    "ada": "ADA2",
+                    "decisionTypeUid": "Δ.1",
+                    "subject": "ΑΝΑΘΕΣΗ ΠΡΟΜΗΘΕΙΑΣ ΓΡΑΦΙΚΗΣ ΥΛΗΣ",
+                    "issueDate": "2026-04-03T12:00:00",
+                    "amountWithVAT": "1000.00",
+                }
+            ),
+            normalize_decision(
+                {
+                    "ada": "ADA3",
+                    "decisionTypeUid": "Δ.1",
+                    "subject": "Ανάθεση υπηρεσιών καθαρισμού",
+                    "issueDate": "2026-04-04T12:00:00",
+                    "amountWithVAT": "2500.00",
+                }
+            ),
+        ]
+
+        summary = assign_procurement_groups(decisions)
+        top = build_top_procurements(decisions)
+
+        self.assertEqual(summary["duplicate_groups"], 1)
+        self.assertEqual(decisions[0]["canonical_id"], decisions[1]["canonical_id"])
+        self.assertFalse(decisions[0]["duplicate_flag"])
+        self.assertTrue(decisions[1]["duplicate_flag"])
+        self.assertEqual(top[0]["ada"], "ADA3")
+        self.assertEqual(top[1]["duplicate_count"], 1)
 
 
 if __name__ == "__main__":
