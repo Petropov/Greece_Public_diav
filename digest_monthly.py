@@ -4,7 +4,9 @@ import json
 import math
 import os
 import re
-from datetime import date, timedelta
+import time
+from datetime import date, datetime, timezone, timedelta
+from email.utils import parsedate_to_datetime
 from pathlib import Path
 from urllib.parse import quote
 
@@ -94,6 +96,26 @@ def decision_cache_path(cache_dir, org, year, month, ada):
     return cache_month_dir(cache_dir, org, year, month) / "decisions" / f"{safe_ada_filename(ada)}.json"
 
 
+def metadata_path(cache_dir, org, year, month):
+    return cache_month_dir(cache_dir, org, year, month) / "fetch_metadata.json"
+
+
+def incomplete_marker_path(cache_dir, org, year, month):
+    return cache_month_dir(cache_dir, org, year, month) / "INCOMPLETE"
+
+
+def detail_failures_path(cache_dir, org, year, month):
+    return cache_month_dir(cache_dir, org, year, month) / "detail_fetch_failures.json"
+
+
+class DiavgeiaFetchError(Exception):
+    def __init__(self, message, *, rate_limited=False, status_codes=None, api_calls_attempted=0):
+        super().__init__(message)
+        self.rate_limited = rate_limited
+        self.status_codes = status_codes or []
+        self.api_calls_attempted = api_calls_attempted
+
+
 def read_json(path):
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
@@ -105,6 +127,152 @@ def write_json(path, payload):
     with open(tmp, "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)
     tmp.replace(path)
+
+
+def utc_now_iso():
+    return datetime.now(timezone.utc).isoformat()
+
+
+def parse_retry_after(value):
+    if not value:
+        return None
+    try:
+        return max(0.0, float(value))
+    except (TypeError, ValueError):
+        pass
+    try:
+        retry_at = parsedate_to_datetime(value)
+        if retry_at.tzinfo is None:
+            retry_at = retry_at.replace(tzinfo=timezone.utc)
+        return max(0.0, (retry_at - datetime.now(timezone.utc)).total_seconds())
+    except (TypeError, ValueError, AttributeError, IndexError, OverflowError):
+        return None
+
+
+def response_text(response):
+    return str(getattr(response, "text", "") or "")
+
+
+def response_headers(response):
+    return getattr(response, "headers", {}) or {}
+
+
+def is_rate_limit_response(response):
+    status_code = getattr(response, "status_code", 200)
+    if status_code == 429:
+        return True
+    content = response_text(response).lower()
+    try:
+        payload = response.json()
+    except Exception:
+        payload = None
+    error_keys = {"error", "errors", "message", "messages", "status", "reason"}
+    if isinstance(payload, dict):
+        content = " ".join([content] + [str(payload.get(key, "")).lower() for key in error_keys])
+    rate_limit_markers = (
+        "rate limit",
+        "rate-limit",
+        "too many requests",
+        "threshold",
+        "quota",
+        "throttl",
+        "429",
+        "όριο",
+        "πολλά αιτήματα",
+    )
+    has_marker = any(marker in content for marker in rate_limit_markers)
+    if status_code in {403, 408, 425, 500, 502, 503, 504} and has_marker:
+        return True
+    return status_code == 200 and isinstance(payload, dict) and bool(error_keys & payload.keys()) and has_marker
+
+
+def get_json_with_retries(url, *, params=None, timeout=60, max_retries=3, retry_sleep_seconds=5):
+    status_codes = []
+    attempts = 0
+    last_error = None
+    saw_rate_limit = False
+    for retry_index in range(max_retries + 1):
+        attempts += 1
+        response = requests.get(url, params=params, timeout=timeout)
+        status_code = getattr(response, "status_code", 200)
+        status_codes.append(status_code)
+        if is_rate_limit_response(response):
+            saw_rate_limit = True
+            last_error = DiavgeiaFetchError(
+                f"Diavgeia API rate limited request with HTTP {status_code}",
+                rate_limited=True,
+                status_codes=status_codes,
+                api_calls_attempted=attempts,
+            )
+            if retry_index < max_retries:
+                retry_after = parse_retry_after(response_headers(response).get("Retry-After"))
+                sleep_seconds = retry_after if retry_after is not None else retry_sleep_seconds * (2 ** retry_index)
+                time.sleep(sleep_seconds)
+                continue
+            raise last_error
+        try:
+            response.raise_for_status()
+            payload = response.json()
+            return payload, {
+                "api_calls_attempted": attempts,
+                "http_status_codes": status_codes,
+                "api_rate_limited": saw_rate_limit,
+            }
+        except requests.RequestException as exc:
+            last_error = exc
+            if retry_index < max_retries and status_code in {408, 425, 500, 502, 503, 504}:
+                time.sleep(retry_sleep_seconds * (2 ** retry_index))
+                continue
+            raise DiavgeiaFetchError(
+                f"Diavgeia API request failed with HTTP {status_code}",
+                rate_limited=False,
+                status_codes=status_codes,
+                api_calls_attempted=attempts,
+            ) from exc
+        except ValueError as exc:
+            raise DiavgeiaFetchError(
+                "Diavgeia API returned invalid JSON",
+                rate_limited=False,
+                status_codes=status_codes,
+                api_calls_attempted=attempts,
+            ) from exc
+    raise last_error
+
+
+def write_fetch_metadata(cache_dir, org, year, month, metadata):
+    payload = {
+        "org": str(org) if org else None,
+        "year": year,
+        "month": month,
+        "cache_hit": False,
+        "force_refresh": False,
+        "api_calls_attempted": 0,
+        "api_rate_limited": False,
+        "http_status_codes": [],
+        "fetch_status": "failed",
+        "fetched_at": utc_now_iso(),
+    }
+    payload.update(metadata)
+    write_json(metadata_path(cache_dir, org, year, month), payload)
+
+
+def write_incomplete_marker(cache_dir, org, year, month, reason):
+    path = incomplete_marker_path(cache_dir, org, year, month)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(f"{utc_now_iso()} {reason}\n", encoding="utf-8")
+
+
+def clear_incomplete_marker(cache_dir, org, year, month):
+    path = incomplete_marker_path(cache_dir, org, year, month)
+    if path.exists():
+        path.unlink()
+
+
+def append_detail_failure(cache_dir, org, year, month, failure):
+    path = detail_failures_path(cache_dir, org, year, month)
+    failures = read_json(path) if path.exists() else []
+    failures.append(failure)
+    write_json(path, failures)
 
 
 def extract_export_rows(payload):
@@ -124,13 +292,23 @@ def extract_export_rows(payload):
     return []
 
 
-def fetch_export_payload(issue_from, issue_to, org=None, limit=5000):
+def fetch_export_payload(
+    issue_from,
+    issue_to,
+    org=None,
+    limit=5000,
+    *,
+    max_retries=3,
+    retry_sleep_seconds=5,
+    return_stats=False,
+):
     q = []
     if org:
         q.append(f'organizationUid:"{org}"')
     q.append(f"issueDate:[DT({issue_from}T00:00:00) TO DT({issue_to}T23:59:59)]")
     query = " AND ".join(q)
     rows, page, remaining = [], 0, limit
+    stats = {"api_calls_attempted": 0, "api_rate_limited": False, "http_status_codes": []}
     while remaining > 0:
         params = {
             "q": query,
@@ -139,9 +317,25 @@ def fetch_export_payload(issue_from, issue_to, org=None, limit=5000):
             "page": page,
             "size": min(remaining, 500),
         }
-        r = requests.get(BASE, params=params, timeout=60)
-        r.raise_for_status()
-        data = r.json()
+        try:
+            data, request_stats = get_json_with_retries(
+                BASE,
+                params=params,
+                timeout=60,
+                max_retries=max_retries,
+                retry_sleep_seconds=retry_sleep_seconds,
+            )
+        except DiavgeiaFetchError as exc:
+            stats["api_calls_attempted"] += exc.api_calls_attempted
+            stats["http_status_codes"].extend(exc.status_codes)
+            stats["api_rate_limited"] = stats["api_rate_limited"] or exc.rate_limited
+            exc.api_calls_attempted = stats["api_calls_attempted"]
+            exc.status_codes = stats["http_status_codes"]
+            exc.rate_limited = stats["api_rate_limited"]
+            raise
+        stats["api_calls_attempted"] += request_stats["api_calls_attempted"]
+        stats["http_status_codes"].extend(request_stats["http_status_codes"])
+        stats["api_rate_limited"] = stats["api_rate_limited"] or request_stats["api_rate_limited"]
         batch = extract_export_rows(data)
         if not batch:
             break
@@ -150,49 +344,169 @@ def fetch_export_payload(issue_from, issue_to, org=None, limit=5000):
         if len(batch) < params["size"]:
             break
         page += 1
-    return {"decisionResultList": rows}
+    payload = {"decisionResultList": rows}
+    if return_stats:
+        return payload, stats
+    return payload
 
 
-def fetch_export(issue_from, issue_to, org=None, limit=5000):
-    return pd.DataFrame(extract_export_rows(fetch_export_payload(issue_from, issue_to, org, limit)))
+def fetch_export(issue_from, issue_to, org=None, limit=5000, max_retries=3, retry_sleep_seconds=5):
+    return pd.DataFrame(
+        extract_export_rows(
+            fetch_export_payload(
+                issue_from,
+                issue_to,
+                org,
+                limit,
+                max_retries=max_retries,
+                retry_sleep_seconds=retry_sleep_seconds,
+            )
+        )
+    )
 
 
-def fetch_month_export(cache_dir, org, year, month, force_refresh=False, limit=5000):
+def fetch_month_export(
+    cache_dir,
+    org,
+    year,
+    month,
+    force_refresh=False,
+    limit=5000,
+    max_retries=3,
+    retry_sleep_seconds=5,
+):
     path = search_cache_path(cache_dir, org, year, month)
     if path.exists() and not force_refresh:
         payload = read_json(path)
-    else:
-        start, end = month_bounds(year, month)
-        payload = fetch_export_payload(dtfmt(start), dtfmt(end), org, limit=limit)
-        write_json(path, payload)
+        write_fetch_metadata(
+            cache_dir,
+            org,
+            year,
+            month,
+            {
+                "cache_hit": True,
+                "force_refresh": force_refresh,
+                "fetch_status": "cache_hit",
+            },
+        )
+        return pd.DataFrame(extract_export_rows(payload))
+
+    start, end = month_bounds(year, month)
+    try:
+        payload, stats = fetch_export_payload(
+            dtfmt(start),
+            dtfmt(end),
+            org,
+            limit=limit,
+            max_retries=max_retries,
+            retry_sleep_seconds=retry_sleep_seconds,
+            return_stats=True,
+        )
+    except DiavgeiaFetchError as exc:
+        status = "rate_limited" if exc.rate_limited else "failed"
+        write_fetch_metadata(
+            cache_dir,
+            org,
+            year,
+            month,
+            {
+                "cache_hit": path.exists(),
+                "force_refresh": force_refresh,
+                "api_calls_attempted": exc.api_calls_attempted,
+                "api_rate_limited": exc.rate_limited,
+                "http_status_codes": exc.status_codes,
+                "fetch_status": status,
+            },
+        )
+        write_incomplete_marker(cache_dir, org, year, month, status)
+        if path.exists():
+            return pd.DataFrame(extract_export_rows(read_json(path)))
+        return pd.DataFrame()
+
+    write_json(path, payload)
+    clear_incomplete_marker(cache_dir, org, year, month)
+    write_fetch_metadata(
+        cache_dir,
+        org,
+        year,
+        month,
+        {
+            "cache_hit": False,
+            "force_refresh": force_refresh,
+            "api_calls_attempted": stats["api_calls_attempted"],
+            "api_rate_limited": stats["api_rate_limited"],
+            "http_status_codes": stats["http_status_codes"],
+            "fetch_status": "success",
+        },
+    )
     return pd.DataFrame(extract_export_rows(payload))
 
 
-def fetch_period_months(cache_dir, org, start, end, force_refresh=False, limit=5000):
+def fetch_period_months(
+    cache_dir,
+    org,
+    start,
+    end,
+    force_refresh=False,
+    limit=5000,
+    max_retries=3,
+    retry_sleep_seconds=5,
+):
     frames = [
-        fetch_month_export(cache_dir, org, year, month, force_refresh=force_refresh, limit=limit)
+        fetch_month_export(
+            cache_dir,
+            org,
+            year,
+            month,
+            force_refresh=force_refresh,
+            limit=limit,
+            max_retries=max_retries,
+            retry_sleep_seconds=retry_sleep_seconds,
+        )
         for year, month in iter_months(start.year, start.month, end.year, end.month)
     ]
     non_empty = [df for df in frames if not df.empty]
     return pd.concat(non_empty, ignore_index=True) if non_empty else pd.DataFrame()
 
 
-def fetch_decision_detail(ada):
-    r = requests.get(f"{DETAIL_BASE}/{quote(str(ada), safe='')}", timeout=30)
-    r.raise_for_status()
-    return r.json()
+def fetch_decision_detail(ada, max_retries=3, retry_sleep_seconds=5):
+    payload, _stats = get_json_with_retries(
+        f"{DETAIL_BASE}/{quote(str(ada), safe='')}",
+        timeout=30,
+        max_retries=max_retries,
+        retry_sleep_seconds=retry_sleep_seconds,
+    )
+    return payload
 
 
-def fetch_cached_decision_detail(cache_dir, org, year, month, ada, force_refresh=False):
+def fetch_cached_decision_detail(
+    cache_dir,
+    org,
+    year,
+    month,
+    ada,
+    force_refresh=False,
+    max_retries=3,
+    retry_sleep_seconds=5,
+):
     path = decision_cache_path(cache_dir, org, year, month, ada)
     if path.exists() and not force_refresh:
         return read_json(path)
-    payload = fetch_decision_detail(ada)
+    payload = fetch_decision_detail(ada, max_retries=max_retries, retry_sleep_seconds=retry_sleep_seconds)
     write_json(path, payload)
     return payload
 
 
-def enrich_current_month_details(df, cache_dir, org, year, month, force_refresh=False):
+def enrich_current_month_details(
+    df,
+    cache_dir,
+    org,
+    year,
+    month,
+    force_refresh=False,
+    max_retries=3,
+    retry_sleep_seconds=5,
+):
     """Cache raw decision detail responses for each ADA and lightly enrich rows.
 
     The digest keeps using the export rows as its primary source, but this step
@@ -209,7 +523,36 @@ def enrich_current_month_details(df, cache_dir, org, year, month, force_refresh=
         record = row.to_dict()
         ada = record.get("ada")
         if ada:
-            detail = fetch_cached_decision_detail(cache_dir, org, year, month, ada, force_refresh)
+            try:
+                detail = fetch_cached_decision_detail(
+                    cache_dir,
+                    org,
+                    year,
+                    month,
+                    ada,
+                    force_refresh,
+                    max_retries=max_retries,
+                    retry_sleep_seconds=retry_sleep_seconds,
+                )
+            except DiavgeiaFetchError as exc:
+                append_detail_failure(
+                    cache_dir,
+                    org,
+                    year,
+                    month,
+                    {
+                        "ada": str(ada),
+                        "fetch_status": "rate_limited" if exc.rate_limited else "failed",
+                        "api_rate_limited": exc.rate_limited,
+                        "api_calls_attempted": exc.api_calls_attempted,
+                        "http_status_codes": exc.status_codes,
+                        "fetched_at": utc_now_iso(),
+                        "error": str(exc),
+                    },
+                )
+                if exc.rate_limited:
+                    write_incomplete_marker(cache_dir, org, year, month, "detail_rate_limited")
+                detail = None
             if isinstance(detail, dict):
                 for field in detail_fields:
                     if not record.get(field) and detail.get(field):
@@ -364,7 +707,15 @@ def run_monthly_digest(args, year, month):
     fetched = {}
     for label, key, start, end in fetches:
         try:
-            fetched[key] = fetch_period_months(args.cache_dir, args.org, start, end, args.force_refresh)
+            fetched[key] = fetch_period_months(
+                args.cache_dir,
+                args.org,
+                start,
+                end,
+                args.force_refresh,
+                max_retries=args.max_retries,
+                retry_sleep_seconds=args.retry_sleep_seconds,
+            )
         except Exception as e:
             if debug:
                 print(f"[DEBUG] Failed to fetch {label}: {e}")
@@ -373,7 +724,16 @@ def run_monthly_digest(args, year, month):
     cur = fetched["cur"]
     if not cur.empty:
         try:
-            cur = enrich_current_month_details(cur, args.cache_dir, args.org, year, month, args.force_refresh)
+            cur = enrich_current_month_details(
+                cur,
+                args.cache_dir,
+                args.org,
+                year,
+                month,
+                args.force_refresh,
+                max_retries=args.max_retries,
+                retry_sleep_seconds=args.retry_sleep_seconds,
+            )
         except Exception as e:
             if debug:
                 print(f"[DEBUG] Failed to cache/enrich decision details: {e}")
@@ -485,6 +845,8 @@ def build_parser():
     ap.add_argument("--month", type=int)
     ap.add_argument("--cache-dir", default=DEFAULT_CACHE_DIR, help="Raw Diavgeia cache directory")
     ap.add_argument("--force-refresh", action="store_true", help="Ignore cached API responses and refetch")
+    ap.add_argument("--max-retries", type=int, default=3, help="Maximum retries after Diavgeia rate-limit responses")
+    ap.add_argument("--retry-sleep-seconds", type=float, default=5, help="Initial sleep between Diavgeia retries")
     ap.add_argument("--from", dest="from_month", type=parse_month, help="Start month for historical backfill (YYYY-MM)")
     ap.add_argument("--to", dest="to_month", type=parse_month, help="End month for historical backfill (YYYY-MM)")
     return ap

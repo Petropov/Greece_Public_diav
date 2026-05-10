@@ -7,11 +7,15 @@ import digest_monthly
 
 
 class FakeResponse:
-    def __init__(self, payload):
+    def __init__(self, payload, status_code=200, headers=None, text=""):
         self.payload = payload
+        self.status_code = status_code
+        self.headers = headers or {}
+        self.text = text
 
     def raise_for_status(self):
-        pass
+        if self.status_code >= 400:
+            raise digest_monthly.requests.HTTPError(f"HTTP {self.status_code}")
 
     def json(self):
         return self.payload
@@ -58,6 +62,82 @@ class DigestMonthlyCacheTests(unittest.TestCase):
             get.assert_called_once()
             self.assertEqual(df.iloc[0]["ada"], "FRESH")
             self.assertEqual(digest_monthly.read_json(cache_path), payload)
+
+    def test_429_does_not_overwrite_existing_cache(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            cache_path = digest_monthly.search_cache_path(tmp, "6166", 2026, 4)
+            cached = {"decisionResultList": [{"ada": "CACHED"}]}
+            digest_monthly.write_json(cache_path, cached)
+
+            with patch(
+                "digest_monthly.requests.get",
+                return_value=FakeResponse({"error": "too many requests"}, status_code=429),
+            ), patch("digest_monthly.time.sleep"):
+                df = digest_monthly.fetch_month_export(
+                    tmp, "6166", 2026, 4, force_refresh=True, max_retries=1, retry_sleep_seconds=0
+                )
+
+            self.assertEqual(df.iloc[0]["ada"], "CACHED")
+            self.assertEqual(digest_monthly.read_json(cache_path), cached)
+            metadata = digest_monthly.read_json(digest_monthly.metadata_path(tmp, "6166", 2026, 4))
+            self.assertEqual(metadata["fetch_status"], "rate_limited")
+            self.assertTrue(metadata["api_rate_limited"])
+            self.assertTrue(digest_monthly.incomplete_marker_path(tmp, "6166", 2026, 4).exists())
+
+    def test_retry_after_retry_succeeds(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            payload = {"decisionResultList": [{"ada": "AFTER"}]}
+            responses = [
+                FakeResponse({"error": "too many requests"}, status_code=429, headers={"Retry-After": "7"}),
+                FakeResponse(payload),
+            ]
+
+            with patch("digest_monthly.requests.get", side_effect=responses) as get, patch(
+                "digest_monthly.time.sleep"
+            ) as sleep:
+                df = digest_monthly.fetch_month_export(
+                    tmp, "6166", 2026, 4, max_retries=1, retry_sleep_seconds=1
+                )
+
+            self.assertEqual(df.iloc[0]["ada"], "AFTER")
+            self.assertEqual(get.call_count, 2)
+            sleep.assert_called_once_with(7.0)
+            metadata = digest_monthly.read_json(digest_monthly.metadata_path(tmp, "6166", 2026, 4))
+            self.assertEqual(metadata["api_calls_attempted"], 2)
+            self.assertEqual(metadata["http_status_codes"], [429, 200])
+
+    def test_metadata_is_written(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            payload = {"decisionResultList": [{"ada": "META"}]}
+            with patch("digest_monthly.requests.get", return_value=FakeResponse(payload)):
+                digest_monthly.fetch_month_export(tmp, "6166", 2026, 4)
+
+            metadata = digest_monthly.read_json(digest_monthly.metadata_path(tmp, "6166", 2026, 4))
+            self.assertEqual(metadata["org"], "6166")
+            self.assertEqual(metadata["year"], 2026)
+            self.assertEqual(metadata["month"], 4)
+            self.assertFalse(metadata["cache_hit"])
+            self.assertFalse(metadata["force_refresh"])
+            self.assertEqual(metadata["api_calls_attempted"], 1)
+            self.assertFalse(metadata["api_rate_limited"])
+            self.assertEqual(metadata["http_status_codes"], [200])
+            self.assertEqual(metadata["fetch_status"], "success")
+            self.assertIn("fetched_at", metadata)
+
+    def test_incomplete_marker_is_written_on_repeated_rate_limit_failure(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            with patch(
+                "digest_monthly.requests.get",
+                return_value=FakeResponse({"error": "threshold exceeded"}, status_code=429),
+            ), patch("digest_monthly.time.sleep"):
+                df = digest_monthly.fetch_month_export(
+                    tmp, "6166", 2026, 4, max_retries=2, retry_sleep_seconds=0
+                )
+
+            self.assertTrue(df.empty)
+            marker = digest_monthly.incomplete_marker_path(tmp, "6166", 2026, 4)
+            self.assertTrue(marker.exists())
+            self.assertIn("rate_limited", marker.read_text(encoding="utf-8"))
 
     def test_decision_detail_cache_uses_ada_path(self):
         with tempfile.TemporaryDirectory() as tmp:
