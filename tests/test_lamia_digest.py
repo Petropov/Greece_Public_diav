@@ -259,11 +259,81 @@ class LamiaDigestAmountTests(unittest.TestCase):
 
         by_amount, by_count = build_top_suppliers(decisions)
 
+        self.assertEqual(len(by_amount), 1)
+        self.assertEqual(by_amount[0]["supplier_name_normalized"], "ΛΟΥΚΑΣ ΚΙΤΣΟΣ")
         self.assertEqual(by_amount[0]["supplier_normalized_name"], "ΛΟΥΚΑΣ ΚΙΤΣΟΣ")
         self.assertEqual(by_amount[0]["supplier_key"], "name:λουκας κιτσος")
+        self.assertEqual(by_amount[0]["supplier_name_raw"], variants[0])
         self.assertEqual(by_amount[0]["decision_count"], 2)
         self.assertEqual(by_amount[0]["total_amount"], 300.0)
         self.assertEqual(by_count[0]["supplier_type"], "vendor")
+        self.assertEqual(by_count[0]["normalization_confidence"], 0.9)
+
+        for decision in decisions:
+            self.assertEqual(decision["supplier_name_raw"], decision["supplier_name"])
+            self.assertEqual(decision["supplier_name_normalized"], "ΛΟΥΚΑΣ ΚΙΤΣΟΣ")
+            self.assertEqual(decision["supplier_type"], "vendor")
+            self.assertEqual(decision["normalization_confidence"], 0.9)
+
+    def test_markdown_supplier_rankings_use_normalized_supplier_group(self):
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+
+        variants = [
+            "Λ. ΚΙΤΣΟΣ Α.Τ.Ε.",
+            "ΚΑΤΑΣΚΕΥΕΣ ΤΕΧΝΙΚΩΝ ΕΡΓΩΝ ΛΟΥΚΑΣ ΚΙΤΣΟΣ ΑΝΩΝΥΜΗ ΤΕΧΝΙΚΗ ΕΤΑΙΡΕΙΑ",
+        ]
+        decisions = [
+            normalize_decision(
+                {
+                    "ada": "KIT1",
+                    "subject": "Ανάθεση έργου",
+                    "issueDate": "2026-04-01",
+                    "decisionTypeUid": "Δ.1",
+                    "amountWithVAT": "100,00",
+                    "supplierName": variants[0],
+                }
+            ),
+            normalize_decision(
+                {
+                    "ada": "KIT2",
+                    "subject": "Ανάθεση έργου",
+                    "issueDate": "2026-04-02",
+                    "decisionTypeUid": "Δ.1",
+                    "amountWithVAT": "200,00",
+                    "supplierName": variants[1],
+                }
+            ),
+        ]
+        by_amount, by_count = build_top_suppliers(decisions)
+        payload = {
+            "metadata": {
+                "organization_name": "ΔΗΜΟΣ ΛΑΜΙΕΩΝ",
+                "organization_uid": "6166",
+                "organization_slug": "dhmos_lamieon",
+                "date_from": "2026-04-01",
+                "date_to": "2026-04-30",
+                "count": 2,
+                "query": "q",
+            },
+            "top_suppliers_by_amount": by_amount,
+            "top_suppliers_by_count": by_count,
+            "decisions": decisions,
+        }
+
+        with TemporaryDirectory() as tmp:
+            path = Path(tmp) / "digest.md"
+            write_markdown(path, payload)
+            text = path.read_text(encoding="utf-8")
+
+        self.assertIn(
+            "| 1 | ΛΟΥΚΑΣ ΚΙΤΣΟΣ | Λ. ΚΙΤΣΟΣ Α.Τ.Ε. | vendor | name:λουκας κιτσος | — | 300 | 2 | 2 | KIT1, KIT2 |",
+            text,
+        )
+        self.assertNotIn(
+            "| 2 | ΛΟΥΚΑΣ ΚΙΤΣΟΣ",
+            text,
+        )
 
     def test_supplier_classification_and_filtering_public_internal(self):
         self.assertEqual(classify_supplier("Δ.Ο.Υ. ΛΑΜΙΑΣ"), "tax_authority")
