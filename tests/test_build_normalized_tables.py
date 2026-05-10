@@ -142,6 +142,34 @@ class BuildNormalizedTablesTest(unittest.TestCase):
             self.assertEqual(summary["amount_known_count"], 0)
             self.assertEqual(summary["amount_missing_count"], 1)
 
+    def test_nested_subject_numbers_are_not_parsed_as_amounts(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            raw_root = Path(tmp) / "raw"
+            month_dir = raw_root / "organization_uid=6166" / "year=2026" / "month=01"
+            write_json(
+                month_dir / "search_export.json",
+                {
+                    "decisionResultList": [
+                        {
+                            "ada": "NESTED-SUBJECT-NUMBER-1",
+                            "issueDate": "2026-01-04",
+                            "subject": {
+                                "title": "Έγκριση πρακτικού 784963597095",
+                                "amount": "784963597095",
+                            },
+                        }
+                    ]
+                },
+            )
+
+            tables = build_normalized_tables.build_tables(
+                build_normalized_tables.load_decisions(raw_root, "6166")
+            )
+
+            decision = tables["decisions"].iloc[0]
+            self.assertTrue(pd.isna(decision["amount"]))
+            self.assertIsNone(decision["amount_source"])
+
     def test_structured_amount_fields_are_parsed_correctly(self):
         with tempfile.TemporaryDirectory() as tmp:
             raw_root = Path(tmp) / "raw"

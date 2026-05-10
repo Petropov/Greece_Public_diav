@@ -104,6 +104,10 @@ AMOUNT_KEYS = (
     "amountWithVAT",
     "budgetAmount",
 )
+# These fields frequently contain identifiers, dates, budget codes, and other
+# narrative text. Even when their value is a nested object with amount-like
+# child keys, they are not trusted amount containers.
+UNTRUSTED_AMOUNT_TEXT_KEYS = (*SUBJECT_KEYS, *URL_KEYS, *SIGNER_KEYS, *UNIT_KEYS)
 AMOUNT_WARNING_THRESHOLD = 10_000_000
 LOW_AMOUNT_COVERAGE_THRESHOLD = 0.5
 SUPPLIER_NAME_KEYS = (
@@ -387,6 +391,11 @@ def is_amount_label(value: Any) -> bool:
     return any(token in label for token in AMOUNT_LABEL_TOKENS)
 
 
+def is_untrusted_amount_text_key(value: Any) -> bool:
+    label = normalize_label(value)
+    return any(label == normalize_label(key) for key in UNTRUSTED_AMOUNT_TEXT_KEYS)
+
+
 def is_supplier_name_label(value: Any) -> bool:
     label = normalize_label(value)
     return any(normalize_label(token) in label for token in SUPPLIER_NAME_LABEL_TOKENS) and not is_supplier_tax_id_label(value)
@@ -455,6 +464,8 @@ def _extract_structured_amount(source: Any, path: str = "") -> tuple[float | Non
                     return amount, source_name
         for key, value in source.items():
             child_path = f"{path}.{key}" if path else str(key)
+            if is_untrusted_amount_text_key(key):
+                continue
             if key in AMOUNT_KEYS or is_amount_label(key):
                 amount = normalize_amount(value)
                 if amount is not None:
