@@ -6,9 +6,11 @@ from src.lamia_digest import (
     assign_procurement_groups,
     assert_unique_adas,
     build_top_procurements,
+    build_top_suppliers,
     deduplicate_decisions_by_ada,
     extract_amount,
     extract_budget_source,
+    extract_supplier_fields,
     fetch_export,
     format_amount,
     has_amount,
@@ -82,6 +84,52 @@ class LamiaDigestAmountTests(unittest.TestCase):
         self.assertEqual(normalized["amount"], 1234.56)
         self.assertEqual(normalized["budget_source"], "Τακτικός Προϋπολογισμός")
 
+    def test_supplier_extraction_from_extra_field_values(self):
+        hit = {
+            "ada": "SUP1",
+            "subject": "Ανάθεση προμήθειας",
+            "issueDate": "2026-04-01",
+            "decisionTypeUid": "Δ.1",
+            "extraFieldValues": {
+                "sponsorName": "ACME ΕΠΕ",
+                "sponsorAFM": "012345678",
+                "amountWithVAT": {"amount": "1.000,00", "currency": "EUR"},
+            },
+        }
+
+        self.assertEqual(
+            extract_supplier_fields(hit),
+            (
+                "ACME ΕΠΕ",
+                "012345678",
+                "extraFieldValues.sponsorName",
+                "extraFieldValues.sponsorAFM",
+            ),
+        )
+
+        normalized = normalize_decision(hit)
+        self.assertEqual(normalized["supplier_name"], "ACME ΕΠΕ")
+        self.assertEqual(normalized["supplier_tax_id"], "012345678")
+        self.assertEqual(normalized["raw_extra_fields"], hit["extraFieldValues"])
+
+    def test_supplier_extraction_from_labeled_extra_fields(self):
+        detail = {
+            "extraFieldValues": [
+                {"label": "Επωνυμία Αναδόχου", "value": "ΒΗΤΑ ΑΕ"},
+                {"label": "ΑΦΜ Αναδόχου", "value": "099999999"},
+            ]
+        }
+
+        self.assertEqual(
+            extract_supplier_fields(detail),
+            (
+                "ΒΗΤΑ ΑΕ",
+                "099999999",
+                "extraFieldValues.0.value",
+                "extraFieldValues.1.value",
+            ),
+        )
+
     def test_markdown_renders_missing_amount_as_dash(self):
         lines = []
         payload = {
@@ -120,9 +168,55 @@ class LamiaDigestAmountTests(unittest.TestCase):
             lines = path.read_text(encoding="utf-8").splitlines()
 
         self.assertIn(
-            "| 2026-04-01 | [TEST](https://example.test) | lamia-decision-test | no | Other | Other | RAW | Title | — | — | Πρόγραμμα Δημοσίων Επενδύσεων | https://example.test |",
+            "| 2026-04-01 | [TEST](https://example.test) | lamia-decision-test | no | Other | Other | RAW | Title | — | — | — | — | Πρόγραμμα Δημοσίων Επενδύσεων | https://example.test |",
             lines,
         )
+
+    def test_markdown_includes_top_supplier_sections(self):
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+
+        payload = {
+            "metadata": {
+                "organization_name": "ΔΗΜΟΣ ΛΑΜΙΕΩΝ",
+                "organization_uid": "6166",
+                "organization_slug": "dhmos_lamieon",
+                "date_from": "2026-04-01",
+                "date_to": "2026-04-30",
+                "count": 1,
+                "query": "q",
+            },
+            "top_suppliers_by_amount": [
+                {
+                    "supplier_name": "ACME ΕΠΕ",
+                    "supplier_tax_id": "012345678",
+                    "total_amount": 100.0,
+                    "amount_decision_count": 1,
+                    "decision_count": 1,
+                    "adas": ["SUP1"],
+                }
+            ],
+            "top_suppliers_by_count": [
+                {
+                    "supplier_name": "ACME ΕΠΕ",
+                    "supplier_tax_id": "012345678",
+                    "total_amount": 100.0,
+                    "amount_decision_count": 1,
+                    "decision_count": 1,
+                    "adas": ["SUP1"],
+                }
+            ],
+            "decisions": [],
+        }
+
+        with TemporaryDirectory() as tmp:
+            path = Path(tmp) / "digest.md"
+            write_markdown(path, payload)
+            text = path.read_text(encoding="utf-8")
+
+        self.assertIn("## Top Suppliers by Amount", text)
+        self.assertIn("## Top Suppliers by Count", text)
+        self.assertIn("| 1 | ACME ΕΠΕ | 012345678 | 100 | 1 | 1 | SUP1 |", text)
 
 
 class LamiaDigestSignerUnitTests(unittest.TestCase):
@@ -141,7 +235,11 @@ class LamiaDigestSignerUnitTests(unittest.TestCase):
             "unitLabel": "Finance Unit",
             "signerIds": ["1"],
             "unitIds": ["2"],
-            "extraFieldValues": {"budgettype": "Τακτικός Προϋπολογισμός"},
+            "extraFieldValues": {
+                "budgettype": "Τακτικός Προϋπολογισμός",
+                "contractorName": "ΓΑΜΜΑ ΟΕ",
+                "contractorAFM": "123456789",
+            },
         }
 
         apply_detail_enrichment(item, detail, DummySession(), 1, {})
@@ -152,6 +250,9 @@ class LamiaDigestSignerUnitTests(unittest.TestCase):
         self.assertEqual(item["signer_ids"], ["1"])
         self.assertEqual(item["unit_ids"], ["2"])
         self.assertEqual(item["budget_source"], "Τακτικός Προϋπολογισμός")
+        self.assertEqual(item["supplier_name"], "ΓΑΜΜΑ ΟΕ")
+        self.assertEqual(item["supplier_tax_id"], "123456789")
+        self.assertEqual(item["raw_detail_extra_fields"], detail["extraFieldValues"])
 
     def test_detail_enrichment_fills_minimum_final_fields(self):
         item = {
@@ -370,6 +471,54 @@ class LamiaDigestSemanticQualityTests(unittest.TestCase):
         self.assertTrue(decisions[1]["duplicate_flag"])
         self.assertEqual(top[0]["ada"], "ADA3")
         self.assertEqual(top[1]["duplicate_count"], 1)
+
+    def test_top_suppliers_aggregate_by_tax_id_without_duplicate_adas(self):
+        decisions = [
+            normalize_decision(
+                {
+                    "ada": "SUP-DUP",
+                    "subject": "Ανάθεση προμήθειας",
+                    "issueDate": "2026-04-01",
+                    "decisionTypeUid": "Δ.1",
+                    "amountWithVAT": "100,00",
+                    "supplierName": "ACME ΕΠΕ",
+                    "supplierAFM": "012345678",
+                }
+            ),
+            normalize_decision(
+                {
+                    "ada": "SUP-DUP",
+                    "subject": "Ανάθεση προμήθειας duplicate",
+                    "issueDate": "2026-04-01",
+                    "decisionTypeUid": "Δ.1",
+                    "amountWithVAT": "100,00",
+                    "supplierName": "ACME ΕΠΕ",
+                    "supplierAFM": "012345678",
+                    "protocolNumber": "77",
+                }
+            ),
+            normalize_decision(
+                {
+                    "ada": "SUP2",
+                    "subject": "Ανάθεση υπηρεσιών",
+                    "issueDate": "2026-04-02",
+                    "decisionTypeUid": "Δ.1",
+                    "amountWithVAT": "250,00",
+                    "supplierName": "ΒΗΤΑ ΑΕ",
+                    "supplierAFM": "099999999",
+                }
+            ),
+        ]
+
+        unique, _ = deduplicate_decisions_by_ada(decisions)
+        assert_unique_adas(unique)
+        by_amount, by_count = build_top_suppliers(unique)
+
+        self.assertEqual([item["ada"] for item in unique], ["SUP-DUP", "SUP2"])
+        self.assertEqual(by_amount[0]["supplier_name"], "ΒΗΤΑ ΑΕ")
+        self.assertEqual(by_amount[0]["total_amount"], 250.0)
+        self.assertEqual(by_count[0]["decision_count"], 1)
+        self.assertEqual(by_count[0]["adas"], ["SUP2"])
 
 
 if __name__ == "__main__":

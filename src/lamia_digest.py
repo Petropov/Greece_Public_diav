@@ -171,6 +171,107 @@ UNIT_KEYS = (
     "organizationUnitLabel",
 )
 
+
+SUPPLIER_NAME_KEYS = (
+    "supplier_name",
+    "supplierName",
+    "supplier",
+    "vendor_name",
+    "vendorName",
+    "vendor",
+    "contractor_name",
+    "contractorName",
+    "contractor",
+    "counterparty_name",
+    "counterpartyName",
+    "counterparty",
+    "beneficiary_name",
+    "beneficiaryName",
+    "beneficiary",
+    "recipient_name",
+    "recipientName",
+    "recipient",
+    "payee_name",
+    "payeeName",
+    "payee",
+    "sponsor_name",
+    "sponsorName",
+    "sponsor",
+    "contractorTitle",
+    "companyName",
+)
+
+SUPPLIER_TAX_ID_KEYS = (
+    "supplier_tax_id",
+    "supplierTaxId",
+    "supplierAfm",
+    "supplierAFM",
+    "vendor_tax_id",
+    "vendorTaxId",
+    "vendorAfm",
+    "vendorAFM",
+    "contractor_tax_id",
+    "contractorTaxId",
+    "contractorAfm",
+    "contractorAFM",
+    "counterparty_tax_id",
+    "counterpartyTaxId",
+    "counterpartyAfm",
+    "counterpartyAFM",
+    "beneficiary_tax_id",
+    "beneficiaryTaxId",
+    "beneficiaryAfm",
+    "beneficiaryAFM",
+    "recipient_tax_id",
+    "recipientTaxId",
+    "payee_tax_id",
+    "payeeTaxId",
+    "sponsor_afm",
+    "sponsorAFM",
+    "sponsorTaxId",
+    "afm",
+    "AFM",
+    "vatNumber",
+    "vatId",
+    "taxId",
+    "taxNumber",
+    "tin",
+)
+
+SUPPLIER_NAME_LABEL_TOKENS = (
+    "supplier",
+    "vendor",
+    "contractor",
+    "counterparty",
+    "beneficiary",
+    "recipient",
+    "payee",
+    "sponsor",
+    "αναδοχος",
+    "αναδοχου",
+    "προμηθευτης",
+    "προμηθευτη",
+    "προμηθευτησ",
+    "αντισυμβαλλομενος",
+    "δικαιουχος",
+    "δικαιουχου",
+    "αποδεκτης",
+    "αποδεκτη",
+    "επωνυμια",
+)
+
+SUPPLIER_TAX_ID_LABEL_TOKENS = (
+    "afm",
+    "αφμ",
+    "taxid",
+    "taxnumber",
+    "vatnumber",
+    "vatid",
+    "tin",
+)
+
+TOP_SUPPLIERS_LIMIT = 10
+
 BUDGET_SOURCE_KEYS = (
     "budgettype",
     "budgetType",
@@ -363,6 +464,159 @@ def normalize_text(value: Any) -> str | None:
         return None
     text = str(value).strip()
     return text or None
+
+
+def is_supplier_tax_id_label(value: Any) -> bool:
+    if value in (None, ""):
+        return False
+    label = normalize_label(value)
+    if "amountwithvat" in label:
+        return False
+    return any(token in label for token in SUPPLIER_TAX_ID_LABEL_TOKENS)
+
+
+def is_supplier_name_label(value: Any) -> bool:
+    if value in (None, ""):
+        return False
+    if is_supplier_tax_id_label(value):
+        return False
+    label = normalize_label(value)
+    return any(normalize_label(token) in label for token in SUPPLIER_NAME_LABEL_TOKENS)
+
+
+def normalize_tax_id(value: Any) -> str | None:
+    text = normalize_text(value)
+    if not text:
+        return None
+    compact = re.sub(r"[^0-9A-Za-zΑ-Ωα-ω]", "", text)
+    digits = re.sub(r"\D", "", compact)
+    if len(digits) == 9:
+        return digits
+    if digits and 7 <= len(digits) <= 15 and len(digits) >= len(compact) - 2:
+        return digits
+    return compact or None
+
+
+def value_text_from_extra(value: Any) -> str | None:
+    if isinstance(value, dict):
+        for key in EXTRA_FIELD_VALUE_KEYS:
+            text = normalize_text(value.get(key))
+            if text:
+                return text
+        return None
+    if isinstance(value, list):
+        texts = [normalize_text(item) for item in value]
+        texts = [text for text in texts if text]
+        return ", ".join(texts) if texts else None
+    return normalize_text(value)
+
+
+def extract_supplier_fields(
+    source: Any, path: tuple[str, ...] = (), supplier_context: bool = False
+) -> tuple[str | None, str | None, str | None, str | None]:
+    """Find supplier/counterparty name and Greek tax id in raw Diavgeia shapes."""
+    supplier_name = None
+    supplier_tax_id = None
+    name_source = None
+    tax_source = None
+
+    def remember_name(value: Any, source_path: tuple[str, ...]) -> None:
+        nonlocal supplier_name, name_source
+        if supplier_name:
+            return
+        text = value_text_from_extra(value)
+        if text:
+            supplier_name = text
+            name_source = ".".join(source_path)
+
+    def remember_tax_id(value: Any, source_path: tuple[str, ...]) -> None:
+        nonlocal supplier_tax_id, tax_source
+        if supplier_tax_id:
+            return
+        if isinstance(value, dict):
+            for key in EXTRA_FIELD_VALUE_KEYS:
+                tax = normalize_tax_id(value.get(key))
+                if tax:
+                    supplier_tax_id = tax
+                    tax_source = ".".join((*source_path, key))
+                    return
+        else:
+            tax = normalize_tax_id(value)
+            if tax:
+                supplier_tax_id = tax
+                tax_source = ".".join(source_path)
+
+    if isinstance(source, dict):
+        labels = [
+            source.get(key)
+            for key in EXTRA_FIELD_LABEL_KEYS
+            if source.get(key) not in (None, "", [])
+        ]
+        if any(is_supplier_tax_id_label(label) for label in labels):
+            for key in EXTRA_FIELD_VALUE_KEYS:
+                remember_tax_id(source.get(key), (*path, key))
+                if supplier_tax_id:
+                    break
+        if any(is_supplier_name_label(label) for label in labels):
+            for key in EXTRA_FIELD_VALUE_KEYS:
+                remember_name(source.get(key), (*path, key))
+                if supplier_name:
+                    break
+
+        current_context = supplier_context or any(
+            is_supplier_name_label(label) for label in labels
+        )
+        for key, value in source.items():
+            key_text = str(key)
+            key_path = (*path, key_text)
+            if key in SUPPLIER_TAX_ID_KEYS or is_supplier_tax_id_label(key_text):
+                remember_tax_id(value, key_path)
+            elif key in SUPPLIER_NAME_KEYS or is_supplier_name_label(key_text):
+                remember_name(value, key_path)
+            elif current_context and normalize_label(key_text) in {
+                "name",
+                "label",
+                "title",
+                "description",
+                "fullname",
+                "επωνυμια",
+                "ονομα",
+            }:
+                remember_name(value, key_path)
+
+            if supplier_name and supplier_tax_id:
+                return supplier_name, supplier_tax_id, name_source, tax_source
+
+        for key, value in source.items():
+            if isinstance(value, (dict, list)):
+                nested_context = current_context or is_supplier_name_label(key)
+                name, tax_id, nested_name_source, nested_tax_source = (
+                    extract_supplier_fields(value, (*path, str(key)), nested_context)
+                )
+                if name and not supplier_name:
+                    supplier_name = name
+                    name_source = nested_name_source
+                if tax_id and not supplier_tax_id:
+                    supplier_tax_id = tax_id
+                    tax_source = nested_tax_source
+                if supplier_name and supplier_tax_id:
+                    break
+
+    elif isinstance(source, list):
+        for index, item in enumerate(source):
+            name, tax_id, nested_name_source, nested_tax_source = (
+                extract_supplier_fields(item, (*path, str(index)), supplier_context)
+            )
+            if name and not supplier_name:
+                supplier_name = name
+                name_source = nested_name_source
+            if tax_id and not supplier_tax_id:
+                supplier_tax_id = tax_id
+                tax_source = nested_tax_source
+            if supplier_name and supplier_tax_id:
+                break
+
+    return supplier_name, supplier_tax_id, name_source, tax_source
 
 
 def first_subject(source: dict[str, Any]) -> tuple[str | None, str | None]:
@@ -736,6 +990,32 @@ def apply_detail_enrichment(
         item["amount"] = amount
         item["amount_source"] = f"full_record:{source}" if source else "full_record"
 
+    raw_extra_fields = detail.get("extraFieldValues")
+    if raw_extra_fields not in (None, "", []) and not item.get(
+        "raw_detail_extra_fields"
+    ):
+        item["raw_detail_extra_fields"] = raw_extra_fields
+        if not item.get("raw_extra_fields"):
+            item["raw_extra_fields"] = raw_extra_fields
+
+    supplier_name, supplier_tax_id, supplier_name_source, supplier_tax_id_source = (
+        extract_supplier_fields(detail)
+    )
+    if supplier_name and not item.get("supplier_name"):
+        item["supplier_name"] = supplier_name
+        item["supplier_name_source"] = (
+            f"full_record:{supplier_name_source}"
+            if supplier_name_source
+            else "full_record"
+        )
+    if supplier_tax_id and not item.get("supplier_tax_id"):
+        item["supplier_tax_id"] = supplier_tax_id
+        item["supplier_tax_id_source"] = (
+            f"full_record:{supplier_tax_id_source}"
+            if supplier_tax_id_source
+            else "full_record"
+        )
+
     budget_source = extract_budget_source(detail)
     if budget_source and not item.get("budget_source"):
         item["budget_source"] = budget_source
@@ -819,6 +1099,11 @@ def enrich_missing_amounts(
         "units_found_before_enrichment": sum(
             1 for item in decisions if item.get("unit")
         ),
+        "suppliers_found_before_enrichment": sum(
+            1
+            for item in decisions
+            if item.get("supplier_name") or item.get("supplier_tax_id")
+        ),
         "subjects_missing_before_enrichment": sum(
             1 for item in decisions if not item.get("title")
         ),
@@ -826,6 +1111,7 @@ def enrich_missing_amounts(
         "amounts_found_after_enrichment": 0,
         "signers_found_after_enrichment": 0,
         "units_found_after_enrichment": 0,
+        "suppliers_found_after_enrichment": 0,
         "subjects_missing_after_enrichment": 0,
         "detail_fetch_failures": 0,
     }
@@ -840,6 +1126,9 @@ def enrich_missing_amounts(
         summary["units_found_after_enrichment"] = summary[
             "units_found_before_enrichment"
         ]
+        summary["suppliers_found_after_enrichment"] = summary[
+            "suppliers_found_before_enrichment"
+        ]
         summary["subjects_missing_after_enrichment"] = summary[
             "subjects_missing_before_enrichment"
         ]
@@ -852,7 +1141,16 @@ def enrich_missing_amounts(
             needs_signer = not item.get("signer")
             needs_unit = not item.get("unit")
             needs_title = not item.get("title")
-            if not (needs_amount or needs_signer or needs_unit or needs_title):
+            needs_supplier = not (
+                item.get("supplier_name") or item.get("supplier_tax_id")
+            )
+            if not (
+                needs_amount
+                or needs_signer
+                or needs_unit
+                or needs_title
+                or needs_supplier
+            ):
                 continue
 
             detail_attempts = (
@@ -889,6 +1187,11 @@ def enrich_missing_amounts(
     )
     summary["units_found_after_enrichment"] = sum(
         1 for item in decisions if item.get("unit")
+    )
+    summary["suppliers_found_after_enrichment"] = sum(
+        1
+        for item in decisions
+        if item.get("supplier_name") or item.get("supplier_tax_id")
     )
     summary["subjects_missing_after_enrichment"] = sum(
         1 for item in decisions if not item.get("title")
@@ -941,6 +1244,9 @@ def normalize_decision(hit: dict[str, Any]) -> dict[str, Any]:
     unit = first_present(hit, UNIT_KEYS)
     amount, amount_source = extract_amount(hit)
     budget_source = extract_budget_source(hit)
+    supplier_name, supplier_tax_id, supplier_name_source, supplier_tax_id_source = (
+        extract_supplier_fields(hit)
+    )
     organization_id = first_present(hit, ORG_ID_KEYS)
     title, title_source = first_subject(hit)
     issue_date = normalize_date(first_present(hit, ISSUE_DATE_KEYS))
@@ -966,6 +1272,16 @@ def normalize_decision(hit: dict[str, Any]) -> dict[str, Any]:
         "amount": amount,
         "amount_source": f"export:{amount_source}" if amount_source else None,
         "budget_source": budget_source,
+        "supplier_name": supplier_name,
+        "supplier_name_source": (
+            f"export:{supplier_name_source}" if supplier_name_source else None
+        ),
+        "supplier_tax_id": supplier_tax_id,
+        "supplier_tax_id_source": (
+            f"export:{supplier_tax_id_source}" if supplier_tax_id_source else None
+        ),
+        "raw_extra_fields": hit.get("extraFieldValues"),
+        "raw_detail_extra_fields": None,
         "enriched_from_full_record": False,
         "url": decision_url(ada, hit),
         "category": categorize(hit, decision_type_raw, decision_type_label),
@@ -995,6 +1311,8 @@ def decision_richness_score(item: dict[str, Any]) -> tuple[int, int, int, int]:
         "protocol_number",
         "amount",
         "budget_source",
+        "supplier_name",
+        "supplier_tax_id",
         "signer",
         "unit",
         "organization_id",
@@ -1194,6 +1512,73 @@ def assign_procurement_groups(decisions: list[dict[str, Any]]) -> dict[str, Any]
     }
 
 
+def supplier_group_key(item: dict[str, Any]) -> str | None:
+    tax_id = normalize_tax_id(item.get("supplier_tax_id"))
+    if tax_id:
+        return f"tax:{tax_id}"
+    name = normalize_text(item.get("supplier_name"))
+    if name:
+        return f"name:{canonical_text(name)}"
+    return None
+
+
+def build_top_suppliers(
+    decisions: list[dict[str, Any]], limit: int = TOP_SUPPLIERS_LIMIT
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    grouped: dict[str, dict[str, Any]] = {}
+    for item in decisions:
+        key = supplier_group_key(item)
+        if not key:
+            continue
+
+        group = grouped.setdefault(
+            key,
+            {
+                "supplier_name": item.get("supplier_name"),
+                "supplier_tax_id": item.get("supplier_tax_id"),
+                "decision_count": 0,
+                "amount_decision_count": 0,
+                "total_amount": 0.0,
+                "adas": [],
+            },
+        )
+        if item.get("supplier_name") and not group.get("supplier_name"):
+            group["supplier_name"] = item.get("supplier_name")
+        if item.get("supplier_tax_id") and not group.get("supplier_tax_id"):
+            group["supplier_tax_id"] = item.get("supplier_tax_id")
+        group["decision_count"] += 1
+        if item.get("ada"):
+            group["adas"].append(item.get("ada"))
+        if has_amount(item.get("amount")):
+            group["total_amount"] += float(item.get("amount"))
+            group["amount_decision_count"] += 1
+
+    summaries = list(grouped.values())
+    for group in summaries:
+        group["total_amount"] = round(group["total_amount"], 2)
+
+    by_amount = sorted(
+        summaries,
+        key=lambda item: (
+            float(item.get("total_amount") or 0),
+            int(item.get("amount_decision_count") or 0),
+            int(item.get("decision_count") or 0),
+            str(item.get("supplier_name") or ""),
+        ),
+        reverse=True,
+    )[:limit]
+    by_count = sorted(
+        summaries,
+        key=lambda item: (
+            int(item.get("decision_count") or 0),
+            float(item.get("total_amount") or 0),
+            str(item.get("supplier_name") or ""),
+        ),
+        reverse=True,
+    )[:limit]
+    return by_amount, by_count
+
+
 def build_top_procurements(
     decisions: list[dict[str, Any]], limit: int = TOP_PROCUREMENTS_LIMIT
 ) -> list[dict[str, Any]]:
@@ -1221,6 +1606,8 @@ def build_top_procurements(
                 "amount": primary.get("amount"),
                 "decision_type": primary.get("decision_type"),
                 "budget_source": primary.get("budget_source"),
+                "supplier_name": primary.get("supplier_name"),
+                "supplier_tax_id": primary.get("supplier_tax_id"),
                 "url": primary.get("url"),
                 "duplicate_count": max(0, len(items) - 1),
             }
@@ -1288,8 +1675,8 @@ def write_markdown(path: Path, payload: dict[str, Any]) -> None:
             [
                 "## Top procurements / contracts",
                 "",
-                "| Rank | Canonical event | Date | ΑΔΑ | Type | Title | Amount | Duplicates | URL |",
-                "| ---: | --- | --- | --- | --- | --- | ---: | ---: | --- |",
+                "| Rank | Canonical event | Date | ΑΔΑ | Type | Title | Supplier | Amount | Duplicates | URL |",
+                "| ---: | --- | --- | --- | --- | --- | --- | ---: | ---: | --- |",
             ]
         )
         for rank, item in enumerate(top_procurements, start=1):
@@ -1306,9 +1693,72 @@ def write_markdown(path: Path, payload: dict[str, Any]) -> None:
                         ada_text,
                         markdown_cell(item.get("decision_type")),
                         markdown_cell(item.get("title")),
+                        markdown_cell(
+                            item.get("supplier_name") or item.get("supplier_tax_id")
+                        ),
                         format_amount(item.get("amount")),
                         str(item.get("duplicate_count", 0)),
                         markdown_cell(url),
+                    ]
+                )
+                + " |"
+            )
+        lines.append("")
+
+    top_suppliers_by_amount = payload.get("top_suppliers_by_amount") or []
+    if top_suppliers_by_amount:
+        lines.extend(
+            [
+                "## Top Suppliers by Amount",
+                "",
+                "| Rank | Supplier | Tax ID | Total amount | Amount-bearing decisions | Decisions | ΑΔΑ samples |",
+                "| ---: | --- | --- | ---: | ---: | ---: | --- |",
+            ]
+        )
+        for rank, item in enumerate(top_suppliers_by_amount, start=1):
+            lines.append(
+                "| "
+                + " | ".join(
+                    [
+                        str(rank),
+                        markdown_cell(item.get("supplier_name")),
+                        markdown_cell(item.get("supplier_tax_id")),
+                        format_amount(item.get("total_amount")),
+                        str(item.get("amount_decision_count", 0)),
+                        str(item.get("decision_count", 0)),
+                        markdown_cell(
+                            ", ".join(str(ada) for ada in item.get("adas", [])[:5])
+                        ),
+                    ]
+                )
+                + " |"
+            )
+        lines.append("")
+
+    top_suppliers_by_count = payload.get("top_suppliers_by_count") or []
+    if top_suppliers_by_count:
+        lines.extend(
+            [
+                "## Top Suppliers by Count",
+                "",
+                "| Rank | Supplier | Tax ID | Decisions | Total amount | Amount-bearing decisions | ΑΔΑ samples |",
+                "| ---: | --- | --- | ---: | ---: | ---: | --- |",
+            ]
+        )
+        for rank, item in enumerate(top_suppliers_by_count, start=1):
+            lines.append(
+                "| "
+                + " | ".join(
+                    [
+                        str(rank),
+                        markdown_cell(item.get("supplier_name")),
+                        markdown_cell(item.get("supplier_tax_id")),
+                        str(item.get("decision_count", 0)),
+                        format_amount(item.get("total_amount")),
+                        str(item.get("amount_decision_count", 0)),
+                        markdown_cell(
+                            ", ".join(str(ada) for ada in item.get("adas", [])[:5])
+                        ),
                     ]
                 )
                 + " |"
@@ -1322,8 +1772,8 @@ def write_markdown(path: Path, payload: dict[str, Any]) -> None:
             [
                 "## Decisions",
                 "",
-                "| Date | ΑΔΑ | Canonical event | Duplicate? | Category | Type | Raw type | Title | Signer / Unit | Amount | Budget source | URL |",
-                "| --- | --- | --- | --- | --- | --- | --- | --- | --- | ---: | --- | --- |",
+                "| Date | ΑΔΑ | Canonical event | Duplicate? | Category | Type | Raw type | Title | Supplier | Tax ID | Signer / Unit | Amount | Budget source | URL |",
+                "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | ---: | --- | --- |",
             ]
         )
         for item in decisions:
@@ -1348,6 +1798,8 @@ def write_markdown(path: Path, payload: dict[str, Any]) -> None:
                         markdown_cell(item.get("decision_type")),
                         markdown_cell(item.get("decision_type_raw")),
                         markdown_cell(item.get("title")),
+                        markdown_cell(item.get("supplier_name")),
+                        markdown_cell(item.get("supplier_tax_id")),
                         markdown_cell(signer_unit),
                         format_amount(item.get("amount")),
                         markdown_cell(item.get("budget_source")),
@@ -1476,6 +1928,7 @@ def main(argv: list[str] | None = None) -> int:
     duplicate_summary = assign_procurement_groups(decisions)
     duplicate_summary.update(ada_dedup_summary)
     top_procurements = build_top_procurements(decisions)
+    top_suppliers_by_amount, top_suppliers_by_count = build_top_suppliers(decisions)
 
     if args.verbose:
         print("Enrichment summary:", file=sys.stderr)
@@ -1500,6 +1953,8 @@ def main(argv: list[str] | None = None) -> int:
             "malformed_decision_count": len(malformed_decisions),
         },
         "top_procurements": top_procurements,
+        "top_suppliers_by_amount": top_suppliers_by_amount,
+        "top_suppliers_by_count": top_suppliers_by_count,
         "decisions": decisions,
     }
 
