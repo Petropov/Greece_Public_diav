@@ -3,19 +3,25 @@ import unittest
 from src.lamia_digest import (
     apply_detail_enrichment,
     assign_procurement_groups,
+    assert_unique_adas,
     build_top_procurements,
+    deduplicate_decisions_by_ada,
     extract_amount,
     extract_budget_source,
     format_amount,
     has_amount,
     normalize_amount,
     normalize_decision,
+    split_malformed_decisions,
+    write_json,
     write_markdown,
 )
 
 
 class DummySession:
-    def get(self, *args, **kwargs):  # pragma: no cover - should not be used in these tests
+    def get(
+        self, *args, **kwargs
+    ):  # pragma: no cover - should not be used in these tests
         raise AssertionError("metadata endpoint should not be called")
 
 
@@ -36,7 +42,9 @@ class LamiaDigestAmountTests(unittest.TestCase):
             },
         }
 
-        self.assertEqual(extract_amount(hit), (1234.56, "extraFieldValues.amountWithVAT.amount"))
+        self.assertEqual(
+            extract_amount(hit), (1234.56, "extraFieldValues.amountWithVAT.amount")
+        )
         self.assertEqual(extract_budget_source(hit), "Τακτικός Προϋπολογισμός")
 
         normalized = normalize_decision(hit)
@@ -80,7 +88,10 @@ class LamiaDigestAmountTests(unittest.TestCase):
             write_markdown(path, payload)
             lines = path.read_text(encoding="utf-8").splitlines()
 
-        self.assertIn("| 2026-04-01 | [TEST](https://example.test) | lamia-decision-test | no | Other | Other | RAW | Title | — | — | Πρόγραμμα Δημοσίων Επενδύσεων | https://example.test |", lines)
+        self.assertIn(
+            "| 2026-04-01 | [TEST](https://example.test) | lamia-decision-test | no | Other | Other | RAW | Title | — | — | Πρόγραμμα Δημοσίων Επενδύσεων | https://example.test |",
+            lines,
+        )
 
 
 class LamiaDigestSignerUnitTests(unittest.TestCase):
@@ -110,6 +121,38 @@ class LamiaDigestSignerUnitTests(unittest.TestCase):
         self.assertEqual(item["signer_ids"], ["1"])
         self.assertEqual(item["unit_ids"], ["2"])
         self.assertEqual(item["budget_source"], "Τακτικός Προϋπολογισμός")
+
+    def test_detail_enrichment_fills_minimum_final_fields(self):
+        item = {
+            "ada": "DETAIL1",
+            "amount": None,
+            "signer": None,
+            "unit": None,
+            "signer_ids": [],
+            "unit_ids": [],
+            "organization_id": "6166",
+            "subject": None,
+            "title": None,
+            "issue_date": None,
+            "decision_date": None,
+            "decision_type": None,
+            "decision_type_raw": None,
+            "missing_subject": True,
+        }
+        detail = {
+            "subject": "Προμήθεια υλικών",
+            "issueDate": "2026-04-05T08:30:00",
+            "decisionTypeUid": "Δ.1",
+            "protocolNumber": "123/2026",
+        }
+
+        apply_detail_enrichment(item, detail, DummySession(), 1, {})
+
+        self.assertEqual(item["subject"], "Προμήθεια υλικών")
+        self.assertEqual(item["issue_date"], "2026-04-05")
+        self.assertEqual(item["decision_date"], "2026-04-05")
+        self.assertEqual(item["decision_type"], "Direct procurement assignment")
+        self.assertEqual(item["protocol_number"], "123/2026")
 
 
 class LamiaDigestSemanticQualityTests(unittest.TestCase):
@@ -146,6 +189,69 @@ class LamiaDigestSemanticQualityTests(unittest.TestCase):
         self.assertEqual(item["title"], "Προμήθεια υλικών")
         self.assertEqual(item["title_source"], "full_record:subject")
         self.assertFalse(item["missing_subject"])
+
+    def test_deduplicates_by_ada_before_final_json(self):
+        decisions = [
+            normalize_decision(
+                {
+                    "ada": "DUP1",
+                    "subject": "Raw subject",
+                    "issueDate": "2026-04-01",
+                    "decisionTypeUid": "Δ.1",
+                }
+            ),
+            normalize_decision(
+                {
+                    "ada": "DUP1",
+                    "subject": "Duplicate subject",
+                    "issueDate": "2026-04-01",
+                    "decisionTypeUid": "Δ.1",
+                    "protocolNumber": "42",
+                }
+            ),
+            normalize_decision(
+                {
+                    "ada": "DUP2",
+                    "subject": "Other",
+                    "issueDate": "2026-04-02",
+                    "decisionTypeUid": "Β.2.1",
+                }
+            ),
+        ]
+
+        unique, summary = deduplicate_decisions_by_ada(decisions)
+
+        self.assertEqual([item["ada"] for item in unique], ["DUP1", "DUP2"])
+        self.assertEqual(summary["duplicate_ada_rows_removed"], 1)
+        self.assertEqual(unique[0]["protocol_number"], "42")
+        assert_unique_adas(unique)
+
+    def test_write_json_asserts_duplicate_ada_entries(self):
+        from tempfile import TemporaryDirectory
+        from pathlib import Path
+
+        payload = {"decisions": [{"ada": "DUP"}, {"ada": "DUP"}]}
+        with TemporaryDirectory() as tmp:
+            with self.assertRaises(AssertionError):
+                write_json(Path(tmp) / "digest.json", payload)
+
+    def test_malformed_decisions_are_split_from_final_rows(self):
+        valid = normalize_decision(
+            {
+                "ada": "OK",
+                "subject": "Subject",
+                "issueDate": "2026-04-01",
+                "decisionTypeUid": "Δ.1",
+            }
+        )
+        missing_subject = normalize_decision(
+            {"ada": "BAD", "issueDate": "2026-04-01", "decisionTypeUid": "Δ.1"}
+        )
+
+        rows, malformed = split_malformed_decisions([valid, missing_subject])
+
+        self.assertEqual([item["ada"] for item in rows], ["OK"])
+        self.assertEqual(malformed[0]["missing_fields"], ["subject"])
 
     def test_duplicate_procurements_share_canonical_id(self):
         decisions = [
