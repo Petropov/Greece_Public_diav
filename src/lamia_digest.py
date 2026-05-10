@@ -229,6 +229,9 @@ SUPPLIER_TAX_ID_KEYS = (
     "sponsor_afm",
     "sponsorAFM",
     "sponsorTaxId",
+)
+
+GENERIC_TAX_ID_KEYS = (
     "afm",
     "AFM",
     "vatNumber",
@@ -510,13 +513,57 @@ def is_supplier_tax_id_label(value: Any) -> bool:
     return any(token in label for token in SUPPLIER_TAX_ID_LABEL_TOKENS)
 
 
+def has_supplier_role_token(value: Any) -> bool:
+    if value in (None, ""):
+        return False
+    label = normalize_label(value)
+    return any(normalize_label(token) in label for token in SUPPLIER_NAME_LABEL_TOKENS)
+
+
 def is_supplier_name_label(value: Any) -> bool:
     if value in (None, ""):
         return False
     if is_supplier_tax_id_label(value):
         return False
+    return has_supplier_role_token(value)
+
+
+def is_org_or_issuer_label(value: Any) -> bool:
+    if value in (None, ""):
+        return False
     label = normalize_label(value)
-    return any(normalize_label(token) in label for token in SUPPLIER_NAME_LABEL_TOKENS)
+    return any(
+        token in label
+        for token in (
+            "organization",
+            "organisation",
+            "issuer",
+            "foreas",
+            "φορεας",
+            "φορεα",
+            "εκδοτης",
+            "εκδοτη",
+            "οργανισμος",
+            "δημοςλαμιεων",
+            "δημουλαμιεων",
+        )
+    )
+
+
+def is_explicit_supplier_tax_id_key(value: Any) -> bool:
+    key = str(value)
+    return key in SUPPLIER_TAX_ID_KEYS or (
+        is_supplier_tax_id_label(key)
+        and has_supplier_role_token(key)
+        and not is_org_or_issuer_label(key)
+    )
+
+
+def is_generic_tax_id_key(value: Any) -> bool:
+    key = str(value)
+    return key in GENERIC_TAX_ID_KEYS or (
+        is_supplier_tax_id_label(key) and not has_supplier_role_token(key)
+    )
 
 
 def normalize_tax_id(value: Any) -> str | None:
@@ -701,7 +748,13 @@ def extract_supplier_fields(
             for key in EXTRA_FIELD_LABEL_KEYS
             if source.get(key) not in (None, "", [])
         ]
-        if any(is_supplier_tax_id_label(label) for label in labels):
+        label_supplier_context = any(has_supplier_role_token(label) for label in labels)
+        if any(
+            is_supplier_tax_id_label(label)
+            and not is_org_or_issuer_label(label)
+            and (supplier_context or label_supplier_context)
+            for label in labels
+        ):
             for key in EXTRA_FIELD_VALUE_KEYS:
                 remember_tax_id(source.get(key), (*path, key))
                 if supplier_tax_id:
@@ -712,13 +765,15 @@ def extract_supplier_fields(
                 if supplier_name:
                     break
 
-        current_context = supplier_context or any(
-            is_supplier_name_label(label) for label in labels
-        )
+        current_context = supplier_context or label_supplier_context
         for key, value in source.items():
             key_text = str(key)
             key_path = (*path, key_text)
-            if key in SUPPLIER_TAX_ID_KEYS or is_supplier_tax_id_label(key_text):
+            if is_org_or_issuer_label(key_text):
+                continue
+            if is_explicit_supplier_tax_id_key(key_text) or (
+                current_context and is_generic_tax_id_key(key_text)
+            ):
                 remember_tax_id(value, key_path)
             elif key in SUPPLIER_NAME_KEYS or is_supplier_name_label(key_text):
                 remember_name(value, key_path)
@@ -738,7 +793,9 @@ def extract_supplier_fields(
 
         for key, value in source.items():
             if isinstance(value, (dict, list)):
-                nested_context = current_context or is_supplier_name_label(key)
+                nested_context = current_context or (
+                    not is_org_or_issuer_label(key) and has_supplier_role_token(key)
+                )
                 name, tax_id, nested_name_source, nested_tax_source = (
                     extract_supplier_fields(value, (*path, str(key)), nested_context)
                 )

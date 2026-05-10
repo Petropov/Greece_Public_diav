@@ -132,6 +132,112 @@ class LamiaDigestAmountTests(unittest.TestCase):
             ),
         )
 
+    def test_supplier_tax_id_ignores_municipality_issuer_vat(self):
+        cases = [
+            ("DOY", "ΔΟΥ-ΛΑΜΙΑΣ"),
+            ("KAT", "ΚΑΤΣΑΡΑΣ ΙΩΑΝΝΗΣ"),
+            ("KIT", "Λ. ΚΙΤΣΟΣ Α.Τ.Ε."),
+            (
+                "SCH",
+                "ΣΧΟΛΙΚΗ ΕΠΙΤΡΟΠΗ ΠΡΩΤΟΒΑΘΜΙΑΣ ΕΚΠΑΙΔΕΥΣΗΣ ΔΗΜΟΥ ΛΑΜΙΕΩΝ",
+            ),
+        ]
+        decisions = [
+            normalize_decision(
+                {
+                    "ada": ada,
+                    "subject": "Πληρωμή",
+                    "issueDate": "2026-04-01",
+                    "decisionTypeUid": "Β.2.1",
+                    "amountWithVAT": "100,00",
+                    "supplierName": supplier,
+                    "extraFieldValues": {
+                        "organizationAfm": "997947640",
+                        "issuerVatNumber": "997947640",
+                    },
+                }
+            )
+            for ada, supplier in cases
+        ]
+
+        for decision in decisions:
+            self.assertIsNone(decision["supplier_tax_id"])
+            self.assertTrue(decision["supplier_key"].startswith("name:"))
+            self.assertNotEqual(decision["supplier_key"], "tax:997947640")
+
+        self.assertEqual(
+            len({decision["supplier_key"] for decision in decisions}), len(decisions)
+        )
+
+    def test_supplier_tax_id_uses_only_explicit_counterparty_tax_id(self):
+        explicit = normalize_decision(
+            {
+                "ada": "EXP",
+                "subject": "Ανάθεση",
+                "issueDate": "2026-04-01",
+                "decisionTypeUid": "Δ.1",
+                "supplierName": "ACME ΕΠΕ",
+                "extraFieldValues": {
+                    "issuerAfm": "997947640",
+                    "contractorAFM": "123456789",
+                },
+            }
+        )
+        generic_nested_in_supplier = normalize_decision(
+            {
+                "ada": "GEN",
+                "subject": "Ανάθεση",
+                "issueDate": "2026-04-01",
+                "decisionTypeUid": "Δ.1",
+                "extraFieldValues": {
+                    "contractor": {"name": "ΒΗΤΑ ΑΕ", "afm": "987654321"},
+                    "organization": {"name": "ΔΗΜΟΣ ΛΑΜΙΕΩΝ", "afm": "997947640"},
+                },
+            }
+        )
+
+        self.assertEqual(explicit["supplier_tax_id"], "123456789")
+        self.assertEqual(explicit["supplier_key"], "tax:123456789")
+        self.assertEqual(generic_nested_in_supplier["supplier_tax_id"], "987654321")
+        self.assertEqual(generic_nested_in_supplier["supplier_key"], "tax:987654321")
+
+    def test_missing_tax_id_supplier_key_collapses_by_normalized_name(self):
+        decisions = [
+            normalize_decision(
+                {
+                    "ada": "KIT1",
+                    "subject": "Ανάθεση έργου",
+                    "issueDate": "2026-04-01",
+                    "decisionTypeUid": "Δ.1",
+                    "amountWithVAT": "100,00",
+                    "supplierName": "Λ. ΚΙΤΣΟΣ Α.Τ.Ε.",
+                    "extraFieldValues": {"issuerAfm": "997947640"},
+                }
+            ),
+            normalize_decision(
+                {
+                    "ada": "KIT2",
+                    "subject": "Ανάθεση έργου",
+                    "issueDate": "2026-04-02",
+                    "decisionTypeUid": "Δ.1",
+                    "amountWithVAT": "200,00",
+                    "supplierName": "ΚΑΤΑΣΚΕΥΕΣ ΤΕΧΝΙΚΩΝ ΕΡΓΩΝ ΛΟΥΚΑΣ ΚΙΤΣΟΣ ΑΝΩΝΥΜΗ ΤΕΧΝΙΚΗ ΕΤΑΙΡΕΙΑ",
+                    "extraFieldValues": {"organizationAfm": "997947640"},
+                }
+            ),
+        ]
+
+        by_amount, _ = build_top_suppliers(decisions)
+
+        self.assertEqual({decision["supplier_tax_id"] for decision in decisions}, {None})
+        self.assertEqual(
+            {decision["supplier_key"] for decision in decisions},
+            {"name:λουκας κιτσος"},
+        )
+        self.assertEqual(len(by_amount), 1)
+        self.assertEqual(by_amount[0]["supplier_key"], "name:λουκας κιτσος")
+        self.assertEqual(by_amount[0]["decision_count"], 2)
+
     def test_markdown_renders_missing_amount_as_dash(self):
         lines = []
         payload = {
