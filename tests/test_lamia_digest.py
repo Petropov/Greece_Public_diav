@@ -7,6 +7,7 @@ from src.lamia_digest import (
     assert_unique_adas,
     build_top_procurements,
     build_top_suppliers,
+    classify_supplier,
     deduplicate_decisions_by_ada,
     extract_amount,
     extract_budget_source,
@@ -16,6 +17,7 @@ from src.lamia_digest import (
     has_amount,
     normalize_amount,
     normalize_decision,
+    canonical_supplier_name,
     split_malformed_decisions,
     write_json,
     write_markdown,
@@ -216,7 +218,95 @@ class LamiaDigestAmountTests(unittest.TestCase):
 
         self.assertIn("## Top Suppliers by Amount", text)
         self.assertIn("## Top Suppliers by Count", text)
-        self.assertIn("| 1 | ACME ΕΠΕ | 012345678 | 100 | 1 | 1 | SUP1 |", text)
+        self.assertIn(
+            "| 1 | ACME | ACME ΕΠΕ | vendor | tax:012345678 | 012345678 | 100 | 1 | 1 | SUP1 |",
+            text,
+        )
+
+    def test_supplier_normalization_groups_legal_name_variants(self):
+        variants = [
+            "Λ. ΚΙΤΣΟΣ Α.Τ.Ε.",
+            "ΚΑΤΑΣΚΕΥΕΣ ΤΕΧΝΙΚΩΝ ΕΡΓΩΝ ΛΟΥΚΑΣ ΚΙΤΣΟΣ ΑΝΩΝΥΜΗ ΤΕΧΝΙΚΗ ΕΤΑΙΡΕΙΑ",
+        ]
+
+        self.assertEqual(
+            [canonical_supplier_name(value) for value in variants],
+            ["ΛΟΥΚΑΣ ΚΙΤΣΟΣ", "ΛΟΥΚΑΣ ΚΙΤΣΟΣ"],
+        )
+
+        decisions = [
+            normalize_decision(
+                {
+                    "ada": "KIT1",
+                    "subject": "Ανάθεση έργου",
+                    "issueDate": "2026-04-01",
+                    "decisionTypeUid": "Δ.1",
+                    "amountWithVAT": "100,00",
+                    "supplierName": variants[0],
+                }
+            ),
+            normalize_decision(
+                {
+                    "ada": "KIT2",
+                    "subject": "Ανάθεση έργου",
+                    "issueDate": "2026-04-02",
+                    "decisionTypeUid": "Δ.1",
+                    "amountWithVAT": "200,00",
+                    "supplierName": variants[1],
+                }
+            ),
+        ]
+
+        by_amount, by_count = build_top_suppliers(decisions)
+
+        self.assertEqual(by_amount[0]["supplier_normalized_name"], "ΛΟΥΚΑΣ ΚΙΤΣΟΣ")
+        self.assertEqual(by_amount[0]["supplier_key"], "name:λουκας κιτσος")
+        self.assertEqual(by_amount[0]["decision_count"], 2)
+        self.assertEqual(by_amount[0]["total_amount"], 300.0)
+        self.assertEqual(by_count[0]["supplier_type"], "vendor")
+
+    def test_supplier_classification_and_filtering_public_internal(self):
+        self.assertEqual(classify_supplier("Δ.Ο.Υ. ΛΑΜΙΑΣ"), "tax_authority")
+        self.assertEqual(classify_supplier("e-ΕΦΚΑ"), "social_security")
+        self.assertEqual(
+            classify_supplier("ΣΧΟΛΙΚΗ ΕΠΙΤΡΟΠΗ ΠΡΩΤΟΒΑΘΜΙΑΣ ΕΚΠΑΙΔΕΥΣΗΣ"),
+            "school_committee",
+        )
+        self.assertEqual(classify_supplier("ΔΗΜΟΣ ΛΑΜΙΕΩΝ"), "municipality_internal")
+        self.assertEqual(
+            classify_supplier("ΠΕΡΙΦΕΡΕΙΑ ΣΤΕΡΕΑΣ ΕΛΛΑΔΑΣ"), "public_authority"
+        )
+
+        decisions = [
+            normalize_decision(
+                {
+                    "ada": "TAX",
+                    "subject": "Πληρωμή φόρου",
+                    "issueDate": "2026-04-01",
+                    "decisionTypeUid": "Β.2.1",
+                    "amountWithVAT": "1000,00",
+                    "supplierName": "Δ.Ο.Υ. ΛΑΜΙΑΣ",
+                }
+            ),
+            normalize_decision(
+                {
+                    "ada": "VEN",
+                    "subject": "Ανάθεση προμήθειας",
+                    "issueDate": "2026-04-02",
+                    "decisionTypeUid": "Δ.1",
+                    "amountWithVAT": "100,00",
+                    "supplierName": "ACME ΕΠΕ",
+                }
+            ),
+        ]
+
+        by_amount, _ = build_top_suppliers(
+            decisions, exclude_supplier_types=("tax_authority",)
+        )
+
+        self.assertEqual(
+            [item["supplier_normalized_name"] for item in by_amount], ["ACME"]
+        )
 
 
 class LamiaDigestSignerUnitTests(unittest.TestCase):
