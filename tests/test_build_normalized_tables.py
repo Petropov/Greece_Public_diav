@@ -5,6 +5,7 @@ import sys
 import tempfile
 from pathlib import Path
 import unittest
+from unittest.mock import patch
 
 import pandas as pd
 
@@ -105,6 +106,90 @@ class BuildNormalizedTablesTest(unittest.TestCase):
             self.assertEqual(summary["decision_count"], 2)
             self.assertAlmostEqual(summary["amount_total"], 1234.56)
             self.assertEqual(summary["supplier_count"], 1)
+
+    def test_write_tables_csv_does_not_require_parquet_engine(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            raw_root = Path(tmp) / "raw"
+            output_root = Path(tmp) / "normalized"
+            month_dir = raw_root / "organization_uid=6166" / "year=2026" / "month=05"
+            write_json(
+                month_dir / "search_export.json",
+                {"decisionResultList": [{"ada": "CSV-1", "issueDate": "2026-05-03", "amount": 10}]},
+            )
+            tables = build_normalized_tables.build_tables(
+                build_normalized_tables.load_decisions(raw_root, "6166")
+            )
+
+            with patch.object(
+                pd.DataFrame, "to_parquet", side_effect=AssertionError("parquet should not be used")
+            ):
+                paths = build_normalized_tables.write_tables(tables, output_root, "6166", "csv")
+
+            self.assertEqual(paths["decisions"], output_root / "org=6166" / "decisions.csv")
+            self.assertTrue((output_root / "org=6166" / "decisions.csv").exists())
+            self.assertTrue((output_root / "org=6166" / "suppliers.csv").exists())
+            self.assertTrue((output_root / "org=6166" / "procurements.csv").exists())
+            self.assertTrue((output_root / "org=6166" / "monthly_summary.csv").exists())
+            decisions_df = pd.read_csv(output_root / "org=6166" / "decisions.csv")
+            self.assertEqual(len(decisions_df), 1)
+            self.assertEqual(decisions_df.iloc[0]["ada"], "CSV-1")
+            self.assertEqual(decisions_df.iloc[0]["amount"], 10)
+
+    def test_cli_writes_csv_org_partition_without_parquet_engine(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            raw_root = Path(tmp) / "raw"
+            output_root = Path(tmp) / "normalized"
+            month_dir = raw_root / "organization_uid=6166" / "year=2026" / "month=05"
+            write_json(
+                month_dir / "search_export.json",
+                {"decisionResultList": [{"ada": "CLI-CSV-1", "issueDate": "2026-05-03", "amount": 10}]},
+            )
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(SCRIPT_PATH),
+                    "--org",
+                    "6166",
+                    "--raw-root",
+                    str(raw_root),
+                    "--output-root",
+                    str(output_root),
+                    "--format",
+                    "csv",
+                ],
+                check=True,
+                text=True,
+                capture_output=True,
+            )
+
+            self.assertIn("Wrote decisions", result.stdout)
+            self.assertTrue((output_root / "org=6166" / "decisions.csv").exists())
+            self.assertFalse((output_root / "org=6166" / "decisions.parquet").exists())
+            self.assertEqual(len(pd.read_csv(output_root / "org=6166" / "decisions.csv")), 1)
+
+    def test_parquet_missing_message_is_clear_without_traceback(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            raw_root = Path(tmp) / "raw"
+            output_root = Path(tmp) / "normalized"
+            argv = [
+                "build_normalized_tables.py",
+                "--org",
+                "6166",
+                "--raw-root",
+                str(raw_root),
+                "--output-root",
+                str(output_root),
+            ]
+            with patch.object(sys, "argv", argv), patch.object(
+                build_normalized_tables, "has_parquet_engine", return_value=False
+            ):
+                with patch("builtins.print") as mocked_print:
+                    exit_code = build_normalized_tables.main()
+
+            self.assertEqual(exit_code, 1)
+            mocked_print.assert_called_once_with(build_normalized_tables.PARQUET_ENGINE_MISSING_MESSAGE)
+            self.assertFalse((output_root / "org=6166").exists())
 
     @unittest.skipUnless(HAS_PARQUET_ENGINE, "pandas parquet engine is not installed")
     def test_cli_writes_expected_org_partition_without_network(self):

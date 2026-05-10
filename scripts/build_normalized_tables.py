@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.util
 import json
 import re
 import unicodedata
@@ -23,6 +24,8 @@ import pandas as pd
 DEFAULT_RAW_ROOT = Path("data/raw/diavgeia")
 DEFAULT_OUTPUT_ROOT = Path("data/normalized")
 DETAIL_URL_TEMPLATE = "https://diavgeia.gov.gr/opendata/decisions/{ada}"
+OUTPUT_FORMATS = ("parquet", "csv")
+PARQUET_ENGINE_MISSING_MESSAGE = "Parquet engine missing. Re-run with --format csv"
 
 DECISION_TYPE_LABELS = {
     "Α.1": "Regulatory act",
@@ -731,33 +734,55 @@ def build_tables(decisions: list[dict[str, Any]]) -> dict[str, pd.DataFrame]:
     }
 
 
-def write_tables(tables: dict[str, pd.DataFrame], output_root: Path, org: str) -> dict[str, Path]:
+def has_parquet_engine() -> bool:
+    return bool(importlib.util.find_spec("pyarrow") or importlib.util.find_spec("fastparquet"))
+
+
+def write_tables(
+    tables: dict[str, pd.DataFrame], output_root: Path, org: str, output_format: str = "parquet"
+) -> dict[str, Path]:
     output_dir = output_root / f"org={org}"
     output_dir.mkdir(parents=True, exist_ok=True)
     paths = {
-        "decisions": output_dir / "decisions.parquet",
-        "suppliers": output_dir / "suppliers.parquet",
-        "procurements": output_dir / "procurements.parquet",
-        "monthly_summary": output_dir / "monthly_summary.parquet",
+        "decisions": output_dir / f"decisions.{output_format}",
+        "suppliers": output_dir / f"suppliers.{output_format}",
+        "procurements": output_dir / f"procurements.{output_format}",
+        "monthly_summary": output_dir / f"monthly_summary.{output_format}",
     }
     for name, path in paths.items():
-        tables[name].to_parquet(path, index=False)
+        if output_format == "csv":
+            tables[name].to_csv(path, index=False)
+        else:
+            tables[name].to_parquet(path, index=False)
     return paths
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Build normalized parquet tables from cached Diavgeia JSON.")
+    parser = argparse.ArgumentParser(description="Build normalized tables from cached Diavgeia JSON.")
     parser.add_argument("--org", required=True, help="Diavgeia organizationUid to normalize, e.g. 6166")
     parser.add_argument("--raw-root", type=Path, default=DEFAULT_RAW_ROOT, help="Raw Diavgeia cache root")
     parser.add_argument("--output-root", type=Path, default=DEFAULT_OUTPUT_ROOT, help="Normalized output root")
+    parser.add_argument(
+        "--format", choices=OUTPUT_FORMATS, default="parquet", help="Output file format (default: parquet)"
+    )
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_args()
+    if args.format == "parquet" and not has_parquet_engine():
+        print(PARQUET_ENGINE_MISSING_MESSAGE)
+        return 1
+
     decisions = load_decisions(args.raw_root, str(args.org))
     tables = build_tables(decisions)
-    paths = write_tables(tables, args.output_root, str(args.org))
+    try:
+        paths = write_tables(tables, args.output_root, str(args.org), args.format)
+    except ImportError:
+        if args.format == "parquet":
+            print(PARQUET_ENGINE_MISSING_MESSAGE)
+            return 1
+        raise
     for name, path in paths.items():
         print(f"Wrote {name}: {path} ({len(tables[name])} rows)")
     return 0
