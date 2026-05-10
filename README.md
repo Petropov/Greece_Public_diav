@@ -57,6 +57,64 @@ git ls-files '*.py' | xargs python -m py_compile
 
 This validates only tracked Python files and avoids compiling files inside `.git/` or other untracked/local directories.
 
+
+## Lamia Municipality pilot workflow
+
+This repository also includes a separate Lamia-focused pilot pipeline. It does **not** replace or change the general monthly digest. The Lamia pipeline only queries Diavgeia decisions for the Municipality of Lamia.
+
+- **Workflow name:** `Lamia Municipality Digest`
+- **Workflow file:** `.github/workflows/lamia-digest.yml`
+- **Script:** `src/lamia_digest.py`
+- **Target organization:** `ΔΗΜΟΣ ΛΑΜΙΕΩΝ`
+- **Slug:** `dhmos_lamieon`
+- **Diavgeia organizationUid:** `6166`
+- **Query scope:** `organizationUid:"6166"` plus an `issueDate` range
+- **Default period:** previous calendar month
+- **Schedule:** `30 7 5 * *` — runs at 07:30 UTC on the 5th day of each month. GitHub cron expressions use UTC.
+- **Manual trigger:** enabled via `workflow_dispatch`.
+
+Trigger the Lamia workflow manually from the GitHub CLI:
+
+```bash
+gh workflow run lamia-digest.yml --ref main
+```
+
+Monitor the latest run and return a non-zero exit code on failure:
+
+```bash
+gh run watch --exit-status
+```
+
+The Lamia workflow saves its generated files under:
+
+```text
+artifacts/lamia/
+```
+
+Expected Lamia artifacts are:
+
+- `artifacts/lamia/lamia_digest.json` — structured JSON payload with metadata and normalized decisions.
+- `artifacts/lamia/lamia_digest.md` — Markdown table for quick review.
+
+Run the Lamia digest locally after installing requirements:
+
+```bash
+python src/lamia_digest.py --verbose
+```
+
+Optionally override the date range and limit:
+
+```bash
+python src/lamia_digest.py --from 2026-04-01 --to 2026-04-30 --limit 200 --verbose
+```
+
+The Lamia pilot differs from the general `Diavgeia Monthly Digest` workflow in these ways:
+
+- It is municipality-specific and always filters on Diavgeia organizationUid `6166`.
+- It writes only Lamia artifacts under `artifacts/lamia/`.
+- It does not send email.
+- It does not modify or reuse the existing monthly digest business logic.
+
 ## Local development and validation
 
 Create and activate a local virtual environment, install dependencies, and run the same Python syntax check used by CI:
