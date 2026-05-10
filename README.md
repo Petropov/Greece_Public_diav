@@ -108,6 +108,18 @@ Optionally override the date range and limit:
 python src/lamia_digest.py --from 2026-04-01 --to 2026-04-30 --limit 200 --verbose
 ```
 
+The Lamia digest enriches missing amounts by fetching full records from the Diavgeia OpenData decision endpoint:
+
+```text
+https://diavgeia.gov.gr/opendata/decisions/{ada}
+```
+
+Before increasing limits for a bulk run, smoke-test enrichment with a small cap:
+
+```bash
+python src/lamia_digest.py --from 2026-04-01 --to 2026-04-30 --limit 10 --max-detail-fetches 1 --verbose
+```
+
 The Lamia pilot differs from the general `Diavgeia Monthly Digest` workflow in these ways:
 
 - It is municipality-specific and always filters on Diavgeia organizationUid `6166`.

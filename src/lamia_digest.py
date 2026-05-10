@@ -24,7 +24,7 @@ import requests
 
 BASE_URL = "https://diavgeia.gov.gr"
 EXPORT_URL = f"{BASE_URL}/luminapi/api/search/export"
-DETAIL_URL_TEMPLATE = f"{BASE_URL}/opendata/search/decision/{{ada}}.json"
+DETAIL_URL_TEMPLATE = f"{BASE_URL}/opendata/decisions/{{ada}}"
 LAMIA_ORG_UID = "6166"
 LAMIA_NAME = "ΔΗΜΟΣ ΛΑΜΙΕΩΝ"
 LAMIA_SLUG = "dhmos_lamieon"
