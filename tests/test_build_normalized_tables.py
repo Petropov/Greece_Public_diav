@@ -107,6 +107,46 @@ class BuildNormalizedTablesTest(unittest.TestCase):
             self.assertAlmostEqual(summary["amount_total"], 1234.56)
             self.assertEqual(summary["supplier_count"], 1)
 
+    def test_procurement_classification_uses_canonical_tokens(self):
+        decision = {
+            "decision_type": "Regulatory act",
+            "subject": "Σύμβαση καθαρισμού χωρίς ποσό",
+            "supplier_name": None,
+            "supplier_tax_id": None,
+            "amount": None,
+        }
+
+        self.assertTrue(build_normalized_tables.is_procurement(decision))
+
+    def test_procurement_classification_uses_precomputed_searchable_text(self):
+        decision = {
+            "_procurement_searchable_text": build_normalized_tables.procurement_searchable_text(
+                {"decision_type": "Regulatory act", "subject": "Προμήθεια υλικών"}
+            ),
+            "supplier_name": None,
+            "supplier_tax_id": None,
+            "amount": None,
+        }
+
+        with patch.object(
+            build_normalized_tables,
+            "canonical_text",
+            side_effect=AssertionError("canonical_text should not be called"),
+        ):
+            self.assertTrue(build_normalized_tables.is_procurement(decision))
+
+    def test_limit_months_loads_first_cached_months_only(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            raw_root = Path(tmp) / "raw"
+            april_dir = raw_root / "organization_uid=6166" / "year=2026" / "month=04"
+            may_dir = raw_root / "organization_uid=6166" / "year=2026" / "month=05"
+            write_json(april_dir / "search_export.json", {"decisionResultList": [{"ada": "APRIL-1"}]})
+            write_json(may_dir / "search_export.json", {"decisionResultList": [{"ada": "MAY-1"}]})
+
+            decisions = build_normalized_tables.load_decisions(raw_root, "6166", limit_months=1)
+
+            self.assertEqual([decision["ada"] for decision in decisions], ["APRIL-1"])
+
     def test_write_tables_csv_does_not_require_parquet_engine(self):
         with tempfile.TemporaryDirectory() as tmp:
             raw_root = Path(tmp) / "raw"
