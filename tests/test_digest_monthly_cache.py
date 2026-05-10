@@ -1,6 +1,7 @@
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 
 import digest_monthly
@@ -138,6 +139,80 @@ class DigestMonthlyCacheTests(unittest.TestCase):
             marker = digest_monthly.incomplete_marker_path(tmp, "6166", 2026, 4)
             self.assertTrue(marker.exists())
             self.assertIn("rate_limited", marker.read_text(encoding="utf-8"))
+
+    def test_search_only_run_does_not_call_decision_detail_endpoint(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            payload = {
+                "decisionResultList": [
+                    {
+                        "ada": "SEARCH-ONLY",
+                        "issueDate": "01/04/2026 00:00:00",
+                        "submissionTimestamp": "01/04/2026 00:00:00",
+                    }
+                ]
+            }
+            args = SimpleNamespace(
+                cache_dir=tmp,
+                org="6166",
+                force_refresh=False,
+                max_retries=0,
+                retry_sleep_seconds=0,
+                search_only=True,
+            )
+
+            with patch("digest_monthly.requests.get", return_value=FakeResponse(payload)) as get, patch(
+                "digest_monthly.fetch_decision_detail"
+            ) as detail:
+                digest_monthly.run_monthly_digest(args, 2026, 4)
+
+            get.assert_called_once()
+            detail.assert_not_called()
+
+    def test_search_only_writes_monthly_search_cache_and_metadata(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            payload = {"decisionResultList": [{"ada": "SEARCH-CACHE"}]}
+            args = SimpleNamespace(
+                cache_dir=tmp,
+                org="6166",
+                force_refresh=False,
+                max_retries=0,
+                retry_sleep_seconds=0,
+                search_only=True,
+            )
+
+            with patch("digest_monthly.requests.get", return_value=FakeResponse(payload)):
+                digest_monthly.run_monthly_digest(args, 2026, 4)
+
+            cache_path = digest_monthly.search_cache_path(tmp, "6166", 2026, 4)
+            self.assertTrue(cache_path.exists())
+            self.assertEqual(digest_monthly.read_json(cache_path), payload)
+            metadata = digest_monthly.read_json(digest_monthly.metadata_path(tmp, "6166", 2026, 4))
+            self.assertEqual(metadata["detail_enrichment"], "skipped")
+            self.assertEqual(metadata["fetch_status"], "success")
+            self.assertFalse(digest_monthly.incomplete_marker_path(tmp, "6166", 2026, 4).exists())
+
+    def test_search_only_cache_hit_marks_metadata_without_incomplete_marker(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            cache_path = digest_monthly.search_cache_path(tmp, "6166", 2026, 4)
+            digest_monthly.write_json(cache_path, {"decisionResultList": [{"ada": "CACHED-SEARCH"}]})
+            args = SimpleNamespace(
+                cache_dir=tmp,
+                org="6166",
+                force_refresh=False,
+                max_retries=0,
+                retry_sleep_seconds=0,
+                search_only=True,
+            )
+
+            with patch("digest_monthly.requests.get") as get, patch("digest_monthly.fetch_decision_detail") as detail:
+                digest_monthly.run_monthly_digest(args, 2026, 4)
+
+            get.assert_not_called()
+            detail.assert_not_called()
+            metadata = digest_monthly.read_json(digest_monthly.metadata_path(tmp, "6166", 2026, 4))
+            self.assertEqual(metadata["detail_enrichment"], "skipped")
+            self.assertEqual(metadata["fetch_status"], "cache_hit")
+            self.assertFalse(digest_monthly.incomplete_marker_path(tmp, "6166", 2026, 4).exists())
 
     def test_decision_detail_cache_uses_ada_path(self):
         with tempfile.TemporaryDirectory() as tmp:

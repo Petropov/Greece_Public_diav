@@ -374,21 +374,19 @@ def fetch_month_export(
     limit=5000,
     max_retries=3,
     retry_sleep_seconds=5,
+    detail_enrichment=None,
 ):
     path = search_cache_path(cache_dir, org, year, month)
     if path.exists() and not force_refresh:
         payload = read_json(path)
-        write_fetch_metadata(
-            cache_dir,
-            org,
-            year,
-            month,
-            {
-                "cache_hit": True,
-                "force_refresh": force_refresh,
-                "fetch_status": "cache_hit",
-            },
-        )
+        metadata = {
+            "cache_hit": True,
+            "force_refresh": force_refresh,
+            "fetch_status": "cache_hit",
+        }
+        if detail_enrichment is not None:
+            metadata["detail_enrichment"] = detail_enrichment
+        write_fetch_metadata(cache_dir, org, year, month, metadata)
         return pd.DataFrame(extract_export_rows(payload))
 
     start, end = month_bounds(year, month)
@@ -404,20 +402,17 @@ def fetch_month_export(
         )
     except DiavgeiaFetchError as exc:
         status = "rate_limited" if exc.rate_limited else "failed"
-        write_fetch_metadata(
-            cache_dir,
-            org,
-            year,
-            month,
-            {
-                "cache_hit": path.exists(),
-                "force_refresh": force_refresh,
-                "api_calls_attempted": exc.api_calls_attempted,
-                "api_rate_limited": exc.rate_limited,
-                "http_status_codes": exc.status_codes,
-                "fetch_status": status,
-            },
-        )
+        metadata = {
+            "cache_hit": path.exists(),
+            "force_refresh": force_refresh,
+            "api_calls_attempted": exc.api_calls_attempted,
+            "api_rate_limited": exc.rate_limited,
+            "http_status_codes": exc.status_codes,
+            "fetch_status": status,
+        }
+        if detail_enrichment is not None:
+            metadata["detail_enrichment"] = detail_enrichment
+        write_fetch_metadata(cache_dir, org, year, month, metadata)
         write_incomplete_marker(cache_dir, org, year, month, status)
         if path.exists():
             return pd.DataFrame(extract_export_rows(read_json(path)))
@@ -425,20 +420,17 @@ def fetch_month_export(
 
     write_json(path, payload)
     clear_incomplete_marker(cache_dir, org, year, month)
-    write_fetch_metadata(
-        cache_dir,
-        org,
-        year,
-        month,
-        {
-            "cache_hit": False,
-            "force_refresh": force_refresh,
-            "api_calls_attempted": stats["api_calls_attempted"],
-            "api_rate_limited": stats["api_rate_limited"],
-            "http_status_codes": stats["http_status_codes"],
-            "fetch_status": "success",
-        },
-    )
+    metadata = {
+        "cache_hit": False,
+        "force_refresh": force_refresh,
+        "api_calls_attempted": stats["api_calls_attempted"],
+        "api_rate_limited": stats["api_rate_limited"],
+        "http_status_codes": stats["http_status_codes"],
+        "fetch_status": "success",
+    }
+    if detail_enrichment is not None:
+        metadata["detail_enrichment"] = detail_enrichment
+    write_fetch_metadata(cache_dir, org, year, month, metadata)
     return pd.DataFrame(extract_export_rows(payload))
 
 
@@ -684,7 +676,25 @@ def render_html(ctx):
     return "".join(html)
 
 
+def run_search_only_month(args, year, month):
+    fetch_month_export(
+        args.cache_dir,
+        args.org,
+        year,
+        month,
+        args.force_refresh,
+        max_retries=args.max_retries,
+        retry_sleep_seconds=args.retry_sleep_seconds,
+        detail_enrichment="skipped",
+    )
+    print(f"Cached search export for {month_key(year, month)}")
+
+
 def run_monthly_digest(args, year, month):
+    if getattr(args, "search_only", False):
+        run_search_only_month(args, year, month)
+        return
+
     mo_start, mo_end = month_bounds(year, month)
     prev_start, prev_end = month_bounds(year if month > 1 else year - 1, (month - 1 or 12))
     ytd_start = date(year, 1, 1)
@@ -845,6 +855,11 @@ def build_parser():
     ap.add_argument("--month", type=int)
     ap.add_argument("--cache-dir", default=DEFAULT_CACHE_DIR, help="Raw Diavgeia cache directory")
     ap.add_argument("--force-refresh", action="store_true", help="Ignore cached API responses and refetch")
+    ap.add_argument(
+        "--search-only",
+        action="store_true",
+        help="Only fetch/cache monthly search_export.json files; skip per-ADA detail enrichment and digest rendering",
+    )
     ap.add_argument("--max-retries", type=int, default=3, help="Maximum retries after Diavgeia rate-limit responses")
     ap.add_argument("--retry-sleep-seconds", type=float, default=5, help="Initial sleep between Diavgeia retries")
     ap.add_argument("--from", dest="from_month", type=parse_month, help="Start month for historical backfill (YYYY-MM)")

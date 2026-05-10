@@ -84,6 +84,14 @@ Use `--cache-dir` to point at a different raw-data root, and use `--force-refres
 python digest_monthly.py --org 6166 --from 2026-01 --to 2026-04
 ```
 
+For broad historical ingestion, use `--search-only` to fetch and cache only each monthly `search_export.json` without per-ADA decision detail enrichment:
+
+```bash
+python digest_monthly.py --org 6166 --from 2020-01 --to 2026-05 --search-only
+```
+
+In search-only mode, each month's `fetch_metadata.json` records `detail_enrichment: "skipped"` and a `fetch_status` of `success` or `cache_hit`; skipped details alone do not create an `INCOMPLETE` marker.
+
 The digest keeps writing the legacy top-level files in `artifacts/` and also writes per-month copies under:
 
 ```text
