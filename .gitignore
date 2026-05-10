@@ -6,3 +6,4 @@ output/
 artifacts/
 diavgeia_docs/
 data/raw/
+decision_labels.json
