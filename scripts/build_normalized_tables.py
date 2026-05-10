@@ -104,6 +104,8 @@ AMOUNT_KEYS = (
     "amountWithVAT",
     "budgetAmount",
 )
+AMOUNT_WARNING_THRESHOLD = 10_000_000
+LOW_AMOUNT_COVERAGE_THRESHOLD = 0.5
 SUPPLIER_NAME_KEYS = (
     "supplier_name",
     "supplierName",
@@ -207,6 +209,7 @@ DECISION_COLUMNS = [
     "subject",
     "url",
     "amount",
+    "amount_source",
     "supplier_name",
     "supplier_tax_id",
     "signer",
@@ -231,6 +234,7 @@ PROCUREMENT_COLUMNS = [
     "decision_type",
     "subject",
     "amount",
+    "amount_source",
     "supplier_key",
     "supplier_name",
     "supplier_tax_id",
@@ -238,7 +242,20 @@ PROCUREMENT_COLUMNS = [
     "unit",
     "url",
 ]
-MONTHLY_SUMMARY_COLUMNS = ["year", "month", "decision_count", "amount_total", "supplier_count"]
+MONTHLY_SUMMARY_COLUMNS = [
+    "year",
+    "month",
+    "decision_count",
+    "amount_total",
+    "supplier_count",
+    "amount_known_count",
+    "amount_missing_count",
+    "supplier_known_count",
+    "supplier_missing_count",
+    "detail_enriched_decision_count",
+    "search_only_decision_count",
+]
+INTERNAL_DECISION_COLUMNS = [*DECISION_COLUMNS, "_detail_enriched"]
 
 
 def read_json(path: Path) -> Any:
@@ -419,37 +436,51 @@ def extract_text_by_keys_or_labels(source: Any, keys: tuple[str, ...], label_tok
     return None
 
 
-def extract_amount(source: Any) -> float | None:
+def _extract_structured_amount(source: Any, path: str = "") -> tuple[float | None, str | None]:
+    """Extract amounts only from trusted structured amount fields.
+
+    The Diavgeia search and detail payloads contain subjects and other free-text
+    strings with long identifiers, dates, and budget references.  Those strings
+    are not safe amount sources, so this helper only inspects explicit amount
+    keys or labeled extra-field values.
+    """
     if isinstance(source, dict):
-        extra_fields = source.get("extraFieldValues")
-        if extra_fields not in (None, "", []):
-            amount = extract_amount(extra_fields)
-            if amount is not None:
-                return amount
         labels = [source.get(key) for key in EXTRA_FIELD_LABEL_KEYS if source.get(key) not in (None, "", [])]
         if any(is_amount_label(label) for label in labels):
             for key in EXTRA_FIELD_VALUE_KEYS:
                 amount = normalize_amount(source.get(key))
                 if amount is not None:
-                    return amount
+                    label_text = normalize_text(labels[0]) or "amount"
+                    source_name = f"{path}.extraFieldValues[{label_text}]" if path else f"extraFieldValues[{label_text}]"
+                    return amount, source_name
         for key, value in source.items():
+            child_path = f"{path}.{key}" if path else str(key)
             if key in AMOUNT_KEYS or is_amount_label(key):
                 amount = normalize_amount(value)
                 if amount is not None:
-                    return amount
-        for value in source.values():
-            if isinstance(value, (dict, list)):
-                amount = extract_amount(value)
+                    return amount, child_path
+            elif isinstance(value, (dict, list)):
+                amount, amount_source = _extract_structured_amount(value, child_path)
                 if amount is not None:
-                    return amount
+                    return amount, amount_source
     elif isinstance(source, list):
-        for item in source:
-            amount = extract_amount(item)
+        for index, item in enumerate(source):
+            amount, amount_source = _extract_structured_amount(item, f"{path}[{index}]" if path else f"[{index}]")
             if amount is not None:
-                return amount
-    else:
-        return normalize_amount(source)
-    return None
+                return amount, amount_source
+    return None, None
+
+
+def extract_amount(source: Any) -> float | None:
+    amount, _amount_source = _extract_structured_amount(source)
+    return amount
+
+
+def extract_amount_with_source(source: Any, source_prefix: str) -> tuple[float | None, str | None]:
+    amount, amount_source = _extract_structured_amount(source)
+    if amount is None:
+        return None, None
+    return amount, f"{source_prefix}:{amount_source}" if amount_source else source_prefix
 
 
 def normalize_tax_id(value: Any) -> str | None:
@@ -555,6 +586,7 @@ def coalesce(*values: Any) -> Any:
 
 
 def normalize_decision(org: str, year: int, month: int, export_row: dict[str, Any], detail: dict[str, Any] | None) -> dict[str, Any]:
+    detail_enriched = bool(detail)
     detail = detail or {}
     combined = {**export_row, **detail}
     ada = normalize_text(coalesce(detail.get("ada"), export_row.get("ada"), export_row.get("ADA")))
@@ -562,9 +594,9 @@ def normalize_decision(org: str, year: int, month: int, export_row: dict[str, An
     issue_date = normalize_date(coalesce(first_present(detail, ISSUE_DATE_KEYS), first_present(export_row, ISSUE_DATE_KEYS)))
     raw_type = coalesce(first_present(detail, DECISION_TYPE_KEYS), first_present(export_row, DECISION_TYPE_KEYS))
     type_label = coalesce(first_present(detail, DECISION_TYPE_LABEL_KEYS), first_present(export_row, DECISION_TYPE_LABEL_KEYS))
-    amount = extract_amount(detail) if detail else None
+    amount, amount_source = extract_amount_with_source(detail, "detail") if detail else (None, None)
     if amount is None:
-        amount = extract_amount(export_row)
+        amount, amount_source = extract_amount_with_source(export_row, "search_export")
     detail_supplier_name, detail_supplier_tax_id = extract_supplier_fields(detail)
     export_supplier_name, export_supplier_tax_id = extract_supplier_fields(export_row)
     supplier_name = normalize_text(detail_supplier_name or export_supplier_name)
@@ -582,10 +614,12 @@ def normalize_decision(org: str, year: int, month: int, export_row: dict[str, An
         "subject": subject,
         "url": url,
         "amount": amount,
+        "amount_source": amount_source,
         "supplier_name": supplier_name,
         "supplier_tax_id": supplier_tax_id,
         "signer": signer,
         "unit": unit,
+        "_detail_enriched": detail_enriched,
     }
 
 
@@ -646,7 +680,7 @@ def is_procurement(decision: dict[str, Any]) -> bool:
 
 
 def build_tables(decisions: list[dict[str, Any]]) -> dict[str, pd.DataFrame]:
-    decisions_df = pd.DataFrame(decisions, columns=DECISION_COLUMNS)
+    decisions_df = pd.DataFrame(decisions, columns=INTERNAL_DECISION_COLUMNS)
     if decisions_df.empty:
         return {
             "decisions": decisions_df[DECISION_COLUMNS],
@@ -724,6 +758,7 @@ def build_tables(decisions: list[dict[str, Any]]) -> dict[str, pd.DataFrame]:
                 "decision_type": row.get("decision_type"),
                 "subject": row.get("subject"),
                 "amount": row.get("amount"),
+                "amount_source": row.get("amount_source"),
                 "supplier_key": key,
                 "supplier_name": row.get("supplier_name"),
                 "supplier_tax_id": row.get("supplier_tax_id"),
@@ -737,13 +772,23 @@ def build_tables(decisions: list[dict[str, Any]]) -> dict[str, pd.DataFrame]:
     summary_rows = []
     for (year, month), group in decisions_df.groupby(["year", "month"], dropna=False):
         supplier_count = int(group["_supplier_key"].dropna().nunique())
+        amount_known_count = int(group["amount"].notna().sum())
+        row_count = int(len(group))
+        supplier_known_count = int(group["_supplier_key"].notna().sum())
+        detail_enriched_count = int(group["_detail_enriched"].fillna(False).astype(bool).sum())
         summary_rows.append(
             {
                 "year": int(year),
                 "month": int(month),
-                "decision_count": int(group["ada"].nunique(dropna=True) or len(group)),
+                "decision_count": int(group["ada"].nunique(dropna=True) or row_count),
                 "amount_total": float(group["amount"].fillna(0).sum()),
                 "supplier_count": supplier_count,
+                "amount_known_count": amount_known_count,
+                "amount_missing_count": row_count - amount_known_count,
+                "supplier_known_count": supplier_known_count,
+                "supplier_missing_count": row_count - supplier_known_count,
+                "detail_enriched_decision_count": detail_enriched_count,
+                "search_only_decision_count": row_count - detail_enriched_count,
             }
         )
     monthly_summary_df = pd.DataFrame(summary_rows, columns=MONTHLY_SUMMARY_COLUMNS).sort_values(["year", "month"]).reset_index(drop=True)
@@ -754,6 +799,47 @@ def build_tables(decisions: list[dict[str, Any]]) -> dict[str, pd.DataFrame]:
         "procurements": procurements_df,
         "monthly_summary": monthly_summary_df,
     }
+
+
+def format_month(year: Any, month: Any) -> str:
+    return f"{int(year):04d}-{int(month):02d}"
+
+
+def data_quality_warnings(tables: dict[str, pd.DataFrame]) -> list[str]:
+    monthly_summary = tables.get("monthly_summary", pd.DataFrame(columns=MONTHLY_SUMMARY_COLUMNS))
+    if monthly_summary.empty:
+        return []
+
+    warnings = []
+    for row in monthly_summary.sort_values(["year", "month"]).to_dict("records"):
+        month_label = format_month(row["year"], row["month"])
+        amount_total = float(row.get("amount_total") or 0)
+        if amount_total > AMOUNT_WARNING_THRESHOLD:
+            warnings.append(
+                f"{month_label}: suspicious amount_total {amount_total:,.2f} exceeds {AMOUNT_WARNING_THRESHOLD:,.0f}"
+            )
+        if int(row.get("supplier_count") or 0) == 0 and int(row.get("decision_count") or 0) > 0:
+            warnings.append(f"{month_label}: supplier_count is 0")
+        decision_count = int(row.get("decision_count") or 0)
+        amount_known_count = int(row.get("amount_known_count") or 0)
+        if decision_count > 0:
+            amount_coverage = amount_known_count / decision_count
+            if amount_coverage < LOW_AMOUNT_COVERAGE_THRESHOLD:
+                warnings.append(
+                    f"{month_label}: low amount coverage {amount_known_count}/{decision_count} "
+                    f"({amount_coverage:.0%})"
+                )
+    return warnings
+
+
+def print_data_quality_warnings(tables: dict[str, pd.DataFrame]) -> None:
+    warnings = data_quality_warnings(tables)
+    if not warnings:
+        print("Data quality warnings: none")
+        return
+    print("Data quality warnings:")
+    for warning in warnings:
+        print(f"- {warning}")
 
 
 def has_parquet_engine() -> bool:
@@ -812,6 +898,7 @@ def main() -> int:
     print(f"Parsed {len(decisions)} decision rows")
 
     tables = build_tables(decisions)
+    print_data_quality_warnings(tables)
     print("Starting table writes")
     try:
         paths = write_tables(tables, args.output_root, str(args.org), args.format)
