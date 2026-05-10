@@ -100,10 +100,16 @@ artifacts/<org>/<YYYY-MM>/
 
 ## Normalized Diavgeia analytics tables
 
-Cached monthly Diavgeia JSON can be converted into reusable parquet tables without re-querying Diavgeia:
+Cached monthly Diavgeia JSON can be converted into reusable normalized tables without re-querying Diavgeia. Parquet remains the default format:
 
 ```bash
 python scripts/build_normalized_tables.py --org 6166
+```
+
+If your local environment does not have a parquet engine such as `pyarrow` or `fastparquet`, use CSV output instead:
+
+```bash
+python scripts/build_normalized_tables.py --org 6166 --format csv
 ```
 
 The normalizer reads only local cache files under:
@@ -120,22 +126,28 @@ data/normalized/org=6166/decisions.parquet
 data/normalized/org=6166/suppliers.parquet
 data/normalized/org=6166/procurements.parquet
 data/normalized/org=6166/monthly_summary.parquet
+
+# With --format csv:
+data/normalized/org=6166/decisions.csv
+data/normalized/org=6166/suppliers.csv
+data/normalized/org=6166/procurements.csv
+data/normalized/org=6166/monthly_summary.csv
 ```
 
 The output tables are intended for local analytics:
 
-- `decisions.parquet` contains one row per cached decision with normalized date, type, amount, supplier, signer, and unit fields.
-- `suppliers.parquet` groups supplier names/tax ids across decisions and tracks first/last seen dates, decision counts, and total amounts.
-- `procurements.parquet` keeps procurement-like financial rows with supplier keys for spend analysis.
-- `monthly_summary.parquet` aggregates decision count, total amount, and unique supplier count by year/month.
+- `decisions.<format>` contains one row per cached decision with normalized date, type, amount, supplier, signer, and unit fields.
+- `suppliers.<format>` groups supplier names/tax ids across decisions and tracks first/last seen dates, decision counts, and total amounts.
+- `procurements.<format>` keeps procurement-like financial rows with supplier keys for spend analysis.
+- `monthly_summary.<format>` aggregates decision count, total amount, and unique supplier count by year/month.
 
 Use alternate roots when testing or building from a copied cache:
 
 ```bash
-python scripts/build_normalized_tables.py --org 6166 --raw-root /path/to/raw/diavgeia --output-root /path/to/normalized
+python scripts/build_normalized_tables.py --org 6166 --raw-root /path/to/raw/diavgeia --output-root /path/to/normalized --format csv
 ```
 
-The script is offline-only and does not call the Diavgeia API.
+The script is offline-only and does not call the Diavgeia API. When the default parquet output is requested without a parquet engine installed, it prints `Parquet engine missing. Re-run with --format csv` instead of a long traceback.
 
 ## Lamia Municipality pilot workflow
 
