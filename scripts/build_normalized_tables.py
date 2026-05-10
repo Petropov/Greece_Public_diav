@@ -304,6 +304,9 @@ def canonical_text(value: Any) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
+CANONICAL_PROCUREMENT_TOKENS = tuple(canonical_text(token) for token in PROCUREMENT_TOKENS)
+
+
 def normalize_date(value: Any) -> str | None:
     text = normalize_text(value)
     if not text:
@@ -523,9 +526,14 @@ def supplier_name_normalized(value: Any) -> str | None:
 
 
 def supplier_key(name: Any, tax_id: Any) -> str | None:
-    normalized_tax_id = normalize_tax_id(tax_id)
+    if tax_id in (None, "", []):
+        normalized_tax_id = None
+    else:
+        normalized_tax_id = normalize_tax_id(tax_id)
     if normalized_tax_id:
         return f"tax:{normalized_tax_id}"
+    if name in (None, "", []):
+        return None
     normalized_name = supplier_name_normalized(name)
     if normalized_name:
         digest = hashlib.sha1(normalized_name.encode("utf-8")).hexdigest()[:12]
@@ -588,13 +596,16 @@ def parse_partition_value(path: Path, prefix: str) -> str | None:
     return None
 
 
-def load_decisions(raw_root: Path, org: str) -> list[dict[str, Any]]:
+def load_decisions(raw_root: Path, org: str, limit_months: int | None = None) -> list[dict[str, Any]]:
     org_dir = raw_root / f"organization_uid={org}"
     if not org_dir.exists():
         return []
 
     decisions: list[dict[str, Any]] = []
-    for search_path in sorted(org_dir.glob("year=*/month=*/search_export.json")):
+    search_paths = sorted(org_dir.glob("year=*/month=*/search_export.json"))
+    if limit_months is not None:
+        search_paths = search_paths[:limit_months]
+    for search_path in search_paths:
         year_text = parse_partition_value(search_path, "year=")
         month_text = parse_partition_value(search_path, "month=")
         if not year_text or not month_text:
@@ -618,25 +629,27 @@ def load_decisions(raw_root: Path, org: str) -> list[dict[str, Any]]:
     return decisions
 
 
-def is_procurement(decision: dict[str, Any]) -> bool:
+def procurement_searchable_text(decision: dict[str, Any]) -> str:
     decision_type = normalize_text(decision.get("decision_type")) or ""
     subject = normalize_text(decision.get("subject")) or ""
-    text = canonical_text(f"{decision_type} {subject}")
+    return canonical_text(f"{decision_type} {subject}")
+
+
+def is_procurement(decision: dict[str, Any]) -> bool:
+    text = decision.get("_procurement_searchable_text")
+    if text is None:
+        text = procurement_searchable_text(decision)
     supplier_present = bool(supplier_key(decision.get("supplier_name"), decision.get("supplier_tax_id")))
     amount = decision.get("amount")
     amount_present = amount is not None and pd.notna(amount)
-    return (
-        supplier_present
-        or amount_present
-        or any(canonical_text(token) in text for token in PROCUREMENT_TOKENS)
-    )
+    return supplier_present or amount_present or any(token in text for token in CANONICAL_PROCUREMENT_TOKENS)
 
 
 def build_tables(decisions: list[dict[str, Any]]) -> dict[str, pd.DataFrame]:
     decisions_df = pd.DataFrame(decisions, columns=DECISION_COLUMNS)
     if decisions_df.empty:
         return {
-            "decisions": decisions_df,
+            "decisions": decisions_df[DECISION_COLUMNS],
             "suppliers": pd.DataFrame(columns=SUPPLIER_COLUMNS),
             "procurements": pd.DataFrame(columns=PROCUREMENT_COLUMNS),
             "monthly_summary": pd.DataFrame(columns=MONTHLY_SUMMARY_COLUMNS),
@@ -645,15 +658,28 @@ def build_tables(decisions: list[dict[str, Any]]) -> dict[str, pd.DataFrame]:
     decisions_df["amount"] = pd.to_numeric(decisions_df["amount"], errors="coerce")
     decisions_df = decisions_df.sort_values(["year", "month", "issue_date", "ada"], na_position="last").reset_index(drop=True)
 
+    sorted_records = decisions_df.to_dict("records")
+    decisions_df["_procurement_searchable_text"] = [procurement_searchable_text(row) for row in sorted_records]
+    decisions_df["_supplier_key"] = [
+        supplier_key(row.get("supplier_name"), row.get("supplier_tax_id")) for row in sorted_records
+    ]
+    decisions_df["_supplier_name_normalized"] = [
+        supplier_name_normalized(name) for name in decisions_df["supplier_name"]
+    ]
+    decisions_df["_supplier_tax_id_normalized"] = [
+        normalize_tax_id(tax_id) for tax_id in decisions_df["supplier_tax_id"]
+    ]
+    decision_records = decisions_df.to_dict("records")
+
     supplier_groups: dict[str, dict[str, Any]] = defaultdict(lambda: {"decision_adas": set(), "total_amount": 0.0})
-    for row in decisions_df.to_dict("records"):
-        key = supplier_key(row.get("supplier_name"), row.get("supplier_tax_id"))
-        if not key:
+    for row in decision_records:
+        key = row.get("_supplier_key")
+        if key is None or pd.isna(key):
             continue
         group = supplier_groups[key]
         group["supplier_key"] = key
-        group["supplier_name_normalized"] = group.get("supplier_name_normalized") or supplier_name_normalized(row.get("supplier_name"))
-        group["supplier_tax_id"] = group.get("supplier_tax_id") or normalize_tax_id(row.get("supplier_tax_id"))
+        group["supplier_name_normalized"] = group.get("supplier_name_normalized") or row.get("_supplier_name_normalized")
+        group["supplier_tax_id"] = group.get("supplier_tax_id") or row.get("_supplier_tax_id_normalized")
         issue_date = row.get("issue_date")
         if issue_date:
             dates = [date for date in (group.get("first_seen"), group.get("last_seen"), issue_date) if date]
@@ -680,10 +706,12 @@ def build_tables(decisions: list[dict[str, Any]]) -> dict[str, pd.DataFrame]:
     suppliers_df = pd.DataFrame(supplier_rows, columns=SUPPLIER_COLUMNS).sort_values("supplier_key").reset_index(drop=True)
 
     procurement_rows = []
-    for row in decisions_df.to_dict("records"):
+    for row in decision_records:
         if not is_procurement(row):
             continue
-        key = supplier_key(row.get("supplier_name"), row.get("supplier_tax_id"))
+        key = row.get("_supplier_key")
+        if key is not None and pd.isna(key):
+            key = None
         procurement_id_source = row.get("ada") or "|".join(str(row.get(col) or "") for col in ("org", "year", "month", "subject", "amount"))
         procurement_rows.append(
             {
@@ -708,13 +736,7 @@ def build_tables(decisions: list[dict[str, Any]]) -> dict[str, pd.DataFrame]:
 
     summary_rows = []
     for (year, month), group in decisions_df.groupby(["year", "month"], dropna=False):
-        supplier_count = len(
-            {
-                supplier_key(row.get("supplier_name"), row.get("supplier_tax_id"))
-                for row in group.to_dict("records")
-                if supplier_key(row.get("supplier_name"), row.get("supplier_tax_id"))
-            }
-        )
+        supplier_count = int(group["_supplier_key"].dropna().nunique())
         summary_rows.append(
             {
                 "year": int(year),
@@ -727,7 +749,7 @@ def build_tables(decisions: list[dict[str, Any]]) -> dict[str, pd.DataFrame]:
     monthly_summary_df = pd.DataFrame(summary_rows, columns=MONTHLY_SUMMARY_COLUMNS).sort_values(["year", "month"]).reset_index(drop=True)
 
     return {
-        "decisions": decisions_df,
+        "decisions": decisions_df[DECISION_COLUMNS],
         "suppliers": suppliers_df,
         "procurements": procurements_df,
         "monthly_summary": monthly_summary_df,
@@ -765,6 +787,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--format", choices=OUTPUT_FORMATS, default="parquet", help="Output file format (default: parquet)"
     )
+    parser.add_argument(
+        "--limit-months",
+        type=int,
+        default=None,
+        help="Only load the first N cached monthly search_export.json files for quick local testing",
+    )
     return parser.parse_args()
 
 
@@ -774,8 +802,17 @@ def main() -> int:
         print(PARQUET_ENGINE_MISSING_MESSAGE)
         return 1
 
-    decisions = load_decisions(args.raw_root, str(args.org))
+    org_dir = args.raw_root / f"organization_uid={args.org}"
+    raw_monthly_files = sorted(org_dir.glob("year=*/month=*/search_export.json")) if org_dir.exists() else []
+    if args.limit_months is not None:
+        raw_monthly_files = raw_monthly_files[: args.limit_months]
+    print(f"Loaded {len(raw_monthly_files)} raw monthly files")
+
+    decisions = load_decisions(args.raw_root, str(args.org), args.limit_months)
+    print(f"Parsed {len(decisions)} decision rows")
+
     tables = build_tables(decisions)
+    print("Starting table writes")
     try:
         paths = write_tables(tables, args.output_root, str(args.org), args.format)
     except ImportError:
@@ -783,6 +820,7 @@ def main() -> int:
             print(PARQUET_ENGINE_MISSING_MESSAGE)
             return 1
         raise
+    print("Finished table writes")
     for name, path in paths.items():
         print(f"Wrote {name}: {path} ({len(tables[name])} rows)")
     return 0
