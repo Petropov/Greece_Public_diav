@@ -98,6 +98,45 @@ The digest keeps writing the legacy top-level files in `artifacts/` and also wri
 artifacts/<org>/<YYYY-MM>/
 ```
 
+## Normalized Diavgeia analytics tables
+
+Cached monthly Diavgeia JSON can be converted into reusable parquet tables without re-querying Diavgeia:
+
+```bash
+python scripts/build_normalized_tables.py --org 6166
+```
+
+The normalizer reads only local cache files under:
+
+```text
+data/raw/diavgeia/organization_uid=<ORG>/year=<YYYY>/month=<MM>/search_export.json
+data/raw/diavgeia/organization_uid=<ORG>/year=<YYYY>/month=<MM>/decisions/*.json
+```
+
+It writes one organization partition under `data/normalized/`:
+
+```text
+data/normalized/org=6166/decisions.parquet
+data/normalized/org=6166/suppliers.parquet
+data/normalized/org=6166/procurements.parquet
+data/normalized/org=6166/monthly_summary.parquet
+```
+
+The output tables are intended for local analytics:
+
+- `decisions.parquet` contains one row per cached decision with normalized date, type, amount, supplier, signer, and unit fields.
+- `suppliers.parquet` groups supplier names/tax ids across decisions and tracks first/last seen dates, decision counts, and total amounts.
+- `procurements.parquet` keeps procurement-like financial rows with supplier keys for spend analysis.
+- `monthly_summary.parquet` aggregates decision count, total amount, and unique supplier count by year/month.
+
+Use alternate roots when testing or building from a copied cache:
+
+```bash
+python scripts/build_normalized_tables.py --org 6166 --raw-root /path/to/raw/diavgeia --output-root /path/to/normalized
+```
+
+The script is offline-only and does not call the Diavgeia API.
+
 ## Lamia Municipality pilot workflow
 
 This repository also includes a separate Lamia-focused pilot pipeline. It does **not** replace or change the general monthly digest. The Lamia pipeline only queries Diavgeia decisions for the Municipality of Lamia.

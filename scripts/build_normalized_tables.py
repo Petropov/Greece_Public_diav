@@ -1,0 +1,767 @@
+#!/usr/bin/env python3
+"""Build normalized analytics tables from cached Diavgeia JSON files.
+
+The script is intentionally offline-only: it reads monthly cache folders created
+by the digest/backfill workflows and never calls the Diavgeia API.
+"""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import re
+import unicodedata
+from collections import defaultdict
+from datetime import datetime
+from pathlib import Path
+from typing import Any
+from urllib.parse import quote
+
+import pandas as pd
+
+DEFAULT_RAW_ROOT = Path("data/raw/diavgeia")
+DEFAULT_OUTPUT_ROOT = Path("data/normalized")
+DETAIL_URL_TEMPLATE = "https://diavgeia.gov.gr/opendata/decisions/{ada}"
+
+DECISION_TYPE_LABELS = {
+    "Α.1": "Regulatory act",
+    "Α.2": "Internal regulation",
+    "Β.1.1": "Budget commitment",
+    "Β.1.2": "Budget amendment",
+    "Β.1.3": "Payment warrant",
+    "Β.2.1": "Expenditure approval",
+    "Β.2.2": "Payment finalization",
+    "Γ.2": "Personnel change",
+    "Δ.1": "Procurement assignment",
+    "Δ.2.1": "Open procurement notice",
+    "Δ.2.2": "Contract award",
+    "Δ.2.3": "Contract signing",
+    "Δ.2.4": "Procurement cancellation",
+    "2.4.7.1": "Other administrative act",
+}
+
+SUBJECT_KEYS = (
+    "subject",
+    "title",
+    "summary",
+    "description",
+    "decisionSubject",
+    "documentSubject",
+)
+ISSUE_DATE_KEYS = (
+    "issueDate",
+    "decisionDate",
+    "issue_date",
+    "decision_date",
+    "date",
+    "publishDate",
+    "publishedDate",
+)
+DECISION_TYPE_KEYS = (
+    "decisionTypeUid",
+    "decisionTypeId",
+    "decision_type_raw",
+    "decision_type_id",
+    "decisionType",
+    "type",
+)
+DECISION_TYPE_LABEL_KEYS = (
+    "decisionTypeLabel",
+    "decision_type",
+    "decision_type_label",
+    "typeLabel",
+)
+URL_KEYS = ("documentUrl", "url", "decisionUrl", "document_url")
+SIGNER_KEYS = (
+    "signerName",
+    "signer",
+    "signedBy",
+    "signed_by",
+    "finalSigner",
+    "finalSignerName",
+    "issuerName",
+)
+UNIT_KEYS = (
+    "unitName",
+    "unitLabel",
+    "unit",
+    "unitDescription",
+    "organizationalUnit",
+    "organizationalUnitLabel",
+    "organizationUnit",
+    "organizationUnitLabel",
+)
+AMOUNT_KEYS = (
+    "amount",
+    "paymentAmount",
+    "expenseAmount",
+    "netAmount",
+    "totalAmount",
+    "amountWithVAT",
+    "budgetAmount",
+)
+SUPPLIER_NAME_KEYS = (
+    "supplier_name",
+    "supplierName",
+    "supplier",
+    "vendor_name",
+    "vendorName",
+    "vendor",
+    "contractor_name",
+    "contractorName",
+    "contractor",
+    "counterparty_name",
+    "counterpartyName",
+    "counterparty",
+    "beneficiary_name",
+    "beneficiaryName",
+    "beneficiary",
+    "recipient_name",
+    "recipientName",
+    "recipient",
+    "payee_name",
+    "payeeName",
+    "payee",
+    "contractorTitle",
+    "companyName",
+)
+SUPPLIER_TAX_ID_KEYS = (
+    "supplier_tax_id",
+    "supplierTaxId",
+    "supplierAfm",
+    "supplierAFM",
+    "vendor_tax_id",
+    "vendorTaxId",
+    "vendorAfm",
+    "vendorAFM",
+    "contractor_tax_id",
+    "contractorTaxId",
+    "contractorAfm",
+    "contractorAFM",
+    "counterparty_tax_id",
+    "counterpartyTaxId",
+    "counterpartyAfm",
+    "counterpartyAFM",
+    "beneficiary_tax_id",
+    "beneficiaryTaxId",
+    "beneficiaryAfm",
+    "beneficiaryAFM",
+    "recipient_tax_id",
+    "recipientTaxId",
+    "payee_tax_id",
+    "payeeTaxId",
+    "afm",
+    "AFM",
+    "vatNumber",
+    "vatId",
+    "taxId",
+    "taxNumber",
+    "tin",
+)
+EXTRA_FIELD_LABEL_KEYS = ("label", "name", "field", "fieldName", "fieldLabel", "field_label", "key", "title")
+EXTRA_FIELD_VALUE_KEYS = ("value", "fieldValue", "field_value", "values", "amount")
+AMOUNT_LABEL_TOKENS = ("ποσο", "amount", "paymentamount", "expenseamount")
+SUPPLIER_NAME_LABEL_TOKENS = (
+    "supplier",
+    "vendor",
+    "contractor",
+    "counterparty",
+    "beneficiary",
+    "recipient",
+    "payee",
+    "αναδοχος",
+    "αναδοχου",
+    "προμηθευτης",
+    "προμηθευτη",
+    "δικαιουχος",
+    "δικαιουχου",
+    "επωνυμια",
+)
+SUPPLIER_TAX_ID_LABEL_TOKENS = ("afm", "αφμ", "taxid", "taxnumber", "vatnumber", "vatid", "tin")
+PROCUREMENT_TOKENS = (
+    "σύμβαση",
+    "συμβαση",
+    "ανάθεση",
+    "αναθεση",
+    "προμήθεια",
+    "προμηθεια",
+    "δαπάνη",
+    "δαπανη",
+    "contract",
+    "procurement",
+    "award",
+    "supplier",
+)
+
+DECISION_COLUMNS = [
+    "org",
+    "year",
+    "month",
+    "ada",
+    "issue_date",
+    "decision_type",
+    "subject",
+    "url",
+    "amount",
+    "supplier_name",
+    "supplier_tax_id",
+    "signer",
+    "unit",
+]
+SUPPLIER_COLUMNS = [
+    "supplier_key",
+    "supplier_name_normalized",
+    "supplier_tax_id",
+    "first_seen",
+    "last_seen",
+    "decision_count",
+    "total_amount",
+]
+PROCUREMENT_COLUMNS = [
+    "procurement_key",
+    "org",
+    "year",
+    "month",
+    "ada",
+    "issue_date",
+    "decision_type",
+    "subject",
+    "amount",
+    "supplier_key",
+    "supplier_name",
+    "supplier_tax_id",
+    "signer",
+    "unit",
+    "url",
+]
+MONTHLY_SUMMARY_COLUMNS = ["year", "month", "decision_count", "amount_total", "supplier_count"]
+
+
+def read_json(path: Path) -> Any:
+    with path.open("r", encoding="utf-8") as handle:
+        return json.load(handle)
+
+
+def extract_export_rows(payload: Any) -> list[dict[str, Any]]:
+    if isinstance(payload, list):
+        return [item for item in payload if isinstance(item, dict)]
+    if not isinstance(payload, dict):
+        return []
+    for key in ("decisionResultList", "decisions", "diavgeia_decisions"):
+        rows = payload.get(key)
+        if isinstance(rows, list):
+            return [item for item in rows if isinstance(item, dict)]
+    decision_results = payload.get("decisionResults") or payload.get("decisionresults")
+    if isinstance(decision_results, dict):
+        rows = decision_results.get("decision") or decision_results.get("decisions") or []
+        if isinstance(rows, dict):
+            return [rows]
+        if isinstance(rows, list):
+            return [item for item in rows if isinstance(item, dict)]
+    return []
+
+
+def unwrap_detail(payload: Any) -> dict[str, Any]:
+    if not isinstance(payload, dict):
+        return {}
+    for key in ("decision", "decisionResult", "data"):
+        value = payload.get(key)
+        if isinstance(value, dict):
+            return value
+    return payload
+
+
+def normalize_text(value: Any) -> str | None:
+    if value in (None, "", []):
+        return None
+    if isinstance(value, float) and value != value:
+        return None
+    if isinstance(value, (dict, list)):
+        return None
+    text = str(value).strip()
+    return text or None
+
+
+def normalize_label(value: Any) -> str:
+    text = str(value).strip().lower()
+    decomposed = unicodedata.normalize("NFD", text)
+    without_accents = "".join(char for char in decomposed if unicodedata.category(char) != "Mn")
+    return re.sub(r"[\s_\-]+", "", without_accents)
+
+
+def canonical_text(value: Any) -> str:
+    if value in (None, "", []):
+        return ""
+    if isinstance(value, float) and value != value:
+        return ""
+    text = unicodedata.normalize("NFD", str(value).lower())
+    text = "".join(char for char in text if unicodedata.category(char) != "Mn")
+    text = re.sub(r"[^0-9a-zα-ω]+", " ", text)
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def normalize_date(value: Any) -> str | None:
+    text = normalize_text(value)
+    if not text:
+        return None
+    for fmt in ("%d/%m/%Y %H:%M:%S", "%d/%m/%Y", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%d"):
+        try:
+            return datetime.strptime(text[:19], fmt).date().isoformat()
+        except ValueError:
+            continue
+    return text
+
+
+def normalize_amount(value: Any) -> float | None:
+    if value in (None, "") or isinstance(value, bool) or isinstance(value, (dict, list)):
+        return None
+    if isinstance(value, (int, float)):
+        return float(value) if value == value else None
+    normalized = str(value).strip().replace("€", "").replace(" ", "")
+    if not normalized:
+        return None
+    if "," in normalized and "." in normalized:
+        normalized = normalized.replace(".", "").replace(",", ".")
+    elif "," in normalized:
+        normalized = normalized.replace(",", ".")
+    elif re.fullmatch(r"[+-]?\d{1,3}(?:\.\d{3})+", normalized):
+        normalized = normalized.replace(".", "")
+    try:
+        return float(normalized)
+    except ValueError:
+        return None
+
+
+def first_present(source: dict[str, Any], keys: tuple[str, ...]) -> Any:
+    for key in keys:
+        value = source.get(key)
+        if value not in (None, "", []):
+            return value
+    return None
+
+
+def text_from_named_value(value: Any) -> str | None:
+    if isinstance(value, dict):
+        first_name = normalize_text(value.get("firstName") or value.get("firstname"))
+        last_name = normalize_text(value.get("lastName") or value.get("lastname") or value.get("surname"))
+        if first_name or last_name:
+            return " ".join(part for part in (first_name, last_name) if part)
+        for key in ("name", "label", "title", "description", "fullName", "displayName", *EXTRA_FIELD_VALUE_KEYS):
+            text = text_from_named_value(value.get(key))
+            if text:
+                return text
+        return None
+    if isinstance(value, list):
+        texts = [text_from_named_value(item) for item in value]
+        texts = [text for text in texts if text]
+        return ", ".join(texts) if texts else None
+    return normalize_text(value)
+
+
+def is_amount_label(value: Any) -> bool:
+    label = normalize_label(value)
+    return any(token in label for token in AMOUNT_LABEL_TOKENS)
+
+
+def is_supplier_name_label(value: Any) -> bool:
+    label = normalize_label(value)
+    return any(normalize_label(token) in label for token in SUPPLIER_NAME_LABEL_TOKENS) and not is_supplier_tax_id_label(value)
+
+
+def is_supplier_tax_id_label(value: Any) -> bool:
+    label = normalize_label(value)
+    return "amountwithvat" not in label and any(token in label for token in SUPPLIER_TAX_ID_LABEL_TOKENS)
+
+
+def extract_text_by_keys_or_labels(source: Any, keys: tuple[str, ...], label_tokens: tuple[str, ...]) -> str | None:
+    if isinstance(source, dict):
+        for key in keys:
+            if key in source:
+                text = text_from_named_value(source.get(key))
+                if text:
+                    return text
+        labels = [source.get(key) for key in EXTRA_FIELD_LABEL_KEYS if source.get(key) not in (None, "", [])]
+        if any(any(normalize_label(token) in normalize_label(label) for token in label_tokens) for label in labels):
+            for key in EXTRA_FIELD_VALUE_KEYS:
+                text = text_from_named_value(source.get(key))
+                if text:
+                    return text
+        extra_fields = source.get("extraFieldValues")
+        if extra_fields not in (None, "", []):
+            text = extract_text_by_keys_or_labels(extra_fields, keys, label_tokens)
+            if text:
+                return text
+        for key, value in source.items():
+            if key == "extraFieldValues":
+                continue
+            key_label = normalize_label(key)
+            if any(normalize_label(token) in key_label for token in label_tokens):
+                text = text_from_named_value(value)
+                if text:
+                    return text
+        for value in source.values():
+            if isinstance(value, (dict, list)):
+                text = extract_text_by_keys_or_labels(value, keys, label_tokens)
+                if text:
+                    return text
+    elif isinstance(source, list):
+        for item in source:
+            text = extract_text_by_keys_or_labels(item, keys, label_tokens)
+            if text:
+                return text
+    return None
+
+
+def extract_amount(source: Any) -> float | None:
+    if isinstance(source, dict):
+        extra_fields = source.get("extraFieldValues")
+        if extra_fields not in (None, "", []):
+            amount = extract_amount(extra_fields)
+            if amount is not None:
+                return amount
+        labels = [source.get(key) for key in EXTRA_FIELD_LABEL_KEYS if source.get(key) not in (None, "", [])]
+        if any(is_amount_label(label) for label in labels):
+            for key in EXTRA_FIELD_VALUE_KEYS:
+                amount = normalize_amount(source.get(key))
+                if amount is not None:
+                    return amount
+        for key, value in source.items():
+            if key in AMOUNT_KEYS or is_amount_label(key):
+                amount = normalize_amount(value)
+                if amount is not None:
+                    return amount
+        for value in source.values():
+            if isinstance(value, (dict, list)):
+                amount = extract_amount(value)
+                if amount is not None:
+                    return amount
+    elif isinstance(source, list):
+        for item in source:
+            amount = extract_amount(item)
+            if amount is not None:
+                return amount
+    else:
+        return normalize_amount(source)
+    return None
+
+
+def normalize_tax_id(value: Any) -> str | None:
+    text = normalize_text(value)
+    if not text:
+        return None
+    compact = re.sub(r"[^0-9A-Za-z]", "", text).upper()
+    if not compact or compact == "EL":
+        return None
+    full_match = re.fullmatch(r"(?:EL)?(\d{9})", compact)
+    if full_match:
+        return full_match.group(1)
+    el_match = re.search(r"EL(\d{9})(?!\d)", compact)
+    if el_match:
+        return el_match.group(1)
+    digit_sequences = re.findall(r"\d+", text)
+    if len(digit_sequences) == 1 and len(digit_sequences[0]) == 9:
+        return digit_sequences[0]
+    return None
+
+
+def extract_supplier_fields(source: Any) -> tuple[str | None, str | None]:
+    name = None
+    tax_id = None
+    if isinstance(source, dict):
+        labels = [source.get(key) for key in EXTRA_FIELD_LABEL_KEYS if source.get(key) not in (None, "", [])]
+        if any(is_supplier_name_label(label) for label in labels):
+            for key in EXTRA_FIELD_VALUE_KEYS:
+                name = text_from_named_value(source.get(key))
+                if name:
+                    break
+        if any(is_supplier_tax_id_label(label) for label in labels):
+            for key in EXTRA_FIELD_VALUE_KEYS:
+                tax_id = normalize_tax_id(source.get(key))
+                if tax_id:
+                    break
+        for key, value in source.items():
+            if not name and (key in SUPPLIER_NAME_KEYS or is_supplier_name_label(key)):
+                name = text_from_named_value(value)
+            if not tax_id and (key in SUPPLIER_TAX_ID_KEYS or is_supplier_tax_id_label(key)):
+                tax_id = normalize_tax_id(value)
+            if name and tax_id:
+                return name, tax_id
+        for value in source.values():
+            if isinstance(value, (dict, list)):
+                nested_name, nested_tax_id = extract_supplier_fields(value)
+                name = name or nested_name
+                tax_id = tax_id or nested_tax_id
+                if name and tax_id:
+                    return name, tax_id
+    elif isinstance(source, list):
+        for item in source:
+            nested_name, nested_tax_id = extract_supplier_fields(item)
+            name = name or nested_name
+            tax_id = tax_id or nested_tax_id
+            if name and tax_id:
+                return name, tax_id
+    return name, tax_id
+
+
+def normalized_decision_type(raw_type: Any, label: Any = None) -> str | None:
+    label_text = normalize_text(label)
+    if label_text:
+        return label_text
+    raw_text = normalize_text(raw_type)
+    if not raw_text:
+        return None
+    return DECISION_TYPE_LABELS.get(raw_text, raw_text)
+
+
+def supplier_name_normalized(value: Any) -> str | None:
+    text = canonical_text(value)
+    return text.upper() if text else None
+
+
+def supplier_key(name: Any, tax_id: Any) -> str | None:
+    normalized_tax_id = normalize_tax_id(tax_id)
+    if normalized_tax_id:
+        return f"tax:{normalized_tax_id}"
+    normalized_name = supplier_name_normalized(name)
+    if normalized_name:
+        digest = hashlib.sha1(normalized_name.encode("utf-8")).hexdigest()[:12]
+        return f"name:{digest}"
+    return None
+
+
+def detail_url(ada: str | None) -> str | None:
+    if not ada:
+        return None
+    return DETAIL_URL_TEMPLATE.format(ada=quote(str(ada), safe=""))
+
+
+def coalesce(*values: Any) -> Any:
+    for value in values:
+        if value not in (None, "", []):
+            return value
+    return None
+
+
+def normalize_decision(org: str, year: int, month: int, export_row: dict[str, Any], detail: dict[str, Any] | None) -> dict[str, Any]:
+    detail = detail or {}
+    combined = {**export_row, **detail}
+    ada = normalize_text(coalesce(detail.get("ada"), export_row.get("ada"), export_row.get("ADA")))
+    subject = text_from_named_value(coalesce(first_present(detail, SUBJECT_KEYS), first_present(export_row, SUBJECT_KEYS)))
+    issue_date = normalize_date(coalesce(first_present(detail, ISSUE_DATE_KEYS), first_present(export_row, ISSUE_DATE_KEYS)))
+    raw_type = coalesce(first_present(detail, DECISION_TYPE_KEYS), first_present(export_row, DECISION_TYPE_KEYS))
+    type_label = coalesce(first_present(detail, DECISION_TYPE_LABEL_KEYS), first_present(export_row, DECISION_TYPE_LABEL_KEYS))
+    amount = extract_amount(detail) if detail else None
+    if amount is None:
+        amount = extract_amount(export_row)
+    detail_supplier_name, detail_supplier_tax_id = extract_supplier_fields(detail)
+    export_supplier_name, export_supplier_tax_id = extract_supplier_fields(export_row)
+    supplier_name = normalize_text(detail_supplier_name or export_supplier_name)
+    supplier_tax_id = normalize_tax_id(detail_supplier_tax_id or export_supplier_tax_id)
+    url = normalize_text(coalesce(first_present(detail, URL_KEYS), first_present(export_row, URL_KEYS), detail_url(ada)))
+    signer = extract_text_by_keys_or_labels(combined, SIGNER_KEYS, ("signer", "signedby", "finalsigner", "υπογραφων", "υπογραφη"))
+    unit = extract_text_by_keys_or_labels(combined, UNIT_KEYS, ("unit", "organizationunit", "organizationalunit", "μοναδα", "τμημα", "διευθυνση"))
+    return {
+        "org": str(org),
+        "year": int(year),
+        "month": int(month),
+        "ada": ada,
+        "issue_date": issue_date,
+        "decision_type": normalized_decision_type(raw_type, type_label),
+        "subject": subject,
+        "url": url,
+        "amount": amount,
+        "supplier_name": supplier_name,
+        "supplier_tax_id": supplier_tax_id,
+        "signer": signer,
+        "unit": unit,
+    }
+
+
+def parse_partition_value(path: Path, prefix: str) -> str | None:
+    for part in path.parts:
+        if part.startswith(prefix):
+            return part.split("=", 1)[1]
+    return None
+
+
+def load_decisions(raw_root: Path, org: str) -> list[dict[str, Any]]:
+    org_dir = raw_root / f"organization_uid={org}"
+    if not org_dir.exists():
+        return []
+
+    decisions: list[dict[str, Any]] = []
+    for search_path in sorted(org_dir.glob("year=*/month=*/search_export.json")):
+        year_text = parse_partition_value(search_path, "year=")
+        month_text = parse_partition_value(search_path, "month=")
+        if not year_text or not month_text:
+            continue
+        year = int(year_text)
+        month = int(month_text)
+        month_dir = search_path.parent
+        export_rows = extract_export_rows(read_json(search_path))
+        detail_by_ada: dict[str, dict[str, Any]] = {}
+        decisions_dir = month_dir / "decisions"
+        if decisions_dir.exists():
+            for detail_path in sorted(decisions_dir.glob("*.json")):
+                detail = unwrap_detail(read_json(detail_path))
+                ada = normalize_text(detail.get("ada")) or detail_path.stem
+                detail_by_ada[ada] = detail
+
+        for row in export_rows:
+            ada = normalize_text(row.get("ada") or row.get("ADA"))
+            detail = detail_by_ada.get(ada) if ada else None
+            decisions.append(normalize_decision(org, year, month, row, detail))
+    return decisions
+
+
+def is_procurement(decision: dict[str, Any]) -> bool:
+    decision_type = normalize_text(decision.get("decision_type")) or ""
+    subject = normalize_text(decision.get("subject")) or ""
+    text = canonical_text(f"{decision_type} {subject}")
+    supplier_present = bool(supplier_key(decision.get("supplier_name"), decision.get("supplier_tax_id")))
+    amount = decision.get("amount")
+    amount_present = amount is not None and pd.notna(amount)
+    return (
+        supplier_present
+        or amount_present
+        or any(canonical_text(token) in text for token in PROCUREMENT_TOKENS)
+    )
+
+
+def build_tables(decisions: list[dict[str, Any]]) -> dict[str, pd.DataFrame]:
+    decisions_df = pd.DataFrame(decisions, columns=DECISION_COLUMNS)
+    if decisions_df.empty:
+        return {
+            "decisions": decisions_df,
+            "suppliers": pd.DataFrame(columns=SUPPLIER_COLUMNS),
+            "procurements": pd.DataFrame(columns=PROCUREMENT_COLUMNS),
+            "monthly_summary": pd.DataFrame(columns=MONTHLY_SUMMARY_COLUMNS),
+        }
+
+    decisions_df["amount"] = pd.to_numeric(decisions_df["amount"], errors="coerce")
+    decisions_df = decisions_df.sort_values(["year", "month", "issue_date", "ada"], na_position="last").reset_index(drop=True)
+
+    supplier_groups: dict[str, dict[str, Any]] = defaultdict(lambda: {"decision_adas": set(), "total_amount": 0.0})
+    for row in decisions_df.to_dict("records"):
+        key = supplier_key(row.get("supplier_name"), row.get("supplier_tax_id"))
+        if not key:
+            continue
+        group = supplier_groups[key]
+        group["supplier_key"] = key
+        group["supplier_name_normalized"] = group.get("supplier_name_normalized") or supplier_name_normalized(row.get("supplier_name"))
+        group["supplier_tax_id"] = group.get("supplier_tax_id") or normalize_tax_id(row.get("supplier_tax_id"))
+        issue_date = row.get("issue_date")
+        if issue_date:
+            dates = [date for date in (group.get("first_seen"), group.get("last_seen"), issue_date) if date]
+            group["first_seen"] = min(dates)
+            group["last_seen"] = max(dates)
+        if row.get("ada"):
+            group["decision_adas"].add(row.get("ada"))
+        if pd.notna(row.get("amount")):
+            group["total_amount"] += float(row.get("amount"))
+
+    supplier_rows = []
+    for group in supplier_groups.values():
+        supplier_rows.append(
+            {
+                "supplier_key": group.get("supplier_key"),
+                "supplier_name_normalized": group.get("supplier_name_normalized"),
+                "supplier_tax_id": group.get("supplier_tax_id"),
+                "first_seen": group.get("first_seen"),
+                "last_seen": group.get("last_seen"),
+                "decision_count": len(group.get("decision_adas", set())),
+                "total_amount": group.get("total_amount", 0.0),
+            }
+        )
+    suppliers_df = pd.DataFrame(supplier_rows, columns=SUPPLIER_COLUMNS).sort_values("supplier_key").reset_index(drop=True)
+
+    procurement_rows = []
+    for row in decisions_df.to_dict("records"):
+        if not is_procurement(row):
+            continue
+        key = supplier_key(row.get("supplier_name"), row.get("supplier_tax_id"))
+        procurement_id_source = row.get("ada") or "|".join(str(row.get(col) or "") for col in ("org", "year", "month", "subject", "amount"))
+        procurement_rows.append(
+            {
+                "procurement_key": f"proc:{hashlib.sha1(str(procurement_id_source).encode('utf-8')).hexdigest()[:12]}",
+                "org": row.get("org"),
+                "year": row.get("year"),
+                "month": row.get("month"),
+                "ada": row.get("ada"),
+                "issue_date": row.get("issue_date"),
+                "decision_type": row.get("decision_type"),
+                "subject": row.get("subject"),
+                "amount": row.get("amount"),
+                "supplier_key": key,
+                "supplier_name": row.get("supplier_name"),
+                "supplier_tax_id": row.get("supplier_tax_id"),
+                "signer": row.get("signer"),
+                "unit": row.get("unit"),
+                "url": row.get("url"),
+            }
+        )
+    procurements_df = pd.DataFrame(procurement_rows, columns=PROCUREMENT_COLUMNS)
+
+    summary_rows = []
+    for (year, month), group in decisions_df.groupby(["year", "month"], dropna=False):
+        supplier_count = len(
+            {
+                supplier_key(row.get("supplier_name"), row.get("supplier_tax_id"))
+                for row in group.to_dict("records")
+                if supplier_key(row.get("supplier_name"), row.get("supplier_tax_id"))
+            }
+        )
+        summary_rows.append(
+            {
+                "year": int(year),
+                "month": int(month),
+                "decision_count": int(group["ada"].nunique(dropna=True) or len(group)),
+                "amount_total": float(group["amount"].fillna(0).sum()),
+                "supplier_count": supplier_count,
+            }
+        )
+    monthly_summary_df = pd.DataFrame(summary_rows, columns=MONTHLY_SUMMARY_COLUMNS).sort_values(["year", "month"]).reset_index(drop=True)
+
+    return {
+        "decisions": decisions_df,
+        "suppliers": suppliers_df,
+        "procurements": procurements_df,
+        "monthly_summary": monthly_summary_df,
+    }
+
+
+def write_tables(tables: dict[str, pd.DataFrame], output_root: Path, org: str) -> dict[str, Path]:
+    output_dir = output_root / f"org={org}"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    paths = {
+        "decisions": output_dir / "decisions.parquet",
+        "suppliers": output_dir / "suppliers.parquet",
+        "procurements": output_dir / "procurements.parquet",
+        "monthly_summary": output_dir / "monthly_summary.parquet",
+    }
+    for name, path in paths.items():
+        tables[name].to_parquet(path, index=False)
+    return paths
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Build normalized parquet tables from cached Diavgeia JSON.")
+    parser.add_argument("--org", required=True, help="Diavgeia organizationUid to normalize, e.g. 6166")
+    parser.add_argument("--raw-root", type=Path, default=DEFAULT_RAW_ROOT, help="Raw Diavgeia cache root")
+    parser.add_argument("--output-root", type=Path, default=DEFAULT_OUTPUT_ROOT, help="Normalized output root")
+    return parser.parse_args()
+
+
+def main() -> int:
+    args = parse_args()
+    decisions = load_decisions(args.raw_root, str(args.org))
+    tables = build_tables(decisions)
+    paths = write_tables(tables, args.output_root, str(args.org))
+    for name, path in paths.items():
+        print(f"Wrote {name}: {path} ({len(tables[name])} rows)")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
