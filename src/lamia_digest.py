@@ -27,7 +27,9 @@ import requests
 BASE_URL = "https://diavgeia.gov.gr"
 EXPORT_URL = f"{BASE_URL}/luminapi/api/search/export"
 DETAIL_URL_TEMPLATE = f"{BASE_URL}/opendata/decisions/{{ada}}"
-ORG_METADATA_URL_TEMPLATE = f"{BASE_URL}/luminapi/opendata/organizations/{{organization_id}}/{{kind}}"
+ORG_METADATA_URL_TEMPLATE = (
+    f"{BASE_URL}/luminapi/opendata/organizations/{{organization_id}}/{{kind}}"
+)
 LAMIA_ORG_UID = "6166"
 LAMIA_NAME = "ΔΗΜΟΣ ΛΑΜΙΕΩΝ"
 LAMIA_SLUG = "dhmos_lamieon"
@@ -61,6 +63,42 @@ SUBJECT_KEYS = (
     "decisionSubject",
     "documentSubject",
 )
+
+ISSUE_DATE_KEYS = (
+    "issueDate",
+    "decisionDate",
+    "issue_date",
+    "decision_date",
+    "date",
+    "publishDate",
+    "publishedDate",
+)
+
+PROTOCOL_NUMBER_KEYS = (
+    "protocolNumber",
+    "protocolNo",
+    "protocol_number",
+    "protocol",
+    "documentProtocolNumber",
+)
+
+DECISION_TYPE_KEYS = (
+    "decisionTypeUid",
+    "decisionTypeId",
+    "decision_type_raw",
+    "decision_type_id",
+    "decisionType",
+    "type",
+)
+
+DECISION_TYPE_LABEL_KEYS = (
+    "decisionTypeLabel",
+    "decision_type",
+    "decision_type_label",
+    "typeLabel",
+)
+
+REQUIRED_DECISION_FIELDS = ("ada", "issue_date", "subject", "decision_type")
 
 PROCUREMENT_TOKENS = (
     "σύμβαση",
@@ -172,7 +210,9 @@ def build_query(date_from: date | None, date_to: date | None) -> str:
     return " AND ".join(parts)
 
 
-def fetch_export(query: str, limit: int, page_size: int, timeout: int) -> list[dict[str, Any]]:
+def fetch_export(
+    query: str, limit: int, page_size: int, timeout: int
+) -> list[dict[str, Any]]:
     decisions: list[dict[str, Any]] = []
     page = 0
     remaining = limit
@@ -213,7 +253,9 @@ def extract_decisions(payload: Any) -> list[dict[str, Any]]:
 
     decision_results = payload.get("decisionresults") or payload.get("decisionResults")
     if isinstance(decision_results, dict):
-        value = decision_results.get("decision") or decision_results.get("decisions") or []
+        value = (
+            decision_results.get("decision") or decision_results.get("decisions") or []
+        )
         if isinstance(value, dict):
             return [value]
         if isinstance(value, list):
@@ -280,7 +322,9 @@ def has_amount(value: Any) -> bool:
 def normalize_label(value: Any) -> str:
     text = str(value).strip().lower()
     decomposed = unicodedata.normalize("NFD", text)
-    without_accents = "".join(char for char in decomposed if unicodedata.category(char) != "Mn")
+    without_accents = "".join(
+        char for char in decomposed if unicodedata.category(char) != "Mn"
+    )
     return re.sub(r"[\s_\-]+", "", without_accents)
 
 
@@ -317,7 +361,13 @@ def first_subject(source: dict[str, Any]) -> tuple[str | None, str | None]:
     extra_fields = source.get("extraFieldValues")
     if isinstance(extra_fields, dict):
         for key, value in extra_fields.items():
-            if normalize_label(key) in {"subject", "title", "description", "summary", "thema"}:
+            if normalize_label(key) in {
+                "subject",
+                "title",
+                "description",
+                "summary",
+                "thema",
+            }:
                 text = normalize_text(value)
                 if text:
                     return text, f"extraFieldValues.{key}"
@@ -369,12 +419,18 @@ def title_similarity(left: Any, right: Any) -> float:
 
 
 def is_procurement_decision(item: dict[str, Any]) -> bool:
-    text = canonical_text(" ".join(str(part) for part in (
-        item.get("title"),
-        item.get("category"),
-        item.get("decision_type"),
-        item.get("decision_type_raw"),
-    ) if part))
+    text = canonical_text(
+        " ".join(
+            str(part)
+            for part in (
+                item.get("title"),
+                item.get("category"),
+                item.get("decision_type"),
+                item.get("decision_type_raw"),
+            )
+            if part
+        )
+    )
     raw_type = item.get("decision_type_raw")
     if raw_type and str(raw_type).startswith("Δ."):
         return True
@@ -390,7 +446,11 @@ def extract_budget_source(source: Any) -> str | None:
                 if text:
                     return text
             if isinstance(value, dict):
-                labels = [value.get(label_key) for label_key in EXTRA_FIELD_LABEL_KEYS if value.get(label_key) not in (None, "", [])]
+                labels = [
+                    value.get(label_key)
+                    for label_key in EXTRA_FIELD_LABEL_KEYS
+                    if value.get(label_key) not in (None, "", [])
+                ]
                 if any(is_budget_source_label(label) for label in labels):
                     for value_key in EXTRA_FIELD_VALUE_KEYS:
                         text = normalize_text(value.get(value_key))
@@ -442,7 +502,9 @@ def amount_from_value(value: Any, path: tuple[str, ...]) -> tuple[Any, str | Non
     return None, None
 
 
-def extract_extra_field_amount(value: Any, path: tuple[str, ...]) -> tuple[Any, str | None]:
+def extract_extra_field_amount(
+    value: Any, path: tuple[str, ...]
+) -> tuple[Any, str | None]:
     if isinstance(value, dict):
         for key, item in value.items():
             if is_amount_label(key):
@@ -450,7 +512,11 @@ def extract_extra_field_amount(value: Any, path: tuple[str, ...]) -> tuple[Any, 
                 if has_amount(amount):
                     return amount, source or amount_path(path, str(key))
 
-        labels = [value.get(key) for key in EXTRA_FIELD_LABEL_KEYS if value.get(key) not in (None, "", [])]
+        labels = [
+            value.get(key)
+            for key in EXTRA_FIELD_LABEL_KEYS
+            if value.get(key) not in (None, "", [])
+        ]
         if any(is_amount_label(label) for label in labels):
             for key in EXTRA_FIELD_VALUE_KEYS:
                 amount, source = amount_from_value(value.get(key), (*path, key))
@@ -471,7 +537,9 @@ def extract_amount(source: Any, path: tuple[str, ...] = ()) -> tuple[Any, str | 
     if isinstance(source, dict):
         extra_fields = source.get("extraFieldValues")
         if extra_fields not in (None, "", []):
-            amount, amount_source = extract_extra_field_amount(extra_fields, (*path, "extraFieldValues"))
+            amount, amount_source = extract_extra_field_amount(
+                extra_fields, (*path, "extraFieldValues")
+            )
             if has_amount(amount):
                 return amount, amount_source
 
@@ -515,7 +583,9 @@ def fetch_full_decision(
             payload = response.json()
             if isinstance(payload, dict):
                 return payload
-            raise requests.RequestException(f"Unexpected detail payload type: {type(payload).__name__}")
+            raise requests.RequestException(
+                f"Unexpected detail payload type: {type(payload).__name__}"
+            )
         except (ValueError, requests.RequestException) as exc:
             if isinstance(exc, requests.RequestException):
                 last_error = exc
@@ -567,8 +637,18 @@ def metadata_item_name(item: Any) -> tuple[str | None, str | None]:
     if not name:
         first_name = first_present(item, ("firstName", "firstname"))
         last_name = first_present(item, ("lastName", "lastname", "surname"))
-        name = " ".join(str(part).strip() for part in (first_name, last_name) if part not in (None, "", [])) or None
-    return (str(item_id) if item_id not in (None, "", []) else None, str(name) if name else None)
+        name = (
+            " ".join(
+                str(part).strip()
+                for part in (first_name, last_name)
+                if part not in (None, "", [])
+            )
+            or None
+        )
+    return (
+        str(item_id) if item_id not in (None, "", []) else None,
+        str(name) if name else None,
+    )
 
 
 def extract_metadata_items(payload: Any) -> list[Any]:
@@ -596,13 +676,18 @@ def fetch_org_lookup(
     if cache_key in cache:
         return cache[cache_key]
 
-    url = ORG_METADATA_URL_TEMPLATE.format(organization_id=quote(organization_id, safe=""), kind=kind)
+    url = ORG_METADATA_URL_TEMPLATE.format(
+        organization_id=quote(organization_id, safe=""), kind=kind
+    )
     try:
         response = session.get(url, timeout=timeout)
         response.raise_for_status()
         payload = response.json()
     except (ValueError, requests.RequestException) as exc:
-        print(f"Warning: failed to fetch {kind} metadata for organization {organization_id}: {exc}", file=sys.stderr)
+        print(
+            f"Warning: failed to fetch {kind} metadata for organization {organization_id}: {exc}",
+            file=sys.stderr,
+        )
         cache[cache_key] = {}
         return {}
 
@@ -616,7 +701,9 @@ def fetch_org_lookup(
 
 
 def resolve_names(ids: list[str], lookup: dict[str, str]) -> str | None:
-    names = [lookup[item_id] for item_id in ids if item_id in lookup and lookup[item_id]]
+    names = [
+        lookup[item_id] for item_id in ids if item_id in lookup and lookup[item_id]
+    ]
     return ", ".join(names) if names else None
 
 
@@ -640,13 +727,37 @@ def apply_detail_enrichment(
         item["budget_source"] = budget_source
 
     title, title_source = first_subject(detail)
+    if title and not item.get("subject"):
+        item["subject"] = title
     if title and not item.get("title"):
         item["title"] = title
-        item["title_source"] = f"full_record:{title_source}" if title_source else "full_record"
+        item["title_source"] = (
+            f"full_record:{title_source}" if title_source else "full_record"
+        )
         item["missing_subject"] = False
 
+    detail_issue_date = normalize_date(first_present(detail, ISSUE_DATE_KEYS))
+    if detail_issue_date and not item.get("issue_date"):
+        item["issue_date"] = detail_issue_date
+        item["decision_date"] = detail_issue_date
+
+    detail_protocol_number = normalize_text(first_present(detail, PROTOCOL_NUMBER_KEYS))
+    if detail_protocol_number and not item.get("protocol_number"):
+        item["protocol_number"] = detail_protocol_number
+
+    detail_type_raw = first_present(detail, DECISION_TYPE_KEYS)
+    detail_type_label = first_present(detail, DECISION_TYPE_LABEL_KEYS)
+    detail_type = normalized_decision_type(detail_type_raw, detail_type_label)
+    if detail_type_raw and not item.get("decision_type_raw"):
+        item["decision_type_raw"] = detail_type_raw
+    if detail_type and not item.get("decision_type"):
+        item["decision_type"] = detail_type
+        item["decision_type_label"] = detail_type
+
     organization_id = first_present(detail, ORG_ID_KEYS) or item.get("organization_id")
-    organization_id = str(organization_id) if organization_id not in (None, "", []) else None
+    organization_id = (
+        str(organization_id) if organization_id not in (None, "", []) else None
+    )
 
     signer_ids = item.get("signer_ids") or extract_ids(detail, SIGNER_ID_KEYS)
     unit_ids = item.get("unit_ids") or extract_ids(detail, UNIT_ID_KEYS)
@@ -656,9 +767,19 @@ def apply_detail_enrichment(
     signer = first_present(detail, SIGNER_KEYS)
     unit = first_present(detail, UNIT_KEYS)
     if not signer and signer_ids:
-        signer = resolve_names(signer_ids, fetch_org_lookup(session, organization_id, "signers", timeout, metadata_cache))
+        signer = resolve_names(
+            signer_ids,
+            fetch_org_lookup(
+                session, organization_id, "signers", timeout, metadata_cache
+            ),
+        )
     if not unit and unit_ids:
-        unit = resolve_names(unit_ids, fetch_org_lookup(session, organization_id, "units", timeout, metadata_cache))
+        unit = resolve_names(
+            unit_ids,
+            fetch_org_lookup(
+                session, organization_id, "units", timeout, metadata_cache
+            ),
+        )
 
     if signer and not item.get("signer"):
         item["signer"] = signer
@@ -675,10 +796,18 @@ def enrich_missing_amounts(
 ) -> dict[str, int]:
     summary = {
         "decisions_fetched": len(decisions),
-        "amounts_found_before_enrichment": sum(1 for item in decisions if has_amount(item.get("amount"))),
-        "signers_found_before_enrichment": sum(1 for item in decisions if item.get("signer")),
-        "units_found_before_enrichment": sum(1 for item in decisions if item.get("unit")),
-        "subjects_missing_before_enrichment": sum(1 for item in decisions if not item.get("title")),
+        "amounts_found_before_enrichment": sum(
+            1 for item in decisions if has_amount(item.get("amount"))
+        ),
+        "signers_found_before_enrichment": sum(
+            1 for item in decisions if item.get("signer")
+        ),
+        "units_found_before_enrichment": sum(
+            1 for item in decisions if item.get("unit")
+        ),
+        "subjects_missing_before_enrichment": sum(
+            1 for item in decisions if not item.get("title")
+        ),
         "details_fetched": 0,
         "amounts_found_after_enrichment": 0,
         "signers_found_after_enrichment": 0,
@@ -688,10 +817,18 @@ def enrich_missing_amounts(
     }
 
     if not enabled:
-        summary["amounts_found_after_enrichment"] = summary["amounts_found_before_enrichment"]
-        summary["signers_found_after_enrichment"] = summary["signers_found_before_enrichment"]
-        summary["units_found_after_enrichment"] = summary["units_found_before_enrichment"]
-        summary["subjects_missing_after_enrichment"] = summary["subjects_missing_before_enrichment"]
+        summary["amounts_found_after_enrichment"] = summary[
+            "amounts_found_before_enrichment"
+        ]
+        summary["signers_found_after_enrichment"] = summary[
+            "signers_found_before_enrichment"
+        ]
+        summary["units_found_after_enrichment"] = summary[
+            "units_found_before_enrichment"
+        ]
+        summary["subjects_missing_after_enrichment"] = summary[
+            "subjects_missing_before_enrichment"
+        ]
         return summary
 
     metadata_cache: dict[tuple[str, str], dict[str, str]] = {}
@@ -704,7 +841,9 @@ def enrich_missing_amounts(
             if not (needs_amount or needs_signer or needs_unit or needs_title):
                 continue
 
-            detail_attempts = summary["details_fetched"] + summary["detail_fetch_failures"]
+            detail_attempts = (
+                summary["details_fetched"] + summary["detail_fetch_failures"]
+            )
             if max_fetches is not None and detail_attempts >= max_fetches:
                 break
 
@@ -716,17 +855,30 @@ def enrich_missing_amounts(
                 payload = fetch_full_decision(session, str(ada), timeout=timeout)
             except requests.RequestException as exc:
                 summary["detail_fetch_failures"] += 1
-                print(f"Warning: failed to fetch full record for ADA {ada}: {exc}", file=sys.stderr)
+                print(
+                    f"Warning: failed to fetch full record for ADA {ada}: {exc}",
+                    file=sys.stderr,
+                )
                 continue
 
             summary["details_fetched"] += 1
             item["enriched_from_full_record"] = True
-            apply_detail_enrichment(item, unwrap_decision_detail(payload), session, timeout, metadata_cache)
+            apply_detail_enrichment(
+                item, unwrap_decision_detail(payload), session, timeout, metadata_cache
+            )
 
-    summary["amounts_found_after_enrichment"] = sum(1 for item in decisions if has_amount(item.get("amount")))
-    summary["signers_found_after_enrichment"] = sum(1 for item in decisions if item.get("signer"))
-    summary["units_found_after_enrichment"] = sum(1 for item in decisions if item.get("unit"))
-    summary["subjects_missing_after_enrichment"] = sum(1 for item in decisions if not item.get("title"))
+    summary["amounts_found_after_enrichment"] = sum(
+        1 for item in decisions if has_amount(item.get("amount"))
+    )
+    summary["signers_found_after_enrichment"] = sum(
+        1 for item in decisions if item.get("signer")
+    )
+    summary["units_found_after_enrichment"] = sum(
+        1 for item in decisions if item.get("unit")
+    )
+    summary["subjects_missing_after_enrichment"] = sum(
+        1 for item in decisions if not item.get("title")
+    )
     return summary
 
 
@@ -740,16 +892,24 @@ def decision_url(ada: str | None, hit: dict[str, Any]) -> str | None:
     return None
 
 
-def categorize(hit: dict[str, Any], decision_type: str | None, decision_type_label: str | None) -> str:
+def categorize(
+    hit: dict[str, Any], decision_type: str | None, decision_type_label: str | None
+) -> str:
     normalized_type = normalized_decision_type(decision_type, decision_type_label)
     if normalized_type:
         return normalized_type
 
     title, _ = first_subject(hit)
     title_text = str(title or "").lower()
-    if re.search(r"(σύμβαση|συμβαση|ανάθεση|αναθεση|προμήθεια|προμηθεια|contract|procurement)", title_text):
+    if re.search(
+        r"(σύμβαση|συμβαση|ανάθεση|αναθεση|προμήθεια|προμηθεια|contract|procurement)",
+        title_text,
+    ):
         return "Procurement / contract"
-    if re.search(r"(πληρωμή|πληρωμη|δαπάνη|δαπανη|ένταλμα|ενταλμα|πίστωση|πιστωση|payment|expense)", title_text):
+    if re.search(
+        r"(πληρωμή|πληρωμη|δαπάνη|δαπανη|ένταλμα|ενταλμα|πίστωση|πιστωση|payment|expense)",
+        title_text,
+    ):
         return "Finance / payment"
     if re.search(r"(προσωπικ|υπάλληλ|υπαλληλ|διορισμ|personnel|staff)", title_text):
         return "Personnel"
@@ -759,9 +919,9 @@ def categorize(hit: dict[str, Any], decision_type: str | None, decision_type_lab
 
 
 def normalize_decision(hit: dict[str, Any]) -> dict[str, Any]:
-    ada = first_present(hit, ("ada", "ADA"))
-    decision_type_raw = first_present(hit, ("decisionTypeUid", "decisionTypeId", "type"))
-    decision_type_label = first_present(hit, ("decisionTypeLabel", "typeLabel"))
+    ada = normalize_text(first_present(hit, ("ada", "ADA")))
+    decision_type_raw = first_present(hit, DECISION_TYPE_KEYS)
+    decision_type_label = first_present(hit, DECISION_TYPE_LABEL_KEYS)
     decision_type = normalized_decision_type(decision_type_raw, decision_type_label)
     signer = first_present(hit, SIGNER_KEYS)
     unit = first_present(hit, UNIT_KEYS)
@@ -769,12 +929,17 @@ def normalize_decision(hit: dict[str, Any]) -> dict[str, Any]:
     budget_source = extract_budget_source(hit)
     organization_id = first_present(hit, ORG_ID_KEYS)
     title, title_source = first_subject(hit)
+    issue_date = normalize_date(first_present(hit, ISSUE_DATE_KEYS))
+    protocol_number = normalize_text(first_present(hit, PROTOCOL_NUMBER_KEYS))
 
     normalized = {
+        "subject": title,
         "title": title,
         "title_source": title_source,
         "missing_subject": title is None,
-        "decision_date": normalize_date(first_present(hit, ("issueDate", "decisionDate"))),
+        "issue_date": issue_date,
+        "decision_date": issue_date,
+        "protocol_number": protocol_number,
         "ada": ada,
         "decision_type_raw": decision_type_raw,
         "decision_type": decision_type,
@@ -790,12 +955,98 @@ def normalize_decision(hit: dict[str, Any]) -> dict[str, Any]:
         "enriched_from_full_record": False,
         "url": decision_url(ada, hit),
         "category": categorize(hit, decision_type_raw, decision_type_label),
-        "canonical_id": stable_id(LAMIA_ORG_UID, normalize_date(first_present(hit, ("issueDate", "decisionDate"))), ada, prefix="lamia-decision"),
+        "canonical_id": stable_id(
+            LAMIA_ORG_UID, issue_date, ada, prefix="lamia-decision"
+        ),
         "duplicate_flag": False,
         "duplicate_of": None,
         "duplicate_group_size": 1,
     }
     return normalized
+
+
+def missing_required_fields(item: dict[str, Any]) -> list[str]:
+    return [field for field in REQUIRED_DECISION_FIELDS if not item.get(field)]
+
+
+def merge_decision_records(primary: dict[str, Any], duplicate: dict[str, Any]) -> None:
+    """Keep one row per ADA while preserving fields found on duplicate hits."""
+    for key, value in duplicate.items():
+        if value in (None, "", []):
+            continue
+        if primary.get(key) in (None, "", []):
+            primary[key] = value
+
+    if primary.get("subject") and not primary.get("title"):
+        primary["title"] = primary["subject"]
+    if primary.get("title") and not primary.get("subject"):
+        primary["subject"] = primary["title"]
+    if primary.get("issue_date") and not primary.get("decision_date"):
+        primary["decision_date"] = primary["issue_date"]
+    if primary.get("decision_date") and not primary.get("issue_date"):
+        primary["issue_date"] = primary["decision_date"]
+
+
+def deduplicate_decisions_by_ada(
+    decisions: list[dict[str, Any]],
+) -> tuple[list[dict[str, Any]], dict[str, int]]:
+    """Return normalized decisions with exact ADA duplicates collapsed."""
+    unique: list[dict[str, Any]] = []
+    seen: dict[str, dict[str, Any]] = {}
+    duplicate_rows = 0
+    malformed_without_ada = 0
+
+    for item in decisions:
+        ada = normalize_text(item.get("ada"))
+        if not ada:
+            malformed_without_ada += 1
+            unique.append(item)
+            continue
+        item["ada"] = ada
+        existing = seen.get(ada)
+        if existing is None:
+            seen[ada] = item
+            unique.append(item)
+            continue
+        duplicate_rows += 1
+        merge_decision_records(existing, item)
+
+    return unique, {
+        "input_rows": len(decisions),
+        "unique_rows": len(unique),
+        "duplicate_ada_rows_removed": duplicate_rows,
+        "malformed_without_ada": malformed_without_ada,
+    }
+
+
+def split_malformed_decisions(
+    decisions: list[dict[str, Any]],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    valid: list[dict[str, Any]] = []
+    malformed: list[dict[str, Any]] = []
+    for item in decisions:
+        missing = missing_required_fields(item)
+        if missing:
+            malformed.append({"missing_fields": missing, "decision": item})
+        else:
+            valid.append(item)
+    return valid, malformed
+
+
+def assert_unique_adas(decisions: list[dict[str, Any]]) -> None:
+    seen: set[str] = set()
+    duplicates: set[str] = set()
+    for item in decisions:
+        ada = str(item.get("ada") or "")
+        if not ada:
+            continue
+        if ada in seen:
+            duplicates.add(ada)
+        seen.add(ada)
+    if duplicates:
+        raise AssertionError(
+            f"Duplicate ADA entries in final decisions: {', '.join(sorted(duplicates))}"
+        )
 
 
 def likely_duplicate(left: dict[str, Any], right: dict[str, Any]) -> bool:
@@ -805,7 +1056,10 @@ def likely_duplicate(left: dict[str, Any], right: dict[str, Any]) -> bool:
         return False
     if left.get("decision_date") != right.get("decision_date"):
         return False
-    return title_similarity(left.get("title"), right.get("title")) >= DUPLICATE_SIMILARITY_THRESHOLD
+    return (
+        title_similarity(left.get("title"), right.get("title"))
+        >= DUPLICATE_SIMILARITY_THRESHOLD
+    )
 
 
 def assign_procurement_groups(decisions: list[dict[str, Any]]) -> dict[str, Any]:
@@ -870,7 +1124,9 @@ def assign_procurement_groups(decisions: list[dict[str, Any]]) -> dict[str, Any]
         for item in group_items:
             item["canonical_id"] = canonical_id
             item["duplicate_group_size"] = len(group_items)
-            item["duplicate_flag"] = len(group_items) > 1 and item is not canonical_basis
+            item["duplicate_flag"] = (
+                len(group_items) > 1 and item is not canonical_basis
+            )
             item["duplicate_of"] = canonical_ada if item["duplicate_flag"] else None
             item["procurement_flag"] = procurement_group
 
@@ -882,11 +1138,19 @@ def assign_procurement_groups(decisions: list[dict[str, Any]]) -> dict[str, Any]
         "duplicate_pair_matches": duplicate_pair_count,
         "duplicate_groups": duplicate_groups,
         "duplicate_rows": duplicate_rows,
-        "procurement_events": len({item.get("canonical_id") for item in decisions if item.get("procurement_flag")}),
+        "procurement_events": len(
+            {
+                item.get("canonical_id")
+                for item in decisions
+                if item.get("procurement_flag")
+            }
+        ),
     }
 
 
-def build_top_procurements(decisions: list[dict[str, Any]], limit: int = TOP_PROCUREMENTS_LIMIT) -> list[dict[str, Any]]:
+def build_top_procurements(
+    decisions: list[dict[str, Any]], limit: int = TOP_PROCUREMENTS_LIMIT
+) -> list[dict[str, Any]]:
     grouped: dict[str, list[dict[str, Any]]] = {}
     for item in decisions:
         if is_procurement_decision(item) and has_amount(item.get("amount")):
@@ -896,7 +1160,11 @@ def build_top_procurements(decisions: list[dict[str, Any]], limit: int = TOP_PRO
     for canonical_id, items in grouped.items():
         primary = sorted(
             items,
-            key=lambda item: (bool(item.get("duplicate_flag")), str(item.get("decision_date") or ""), str(item.get("ada") or "")),
+            key=lambda item: (
+                bool(item.get("duplicate_flag")),
+                str(item.get("decision_date") or ""),
+                str(item.get("ada") or ""),
+            ),
         )[0]
         summaries.append(
             {
@@ -914,14 +1182,22 @@ def build_top_procurements(decisions: list[dict[str, Any]], limit: int = TOP_PRO
 
     return sorted(
         summaries,
-        key=lambda item: (float(item.get("amount") or 0), str(item.get("decision_date") or "")),
+        key=lambda item: (
+            float(item.get("amount") or 0),
+            str(item.get("decision_date") or ""),
+        ),
         reverse=True,
     )[:limit]
 
 
 def write_json(path: Path, payload: dict[str, Any]) -> None:
+    decisions = payload.get("decisions")
+    if isinstance(decisions, list):
+        assert_unique_adas([item for item in decisions if isinstance(item, dict)])
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
 
 
 def markdown_cell(value: Any) -> str:
@@ -1004,7 +1280,12 @@ def write_markdown(path: Path, payload: dict[str, Any]) -> None:
             ]
         )
         for item in decisions:
-            signer_unit = " / ".join(part for part in (item.get("signer"), item.get("unit")) if part) or None
+            signer_unit = (
+                " / ".join(
+                    part for part in (item.get("signer"), item.get("unit")) if part
+                )
+                or None
+            )
             url = item.get("url")
             ada = item.get("ada")
             ada_text = f"[{ada}]({url})" if ada and url else markdown_cell(ada)
@@ -1036,19 +1317,75 @@ def write_markdown(path: Path, payload: dict[str, Any]) -> None:
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     default_from, default_to = previous_month_bounds()
-    parser = argparse.ArgumentParser(description="Build a Lamia Municipality Diavgeia digest")
-    parser.add_argument("--from", dest="date_from", type=parse_iso_date, default=default_from, help="Start date (YYYY-MM-DD). Defaults to the first day of the previous month.")
-    parser.add_argument("--to", dest="date_to", type=parse_iso_date, default=default_to, help="End date (YYYY-MM-DD). Defaults to the last day of the previous month.")
-    parser.add_argument("--limit", type=int, default=int(os.getenv("LAMIA_DIGEST_LIMIT", "500")), help="Maximum decisions to fetch.")
-    parser.add_argument("--page-size", type=int, default=200, help="Diavgeia page size for export requests.")
-    parser.add_argument("--timeout", type=int, default=60, help="HTTP timeout in seconds.")
-    parser.add_argument("--detail-timeout", type=float, default=20.0, help="HTTP timeout in seconds for full-record enrichment requests.")
-    parser.add_argument("--max-detail-fetches", type=int, default=None, help="Optional cap on full-record enrichment attempts for decisions missing amounts.")
+    parser = argparse.ArgumentParser(
+        description="Build a Lamia Municipality Diavgeia digest"
+    )
+    parser.add_argument(
+        "--from",
+        dest="date_from",
+        type=parse_iso_date,
+        default=default_from,
+        help="Start date (YYYY-MM-DD). Defaults to the first day of the previous month.",
+    )
+    parser.add_argument(
+        "--to",
+        dest="date_to",
+        type=parse_iso_date,
+        default=default_to,
+        help="End date (YYYY-MM-DD). Defaults to the last day of the previous month.",
+    )
+    parser.add_argument(
+        "--limit",
+        type=int,
+        default=int(os.getenv("LAMIA_DIGEST_LIMIT", "500")),
+        help="Maximum decisions to fetch.",
+    )
+    parser.add_argument(
+        "--page-size",
+        type=int,
+        default=200,
+        help="Diavgeia page size for export requests.",
+    )
+    parser.add_argument(
+        "--timeout", type=int, default=60, help="HTTP timeout in seconds."
+    )
+    parser.add_argument(
+        "--detail-timeout",
+        type=float,
+        default=20.0,
+        help="HTTP timeout in seconds for full-record enrichment requests.",
+    )
+    parser.add_argument(
+        "--max-detail-fetches",
+        type=int,
+        default=None,
+        help="Optional cap on full-record enrichment attempts for decisions missing amounts.",
+    )
     enrich_group = parser.add_mutually_exclusive_group()
-    enrich_group.add_argument("--enrich-details", dest="enrich_details", action="store_true", default=True, help="Fetch full decision records when export records do not include an amount (default).")
-    enrich_group.add_argument("--no-enrich-details", dest="enrich_details", action="store_false", help="Disable full-record enrichment for missing amounts.")
-    parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR, help="Output directory for Lamia artifacts.")
-    parser.add_argument("--verbose", action="store_true", help="Print query, enrichment summary, and output paths.")
+    enrich_group.add_argument(
+        "--enrich-details",
+        dest="enrich_details",
+        action="store_true",
+        default=True,
+        help="Fetch full decision records when export records do not include an amount (default).",
+    )
+    enrich_group.add_argument(
+        "--no-enrich-details",
+        dest="enrich_details",
+        action="store_false",
+        help="Disable full-record enrichment for missing amounts.",
+    )
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=DEFAULT_OUTPUT_DIR,
+        help="Output directory for Lamia artifacts.",
+    )
+    parser.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Print query, enrichment summary, and output paths.",
+    )
     return parser.parse_args(argv)
 
 
@@ -1072,19 +1409,25 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Query: {query}", file=sys.stderr)
 
     try:
-        raw_decisions = fetch_export(query, limit=args.limit, page_size=args.page_size, timeout=args.timeout)
+        raw_decisions = fetch_export(
+            query, limit=args.limit, page_size=args.page_size, timeout=args.timeout
+        )
     except requests.RequestException as exc:
         print(f"Failed to fetch Lamia decisions from Diavgeia: {exc}", file=sys.stderr)
         return 1
 
-    decisions = [normalize_decision(item) for item in raw_decisions]
+    normalized_decisions = [normalize_decision(item) for item in raw_decisions]
+    decisions, ada_dedup_summary = deduplicate_decisions_by_ada(normalized_decisions)
     enrichment_summary = enrich_missing_amounts(
         decisions,
         enabled=args.enrich_details,
         timeout=args.detail_timeout,
         max_fetches=args.max_detail_fetches,
     )
+    decisions, malformed_decisions = split_malformed_decisions(decisions)
+    assert_unique_adas(decisions)
     duplicate_summary = assign_procurement_groups(decisions)
+    duplicate_summary.update(ada_dedup_summary)
     top_procurements = build_top_procurements(decisions)
 
     if args.verbose:
@@ -1107,6 +1450,7 @@ def main(argv: list[str] | None = None) -> int:
             "enrich_details": args.enrich_details,
             "enrichment_summary": enrichment_summary,
             "duplicate_summary": duplicate_summary,
+            "malformed_decision_count": len(malformed_decisions),
         },
         "top_procurements": top_procurements,
         "decisions": decisions,
@@ -1114,9 +1458,19 @@ def main(argv: list[str] | None = None) -> int:
 
     json_path = args.output_dir / "lamia_digest.json"
     md_path = args.output_dir / "lamia_digest.md"
+    malformed_path = args.output_dir / "lamia_digest_malformed.json"
     write_json(json_path, payload)
+    write_json(
+        malformed_path,
+        {"metadata": payload["metadata"], "malformed_decisions": malformed_decisions},
+    )
     write_markdown(md_path, payload)
 
+    if malformed_decisions:
+        print(
+            f"Warning: wrote {len(malformed_decisions)} malformed Lamia decisions to {malformed_path}",
+            file=sys.stderr,
+        )
     print(f"Wrote {len(decisions)} Lamia decisions to {json_path} and {md_path}")
     return 0
 
