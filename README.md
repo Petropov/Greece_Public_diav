@@ -58,6 +58,38 @@ git ls-files '*.py' | xargs python -m py_compile
 This validates only tracked Python files and avoids compiling files inside `.git/` or other untracked/local directories.
 
 
+## Diavgeia Monthly Digest cache and backfills
+
+The general monthly digest still supports the original one-month invocation:
+
+```bash
+python digest_monthly.py --org 6166 --year 2026 --month 4
+```
+
+Monthly export payloads are cached by default under:
+
+```text
+data/raw/diavgeia/organization_uid=<ORG>/year=<YYYY>/month=<MM>/search_export.json
+```
+
+Decision detail payloads fetched during monthly enrichment are cached under the same monthly directory as:
+
+```text
+data/raw/diavgeia/organization_uid=<ORG>/year=<YYYY>/month=<MM>/decisions/<ADA>.json
+```
+
+Use `--cache-dir` to point at a different raw-data root, and use `--force-refresh` to ignore existing cache files and refetch them from Diavgeia. Historical backfills can be run month-by-month with `--from YYYY-MM --to YYYY-MM`:
+
+```bash
+python digest_monthly.py --org 6166 --from 2026-01 --to 2026-04
+```
+
+The digest keeps writing the legacy top-level files in `artifacts/` and also writes per-month copies under:
+
+```text
+artifacts/<org>/<YYYY-MM>/
+```
+
 ## Lamia Municipality pilot workflow
 
 This repository also includes a separate Lamia-focused pilot pipeline. It does **not** replace or change the general monthly digest. The Lamia pipeline only queries Diavgeia decisions for the Municipality of Lamia.
