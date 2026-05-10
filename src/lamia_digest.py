@@ -622,13 +622,29 @@ def supplier_key(supplier_name: Any, supplier_tax_id: Any = None) -> str | None:
     return None
 
 
+def supplier_normalized_name(item: dict[str, Any]) -> str | None:
+    return item.get("supplier_name_normalized") or item.get("supplier_normalized_name")
+
+
 def apply_supplier_normalization(item: dict[str, Any]) -> None:
-    normalized_name = canonical_supplier_name(item.get("supplier_name"))
+    raw_name = item.get("supplier_name_raw") or item.get("supplier_name")
+    normalized_name = canonical_supplier_name(raw_name) or supplier_normalized_name(
+        item
+    )
+    item["supplier_name_raw"] = raw_name
+    item["supplier_name_normalized"] = normalized_name
+    # Backward-compatible alias retained for existing downstream consumers.
     item["supplier_normalized_name"] = normalized_name
     item["supplier_type"] = classify_supplier(
-        item.get("supplier_name") or normalized_name, item.get("supplier_tax_id")
+        raw_name or normalized_name, item.get("supplier_tax_id")
     )
-    item["supplier_key"] = supplier_key(normalized_name, item.get("supplier_tax_id"))
+    item["supplier_key"] = item.get("supplier_key") or supplier_key(
+        normalized_name or raw_name, item.get("supplier_tax_id")
+    )
+    item["normalization_confidence"] = item.get("normalization_confidence") or (
+        1.0 if item.get("supplier_tax_id") else 0.9 if normalized_name else 0.0
+    )
+
 
 def value_text_from_extra(value: Any) -> str | None:
     if isinstance(value, dict):
@@ -1448,6 +1464,8 @@ def decision_richness_score(item: dict[str, Any]) -> tuple[int, int, int, int]:
         "amount",
         "budget_source",
         "supplier_name",
+        "supplier_name_raw",
+        "supplier_name_normalized",
         "supplier_normalized_name",
         "supplier_type",
         "supplier_key",
@@ -1654,7 +1672,11 @@ def assign_procurement_groups(decisions: list[dict[str, Any]]) -> dict[str, Any]
 
 def supplier_group_key(item: dict[str, Any]) -> str | None:
     return item.get("supplier_key") or supplier_key(
-        item.get("supplier_normalized_name") or item.get("supplier_name"),
+        (
+            supplier_normalized_name(item)
+            or item.get("supplier_name_raw")
+            or item.get("supplier_name")
+        ),
         item.get("supplier_tax_id"),
     )
 
@@ -1680,8 +1702,11 @@ def build_top_suppliers(
             {
                 "supplier_key": key,
                 "supplier_name": item.get("supplier_name"),
-                "supplier_normalized_name": item.get("supplier_normalized_name"),
+                "supplier_name_raw": item.get("supplier_name_raw"),
+                "supplier_name_normalized": supplier_normalized_name(item),
+                "supplier_normalized_name": supplier_normalized_name(item),
                 "supplier_type": item.get("supplier_type") or "unknown",
+                "normalization_confidence": item.get("normalization_confidence"),
                 "supplier_tax_id": item.get("supplier_tax_id"),
                 "decision_count": 0,
                 "amount_decision_count": 0,
@@ -1691,12 +1716,18 @@ def build_top_suppliers(
         )
         if item.get("supplier_name") and not group.get("supplier_name"):
             group["supplier_name"] = item.get("supplier_name")
-        if item.get("supplier_normalized_name") and not group.get(
-            "supplier_normalized_name"
-        ):
-            group["supplier_normalized_name"] = item.get("supplier_normalized_name")
+        if item.get("supplier_name_raw") and not group.get("supplier_name_raw"):
+            group["supplier_name_raw"] = item.get("supplier_name_raw")
+        normalized_item_name = supplier_normalized_name(item)
+        if normalized_item_name and not group.get("supplier_name_normalized"):
+            group["supplier_name_normalized"] = normalized_item_name
+            group["supplier_normalized_name"] = normalized_item_name
         if item.get("supplier_type") and group.get("supplier_type") == "unknown":
             group["supplier_type"] = item.get("supplier_type")
+        if item.get("normalization_confidence") and not group.get(
+            "normalization_confidence"
+        ):
+            group["normalization_confidence"] = item.get("normalization_confidence")
         if item.get("supplier_tax_id") and not group.get("supplier_tax_id"):
             group["supplier_tax_id"] = item.get("supplier_tax_id")
         group["decision_count"] += 1
@@ -1717,7 +1748,8 @@ def build_top_suppliers(
             int(item.get("amount_decision_count") or 0),
             int(item.get("decision_count") or 0),
             str(
-                item.get("supplier_normalized_name")
+                supplier_normalized_name(item)
+                or item.get("supplier_name_raw")
                 or item.get("supplier_name")
                 or ""
             ),
@@ -1730,7 +1762,8 @@ def build_top_suppliers(
             int(item.get("decision_count") or 0),
             float(item.get("total_amount") or 0),
             str(
-                item.get("supplier_normalized_name")
+                supplier_normalized_name(item)
+                or item.get("supplier_name_raw")
                 or item.get("supplier_name")
                 or ""
             ),
@@ -1768,8 +1801,11 @@ def build_top_procurements(
                 "decision_type": primary.get("decision_type"),
                 "budget_source": primary.get("budget_source"),
                 "supplier_name": primary.get("supplier_name"),
-                "supplier_normalized_name": primary.get("supplier_normalized_name"),
+                "supplier_name_raw": primary.get("supplier_name_raw"),
+                "supplier_name_normalized": supplier_normalized_name(primary),
+                "supplier_normalized_name": supplier_normalized_name(primary),
                 "supplier_type": primary.get("supplier_type"),
+                "normalization_confidence": primary.get("normalization_confidence"),
                 "supplier_key": primary.get("supplier_key"),
                 "supplier_tax_id": primary.get("supplier_tax_id"),
                 "url": primary.get("url"),
@@ -1790,7 +1826,10 @@ def build_top_procurements(
 def write_json(path: Path, payload: dict[str, Any]) -> None:
     decisions = payload.get("decisions")
     if isinstance(decisions, list):
-        assert_unique_adas([item for item in decisions if isinstance(item, dict)])
+        decision_items = [item for item in decisions if isinstance(item, dict)]
+        for item in decision_items:
+            apply_supplier_normalization(item)
+        assert_unique_adas(decision_items)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
         json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
@@ -1858,7 +1897,8 @@ def write_markdown(path: Path, payload: dict[str, Any]) -> None:
                         markdown_cell(item.get("decision_type")),
                         markdown_cell(item.get("title")),
                         markdown_cell(
-                            item.get("supplier_normalized_name")
+                            supplier_normalized_name(item)
+                            or item.get("supplier_name_raw")
                             or item.get("supplier_name")
                             or item.get("supplier_tax_id")
                         ),
@@ -1882,15 +1922,18 @@ def write_markdown(path: Path, payload: dict[str, Any]) -> None:
             ]
         )
         for rank, item in enumerate(top_suppliers_by_amount, start=1):
-            normalized_supplier = item.get(
-                "supplier_normalized_name"
-            ) or canonical_supplier_name(item.get("supplier_name"))
+            normalized_supplier = supplier_normalized_name(
+                item
+            ) or canonical_supplier_name(
+                item.get("supplier_name_raw") or item.get("supplier_name")
+            )
+            raw_supplier = item.get("supplier_name_raw") or item.get("supplier_name")
             supplier_type = item.get("supplier_type") or classify_supplier(
-                normalized_supplier or item.get("supplier_name"),
+                normalized_supplier or raw_supplier,
                 item.get("supplier_tax_id"),
             )
             key = item.get("supplier_key") or supplier_key(
-                normalized_supplier or item.get("supplier_name"),
+                normalized_supplier or raw_supplier,
                 item.get("supplier_tax_id"),
             )
             lines.append(
@@ -1898,10 +1941,8 @@ def write_markdown(path: Path, payload: dict[str, Any]) -> None:
                 + " | ".join(
                     [
                         str(rank),
-                        markdown_cell(
-                            normalized_supplier or item.get("supplier_name")
-                        ),
-                        markdown_cell(item.get("supplier_name")),
+                        markdown_cell(normalized_supplier or raw_supplier),
+                        markdown_cell(raw_supplier),
                         markdown_cell(supplier_type),
                         markdown_cell(key),
                         markdown_cell(item.get("supplier_tax_id")),
@@ -1928,15 +1969,18 @@ def write_markdown(path: Path, payload: dict[str, Any]) -> None:
             ]
         )
         for rank, item in enumerate(top_suppliers_by_count, start=1):
-            normalized_supplier = item.get(
-                "supplier_normalized_name"
-            ) or canonical_supplier_name(item.get("supplier_name"))
+            normalized_supplier = supplier_normalized_name(
+                item
+            ) or canonical_supplier_name(
+                item.get("supplier_name_raw") or item.get("supplier_name")
+            )
+            raw_supplier = item.get("supplier_name_raw") or item.get("supplier_name")
             supplier_type = item.get("supplier_type") or classify_supplier(
-                normalized_supplier or item.get("supplier_name"),
+                normalized_supplier or raw_supplier,
                 item.get("supplier_tax_id"),
             )
             key = item.get("supplier_key") or supplier_key(
-                normalized_supplier or item.get("supplier_name"),
+                normalized_supplier or raw_supplier,
                 item.get("supplier_tax_id"),
             )
             lines.append(
@@ -1944,10 +1988,8 @@ def write_markdown(path: Path, payload: dict[str, Any]) -> None:
                 + " | ".join(
                     [
                         str(rank),
-                        markdown_cell(
-                            normalized_supplier or item.get("supplier_name")
-                        ),
-                        markdown_cell(item.get("supplier_name")),
+                        markdown_cell(normalized_supplier or raw_supplier),
+                        markdown_cell(raw_supplier),
                         markdown_cell(supplier_type),
                         markdown_cell(key),
                         markdown_cell(item.get("supplier_tax_id")),
