@@ -28,7 +28,7 @@ BASE_URL = "https://diavgeia.gov.gr"
 EXPORT_URL = f"{BASE_URL}/luminapi/api/search/export"
 DETAIL_URL_TEMPLATE = f"{BASE_URL}/opendata/decisions/{{ada}}"
 ORG_METADATA_URL_TEMPLATE = (
-    f"{BASE_URL}/luminapi/opendata/organizations/{{organization_id}}/{{kind}}"
+    f"{BASE_URL}/luminapi/opendata/organizations/{{organization_id}}/{{kind}}.json"
 )
 LAMIA_ORG_UID = "6166"
 LAMIA_NAME = "ΔΗΜΟΣ ΛΑΜΙΕΩΝ"
@@ -155,16 +155,20 @@ EXTRA_FIELD_LABEL_KEYS = (
 )
 
 SIGNER_KEYS = (
-    "signer",
     "signerName",
+    "signer",
+    "signedBy",
+    "signed_by",
     "finalSigner",
     "finalSignerName",
     "issuerName",
 )
 
 UNIT_KEYS = (
-    "unit",
+    "unitName",
     "unitLabel",
+    "unit",
+    "unitDescription",
     "organizationalUnit",
     "organizationalUnitLabel",
     "organizationUnit",
@@ -322,6 +326,49 @@ BUDGET_SOURCE_KEYS = (
 SIGNER_ID_KEYS = ("signerIds", "signerId", "signers")
 UNIT_ID_KEYS = ("unitIds", "unitId", "units")
 ORG_ID_KEYS = ("organizationId", "organizationUid", "orgId")
+
+SIGNER_LABEL_TOKENS = (
+    "signer",
+    "signedby",
+    "finalsigner",
+    "υπογραφων",
+    "υπογραφοντα",
+    "υπογραφη",
+)
+
+UNIT_LABEL_TOKENS = (
+    "unit",
+    "unitname",
+    "organizationunit",
+    "organizationalunit",
+    "organizationalunitlabel",
+    "οργανικημοναδα",
+    "οργανωτικημοναδα",
+    "μοναδα",
+    "τμημα",
+    "διευθυνση",
+)
+
+TEXT_VALUE_KEYS = (
+    "name",
+    "label",
+    "title",
+    "description",
+    "fullName",
+    "fullname",
+    "displayName",
+    "value",
+    "fieldValue",
+    "field_value",
+)
+
+RECURRING_SERVICE_TOKENS = (
+    "αποκομιδη",
+    "απορριμματων",
+    "καθαριοτητα",
+    "waste collection",
+    "recurring service",
+)
 
 
 def previous_month_bounds(today: date | None = None) -> tuple[date, date]:
@@ -486,6 +533,118 @@ def is_amount_label(value: Any) -> bool:
         return False
     label = normalize_label(value)
     return any(token in label for token in AMOUNT_LABEL_TOKENS)
+
+
+def text_from_named_value(value: Any) -> str | None:
+    if isinstance(value, dict):
+        first_name = normalize_text(first_present(value, ("firstName", "firstname")))
+        last_name = normalize_text(
+            first_present(value, ("lastName", "lastname", "surname"))
+        )
+        if first_name or last_name:
+            return " ".join(part for part in (first_name, last_name) if part)
+        for key in TEXT_VALUE_KEYS:
+            text = text_from_named_value(value.get(key))
+            if text:
+                return text
+        return None
+    if isinstance(value, list):
+        texts = [text_from_named_value(item) for item in value]
+        texts = [text for text in texts if text]
+        return ", ".join(texts) if texts else None
+    return normalize_text(value)
+
+
+def extract_text_by_keys_or_labels(
+    source: Any, keys: tuple[str, ...], label_tokens: tuple[str, ...]
+) -> str | None:
+    """Extract display text from direct fields or labeled extraFieldValues.
+
+    Diavgeia detail payloads may expose names as scalar fields, nested objects,
+    or only as labeled entries in ``extraFieldValues``.  Keep this tolerant so a
+    missing/changed optional field does not block digest generation.
+    """
+    if isinstance(source, dict):
+        for key in keys:
+            if key in source:
+                text = text_from_named_value(source.get(key))
+                if text:
+                    return text
+
+        labels = [
+            source.get(key)
+            for key in EXTRA_FIELD_LABEL_KEYS
+            if source.get(key) not in (None, "", [])
+        ]
+        if any(
+            any(
+                normalize_label(token) in normalize_label(label)
+                for token in label_tokens
+            )
+            for label in labels
+        ):
+            for key in EXTRA_FIELD_VALUE_KEYS:
+                text = text_from_named_value(source.get(key))
+                if text:
+                    return text
+
+        extra_fields = source.get("extraFieldValues")
+        if extra_fields not in (None, "", []):
+            text = extract_text_by_keys_or_labels(extra_fields, keys, label_tokens)
+            if text:
+                return text
+
+        for key, value in source.items():
+            if key == "extraFieldValues":
+                continue
+            key_label = normalize_label(key)
+            if key in (*SIGNER_ID_KEYS, *UNIT_ID_KEYS) or key_label.endswith(("id", "ids")):
+                continue
+            if any(normalize_label(token) in key_label for token in label_tokens):
+                text = text_from_named_value(value)
+                if text:
+                    return text
+
+        for value in source.values():
+            if isinstance(value, (dict, list)):
+                text = extract_text_by_keys_or_labels(value, keys, label_tokens)
+                if text:
+                    return text
+    elif isinstance(source, list):
+        for item in source:
+            text = extract_text_by_keys_or_labels(item, keys, label_tokens)
+            if text:
+                return text
+    return None
+
+
+def extract_signer_name(source: Any) -> str | None:
+    return extract_text_by_keys_or_labels(source, SIGNER_KEYS, SIGNER_LABEL_TOKENS)
+
+
+def extract_unit_name(source: Any) -> str | None:
+    return extract_text_by_keys_or_labels(source, UNIT_KEYS, UNIT_LABEL_TOKENS)
+
+
+def is_recurring_service_decision(item: dict[str, Any]) -> bool:
+    text = canonical_text(
+        " ".join(
+            str(part)
+            for part in (
+                item.get("title"),
+                item.get("category"),
+                item.get("decision_type"),
+                item.get("decision_type_raw"),
+                item.get("budget_source"),
+            )
+            if part
+        )
+    )
+    return any(canonical_text(token) in text for token in RECURRING_SERVICE_TOKENS)
+
+
+def procurement_tags(item: dict[str, Any]) -> list[str]:
+    return ["recurring service"] if is_recurring_service_decision(item) else []
 
 
 def is_budget_source_label(value: Any) -> bool:
@@ -933,6 +1092,8 @@ def is_procurement_decision(item: dict[str, Any]) -> bool:
     raw_type = item.get("decision_type_raw")
     if raw_type and str(raw_type).startswith("Δ."):
         return True
+    if is_recurring_service_decision(item):
+        return True
     return any(canonical_text(token) in text for token in PROCUREMENT_TOKENS)
 
 
@@ -1289,8 +1450,8 @@ def apply_detail_enrichment(
     item["signer_ids"] = signer_ids
     item["unit_ids"] = unit_ids
 
-    signer = first_present(detail, SIGNER_KEYS)
-    unit = first_present(detail, UNIT_KEYS)
+    signer = extract_signer_name(detail)
+    unit = extract_unit_name(detail)
     if not signer and signer_ids:
         signer = resolve_names(
             signer_ids,
@@ -1473,8 +1634,8 @@ def normalize_decision(hit: dict[str, Any]) -> dict[str, Any]:
     decision_type_raw = first_present(hit, DECISION_TYPE_KEYS)
     decision_type_label = first_present(hit, DECISION_TYPE_LABEL_KEYS)
     decision_type = normalized_decision_type(decision_type_raw, decision_type_label)
-    signer = first_present(hit, SIGNER_KEYS)
-    unit = first_present(hit, UNIT_KEYS)
+    signer = extract_signer_name(hit)
+    unit = extract_unit_name(hit)
     amount, amount_source = extract_amount(hit)
     budget_source = extract_budget_source(hit)
     supplier_name, supplier_tax_id, supplier_name_source, supplier_tax_id_source = (
@@ -1891,6 +2052,7 @@ def build_top_procurements(
                 "supplier_key": primary.get("supplier_key"),
                 "supplier_tax_id": primary.get("supplier_tax_id"),
                 "url": primary.get("url"),
+                "tags": procurement_tags(primary),
                 "duplicate_count": max(0, len(items) - 1),
             }
         )
@@ -1960,8 +2122,8 @@ def write_markdown(path: Path, payload: dict[str, Any]) -> None:
             [
                 "## Top procurements / contracts",
                 "",
-                "| Rank | Canonical event | Date | ΑΔΑ | Type | Title | Supplier | Amount | Duplicates | URL |",
-                "| ---: | --- | --- | --- | --- | --- | --- | ---: | ---: | --- |",
+                "| Rank | Canonical event | Date | ΑΔΑ | Type | Title | Supplier | Amount | Tags | Duplicates | URL |",
+                "| ---: | --- | --- | --- | --- | --- | --- | ---: | --- | ---: | --- |",
             ]
         )
         for rank, item in enumerate(top_procurements, start=1):
@@ -1985,6 +2147,7 @@ def write_markdown(path: Path, payload: dict[str, Any]) -> None:
                             or item.get("supplier_tax_id")
                         ),
                         format_amount(item.get("amount")),
+                        markdown_cell(", ".join(item.get("tags") or [])),
                         str(item.get("duplicate_count", 0)),
                         markdown_cell(url),
                     ]

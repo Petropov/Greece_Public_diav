@@ -583,6 +583,27 @@ class LamiaDigestSignerUnitTests(unittest.TestCase):
         self.assertEqual(item["supplier_tax_id"], "123456789")
         self.assertEqual(item["raw_detail_extra_fields"], detail["extraFieldValues"])
 
+    def test_detail_enrichment_maps_nested_and_labeled_signer_unit_names(self):
+        item = {
+            "amount": None,
+            "signer": None,
+            "unit": None,
+            "signer_ids": [],
+            "unit_ids": [],
+            "organization_id": "6166",
+        }
+        detail = {
+            "signer": {"firstName": "Jane", "lastName": "Doe"},
+            "extraFieldValues": [
+                {"label": "Οργανική Μονάδα", "value": "Τμήμα Προμηθειών"},
+            ],
+        }
+
+        apply_detail_enrichment(item, detail, DummySession(), 1, {})
+
+        self.assertEqual(item["signer"], "Jane Doe")
+        self.assertEqual(item["unit"], "Τμήμα Προμηθειών")
+
     def test_detail_enrichment_fills_minimum_final_fields(self):
         item = {
             "ada": "DETAIL1",
@@ -759,6 +780,24 @@ class LamiaDigestSemanticQualityTests(unittest.TestCase):
 
         self.assertEqual([item["ada"] for item in rows], ["OK"])
         self.assertEqual(malformed[0]["missing_fields"], ["subject"])
+
+    def test_top_procurements_includes_large_recurring_service_payment(self):
+        decision = normalize_decision(
+            {
+                "ada": "Ρ91ΝΩΛΚ-ΒΥ8",
+                "subject": "Πληρωμή υπηρεσιών αποκομιδής απορριμμάτων",
+                "issueDate": "2026-04-10",
+                "decisionTypeUid": "Β.2.1",
+                "amountWithVAT": "108.694,00",
+                "supplierName": "ΑΝΑΔΟΧΟΣ ΑΕ",
+            }
+        )
+
+        top = build_top_procurements([decision])
+
+        self.assertEqual(top[0]["ada"], "Ρ91ΝΩΛΚ-ΒΥ8")
+        self.assertEqual(top[0]["amount"], 108694.0)
+        self.assertEqual(top[0]["tags"], ["recurring service"])
 
     def test_duplicate_procurements_share_canonical_id(self):
         decisions = [
