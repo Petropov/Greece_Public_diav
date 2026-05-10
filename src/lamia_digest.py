@@ -25,6 +25,7 @@ import requests
 BASE_URL = "https://diavgeia.gov.gr"
 EXPORT_URL = f"{BASE_URL}/luminapi/api/search/export"
 DETAIL_URL_TEMPLATE = f"{BASE_URL}/opendata/decisions/{{ada}}"
+ORG_METADATA_URL_TEMPLATE = f"{BASE_URL}/luminapi/opendata/organizations/{{organization_id}}/{{kind}}"
 LAMIA_ORG_UID = "6166"
 LAMIA_NAME = "ΔΗΜΟΣ ΛΑΜΙΕΩΝ"
 LAMIA_SLUG = "dhmos_lamieon"
@@ -51,7 +52,6 @@ MONEY_KEYS = (
     "netAmount",
     "totalAmount",
     "amountWithVAT",
-    "budget",
     "budgetAmount",
 )
 
@@ -60,7 +60,6 @@ AMOUNT_LABEL_TOKENS = (
     "amount",
     "paymentamount",
     "expenseamount",
-    "budget",
 )
 
 EXTRA_FIELD_VALUE_KEYS = (
@@ -98,6 +97,19 @@ UNIT_KEYS = (
     "organizationUnit",
     "organizationUnitLabel",
 )
+
+BUDGET_SOURCE_KEYS = (
+    "budgettype",
+    "budgetType",
+    "budget_source",
+    "budgetSource",
+    "fundingSource",
+    "financingSource",
+)
+
+SIGNER_ID_KEYS = ("signerIds", "signerId", "signers")
+UNIT_ID_KEYS = ("unitIds", "unitId", "units")
+ORG_ID_KEYS = ("organizationId", "organizationUid", "orgId")
 
 
 def previous_month_bounds(today: date | None = None) -> tuple[date, date]:
@@ -195,26 +207,39 @@ def normalize_date(value: Any) -> str | None:
     return text
 
 
-def normalize_amount(value: Any) -> Any:
+def normalize_amount(value: Any) -> int | float | None:
+    """Return a numeric amount only; non-numeric labels are not amounts."""
     if value in (None, ""):
         return None
     if isinstance(value, bool):
         return None
     if isinstance(value, (dict, list)):
         return None
-    if isinstance(value, (int, float)):
+    if isinstance(value, int):
         return value
+    if isinstance(value, float):
+        return value if value == value else None
+
     text = str(value).strip()
-    # Preserve unparseable strings rather than hiding available source data.
-    normalized = text.replace("€", "").replace(" ", "").replace(".", "").replace(",", ".")
+    if not text:
+        return None
+
+    normalized = text.replace("€", "").replace(" ", "")
+    if "," in normalized and "." in normalized:
+        normalized = normalized.replace(".", "").replace(",", ".")
+    elif "," in normalized:
+        normalized = normalized.replace(",", ".")
+    elif re.fullmatch(r"[+-]?\d{1,3}(?:\.\d{3})+", normalized):
+        normalized = normalized.replace(".", "")
+
     try:
         return float(normalized)
     except ValueError:
-        return text
+        return None
 
 
 def has_amount(value: Any) -> bool:
-    return value not in (None, "", [])
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
 
 
 def normalize_label(value: Any) -> str:
@@ -229,6 +254,58 @@ def is_amount_label(value: Any) -> bool:
         return False
     label = normalize_label(value)
     return any(token in label for token in AMOUNT_LABEL_TOKENS)
+
+
+def is_budget_source_label(value: Any) -> bool:
+    if value in (None, ""):
+        return False
+    label = normalize_label(value)
+    return any(normalize_label(token) == label for token in BUDGET_SOURCE_KEYS)
+
+
+def normalize_text(value: Any) -> str | None:
+    if value in (None, "", []):
+        return None
+    if isinstance(value, (dict, list)):
+        return None
+    text = str(value).strip()
+    return text or None
+
+
+def extract_budget_source(source: Any) -> str | None:
+    if isinstance(source, dict):
+        for key, value in source.items():
+            key_text = str(key)
+            if is_budget_source_label(key_text):
+                text = normalize_text(value)
+                if text:
+                    return text
+            if isinstance(value, dict):
+                labels = [value.get(label_key) for label_key in EXTRA_FIELD_LABEL_KEYS if value.get(label_key) not in (None, "", [])]
+                if any(is_budget_source_label(label) for label in labels):
+                    for value_key in EXTRA_FIELD_VALUE_KEYS:
+                        text = normalize_text(value.get(value_key))
+                        if text:
+                            return text
+                nested = extract_budget_source(value)
+                if nested:
+                    return nested
+            elif isinstance(value, list):
+                nested = extract_budget_source(value)
+                if nested:
+                    return nested
+    elif isinstance(source, list):
+        for item in source:
+            nested = extract_budget_source(item)
+            if nested:
+                return nested
+    return None
+
+
+def format_amount(value: Any) -> str:
+    if not has_amount(value):
+        return "—"
+    return f"{value:g}" if isinstance(value, float) else str(value)
 
 
 def amount_path(path: tuple[str, ...], key: str) -> str:
@@ -350,6 +427,130 @@ def unwrap_decision_detail(payload: dict[str, Any]) -> Any:
     return payload
 
 
+def values_as_list(value: Any) -> list[Any]:
+    if value in (None, "", []):
+        return []
+    if isinstance(value, list):
+        return value
+    return [value]
+
+
+def extract_ids(source: dict[str, Any], keys: tuple[str, ...]) -> list[str]:
+    ids: list[str] = []
+    for key in keys:
+        for item in values_as_list(source.get(key)):
+            if isinstance(item, dict):
+                value = first_present(item, ("uid", "id", "signerId", "unitId"))
+            else:
+                value = item
+            if value not in (None, "", []):
+                ids.append(str(value))
+        if ids:
+            break
+    return ids
+
+
+def metadata_item_name(item: Any) -> tuple[str | None, str | None]:
+    if not isinstance(item, dict):
+        return None, None
+    item_id = first_present(item, ("uid", "id", "signerId", "unitId"))
+    name = first_present(item, ("label", "name", "description", "title"))
+    if not name:
+        first_name = first_present(item, ("firstName", "firstname"))
+        last_name = first_present(item, ("lastName", "lastname", "surname"))
+        name = " ".join(str(part).strip() for part in (first_name, last_name) if part not in (None, "", [])) or None
+    return (str(item_id) if item_id not in (None, "", []) else None, str(name) if name else None)
+
+
+def extract_metadata_items(payload: Any) -> list[Any]:
+    if isinstance(payload, list):
+        return payload
+    if isinstance(payload, dict):
+        for key in ("signers", "units", "items", "data", "results"):
+            value = payload.get(key)
+            if isinstance(value, list):
+                return value
+        return [payload]
+    return []
+
+
+def fetch_org_lookup(
+    session: requests.Session,
+    organization_id: str | None,
+    kind: str,
+    timeout: float,
+    cache: dict[tuple[str, str], dict[str, str]],
+) -> dict[str, str]:
+    if not organization_id:
+        return {}
+    cache_key = (organization_id, kind)
+    if cache_key in cache:
+        return cache[cache_key]
+
+    url = ORG_METADATA_URL_TEMPLATE.format(organization_id=quote(organization_id, safe=""), kind=kind)
+    try:
+        response = session.get(url, timeout=timeout)
+        response.raise_for_status()
+        payload = response.json()
+    except (ValueError, requests.RequestException) as exc:
+        print(f"Warning: failed to fetch {kind} metadata for organization {organization_id}: {exc}", file=sys.stderr)
+        cache[cache_key] = {}
+        return {}
+
+    lookup: dict[str, str] = {}
+    for item in extract_metadata_items(payload):
+        item_id, name = metadata_item_name(item)
+        if item_id and name:
+            lookup[item_id] = name
+    cache[cache_key] = lookup
+    return lookup
+
+
+def resolve_names(ids: list[str], lookup: dict[str, str]) -> str | None:
+    names = [lookup[item_id] for item_id in ids if item_id in lookup and lookup[item_id]]
+    return ", ".join(names) if names else None
+
+
+def apply_detail_enrichment(
+    item: dict[str, Any],
+    detail: Any,
+    session: requests.Session,
+    timeout: float,
+    metadata_cache: dict[tuple[str, str], dict[str, str]],
+) -> None:
+    if not isinstance(detail, dict):
+        return
+
+    amount, source = extract_amount(detail)
+    if has_amount(amount) and not has_amount(item.get("amount")):
+        item["amount"] = amount
+        item["amount_source"] = f"full_record:{source}" if source else "full_record"
+
+    budget_source = extract_budget_source(detail)
+    if budget_source and not item.get("budget_source"):
+        item["budget_source"] = budget_source
+
+    organization_id = first_present(detail, ORG_ID_KEYS) or item.get("organization_id")
+    organization_id = str(organization_id) if organization_id not in (None, "", []) else None
+
+    signer_ids = item.get("signer_ids") or extract_ids(detail, SIGNER_ID_KEYS)
+    unit_ids = item.get("unit_ids") or extract_ids(detail, UNIT_ID_KEYS)
+    item["signer_ids"] = signer_ids
+    item["unit_ids"] = unit_ids
+
+    signer = first_present(detail, SIGNER_KEYS)
+    unit = first_present(detail, UNIT_KEYS)
+    if not signer and signer_ids:
+        signer = resolve_names(signer_ids, fetch_org_lookup(session, organization_id, "signers", timeout, metadata_cache))
+    if not unit and unit_ids:
+        unit = resolve_names(unit_ids, fetch_org_lookup(session, organization_id, "units", timeout, metadata_cache))
+
+    if signer and not item.get("signer"):
+        item["signer"] = signer
+    if unit and not item.get("unit"):
+        item["unit"] = unit
+
+
 def enrich_missing_amounts(
     decisions: list[dict[str, Any]],
     *,
@@ -360,19 +561,30 @@ def enrich_missing_amounts(
     summary = {
         "decisions_fetched": len(decisions),
         "amounts_found_before_enrichment": sum(1 for item in decisions if has_amount(item.get("amount"))),
+        "signers_found_before_enrichment": sum(1 for item in decisions if item.get("signer")),
+        "units_found_before_enrichment": sum(1 for item in decisions if item.get("unit")),
         "details_fetched": 0,
         "amounts_found_after_enrichment": 0,
+        "signers_found_after_enrichment": 0,
+        "units_found_after_enrichment": 0,
         "detail_fetch_failures": 0,
     }
 
     if not enabled:
         summary["amounts_found_after_enrichment"] = summary["amounts_found_before_enrichment"]
+        summary["signers_found_after_enrichment"] = summary["signers_found_before_enrichment"]
+        summary["units_found_after_enrichment"] = summary["units_found_before_enrichment"]
         return summary
 
+    metadata_cache: dict[tuple[str, str], dict[str, str]] = {}
     with requests.Session() as session:
         for item in decisions:
-            if has_amount(item.get("amount")):
+            needs_amount = not has_amount(item.get("amount"))
+            needs_signer = not item.get("signer")
+            needs_unit = not item.get("unit")
+            if not (needs_amount or needs_signer or needs_unit):
                 continue
+
             detail_attempts = summary["details_fetched"] + summary["detail_fetch_failures"]
             if max_fetches is not None and detail_attempts >= max_fetches:
                 break
@@ -390,13 +602,11 @@ def enrich_missing_amounts(
 
             summary["details_fetched"] += 1
             item["enriched_from_full_record"] = True
-            detail = unwrap_decision_detail(payload)
-            amount, source = extract_amount(detail)
-            if has_amount(amount):
-                item["amount"] = amount
-                item["amount_source"] = f"full_record:{source}" if source else "full_record"
+            apply_detail_enrichment(item, unwrap_decision_detail(payload), session, timeout, metadata_cache)
 
     summary["amounts_found_after_enrichment"] = sum(1 for item in decisions if has_amount(item.get("amount")))
+    summary["signers_found_after_enrichment"] = sum(1 for item in decisions if item.get("signer"))
+    summary["units_found_after_enrichment"] = sum(1 for item in decisions if item.get("unit"))
     return summary
 
 
@@ -435,6 +645,8 @@ def normalize_decision(hit: dict[str, Any]) -> dict[str, Any]:
     signer = first_present(hit, SIGNER_KEYS)
     unit = first_present(hit, UNIT_KEYS)
     amount, amount_source = extract_amount(hit)
+    budget_source = extract_budget_source(hit)
+    organization_id = first_present(hit, ORG_ID_KEYS)
 
     normalized = {
         "title": first_present(hit, ("subject", "title")),
@@ -444,8 +656,12 @@ def normalize_decision(hit: dict[str, Any]) -> dict[str, Any]:
         "decision_type_label": decision_type_label,
         "signer": signer,
         "unit": unit,
+        "signer_ids": extract_ids(hit, SIGNER_ID_KEYS),
+        "unit_ids": extract_ids(hit, UNIT_ID_KEYS),
+        "organization_id": organization_id,
         "amount": amount,
         "amount_source": f"export:{amount_source}" if amount_source else None,
+        "budget_source": budget_source,
         "enriched_from_full_record": False,
         "url": decision_url(ada, hit),
         "category": categorize(hit, decision_type, decision_type_label),
@@ -483,8 +699,8 @@ def write_markdown(path: Path, payload: dict[str, Any]) -> None:
     else:
         lines.extend(
             [
-                "| Date | ΑΔΑ | Category | Type | Title | Signer / Unit | Amount | URL |",
-                "| --- | --- | --- | --- | --- | --- | ---: | --- |",
+                "| Date | ΑΔΑ | Category | Type | Title | Signer / Unit | Amount | Budget source | URL |",
+                "| --- | --- | --- | --- | --- | --- | ---: | --- | --- |",
             ]
         )
         for item in decisions:
@@ -502,7 +718,8 @@ def write_markdown(path: Path, payload: dict[str, Any]) -> None:
                         markdown_cell(item.get("decision_type_label") or item.get("decision_type")),
                         markdown_cell(item.get("title")),
                         markdown_cell(signer_unit),
-                        markdown_cell(item.get("amount")),
+                        format_amount(item.get("amount")),
+                        markdown_cell(item.get("budget_source")),
                         markdown_cell(url),
                     ]
                 )
