@@ -585,6 +585,35 @@ def coalesce(*values: Any) -> Any:
     return None
 
 
+
+def extract_subject_budget_amount(subject: Any) -> tuple[float | None, str | None]:
+    text = normalize_text(subject) or ""
+    canon = canonical_text(text)
+
+    trusted_markers = (
+        "προυπ",
+        "προυπολογισμου",
+        "προυπολ",
+        "προυπολογισμος",
+        "μελετης",
+        "με φπα",
+    )
+    if not any(marker in canon for marker in trusted_markers):
+        return None, None
+
+    matches = re.findall(r"\d{1,3}(?:[.\s]\d{3})+(?:,\d{2})?|\d+(?:,\d{2})", text)
+    amounts = []
+    for raw in matches:
+        amount = normalize_amount(raw)
+        if amount is not None and 1 <= amount <= 10_000_000:
+            amounts.append(amount)
+
+    if not amounts:
+        return None, None
+
+    return max(amounts), "subject:trusted_budget_phrase"
+
+
 def normalize_decision(org: str, year: int, month: int, export_row: dict[str, Any], detail: dict[str, Any] | None) -> dict[str, Any]:
     detail_enriched = bool(detail)
     detail = detail or {}
@@ -597,6 +626,8 @@ def normalize_decision(org: str, year: int, month: int, export_row: dict[str, An
     amount, amount_source = extract_amount_with_source(detail, "detail") if detail else (None, None)
     if amount is None:
         amount, amount_source = extract_amount_with_source(export_row, "search_export")
+    if amount is None:
+        amount, amount_source = extract_subject_budget_amount(subject)
     detail_supplier_name, detail_supplier_tax_id = extract_supplier_fields(detail)
     export_supplier_name, export_supplier_tax_id = extract_supplier_fields(export_row)
     supplier_name = normalize_text(detail_supplier_name or export_supplier_name)
@@ -673,9 +704,31 @@ def is_procurement(decision: dict[str, Any]) -> bool:
     text = decision.get("_procurement_searchable_text")
     if text is None:
         text = procurement_searchable_text(decision)
+
+    non_procurement_tokens = (
+        "μειωση εγγυησεων",
+        "επιστροφη εγγυητικης",
+        "συγκροτηση συνεργειου",
+        "συσταση επιτροπης",
+        "απορριψη",
+        "μη εγκριση",
+        "ακυρωση",
+        "ανακληση",
+        "ανακλησης",
+        "ανακληση διακηρυξης",
+        "κηρυξη προμηθευτη εκπτωτου",
+        "ακυρωση παραστ",
+    )
+    if any(token in text for token in non_procurement_tokens):
+        return False
+
     supplier_present = bool(supplier_key(decision.get("supplier_name"), decision.get("supplier_tax_id")))
     amount = decision.get("amount")
     amount_present = amount is not None and pd.notna(amount)
+
+    if amount_present and float(amount) > 10_000_000:
+        return False
+
     return supplier_present or amount_present or any(token in text for token in CANONICAL_PROCUREMENT_TOKENS)
 
 
@@ -690,6 +743,7 @@ def build_tables(decisions: list[dict[str, Any]]) -> dict[str, pd.DataFrame]:
         }
 
     decisions_df["amount"] = pd.to_numeric(decisions_df["amount"], errors="coerce")
+    decisions_df = decisions_df.drop_duplicates(subset=["ada"], keep="first")
     decisions_df = decisions_df.sort_values(["year", "month", "issue_date", "ada"], na_position="last").reset_index(drop=True)
 
     sorted_records = decisions_df.to_dict("records")
@@ -769,19 +823,25 @@ def build_tables(decisions: list[dict[str, Any]]) -> dict[str, pd.DataFrame]:
         )
     procurements_df = pd.DataFrame(procurement_rows, columns=PROCUREMENT_COLUMNS)
 
+    procurement_month_groups = {
+        key: group for key, group in procurements_df.groupby(["year", "month"], dropna=False)
+    }
+
     summary_rows = []
     for (year, month), group in decisions_df.groupby(["year", "month"], dropna=False):
-        supplier_count = int(group["_supplier_key"].dropna().nunique())
-        amount_known_count = int(group["amount"].notna().sum())
+        pgroup = procurement_month_groups.get((year, month), pd.DataFrame(columns=PROCUREMENT_COLUMNS))
+
+        supplier_count = int(pgroup["supplier_key"].dropna().nunique()) if not pgroup.empty else 0
+        amount_known_count = int(pgroup["amount"].notna().sum()) if not pgroup.empty else 0
         row_count = int(len(group))
-        supplier_known_count = int(group["_supplier_key"].notna().sum())
+        supplier_known_count = int(pgroup["supplier_key"].notna().sum()) if not pgroup.empty else 0
         detail_enriched_count = int(group["_detail_enriched"].fillna(False).astype(bool).sum())
         summary_rows.append(
             {
                 "year": int(year),
                 "month": int(month),
                 "decision_count": int(group["ada"].nunique(dropna=True) or row_count),
-                "amount_total": float(group["amount"].fillna(0).sum()),
+                "amount_total": float(pgroup["amount"].fillna(0).sum()) if not pgroup.empty else 0.0,
                 "supplier_count": supplier_count,
                 "amount_known_count": amount_known_count,
                 "amount_missing_count": row_count - amount_known_count,
