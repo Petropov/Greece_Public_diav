@@ -238,7 +238,16 @@ python scripts/supplier_intelligence_report.py --org 6166
 # Writes: reports/supplier_intelligence_org_6166.html
 ```
 
-**Step 6 — Per-supplier dossiers** (`scripts/build_dossier.py`)
+**Step 6 — Markdown intelligence report** (`scripts/build_markdown_report.py`)
+
+```bash
+python scripts/build_markdown_report.py --org 6166
+# Writes: reports/intelligence_org_6166.md
+```
+
+Sections: executive summary, spend by year, monthly breakdown, top 30 procurements, top 30 suppliers, repeat suppliers, decision-type breakdown, data coverage notes.
+
+**Step 7 — Per-supplier dossiers** (`scripts/build_dossier.py`)
 
 Requires `supplier_clusters.csv` from step 4.
 
