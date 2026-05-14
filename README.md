@@ -249,3 +249,42 @@ git diff main
 ## Generated and local files
 
 `decision_labels.json` is generated/local output and is ignored through `.gitignore`. It should not be committed unless the repository intentionally changes how generated label data is managed.
+
+## Lamia full ingestion and dossier pipeline
+
+Run robust monthly ingestion for Lamia Municipality (`organizationUid=6166`) with
+independent monthly windows, pagination beyond 500 rows, raw per-ADA JSON caching,
+retry/backoff behavior, failed-hydration tracking, and monthly coverage auditing:
+
+```bash
+python scripts/ingest_diavgeia.py --org 6166 --from 2019-01 --to 2026-04
+```
+
+Useful ingestion options:
+
+```bash
+python scripts/ingest_diavgeia.py --org 6166 --from 2019-01 --to 2026-04 --sleep 0.25 --max-retries 5 --timeout 30 --hydrate-all
+python scripts/ingest_diavgeia.py --org 6166 --from 2019-01 --to 2026-04 --force-refresh
+```
+
+The pipeline writes:
+
+```text
+data/index/org=6166/decision_index.csv
+data/index/org=6166/decision_index.parquet
+data/raw/diavgeia/org=6166/ada=<ADA>.json
+data/normalized/org=6166/hydrated_decisions.csv
+data/normalized/org=6166/hydrated_decisions.parquet
+data/quality/org=6166/failed_hydrations.csv
+data/quality/org=6166/monthly_coverage.csv
+```
+
+Build the rich Markdown dossier from those local ingestion outputs:
+
+```bash
+python scripts/build_lamia_full_dossier.py --org 6166 --out artifacts/lamia_full_dossier.md
+```
+
+The dossier includes dataset coverage diagnostics, explicit trend guardrails,
+executive totals, top financial items, direct assignments, supplier intelligence,
+theme analysis, data-quality caveats, and raw JSON evidence snippets.
