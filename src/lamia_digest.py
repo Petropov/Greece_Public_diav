@@ -200,7 +200,9 @@ SUPPLIER_NAME_KEYS = (
     "payee",
     "sponsor_name",
     "sponsorName",
+    "sponsorAFMName",
     "sponsor",
+    "person",
     "contractorTitle",
     "companyName",
 )
@@ -254,6 +256,8 @@ SUPPLIER_NAME_LABEL_TOKENS = (
     "recipient",
     "payee",
     "sponsor",
+    "person",
+    "προσωπο",
     "αναδοχος",
     "αναδοχου",
     "προμηθευτης",
@@ -922,9 +926,9 @@ def value_text_from_extra(value: Any) -> str | None:
             text = normalize_text(value.get(key))
             if text:
                 return text
-        return None
+        return text_from_named_value(value)
     if isinstance(value, list):
-        texts = [normalize_text(item) for item in value]
+        texts = [value_text_from_extra(item) for item in value]
         texts = [text for text in texts if text]
         return ", ".join(texts) if texts else None
     return normalize_text(value)
@@ -994,11 +998,13 @@ def extract_supplier_fields(
             key_path = (*path, key_text)
             if is_org_or_issuer_label(key_text):
                 continue
-            if is_explicit_supplier_tax_id_key(key_text) or (
+            if key in SUPPLIER_NAME_KEYS:
+                remember_name(value, key_path)
+            elif is_explicit_supplier_tax_id_key(key_text) or (
                 current_context and is_generic_tax_id_key(key_text)
             ):
                 remember_tax_id(value, key_path)
-            elif key in SUPPLIER_NAME_KEYS or is_supplier_name_label(key_text):
+            elif is_supplier_name_label(key_text):
                 remember_name(value, key_path)
             elif current_context and normalize_label(key_text) in {
                 "name",
@@ -1290,6 +1296,28 @@ def amount_path(path: tuple[str, ...], key: str) -> str:
     return ".".join((*path, key)) if path else key
 
 
+EURO_AMOUNT_IN_TEXT_RE = re.compile(
+    r"(?<!\d)(\d{1,3}(?:\.\d{3})*(?:,\d{2})|\d+(?:,\d{2})?)\s*(?:€|ευρώ|ευρω)",
+    re.IGNORECASE,
+)
+
+
+def parse_amount_from_text(value: Any) -> tuple[Any, str | None]:
+    """Extract explicit Greek/European euro amounts from free text only.
+
+    To avoid treating protocol numbers as money, this requires a currency marker
+    such as ``€`` or ``ευρώ``.
+    """
+    text = normalize_text(value)
+    if not text:
+        return None, None
+    match = EURO_AMOUNT_IN_TEXT_RE.search(text)
+    if not match:
+        return None, None
+    amount = normalize_amount(match.group(1))
+    return (amount, "subject.text") if has_amount(amount) else (None, None)
+
+
 def amount_from_value(value: Any, path: tuple[str, ...]) -> tuple[Any, str | None]:
     if isinstance(value, dict):
         for key in EXTRA_FIELD_VALUE_KEYS:
@@ -1358,6 +1386,11 @@ def extract_amount(source: Any, path: tuple[str, ...] = ()) -> tuple[Any, str | 
                 amount, amount_source = amount_from_value(value, (*path, key_text))
                 if has_amount(amount):
                     return amount, amount_source or amount_path(path, key_text)
+
+        for key in SUBJECT_KEYS:
+            amount, amount_source = parse_amount_from_text(source.get(key))
+            if has_amount(amount):
+                return amount, amount_path(path, amount_source or key)
 
         for key, value in source.items():
             if isinstance(value, (dict, list)):
