@@ -149,6 +149,126 @@ python scripts/build_normalized_tables.py --org 6166 --raw-root /path/to/raw/dia
 
 The script is offline-only and does not call the Diavgeia API. When the default parquet output is requested without a parquet engine installed, it prints `Parquet engine missing. Re-run with --format csv` instead of a long traceback.
 
+## Search-wide, hydrate-narrow pipeline
+
+The full procurement intelligence pipeline runs in six stages.  Steps 1 and 2
+require network access to `diavgeia.gov.gr`; the rest are offline.
+
+### Quick start (one command)
+
+```bash
+# Full pipeline for Lamia: fetch → hydrate → normalize → cluster → report
+python scripts/pipeline.py --org 6166
+
+# Skip the live-fetch steps if you already have a local cache
+python scripts/pipeline.py --org 6166 --skip-fetch --skip-hydrate
+
+# Include per-supplier dossiers (top 30 by spend)
+python scripts/pipeline.py --org 6166 --skip-fetch --skip-hydrate --dossiers --dossier-top 30
+
+# Dry-run: print every command without executing
+python scripts/pipeline.py --org 6166 --dry-run
+```
+
+### Individual steps
+
+**Step 1 — Fetch search exports** (`digest_monthly.py`)
+
+Fetch and cache every month's `search_export.json`.  Prefer `--search-only`
+for a broad historical pull — it skips per-ADA detail fetches:
+
+```bash
+python digest_monthly.py --org 6166 --from 2020-01 --to 2026-05 --search-only
+```
+
+**Step 2 — Selective hydration** (`scripts/hydrate_narrow.py`)
+
+Score every decision in the local cache and fetch detail JSONs only for those
+that look like genuine procurement decisions.  Payroll, admin noise, and
+already-cached decisions are skipped automatically:
+
+```bash
+# Hydrate all cached months
+python scripts/hydrate_narrow.py --org 6166
+
+# Hydrate a specific range, print per-decision actions
+python scripts/hydrate_narrow.py --org 6166 --months 2024-01:2024-12 --verbose
+
+# Preview what would be fetched without hitting the API
+python scripts/hydrate_narrow.py --org 6166 --dry-run
+
+# Raise the score threshold to fetch only the highest-confidence decisions
+python scripts/hydrate_narrow.py --org 6166 --min-score 4
+```
+
+Hydration score logic (higher = fetch detail):
+- Decision type is a procurement type (`Δ.2.2`, `Δ.1`, `Β.2.1`, …) → +3
+- Subject contains procurement keywords → up to +3
+- Search export already has both amount and supplier → -2
+- Payroll/admin noise tokens present → -10 (always skip)
+
+**Step 3 — Normalize** (`scripts/build_normalized_tables.py`)
+
+```bash
+python scripts/build_normalized_tables.py --org 6166 --format csv
+```
+
+Outputs under `data/normalized/org=6166/`:
+
+```
+decisions.csv         — one row per decision
+suppliers.csv         — grouped supplier entities with totals
+procurements.csv      — procurement-classified rows only
+monthly_summary.csv   — decision counts and amounts by month
+```
+
+**Step 4 — Cluster suppliers** (`scripts/cluster_suppliers.py`)
+
+Deduplicate suppliers: first by tax ID, then by canonical name.
+
+```bash
+python scripts/cluster_suppliers.py --org 6166
+# Writes: data/normalized/org=6166/supplier_clusters.csv
+```
+
+**Step 5 — Intelligence report** (`scripts/supplier_intelligence_report.py`)
+
+```bash
+python scripts/supplier_intelligence_report.py --org 6166
+# Writes: reports/supplier_intelligence_org_6166.html
+```
+
+**Step 6 — Per-supplier dossiers** (`scripts/build_dossier.py`)
+
+Requires `supplier_clusters.csv` from step 4.
+
+```bash
+# Top 50 suppliers by spend (JSON + HTML each)
+python scripts/build_dossier.py --org 6166
+
+# Top 20, HTML only
+python scripts/build_dossier.py --org 6166 --top 20 --format html
+
+# One specific cluster
+python scripts/build_dossier.py --org 6166 --cluster-id cluster:abc123def456
+
+# Dossiers written to: reports/dossiers/org=6166/<supplier_name>.html
+```
+
+### Avoiding brute-force hydration
+
+`hydrate_narrow.py` is intentionally narrow — it skips:
+
+1. Decisions already in the local cache (`decisions/<ADA>.json` exists)
+2. Payroll/HR decisions (employment contracts, overtime, leave, appointments)
+3. Cancellations and reversals
+4. Decisions where the search export already carries both amount and supplier
+5. Any decision scoring below `--min-score` (default 2)
+
+This keeps API load proportional to intelligence value.  A typical year for
+Lamia (org 6166) has ~5 000 search-export rows but only ~1 000–1 500 decisions
+worth hydrating.
+
 ## Lamia Municipality pilot workflow
 
 This repository also includes a separate Lamia-focused pilot pipeline. It does **not** replace or change the general monthly digest. The Lamia pipeline only queries Diavgeia decisions for the Municipality of Lamia.
