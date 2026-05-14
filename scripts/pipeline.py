@@ -182,7 +182,23 @@ def main() -> int:
         elif not args.dry_run:
             print(f"  Report: {report_path}")
 
-    # ── Step 6: Dossiers (optional) ──────────────────────────────────────────
+    # ── Step 6: Markdown report ──────────────────────────────────────────────
+    md_report_path = args.reports_dir / f"intelligence_org_{args.org}.md"
+    cmd = [
+        python,
+        SCRIPTS_DIR / "build_markdown_report.py",
+        "--org", args.org,
+        "--input-dir", str(args.output_root),
+        "--output", str(md_report_path),
+    ]
+    rc = run(cmd, dry_run=args.dry_run, label="Step 6: Markdown report (build_markdown_report)")
+    if rc != 0:
+        errors += 1
+        print("  WARNING: markdown report step failed")
+    elif not args.dry_run:
+        print(f"  Report: {md_report_path}")
+
+    # ── Step 7: Dossiers (optional) ──────────────────────────────────────────
     if args.dossiers:
         cmd = [
             python,
