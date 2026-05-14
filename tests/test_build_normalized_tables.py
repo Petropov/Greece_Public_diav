@@ -9,13 +9,13 @@ from unittest.mock import patch
 
 import pandas as pd
 
-HAS_PARQUET_ENGINE = bool(importlib.util.find_spec("pyarrow") or importlib.util.find_spec("fastparquet"))
-
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPT_PATH = REPO_ROOT / "scripts" / "build_normalized_tables.py"
 spec = importlib.util.spec_from_file_location("build_normalized_tables", SCRIPT_PATH)
 build_normalized_tables = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(build_normalized_tables)
+
+HAS_PARQUET_ENGINE = build_normalized_tables.has_parquet_engine()
 
 
 def write_json(path, payload):
@@ -426,6 +426,62 @@ class BuildNormalizedTablesTest(unittest.TestCase):
             self.assertIn("Wrote decisions", result.stdout)
             self.assertTrue((output_root / "org=6166" / "decisions.parquet").exists())
             self.assertEqual(len(pd.read_parquet(output_root / "org=6166" / "decisions.parquet")), 1)
+
+
+class PayrollAdminNoiseTest(unittest.TestCase):
+    def _decision(self, subject, decision_type=None, supplier=None, amount=None):
+        return {
+            "decision_type": decision_type or "Expenditure approval",
+            "subject": subject,
+            "supplier_name": supplier,
+            "supplier_tax_id": None,
+            "amount": amount,
+        }
+
+    def test_employment_contract_is_excluded(self):
+        d = self._decision("ΣΥΜΒΑΣΗ ΕΡΓΑΣΙΑΣ ΙΔΙΩΤΙΚΟΥ ΔΙΚΑΙΟΥ ΟΡΙΣΜΕΝΟΥ ΧΡΟΝΟΥ")
+        self.assertFalse(build_normalized_tables.is_procurement(d))
+
+    def test_overtime_pay_is_excluded(self):
+        d = self._decision("ΑΠΟΖΗΜΙΩΣΗ ΥΠΕΡΩΡΙΑΚΗΣ ΕΡΓΑΣΙΑΣ ΜΟΝΙΜΟΥ ΥΠΑΛΛΗΛΟΥ")
+        self.assertFalse(build_normalized_tables.is_procurement(d))
+
+    def test_payroll_ratification_is_excluded(self):
+        d = self._decision("ΚΥΡΩΣΗ ΜΙΣΘΟΔΟΤΙΚΗΣ ΚΑΤΑΣΤΑΣΗΣ ΙΟΥΛΙΟΥ")
+        self.assertFalse(build_normalized_tables.is_procurement(d))
+
+    def test_job_vacancy_is_excluded(self):
+        d = self._decision("ΠΡΟΚΗΡΥΞΗ ΠΛΗΡΩΣΗΣ ΘΕΣΕΩΝ ΜΟΝΙΜΟΥ ΠΡΟΣΩΠΙΚΟΥ")
+        self.assertFalse(build_normalized_tables.is_procurement(d))
+
+    def test_oath_taking_is_excluded(self):
+        d = self._decision("ΟΡΚΩΜΟΣΙΑ ΝΕΩΝ ΔΗΜΟΤΙΚΩΝ ΣΥΜΒΟΥΛΩΝ")
+        self.assertFalse(build_normalized_tables.is_procurement(d))
+
+    def test_leave_grant_is_excluded(self):
+        d = self._decision("ΧΟΡΗΓΗΣΗ ΑΔΕΙΑΣ ΑΠΟΥΣΙΑΣ ΥΠΑΛΛΗΛΟΥ")
+        self.assertFalse(build_normalized_tables.is_procurement(d))
+
+    def test_normal_procurement_not_excluded(self):
+        d = self._decision("ΑΝΑΘΕΣΗ ΠΡΟΜΗΘΕΙΑΣ ΥΛΙΚΩΝ ΚΑΘΑΡΙΟΤΗΤΑΣ", amount=5000.0)
+        self.assertTrue(build_normalized_tables.is_procurement(d))
+
+    def test_katakyrosi_award_not_confused_with_akyrosi_cancellation(self):
+        """κατακύρωση (award) must not match the ακύρωση (cancellation) substring filter."""
+        d = self._decision("ΚΑΤΑΚΥΡΩΣΗ ΑΠΟΤΕΛΕΣΜΑΤΩΝ ΔΙΑΓΩΝΙΣΜΟΥ", amount=15000.0)
+        self.assertTrue(build_normalized_tables.is_procurement(d))
+
+    def test_publication_costs_for_hiring_not_excluded(self):
+        """Publication expenses for job announcements are legitimate procurement costs."""
+        d = self._decision(
+            "ΕΞΟΔΑ ΔΗΜΟΣΙΕΥΣΗΣ ΑΝΑΚΟΙΝΩΣΗΣ ΓΙΑ ΠΡΟΣΛΗΨΗ ΠΡΟΣΩΠΙΚΟΥ",
+            amount=200.0,
+        )
+        self.assertTrue(build_normalized_tables.is_procurement(d))
+
+    def test_payroll_admin_tokens_constant_exported(self):
+        self.assertTrue(len(build_normalized_tables.PAYROLL_ADMIN_TOKENS) > 0)
+        self.assertIn("μισθοδοσια", build_normalized_tables.PAYROLL_ADMIN_TOKENS)
 
 
 if __name__ == "__main__":

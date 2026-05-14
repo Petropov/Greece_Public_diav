@@ -742,6 +742,33 @@ def classify_procurement_stage(text: str | None) -> str:
             return stage
 
     return "other"
+PAYROLL_ADMIN_TOKENS = (
+    "συμβαση εργασιας ιδιωτικου δικαιου",
+    "αποζημιωση υπερωρ",
+    "αποζημιωση νυχτ",
+    "μισθοδοσια",
+    "κυρωση μισθοδοτ",
+    "εγκριση αποδοχων",
+    "εγκριση μισθοδοσιας",
+    "προνοιακ επιδομα",
+    "προκηρυξη πληρωσης θεσεων",
+    "πινακα επιτυχοντων",
+    "διοριστεων",
+    "ορκωμοσια",
+    "χορηγηση αδειας",
+    "αδεια απουσιας",
+    "μετακινηση υπαλληλ",
+    "αποσπαση υπαλληλ",
+    "αναθεση καθηκοντων",
+    "τοποθετηση υπαλληλ",
+    "εκπαιδευτικη αδεια",
+    "συνδικαλιστικη αδεια",
+    "αναρρωτικη αδεια",
+    "παραιτηση υπαλληλ",
+    "αυτοδικαιη λυση",
+)
+
+
 def is_procurement(decision: dict[str, Any]) -> bool:
     text = decision.get("_procurement_searchable_text")
     if text is None:
@@ -760,8 +787,10 @@ def is_procurement(decision: dict[str, Any]) -> bool:
         "ανακληση διακηρυξης",
         "κηρυξη προμηθευτη εκπτωτου",
         "ακυρωση παραστ",
+        *PAYROLL_ADMIN_TOKENS,
     )
-    if any(token in text for token in non_procurement_tokens):
+    padded = f" {text} "
+    if any(f" {token}" in padded for token in non_procurement_tokens):
         return False
 
     supplier_present = bool(supplier_key(decision.get("supplier_name"), decision.get("supplier_tax_id")))
@@ -945,7 +974,15 @@ def print_data_quality_warnings(tables: dict[str, pd.DataFrame]) -> None:
 
 
 def has_parquet_engine() -> bool:
-    return bool(importlib.util.find_spec("pyarrow") or importlib.util.find_spec("fastparquet"))
+    for pkg in ("pyarrow", "fastparquet"):
+        if importlib.util.find_spec(pkg) is None:
+            continue
+        try:
+            importlib.import_module(pkg)
+            return True
+        except Exception:
+            pass
+    return False
 
 
 def write_tables(
