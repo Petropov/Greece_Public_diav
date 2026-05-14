@@ -207,6 +207,7 @@ DECISION_COLUMNS = [
     "org",
     "year",
     "month",
+    "procurement_stage",
     "ada",
     "issue_date",
     "decision_type",
@@ -646,6 +647,7 @@ def normalize_decision(org: str, year: int, month: int, export_row: dict[str, An
     url = normalize_text(coalesce(first_present(detail, URL_KEYS), first_present(export_row, URL_KEYS), detail_url(ada)))
     signer = extract_text_by_keys_or_labels(combined, SIGNER_KEYS, ("signer", "signedby", "finalsigner", "υπογραφων", "υπογραφη"))
     unit = extract_text_by_keys_or_labels(combined, UNIT_KEYS, ("unit", "organizationunit", "organizationalunit", "μοναδα", "τμημα", "διευθυνση"))
+    procurement_stage = classify_procurement_stage(subject)
     return {
         "org": str(org),
         "year": int(year),
@@ -653,7 +655,8 @@ def normalize_decision(org: str, year: int, month: int, export_row: dict[str, An
         "ada": ada,
         "issue_date": issue_date,
         "decision_type": normalized_decision_type(raw_type, type_label),
-        "subject": subject,
+        "procurement_stage": procurement_stage,
+	"subject": subject,
         "url": url,
         "amount": amount,
         "amount_source": amount_source,
@@ -710,7 +713,35 @@ def procurement_searchable_text(decision: dict[str, Any]) -> str:
     subject = normalize_text(decision.get("subject")) or ""
     return canonical_text(f"{decision_type} {subject}")
 
+PROCUREMENT_STAGE_RULES = {
+    "award": [
+        "ανακηρυξη προσωρινου αναδοχου",
+        "αναδοχος",
+        "κατακυρωση",
+    ],
+    "committee": [
+        "συγκροτηση επιτροπης",
+        "ορισμος μελων",
+    ],
+    "approval": [
+        "εγκριση",
+        "καταρτιση ορων",
+    ],
+    "cancellation": [
+        "ακυρωση",
+        "ανακληση",
+    ],
+}
 
+
+def classify_procurement_stage(text: str | None) -> str:
+    text = canonical_text(text or "")
+
+    for stage, patterns in PROCUREMENT_STAGE_RULES.items():
+        if any(p in text for p in patterns):
+            return stage
+
+    return "other"
 def is_procurement(decision: dict[str, Any]) -> bool:
     text = decision.get("_procurement_searchable_text")
     if text is None:
