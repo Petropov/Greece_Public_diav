@@ -80,6 +80,8 @@ def build_report(
     procurements: list[dict],
     suppliers: list[dict],
     monthly_summary: list[dict],
+    contracts: list[dict] | None = None,
+    gemi: list[dict] | None = None,
 ) -> str:
     sections: list[str] = []
 
@@ -92,13 +94,23 @@ def build_report(
     with_amount = [p for p in procurements if p.get("amount") and p["amount"] not in ("", "nan")]
     with_tax = [p for p in procurements if p.get("supplier_tax_id")]
 
+    # Use deduplicated contract spend if available
+    clean_amount: float | None = None
+    if contracts:
+        clean_amount = sum(safe_float(c.get("amount", 0)) for c in contracts if safe_float(c.get("amount", 0)) > 0)
+
     sections.append(f"# Δήμος Λαμιέων (org={org}) — Procurement Intelligence Report\n")
+    spend_note = (
+        f"Clean spend (deduplicated): **{eur(clean_amount)}** · Raw (with multi-stage): **{eur(total_amount)}**"
+        if clean_amount is not None
+        else f"Total spend tracked: **{eur(total_amount)}**"
+    )
     sections.append(
         f"> Data range: **{year_range}** · "
         f"Decisions: **{total_decisions:,}** · "
         f"Procurements: **{len(procurements):,}** · "
         f"Known suppliers: **{total_suppliers:,}** · "
-        f"Total spend tracked: **{eur(total_amount)}**\n"
+        f"{spend_note}\n"
     )
 
     # ── 2. Yearly spend ───────────────────────────────────────────────────────
@@ -140,24 +152,40 @@ def build_report(
     ))
     sections.append("")
 
-    # ── 4. Top procurements by value ──────────────────────────────────────────
-    sections.append("## Top 30 Procurements by Value\n")
-    top_procs = sorted(with_amount, key=lambda r: -safe_float(r["amount"]))[:30]
-    rows = []
-    for p in top_procs:
-        subject = str(p.get("subject") or "").replace("\n", " ")[:80]
-        rows.append([
+    # ── 4. Top contracts / procurements by value ─────────────────────────────
+    if contracts:
+        top_source = sorted(
+            [c for c in contracts if safe_float(c.get("amount", 0)) > 0],
+            key=lambda c: -safe_float(c["amount"]),
+        )[:30]
+        section_title = "## Top 30 Contracts by Value (deduplicated)\n"
+        note = "_Amounts deduplicated — each contract counted once across all lifecycle stages._\n"
+        row_builder = lambda c: [
+            (c.get("issue_date") or "—")[:10],
+            c.get("ada") or "—",
+            eur(c.get("amount")),
+            (c.get("decision_type") or "—")[:30],
+            str(c.get("subject") or "").replace("\n", " ")[:80],
+        ]
+        headers = ["Date", "ADA", "Amount", "Type", "Subject"]
+    else:
+        top_source = sorted(with_amount, key=lambda r: -safe_float(r["amount"]))[:30]
+        section_title = "## Top 30 Procurements by Value\n"
+        note = "_Run `link_procurement_lifecycle.py` for deduplicated contract view._\n"
+        row_builder = lambda p: [
             p.get("issue_date") or "—",
             p.get("ada") or "—",
             eur(p.get("amount")),
             p.get("decision_type") or "—",
-            subject,
-        ])
+            str(p.get("subject") or "").replace("\n", " ")[:80],
+        ]
+        headers = ["Date", "ADA", "Amount", "Type", "Subject"]
+
+    sections.append(section_title)
+    sections.append(note)
+    rows = [row_builder(item) for item in top_source]
     if rows:
-        sections.append(md_table(
-            ["Date", "ADA", "Amount", "Type", "Subject"],
-            rows,
-        ))
+        sections.append(md_table(headers, rows))
     else:
         sections.append("_No procurements with structured amounts found._")
     sections.append("")
@@ -232,12 +260,64 @@ def build_report(
         sections.append(md_table(["Stage", "Count"], rows))
         sections.append("")
 
-    # ── 9. Data coverage notes ────────────────────────────────────────────────
+    # ── 9. ΓΕΜΗ transparency flags ────────────────────────────────────────────
+    if gemi:
+        flagged = {
+            "flag_low_capital": [r for r in gemi if r.get("flag_low_capital") == "1"],
+            "flag_recently_registered": [r for r in gemi if r.get("flag_recently_registered") == "1"],
+            "flag_inactive": [r for r in gemi if r.get("flag_inactive") == "1"],
+            "flag_no_gemi_record": [r for r in gemi if r.get("flag_no_gemi_record") == "1"],
+        }
+        total_flagged = len(set(
+            r["supplier_tax_id"] for flags in flagged.values() for r in flags
+        ))
+        if total_flagged > 0:
+            sections.append("## ΓΕΜΗ Transparency Flags\n")
+            sections.append(
+                f"_ΓΕΜΗ enrichment covers {len(gemi)} suppliers. "
+                f"{total_flagged} have at least one flag._\n"
+            )
+            flag_labels = {
+                "flag_low_capital": "Low share capital (< €10k) with large contract (> €100k)",
+                "flag_recently_registered": "Company registered ≤ 12 months before first contract",
+                "flag_inactive": "Company status inactive at time of enrichment",
+                "flag_no_gemi_record": "No ΓΕΜΗ record found for this tax ID",
+            }
+            for flag, label in flag_labels.items():
+                flagged_rows = flagged[flag]
+                if not flagged_rows:
+                    continue
+                sections.append(f"### ⚑ {label} ({len(flagged_rows)} supplier(s))\n")
+                sup_by_tax = {s["supplier_tax_id"]: s for s in suppliers}
+                table_rows = []
+                for r in flagged_rows:
+                    tax = r.get("supplier_tax_id") or "—"
+                    name = r.get("legal_name") or (sup_by_tax.get(tax, {}).get("supplier_name_normalized") or "—")
+                    capital = eur(r.get("share_capital")) if r.get("share_capital") else "—"
+                    reg_date = (r.get("registration_date") or "—")[:10]
+                    spend = eur(sup_by_tax.get(tax, {}).get("total_amount"))
+                    table_rows.append([tax, name[:40], capital, reg_date, spend])
+                sections.append(md_table(
+                    ["Tax ID", "Name", "Capital", "Registered", "Total spend"],
+                    table_rows,
+                ))
+                sections.append("")
+
+    # ── 10. Data coverage notes ───────────────────────────────────────────────
     sections.append("## Data Coverage Notes\n")
     amount_pct = len(with_amount) / len(procurements) * 100 if procurements else 0
     tax_pct = len(with_tax) / len(procurements) * 100 if procurements else 0
     enriched_total = sum(safe_int(r["detail_enriched_decision_count"]) for r in monthly_summary)
     search_only_total = sum(safe_int(r["search_only_decision_count"]) for r in monthly_summary)
+
+    clean_spend_row = (
+        f"| Clean spend (contracts deduplicated) | {eur(clean_amount)} |\n"
+        if clean_amount is not None else ""
+    )
+    gemi_row = (
+        f"| Suppliers enriched via ΓΕΜΗ | {len(gemi):,} |\n"
+        if gemi else ""
+    )
 
     sections.append(
         f"| Metric | Value |\n"
@@ -248,7 +328,9 @@ def build_report(
         f"| Procurements with structured amount | {len(with_amount):,} ({amount_pct:.1f}%) |\n"
         f"| Procurements with supplier tax ID | {len(with_tax):,} ({tax_pct:.1f}%) |\n"
         f"| Unique supplier entities | {total_suppliers:,} |\n"
-        f"| Total tracked spend (all sources) | {eur(total_amount)} |\n"
+        f"| Total tracked spend (raw, may double-count) | {eur(total_amount)} |\n"
+        + clean_spend_row
+        + gemi_row
     )
     sections.append(
         "\n> **Note:** Low amount/supplier coverage in years 2018–2024 reflects search-only cache "
@@ -284,7 +366,18 @@ def main() -> int:
     print(f"  decisions={len(decisions)}, procurements={len(procurements)}, "
           f"suppliers={len(suppliers)}, months={len(monthly_summary)}")
 
-    report = build_report(args.org, decisions, procurements, suppliers, monthly_summary)
+    # Optional enrichment tables
+    contracts: list[dict] | None = None
+    gemi: list[dict] | None = None
+    if (base / "contracts.csv").exists():
+        contracts = read_csv(base / "contracts.csv")
+        print(f"  contracts={len(contracts)} (deduplicated lifecycle view)")
+    if (base / "gemi_enrichment.csv").exists():
+        gemi = read_csv(base / "gemi_enrichment.csv")
+        print(f"  gemi_enrichment={len(gemi)} supplier records")
+
+    report = build_report(args.org, decisions, procurements, suppliers, monthly_summary,
+                          contracts=contracts, gemi=gemi)
 
     out = args.output or (DEFAULT_OUTPUT_DIR / f"intelligence_org_{args.org}.md")
     out.parent.mkdir(parents=True, exist_ok=True)

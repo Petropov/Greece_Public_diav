@@ -3,20 +3,26 @@
 
 Orchestrates the full pipeline for one or more organizations:
 
-  Step 1 (fetch)    — digest_monthly.py: fetch search_export.json for each month
-  Step 2 (hydrate)  — hydrate_narrow.py: fetch detail JSONs for high-value decisions
-  Step 3 (normalize)— build_normalized_tables.py: build decisions/suppliers/procurements CSVs
-  Step 4 (cluster)  — cluster_suppliers.py: deduplicate supplier entities
-  Step 5 (report)   — supplier_intelligence_report.py: HTML intelligence report
-  Step 6 (dossiers) — build_dossier.py: per-supplier dossiers (optional, --dossiers)
+  Step 1a (fetch)     — digest_monthly.py: fetch search_export.json for each month
+  Step 1b (refetch)   — fetch_windowed.py: re-fetch capped months with weekly windows
+  Step 2  (hydrate)   — hydrate_narrow.py: fetch detail JSONs for high-value decisions
+  Step 3  (normalize) — build_normalized_tables.py: build decisions/suppliers/procurements CSVs
+  Step 4  (cluster)   — cluster_suppliers.py: deduplicate supplier entities
+  Step 5  (lifecycle) — link_procurement_lifecycle.py: link stages → one row per contract
+  Step 6  (gemi)      — enrich_gemi.py: enrich suppliers with ΓΕΜΗ company data (needs API key)
+  Step 7  (report)    — supplier_intelligence_report.py: HTML intelligence report
+  Step 8  (markdown)  — build_markdown_report.py: Markdown intelligence report
+  Step 9  (dossiers)  — build_dossier.py: per-supplier dossiers (optional, --dossiers)
 
-Any step can be skipped with --skip-fetch, --skip-hydrate, --skip-normalize,
---skip-cluster, --skip-report.  Steps 1 and 2 require network access.
+Any step can be skipped with the appropriate --skip-* flag.
+Steps 1a, 1b, 2, and 6 require network access.
+Step 6 requires a ΓΕΜΗ API key (free: https://opendata.businessportal.gr/register/).
 
 Usage:
     python scripts/pipeline.py --org 6166
     python scripts/pipeline.py --org 6166 --months 2024-01:2024-12
-    python scripts/pipeline.py --org 6166 --skip-fetch --skip-hydrate
+    python scripts/pipeline.py --org 6166 --skip-fetch --skip-refetch --skip-hydrate
+    python scripts/pipeline.py --org 6166 --gemi-key YOUR_KEY
     python scripts/pipeline.py --org 6166 --dossiers --dossier-top 30
     python scripts/pipeline.py --org 6166 --dry-run
 """
@@ -71,11 +77,16 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output-root", type=Path, default=DEFAULT_OUTPUT_ROOT)
     parser.add_argument("--reports-dir", type=Path, default=DEFAULT_REPORTS_DIR)
 
-    parser.add_argument("--skip-fetch", action="store_true", help="Skip step 1 (digest_monthly fetch)")
+    parser.add_argument("--skip-fetch", action="store_true", help="Skip step 1a (digest_monthly fetch)")
+    parser.add_argument("--skip-refetch", action="store_true", help="Skip step 1b (fetch_windowed cap-busting re-fetch)")
     parser.add_argument("--skip-hydrate", action="store_true", help="Skip step 2 (hydrate_narrow)")
     parser.add_argument("--skip-normalize", action="store_true", help="Skip step 3 (build_normalized_tables)")
     parser.add_argument("--skip-cluster", action="store_true", help="Skip step 4 (cluster_suppliers)")
-    parser.add_argument("--skip-report", action="store_true", help="Skip step 5 (supplier_intelligence_report)")
+    parser.add_argument("--skip-lifecycle", action="store_true", help="Skip step 5 (link_procurement_lifecycle)")
+    parser.add_argument("--skip-gemi", action="store_true", help="Skip step 6 (enrich_gemi)")
+    parser.add_argument("--skip-report", action="store_true", help="Skip step 7 (supplier_intelligence_report)")
+
+    parser.add_argument("--gemi-key", default="", help="ΓΕΜΗ API key (or set GEMI_API_KEY env var)")
 
     parser.add_argument("--dossiers", action="store_true", help="Run step 6: build per-supplier dossiers")
     parser.add_argument("--dossier-top", type=int, default=50, help="Number of top suppliers for dossiers (default: 50)")
@@ -97,7 +108,7 @@ def main() -> int:
     python = sys.executable
     errors = 0
 
-    # ── Step 1: Fetch search exports ──────────────────────────────────────────
+    # ── Step 1a: Fetch search exports ─────────────────────────────────────────
     if not args.skip_fetch:
         cmd: list[str | Path] = [
             python,
@@ -110,10 +121,27 @@ def main() -> int:
             cmd += ["--month", start]
             if end:
                 cmd += ["--end-month", end]
-        rc = run(cmd, dry_run=args.dry_run, label="Step 1: Fetch search exports (digest_monthly)")
+        rc = run(cmd, dry_run=args.dry_run, label="Step 1a: Fetch search exports (digest_monthly)")
         if rc != 0:
             errors += 1
             print("  WARNING: fetch step failed, continuing with cached data")
+
+    # ── Step 1b: Re-fetch capped months with weekly windows ───────────────────
+    if not args.skip_refetch:
+        cmd = [
+            python,
+            SCRIPTS_DIR / "fetch_windowed.py",
+            "--org", args.org,
+            "--raw-root", str(args.raw_root),
+        ]
+        if args.months:
+            cmd += ["--months", args.months]
+        if args.verbose:
+            cmd.append("--verbose")
+        rc = run(cmd, dry_run=args.dry_run, label="Step 1b: Re-fetch capped months (fetch_windowed)")
+        if rc != 0:
+            errors += 1
+            print("  WARNING: windowed re-fetch had errors, continuing with existing cache")
 
     # ── Step 2: Selective hydration ──────────────────────────────────────────
     if not args.skip_hydrate:
@@ -165,7 +193,42 @@ def main() -> int:
             errors += 1
             print("  WARNING: cluster step failed")
 
-    # ── Step 5: HTML intelligence report ────────────────────────────────────
+    # ── Step 5: Procurement lifecycle deduplication ───────────────────────────
+    if not args.skip_lifecycle:
+        cmd = [
+            python,
+            SCRIPTS_DIR / "link_procurement_lifecycle.py",
+            "--org", args.org,
+            "--input-dir", str(args.output_root),
+        ]
+        if args.verbose:
+            cmd.append("--verbose")
+        rc = run(cmd, dry_run=args.dry_run, label="Step 5: Lifecycle linking (link_procurement_lifecycle)")
+        if rc != 0:
+            errors += 1
+            print("  WARNING: lifecycle step failed")
+
+    # ── Step 6: ΓΕΜΗ enrichment (requires API key) ────────────────────────────
+    gemi_key = args.gemi_key or __import__("os").environ.get("GEMI_API_KEY", "")
+    if not args.skip_gemi and gemi_key:
+        cmd = [
+            python,
+            SCRIPTS_DIR / "enrich_gemi.py",
+            "--org", args.org,
+            "--input-dir", str(args.output_root),
+            "--api-key", gemi_key,
+        ]
+        if args.verbose:
+            cmd.append("--verbose")
+        rc = run(cmd, dry_run=args.dry_run, label="Step 6: ΓΕΜΗ enrichment (enrich_gemi)")
+        if rc != 0:
+            errors += 1
+            print("  WARNING: ΓΕΜΗ enrichment had errors")
+    elif not args.skip_gemi and not gemi_key:
+        print("\n  [Step 6 skipped] No ΓΕΜΗ API key — pass --gemi-key or set GEMI_API_KEY")
+        print("  Register free at: https://opendata.businessportal.gr/register/")
+
+    # ── Step 7: HTML intelligence report ────────────────────────────────────
     if not args.skip_report:
         report_path = args.reports_dir / f"supplier_intelligence_org_{args.org}.html"
         cmd = [
@@ -175,14 +238,14 @@ def main() -> int:
             "--input-dir", str(args.output_root),
             "--output", str(report_path),
         ]
-        rc = run(cmd, dry_run=args.dry_run, label="Step 5: Intelligence report (supplier_intelligence_report)")
+        rc = run(cmd, dry_run=args.dry_run, label="Step 7: Intelligence report (supplier_intelligence_report)")
         if rc != 0:
             errors += 1
             print("  WARNING: report step failed")
         elif not args.dry_run:
             print(f"  Report: {report_path}")
 
-    # ── Step 6: Markdown report ──────────────────────────────────────────────
+    # ── Step 8: Markdown report ───────────────────────────────────────────────
     md_report_path = args.reports_dir / f"intelligence_org_{args.org}.md"
     cmd = [
         python,
@@ -191,14 +254,14 @@ def main() -> int:
         "--input-dir", str(args.output_root),
         "--output", str(md_report_path),
     ]
-    rc = run(cmd, dry_run=args.dry_run, label="Step 6: Markdown report (build_markdown_report)")
+    rc = run(cmd, dry_run=args.dry_run, label="Step 8: Markdown report (build_markdown_report)")
     if rc != 0:
         errors += 1
         print("  WARNING: markdown report step failed")
     elif not args.dry_run:
         print(f"  Report: {md_report_path}")
 
-    # ── Step 7: Dossiers (optional) ──────────────────────────────────────────
+    # ── Step 9: Dossiers (optional) ───────────────────────────────────────────
     if args.dossiers:
         cmd = [
             python,
@@ -209,7 +272,7 @@ def main() -> int:
             "--top", str(args.dossier_top),
             "--format", args.dossier_format,
         ]
-        rc = run(cmd, dry_run=args.dry_run, label="Step 6: Per-supplier dossiers (build_dossier)")
+        rc = run(cmd, dry_run=args.dry_run, label="Step 9: Per-supplier dossiers (build_dossier)")
         if rc != 0:
             errors += 1
             print("  WARNING: dossier step failed")
