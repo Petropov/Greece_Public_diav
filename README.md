@@ -1,6 +1,28 @@
 # Greece_Public_diav
 
-This repository builds a Diavgeia public-sector digest and intelligence layer. It currently supports the **Diavgeia Monthly Digest** workflow, which builds the monthly report, emails it using repository secrets, and uploads generated digest artifacts.
+This repository builds a **procurement intelligence pipeline** for Greek municipalities using open government data. It fetches, normalises, and analyses decisions published on [Diavgeia](https://diavgeia.gov.gr) — Greece's mandatory transparency platform — and enriches supplier data via the [ΓΕΜΗ](https://opendata.businessportal.gr) commercial registry.
+
+The pipeline was developed as a pilot study on **Lamia Municipality** (Δήμος Λαμιέων, Diavgeia org `6166`). It is designed to be reusable for any Greek public body. Key findings from the Lamia study are summarised below; full methodology is in [`reports/STUDY_RECAP.md`](reports/STUDY_RECAP.md).
+
+## Lamia Municipality — Pilot Study Findings (2018–2026)
+
+| Metric | Value |
+|--------|-------|
+| Total Diavgeia decisions | 67,878 |
+| Unique contracts (deduplicated) | 28,867 |
+| Clean spend | **€103.17M** |
+| Raw spend (before lifecycle dedup) | ~€189.83M |
+| Unique suppliers | 243 |
+| Suppliers with no ΓΕΜΗ record | 116 (48%) |
+| Inactive / struck-off suppliers | 11 |
+| Peak spend year | **2021 — €31.41M** (EU Recovery/ΕΣΠΑ funds) |
+| Largest single contract | **€9.50M** fuel framework (Dec 2019) |
+
+The 2021 spike in spending (3× the surrounding years) correlates with EU COVID-19 Recovery and Resilience Facility disbursements to municipalities. The 48% no-ΓΕΜΗ-record rate represents a significant transparency gap for supplier verification.
+
+See [`reports/STUDY_RECAP.md`](reports/STUDY_RECAP.md) for the full narrative, supplier transparency flags, and methodology notes.
+
+---
 
 ## Operational workflow
 
