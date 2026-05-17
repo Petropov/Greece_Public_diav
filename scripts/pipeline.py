@@ -116,11 +116,12 @@ def main() -> int:
             "--org", args.org,
             "--cache-dir", str(args.raw_root),
         ]
+        cmd += ["--search-only"]
         if args.months:
             start, _, end = args.months.partition(":")
-            cmd += ["--month", start]
+            cmd += ["--from", start]
             if end:
-                cmd += ["--end-month", end]
+                cmd += ["--to", end]
         rc = run(cmd, dry_run=args.dry_run, label="Step 1a: Fetch search exports (digest_monthly)")
         if rc != 0:
             errors += 1
