@@ -1,0 +1,449 @@
+
+<html>
+<head>
+<meta charset="utf-8">
+<title>Supplier Intelligence 50226</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 32px; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th, td { border: 1px solid #ddd; padding: 8px; vertical-align: top; }
+th { background: #f2f2f2; }
+.card { display:inline-block; padding:14px; margin:8px; border:1px solid #ddd; border-radius:8px; }
+.big { font-size:24px; font-weight:bold; }
+</style>
+</head>
+<body>
+<h1>Supplier Intelligence Report</h1>
+
+<div class="card">Procurements<br><span class="big">1,026</span></div>
+<div class="card">Known suppliers<br><span class="big">0</span></div>
+<div class="card">Known amount<br><span class="big">€10,047,710.23</span></div>
+<div class="card">Max amount<br><span class="big">€10,000,000.00</span></div>
+
+<h2>Top suppliers by amount</h2>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>supplier_name</th>
+      <th>procurement_count</th>
+      <th>total_amount</th>
+      <th>avg_amount</th>
+      <th>first_seen</th>
+      <th>last_seen</th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+
+<h2>Repeat suppliers</h2>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>supplier_name</th>
+      <th>procurement_count</th>
+      <th>total_amount</th>
+      <th>avg_amount</th>
+      <th>first_seen</th>
+      <th>last_seen</th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+
+<h2>Top procurements</h2>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>issue_date</th>
+      <th>ada</th>
+      <th>supplier_name</th>
+      <th>amount</th>
+      <th>subject</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>2024-05-16</td>
+      <td>ΡΗΒΚΟΡΗ9-Θ4Μ</td>
+      <td>NaN</td>
+      <td>10000000.00</td>
+      <td>Περί προτάσεως ορισμού αποφαινόμενων οργάνων για την εκτέλεση του έργου: "ΕΚΒΑΘΥΝΣΗ ΛΙΜΕΝΑ ΣΤΥΛΙΔΑΣ", προϋπολογισμού 10.000.000,00 ευρώ.</td>
+    </tr>
+    <tr>
+      <td>2020-08-07</td>
+      <td>6ΞΦ9ΟΡΗ9-Ζ7Ρ</td>
+      <td>NaN</td>
+      <td>16000.00</td>
+      <td>Έγκρισης 1ου ΑΠΕ σε ισοζύγιο του έργου «κατασκευή θέσης ανέλκυσης καθέλκυσης (γλίστρας) σκαφών Γλύφας Φθιώτιδας», προϋπολογισμού 16.000,00 ευρώ</td>
+    </tr>
+    <tr>
+      <td>2021-12-21</td>
+      <td>ΩΤΜΑΟΡΗ9-7ΒΜ</td>
+      <td>NaN</td>
+      <td>14000.00</td>
+      <td>Εκτέλεση του έργου «Αντικατάσταση δέστρας πρόσδεσης σκαφών και προσθήκη νέας στο λιμάνι Στυλίδας», προϋπολογισμού 14.000,00 ευρώ με το ΦΠΑ</td>
+    </tr>
+    <tr>
+      <td>2022-06-29</td>
+      <td>ΨΘΑΟΟΡΗ9-ΗΚΑ</td>
+      <td>NaN</td>
+      <td>14000.00</td>
+      <td>ΠΕΡΙ Καταβολής στην εταιρεία ΤΡΙΤΩΝ ΣΥΜΒΟΥΛΟΙ ΜΗΧΑΝΙΚΟΙ ΑΕ της 1Ης εντολής πληρωμής της Μελέτης «Μελέτη πλαισίου ανάπτυξης του λιμένα Αγίου Κωνσταντίνου», εκ ευρώ (14.000,00) με το ΦΠΑ.</td>
+    </tr>
+    <tr>
+      <td>2023-07-24</td>
+      <td>ΨΖ7ΙΟΡΗ9-44Ζ</td>
+      <td>NaN</td>
+      <td>669.05</td>
+      <td>Εγκρίσεως δέσμευσης και καταβολής στην Υπηρεσία Φάρων ποσού 669,05 ευρώ στα πλαίσια εκπόνησης  μελέτης φωτοσήμανσης πλωτής εξέδρας στο λιμένα Ραχών</td>
+    </tr>
+    <tr>
+      <td>2026-01-15</td>
+      <td>ΕΩΒΚΟΡΗ9-8Η7</td>
+      <td>NaN</td>
+      <td>641.18</td>
+      <td>περί εγκρίσεως δέσμευσης και καταβολής στην Υπηρεσία Φάρων ποσού 641,18 ευρώ στα πλαίσια εκπόνησης  μελέτης φωτοσήμανσης του έργου «επέκταση προβλήτας, κρηπιδωμάτων και εκβάθυνση διαύλου και λιμενολεκάνης λιμένα Στυλίδας»</td>
+    </tr>
+    <tr>
+      <td>2020-01-20</td>
+      <td>ΩΛΦΑΟΡΗ9-ΔΥ1</td>
+      <td>NaN</td>
+      <td>500.00</td>
+      <td>περί εγκρίσεως των εκάστοτε σταθερών και διαρκούς ή περιοδικού χαρακτήρα Της ανάληψης από τον Κ.Α.0000/0831 του Προϋπολογισμού χρήσης 2018 έτους της Υπηρεσίας του Λ.Τ.Φθ/δας, έως του ποσού των 500,00 ευρώ για την κάλυψη της πάσης φύσεως αλληλογραφίας για το έτος 20209.</td>
+    </tr>
+    <tr>
+      <td>2021-01-08</td>
+      <td>6ΦΦΔΟΡΗ9-ΛΔΧ</td>
+      <td>NaN</td>
+      <td>500.00</td>
+      <td>περί εγκρίσεως της ανάληψης από τον Κ.Α.0000/0831 του Προϋπολογισμού χρήσης 2021 έτους της Υπηρεσίας του Λ.Τ.Φθ/δας του ποσού των 500,00 ευρώ για την κάλυψη της πάσης φύσεως αλληλογραφίας για το έτος 2021.</td>
+    </tr>
+    <tr>
+      <td>2022-01-19</td>
+      <td>Ψ9ΦΒΟΡΗ9-1ΦΜ</td>
+      <td>NaN</td>
+      <td>500.00</td>
+      <td>Εγκρίσεως της ανάληψης από τον Κ.Α.0000/0831 του Προϋπολογισμού χρήσης 2022 έτους της Υπηρεσίας του Λ.Τ.Φθ/δας του ποσού των 500,00 ευρώ για την κάλυψη της πάσης φύσεως αλληλογραφίας για το έτος 2022.</td>
+    </tr>
+    <tr>
+      <td>2021-03-28</td>
+      <td>9ΝΩ2ΟΡΗ9-ΕΕΟ</td>
+      <td>NaN</td>
+      <td>300.00</td>
+      <td>περί εγκρίσεως δέσμευσης και καταβολής στην Υπηρεσία Φάρων ποσού 300,00 ευρώ στα πλαίσια εκπόνησης  μελέτης φωτοσήμανσης του έργου «επέκταση αλιευτικού καταφυγίου Γλύφας»</td>
+    </tr>
+    <tr>
+      <td>2021-04-12</td>
+      <td>61Ω3ΟΡΗ9-1ΚΔ</td>
+      <td>NaN</td>
+      <td>300.00</td>
+      <td>περί εγκρίσεως δέσμευσης και καταβολής στην Υπηρεσία Φάρων ποσού 300,00 ευρώ στα πλαίσια εκπόνησης  μελέτης φωτοσήμανσης του έργου «επέκταση αλιευτικού καταφυγίου Αχλαδίου»</td>
+    </tr>
+    <tr>
+      <td>2022-01-03</td>
+      <td>6Δ9ΞΟΡΗ9-ΠΥΦ</td>
+      <td>NaN</td>
+      <td>300.00</td>
+      <td>περί εγκρίσεως της ανάληψης από τον Κ.Α.0000/0831 του Προϋπολογισμού χρήσης 2022 έτους της Υπηρεσίας του Λ.Τ.Φθ/δας του ποσού των 300,00 ευρώ για την κάλυψη της πάσης φύσεως αλληλογραφίας για το έτος 2022.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Top months</h2>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>year</th>
+      <th>month</th>
+      <th>procurement_count</th>
+      <th>supplier_count</th>
+      <th>total_amount</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>2024</td>
+      <td>5</td>
+      <td>16</td>
+      <td>0</td>
+      <td>10000000.00</td>
+    </tr>
+    <tr>
+      <td>2020</td>
+      <td>8</td>
+      <td>9</td>
+      <td>0</td>
+      <td>16000.00</td>
+    </tr>
+    <tr>
+      <td>2021</td>
+      <td>12</td>
+      <td>13</td>
+      <td>0</td>
+      <td>14000.00</td>
+    </tr>
+    <tr>
+      <td>2022</td>
+      <td>6</td>
+      <td>8</td>
+      <td>0</td>
+      <td>14000.00</td>
+    </tr>
+    <tr>
+      <td>2022</td>
+      <td>1</td>
+      <td>21</td>
+      <td>0</td>
+      <td>800.00</td>
+    </tr>
+    <tr>
+      <td>2023</td>
+      <td>7</td>
+      <td>10</td>
+      <td>0</td>
+      <td>669.05</td>
+    </tr>
+    <tr>
+      <td>2026</td>
+      <td>1</td>
+      <td>26</td>
+      <td>0</td>
+      <td>641.18</td>
+    </tr>
+    <tr>
+      <td>2020</td>
+      <td>1</td>
+      <td>12</td>
+      <td>0</td>
+      <td>500.00</td>
+    </tr>
+    <tr>
+      <td>2021</td>
+      <td>1</td>
+      <td>11</td>
+      <td>0</td>
+      <td>500.00</td>
+    </tr>
+    <tr>
+      <td>2021</td>
+      <td>3</td>
+      <td>12</td>
+      <td>0</td>
+      <td>300.00</td>
+    </tr>
+    <tr>
+      <td>2021</td>
+      <td>4</td>
+      <td>11</td>
+      <td>0</td>
+      <td>300.00</td>
+    </tr>
+    <tr>
+      <td>2023</td>
+      <td>11</td>
+      <td>8</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>2023</td>
+      <td>9</td>
+      <td>15</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>2024</td>
+      <td>10</td>
+      <td>24</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>2023</td>
+      <td>10</td>
+      <td>7</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>2024</td>
+      <td>9</td>
+      <td>19</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>2024</td>
+      <td>8</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>2024</td>
+      <td>1</td>
+      <td>25</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>2024</td>
+      <td>7</td>
+      <td>23</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>2024</td>
+      <td>2</td>
+      <td>18</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>2023</td>
+      <td>12</td>
+      <td>6</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>2024</td>
+      <td>11</td>
+      <td>12</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>2024</td>
+      <td>4</td>
+      <td>15</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>2024</td>
+      <td>3</td>
+      <td>11</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>2024</td>
+      <td>6</td>
+      <td>11</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>2025</td>
+      <td>1</td>
+      <td>16</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>2024</td>
+      <td>12</td>
+      <td>22</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>2025</td>
+      <td>2</td>
+      <td>40</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>2025</td>
+      <td>3</td>
+      <td>17</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>2025</td>
+      <td>4</td>
+      <td>26</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>2025</td>
+      <td>5</td>
+      <td>23</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>2025</td>
+      <td>6</td>
+      <td>18</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>2025</td>
+      <td>7</td>
+      <td>10</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>2025</td>
+      <td>8</td>
+      <td>9</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>2025</td>
+      <td>9</td>
+      <td>10</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>2025</td>
+      <td>10</td>
+      <td>8</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>2025</td>
+      <td>11</td>
+      <td>13</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>2025</td>
+      <td>12</td>
+      <td>53</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>2026</td>
+      <td>2</td>
+      <td>8</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>2026</td>
+      <td>3</td>
+      <td>42</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

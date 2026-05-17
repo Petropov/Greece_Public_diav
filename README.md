@@ -1,6 +1,28 @@
 # Greece_Public_diav
 
-This repository builds a Diavgeia public-sector digest and intelligence layer. It currently supports the **Diavgeia Monthly Digest** workflow, which builds the monthly report, emails it using repository secrets, and uploads generated digest artifacts.
+This repository builds a **procurement intelligence pipeline** for Greek municipalities using open government data. It fetches, normalises, and analyses decisions published on [Diavgeia](https://diavgeia.gov.gr) — Greece's mandatory transparency platform — and enriches supplier data via the [ΓΕΜΗ](https://opendata.businessportal.gr) commercial registry.
+
+The pipeline was developed as a pilot study on **Lamia Municipality** (Δήμος Λαμιέων, Diavgeia org `6166`). It is designed to be reusable for any Greek public body. Key findings from the Lamia study are summarised below; full methodology is in [`reports/STUDY_RECAP.md`](reports/STUDY_RECAP.md).
+
+## Lamia Municipality — Pilot Study Findings (2018–2026)
+
+| Metric | Value |
+|--------|-------|
+| Total Diavgeia decisions | 67,878 |
+| Unique contracts (deduplicated) | 28,867 |
+| Clean spend | **€103.17M** |
+| Raw spend (before lifecycle dedup) | ~€189.83M |
+| Unique suppliers | 243 |
+| Suppliers with no ΓΕΜΗ record | 116 (48%) |
+| Inactive / struck-off suppliers | 11 |
+| Peak spend year | **2021 — €31.41M** (EU Recovery/ΕΣΠΑ funds) |
+| Largest single contract | **€9.50M** fuel framework (Dec 2019) |
+
+The 2021 spike in spending (3× the surrounding years) correlates with EU COVID-19 Recovery and Resilience Facility disbursements to municipalities. The 48% no-ΓΕΜΗ-record rate represents a significant transparency gap for supplier verification.
+
+See [`reports/STUDY_RECAP.md`](reports/STUDY_RECAP.md) for the full narrative, supplier transparency flags, and methodology notes.
+
+---
 
 ## Operational workflow
 
@@ -151,20 +173,23 @@ The script is offline-only and does not call the Diavgeia API. When the default 
 
 ## Search-wide, hydrate-narrow pipeline
 
-The full procurement intelligence pipeline runs in six stages.  Steps 1 and 2
-require network access to `diavgeia.gov.gr`; the rest are offline.
+The full procurement intelligence pipeline runs in nine stages.  Steps 1a, 1b,
+2, and 6 require network access; the rest are offline.
 
 ### Quick start (one command)
 
 ```bash
-# Full pipeline for Lamia: fetch → hydrate → normalize → cluster → report
+# Full pipeline for Lamia (all 9 steps)
 python scripts/pipeline.py --org 6166
 
-# Skip the live-fetch steps if you already have a local cache
-python scripts/pipeline.py --org 6166 --skip-fetch --skip-hydrate
+# Skip network steps if you already have a complete local cache
+python scripts/pipeline.py --org 6166 --skip-fetch --skip-refetch --skip-hydrate --skip-gemi
+
+# With ΓΕΜΗ company enrichment (free API key required)
+python scripts/pipeline.py --org 6166 --skip-fetch --skip-refetch --skip-hydrate --gemi-key YOUR_KEY
 
 # Include per-supplier dossiers (top 30 by spend)
-python scripts/pipeline.py --org 6166 --skip-fetch --skip-hydrate --dossiers --dossier-top 30
+python scripts/pipeline.py --org 6166 --skip-fetch --skip-refetch --skip-hydrate --dossiers --dossier-top 30
 
 # Dry-run: print every command without executing
 python scripts/pipeline.py --org 6166 --dry-run
@@ -172,7 +197,7 @@ python scripts/pipeline.py --org 6166 --dry-run
 
 ### Individual steps
 
-**Step 1 — Fetch search exports** (`digest_monthly.py`)
+**Step 1a — Fetch search exports** (`digest_monthly.py`)
 
 Fetch and cache every month's `search_export.json`.  Prefer `--search-only`
 for a broad historical pull — it skips per-ADA detail fetches:
@@ -180,6 +205,29 @@ for a broad historical pull — it skips per-ADA detail fetches:
 ```bash
 python digest_monthly.py --org 6166 --from 2020-01 --to 2026-05 --search-only
 ```
+
+**Step 1b — Re-fetch capped months** (`scripts/fetch_windowed.py`)
+
+The Diavgeia API returns at most 500 unique decisions per query.  Months with
+more decisions are capped.  This step re-fetches those months using weekly
+sub-windows (7-day date ranges) and merges the results, recovering the missing
+30–40% of decisions from busy months.
+
+```bash
+# Re-fetch all capped months (detected automatically)
+python scripts/fetch_windowed.py --org 6166
+
+# Re-fetch a specific range
+python scripts/fetch_windowed.py --org 6166 --months 2022-01:2024-12
+
+# Use daily windows for very high-volume months
+python scripts/fetch_windowed.py --org 6166 --window-days 1
+
+# Preview without fetching
+python scripts/fetch_windowed.py --org 6166 --dry-run
+```
+
+Typical gain: **+200–300 decisions per capped month** (~35% more data).
 
 **Step 2 — Selective hydration** (`scripts/hydrate_narrow.py`)
 
@@ -231,14 +279,45 @@ python scripts/cluster_suppliers.py --org 6166
 # Writes: data/normalized/org=6166/supplier_clusters.csv
 ```
 
-**Step 5 — Intelligence report** (`scripts/supplier_intelligence_report.py`)
+**Step 5 — Procurement lifecycle deduplication** (`scripts/link_procurement_lifecycle.py`)
+
+Each Greek public contract produces multiple Diavgeia decisions (committee
+minutes, formal award, contract signing, payment).  Naively summing amounts
+causes ~35% double-counting.  This step links stages by matching amounts ±2%
+within a 180-day window and produces a single clean contract row.
+
+```bash
+python scripts/link_procurement_lifecycle.py --org 6166
+# Writes: data/normalized/org=6166/contracts.csv
+#         data/normalized/org=6166/lifecycle.csv
+```
+
+**Step 6 — ΓΕΜΗ company enrichment** (`scripts/enrich_gemi.py`)
+
+Look up each supplier's tax ID in the ΓΕΜΗ (Greek General Commercial Registry)
+OpenData API.  Returns legal name, legal form, share capital, registration date,
+address, and activity codes.  Also computes transparency flags:
+
+- `flag_low_capital` — capital < €10k, contract value > €100k
+- `flag_recently_registered` — company registered within 12 months of first contract
+- `flag_inactive` — company status is not active
+- `flag_no_gemi_record` — no ΓΕΜΗ record found for this tax ID
+
+```bash
+# Register for a free API key at: https://opendata.businessportal.gr/register/
+python scripts/enrich_gemi.py --org 6166 --api-key YOUR_KEY
+# or: export GEMI_API_KEY=YOUR_KEY && python scripts/enrich_gemi.py --org 6166
+# Writes: data/normalized/org=6166/gemi_enrichment.csv
+```
+
+**Step 7 — Intelligence report** (`scripts/supplier_intelligence_report.py`)
 
 ```bash
 python scripts/supplier_intelligence_report.py --org 6166
 # Writes: reports/supplier_intelligence_org_6166.html
 ```
 
-**Step 6 — Markdown intelligence report** (`scripts/build_markdown_report.py`)
+**Step 8 — Markdown intelligence report** (`scripts/build_markdown_report.py`)
 
 ```bash
 python scripts/build_markdown_report.py --org 6166
@@ -247,7 +326,7 @@ python scripts/build_markdown_report.py --org 6166
 
 Sections: executive summary, spend by year, monthly breakdown, top 30 procurements, top 30 suppliers, repeat suppliers, decision-type breakdown, data coverage notes.
 
-**Step 7 — Per-supplier dossiers** (`scripts/build_dossier.py`)
+**Step 9 — Per-supplier dossiers** (`scripts/build_dossier.py`)
 
 Requires `supplier_clusters.csv` from step 4.
 
