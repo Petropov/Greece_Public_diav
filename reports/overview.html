@@ -193,6 +193,7 @@ footer{text-align:center;font-size:.74rem;color:var(--grey);padding:20px;border-
     <li><a href="#" data-tab="municipality">🏛️ Δήμοι</a></li>
     <li><a href="#" data-tab="insights">💡 Συμπεράσματα</a></li>
     <li><a href="#" data-tab="resources">📚 Πηγές & Κώδικας</a></li>
+    <li><a href="#" data-tab="budget">💶 Δαπάνη/Κάτοικο</a></li>
   </ul>
 </div>
 
@@ -885,6 +886,221 @@ footer{text-align:center;font-size:.74rem;color:var(--grey);padding:20px;border-
 
 </div><!-- /pane-resources -->
 
+<!-- ════════════════════ PANE: BUDGET PER CAPITA ════════════════════ -->
+<div class="pane" id="pane-budget">
+
+  <div class="alert blue">
+    <strong>Γνωστή προμηθευτική δαπάνη Διαύγειας (ΑΝΑΘΕΣΗ + ΚΑΤΑΚΥΡΩΣΗ + ΣΥΜΒΑΣΗ) ανά κάτοικο, ανά έτος.</strong>
+    Περιλαμβάνονται <em>όλοι</em> οι τύποι ανάθεσης — άμεσες, ανταγωνιστικές κατακυρώσεις και συμβάσεις —
+    για συνολική εικόνα. Τα ποσά προέρχονται μόνο από αποφάσεις με συμπληρωμένο πεδίο ποσού
+    (<em>δεν αντιπροσωπεύουν τον συνολικό προϋπολογισμό</em> του φορέα).
+    Νοσοκομεία: πληθυσμός νομού · Δήμοι &amp; ΔΕΥΑ: πληθυσμός πόλης.
+  </div>
+
+  <!-- ── Municipalities ── -->
+  <section>
+    <h2><span class="num">1</span>Δήμοι — Συνολική Δαπάνη ανά Κάτοικο / Έτος</h2>
+
+    <div class="alert amber">
+      <strong>Σημείωση κωδικοποίησης:</strong> Δήμος Λαμίας και Τρικκαίων χρησιμοποιούν ΑΝΑΘΕΣΗ για
+      μικρές απευθείας αναθέσεις και ΚΑΤΑΚΥΡΩΣΗ για ανταγωνιστικά έργα — σύγκριση άμεση.
+      Δήμος Καρδίτσας κωδικοποιεί και τα μεγάλα ανταγωνιστικά έργα ως ΑΝΑΘΕΣΗ (μ.ο. €302κ/απόφαση),
+      οπότε εξαιρείται από το γράφημα ως μη συγκρίσιμος. Δήμος Σερρών: κάλυψη ποσών &lt;1%.
+    </div>
+
+    <div class="chart-grid">
+      <div class="chart-box" style="grid-column:1/-1">
+        <h3>€ Διαύγεια ανά κάτοικο — Δήμοι Λαμίας &amp; Τρικκαίων (2020–2025)</h3>
+        <canvas id="muniCapita" style="max-height:280px"></canvas>
+      </div>
+    </div>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Δήμος (πληθυσμός)</th>
+            <th>2020</th><th>2021</th><th>2022</th><th>2023</th><th>2024</th><th>2025</th>
+            <th>Σύνολο</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="lamia">
+            <td><strong>★ Λαμίας</strong> <span class="badge grey">75.000 κατ.</span></td>
+            <td>€42</td><td>€19</td><td>€22</td><td>€55</td><td>€45</td><td>€24</td>
+            <td><strong>€15,6M</strong></td>
+          </tr>
+          <tr>
+            <td>Τρικκαίων <span class="badge grey">81.000 κατ.</span></td>
+            <td>€19</td><td>€69</td><td>€32</td><td>€51</td><td>€30</td><td>€23</td>
+            <td>€18,2M</td>
+          </tr>
+          <tr>
+            <td>Σερρών <span class="badge grey">57.000 κατ.</span></td>
+            <td>€1</td><td>€0</td><td>—</td><td>€0</td><td>€0</td><td>—</td>
+            <td>€0,1M <span class="badge grey">&lt;1% κάλ.</span></td>
+          </tr>
+          <tr>
+            <td>Καρδίτσας <span class="badge grey">~58.000 κατ.</span></td>
+            <td colspan="6" style="color:var(--grey);font-style:italic">Εξαιρείται — διαφορετική κωδικοποίηση (μεγάλα έργα ως ΑΝΑΘΕΣΗ)</td>
+            <td>€778,9M* ⚠️</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <div class="icon">📊</div>
+      <div>
+        <h4>Λαμία και Τρίκαλα σε παρόμοιο εύρος — αλλά με διαφορετική σύνθεση</h4>
+        <p>Ο Δήμος Λαμίας και ο Δήμος Τρικκαίων δαπανούν παρόμοια σε €/κάτοικο/έτος (€19–€69 vs €19–€55).
+        Η διαφορά βρίσκεται στη <strong>σύνθεση</strong>: Λαμία €25,6Μ άμεσες vs €34,3Μ ανταγωνιστικές·
+        Τρίκαλα έχει σχεδόν μηδενικές ανταγωνιστικές στα ποσά που είναι διαθέσιμα στη Διαύγεια
+        (πιθανώς υποκάλυψη στα ποσά ΚΑΤΑΚΥΡΩΣΗΣ λόγω ατελούς hydration).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Hospitals ── -->
+  <section>
+    <h2><span class="num">2</span>Νοσοκομεία — Συνολική Δαπάνη ανά Κάτοικο Νομού / Έτος</h2>
+
+    <div class="alert amber">
+      <strong>Σημείωση κωδικοποίησης:</strong> ΓΝ Τρικάλων, Καρδίτσας, Κοζάνης χρησιμοποιούν
+      κυρίως Β-τύπους (ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ) αντί Δ.1 για τεκμηρίωση προμηθειών.
+      Αποκλείοντας ΑΝΑΛΗΨΗ (για αποφυγή διπλοκαταμέτρησης), οι τιμές τους είναι τεχνητά
+      χαμηλές σε αυτό το γράφημα. ΓΝ Σερρών: ελάχιστη κάλυψη ποσών ΑΝΑΘΕΣΗΣ.
+      Το ΓΝ Λαμίας είναι ο μόνος φορέας με αξιόπιστη κάλυψη (43,6% των αποφάσεων Δ.1).
+    </div>
+
+    <div class="chart-grid">
+      <div class="chart-box" style="grid-column:1/-1">
+        <h3>Νοσοκομεία — € Διαύγεια ανά κάτοικο νομού (2020–2025)</h3>
+        <canvas id="hospCapita" style="max-height:280px"></canvas>
+      </div>
+    </div>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Νοσοκομείο (πληθυσμός νομού)</th>
+            <th>2020</th><th>2021</th><th>2022</th><th>2023</th><th>2024</th><th>2025</th>
+            <th>Σύνολο</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="lamia">
+            <td><strong>★ ΓΝ Λαμίας</strong> <span class="badge grey">155.000 κατ.</span></td>
+            <td>€238</td><td>€341</td><td>€241</td><td>€329</td><td>€306</td><td>€193</td>
+            <td><strong>€255,5M</strong> <span class="badge red">43,6% κάλ.</span></td>
+          </tr>
+          <tr>
+            <td>ΓΝ Τρικάλων <span class="badge grey">131.000 κατ.</span></td>
+            <td>€10</td><td>€0</td><td>€0</td><td>€0</td><td>—</td><td>€6</td>
+            <td>€2,1M <span class="badge grey">Β-τύπος</span></td>
+          </tr>
+          <tr>
+            <td>ΓΝ Σερρών <span class="badge grey">172.000 κατ.</span></td>
+            <td>€0</td><td>€1</td><td>€1</td><td>€2</td><td>€1</td><td>€3</td>
+            <td>€1,3M <span class="badge grey">ατελής</span></td>
+          </tr>
+          <tr>
+            <td>ΓΝ Καρδίτσας / Κοζάνης</td>
+            <td colspan="6" style="color:var(--grey);font-style:italic">Β-τύποι κωδικοποίησης (ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ) — εξαιρούνται για αποφυγή διπλοκαταμέτρησης</td>
+            <td>—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout" style="margin-top:8px">
+      <div class="icon">📌</div>
+      <div>
+        <h4>ΓΝ Λαμίας: €274/κάτοικο/έτος — σταθερά υψηλή δαπάνη, 82,6% μέσω άμεσης ανάθεσης</h4>
+        <p>Από τα €255,5Μ συνολικής καταγεγραμμένης δαπάνης, τα <strong>€215,5Μ (82,6%) αφορούν άμεσες
+        αναθέσεις</strong> και μόνο €45,3Μ ανταγωνιστικές κατακυρώσεις — μια αναλογία που παραμένει
+        αμετάβλητη σε κάθε έτος της περιόδου 2020–2025. Η συνολική δαπάνη σε €/κάτοικο είναι
+        συγκρίσιμη με νοσοκομεία παρόμοιου μεγέθους, αλλά η σύνθεσή της είναι ασυνήθιστη.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── DEYAs ── -->
+  <section>
+    <h2><span class="num">3</span>ΔΕΥΑ — Συνολική Δαπάνη ανά Κάτοικο / Έτος</h2>
+
+    <div class="chart-grid">
+      <div class="chart-box" style="grid-column:1/-1">
+        <h3>€ Διαύγεια ανά κάτοικο — ΔΕΥΑ (2020–2025)</h3>
+        <canvas id="deyvaCapita" style="max-height:290px"></canvas>
+      </div>
+    </div>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ΔΕΥΑ (πληθυσμός)</th>
+            <th>2020</th><th>2021</th><th>2022</th><th>2023</th><th>2024</th><th>2025</th>
+            <th>Σύνολο</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="lamia">
+            <td><strong>★ ΔΕΥΑ Λαμίας</strong> <span class="badge grey">75.000</span></td>
+            <td>€47</td><td>€162</td><td>€62</td><td>€9</td><td>€10</td><td>€9</td>
+            <td><strong>€22,3M</strong></td>
+          </tr>
+          <tr>
+            <td>ΔΕΥΑ Κοζάνης <span class="badge grey">47.000</span></td>
+            <td>€177</td><td>€88</td><td>€142</td><td>€101</td><td>€94</td><td>€50</td>
+            <td>€30,7M</td>
+          </tr>
+          <tr>
+            <td>ΔΕΥΑ Καρδίτσας <span class="badge grey">58.000</span></td>
+            <td>€44</td><td>€28</td><td>€66</td><td>€109</td><td>€93</td><td>€69</td>
+            <td>€23,7M</td>
+          </tr>
+          <tr>
+            <td>ΔΕΥΑ Τρικάλων <span class="badge grey">~48.000</span></td>
+            <td>€116</td><td>€65</td><td>€9</td><td>€22</td><td>€21</td><td>€23</td>
+            <td>€12,3M</td>
+          </tr>
+          <tr>
+            <td>ΔΕΥΑ Σερρών <span class="badge grey">~57.000</span></td>
+            <td>—</td><td>€1</td><td>€1</td><td>—</td><td>—</td><td>—</td>
+            <td>€0,2M <span class="badge grey">&lt;1% κάλ.</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout" style="margin-top:8px">
+      <div class="icon">💡</div>
+      <div>
+        <h4>Η ΔΕΥΑ Λαμίας δαπανά σχεδόν μηδέν από το 2022 — ενώ οι ομότιμοι επενδύουν</h4>
+        <p>Μετά από μια ακμή το 2021 (€162/κάτ., €12,1Μ — πιθανώς ένα μεγάλο έργο),
+        η ΔΕΥΑ Λαμίας κατρακυλά σε <strong>€9–€10/κάτοικο/έτος</strong> (€670κ–750κ/έτος) από το 2023.
+        Σε αντίθεση, η ΔΕΥΑ Κοζάνης διατηρεί <strong>€50–€177/κάτοικο</strong> σταθερά όλη την περίοδο,
+        η ΔΕΥΑ Καρδίτσας <em>αυξάνει</em> τη δαπάνη (€44→€109), και η ΔΕΥΑ Τρικάλων παρουσίασε
+        μεγάλο έργο το 2020 (€116/κάτ.). Για μια υδρευτική εταιρεία, €9/κάτοικο/έτος σε
+        καταγεγραμμένη προμηθευτική δαπάνη είναι εξαιρετικά χαμηλό.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="caveat">
+    <strong>Μεθοδολογική σημείωση:</strong>
+    Τύποι απόφασης που περιλαμβάνονται: ΑΝΑΘΕΣΗ + ΚΑΤΑΚΥΡΩΣΗ + ΣΥΜΒΑΣΗ (εξαιρούνται ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ
+    και ΕΓΚΡΙΣΗ ΔΑΠΑΝΗΣ για αποφυγή διπλοκαταμέτρησης με B-τύπους).
+    Αποκλεισμός ανά συναλλαγή: &gt;€5Μ για δήμους/ΔΕΥΑ, &gt;€50Μ για νοσοκομεία.
+    Πληθυσμός νοσοκομείων = νομός (ΕΛΣΤΑΤ 2021). Ημερομηνία από Unix timestamp ή ISO.
+    Τα στοιχεία 2026 δεν εμφανίζονται (ατελές έτος).
+  </div>
+
+</div><!-- /pane-budget -->
+
 <footer>
   Δεδομένα: Διαύγεια OpenData API (diavgeia.gov.gr) · Επεξεργασία: Μάιος 2026 ·
   Pipeline: search-export + windowed refetch + στοχευμένη hydration ·
@@ -1132,6 +1348,97 @@ new Chart(document.getElementById('muniSpend'), {
       y:{ beginAtZero:true, stacked:true,
           ticks:{ callback:v=>'€'+v+'Μ' }, grid:{ color:'#f0f0f0' } },
       x:{ stacked:true, grid:{ display:false } }
+    }
+  }
+});
+
+// ── Budget per capita: municipalities ─────────────────
+new Chart(document.getElementById('muniCapita'), {
+  type: 'line',
+  data: {
+    labels: ['2020','2021','2022','2023','2024','2025'],
+    datasets: [
+      { label: 'Λαμία ★ (75κ κατ.)', data: [42, 19, 22, 55, 45, 24],
+        borderColor: C.lamia, backgroundColor: C.lamiaL, fill: true,
+        tension: .35, pointRadius: 5, borderWidth: 2.5 },
+      { label: 'Τρίκαλα (81κ)', data: [19, 69, 32, 51, 30, 23],
+        borderColor: C.peers[0], backgroundColor: 'transparent',
+        tension: .35, pointRadius: 4, borderWidth: 2, borderDash: [6,3] },
+    ]
+  },
+  options: {
+    plugins: {
+      legend: { position: 'bottom', labels: { boxWidth: 12 } },
+      tooltip: { callbacks: { label: c => ` ${c.dataset.label}: €${c.raw ?? '—'}/κάτ.` } }
+    },
+    scales: {
+      y: { beginAtZero: true, ticks: { callback: v => '€'+v }, grid: { color: '#f0f0f0' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// ── Budget per capita: hospitals ──────────────────────
+new Chart(document.getElementById('hospCapita'), {
+  type: 'line',
+  data: {
+    labels: ['2020','2021','2022','2023','2024','2025'],
+    datasets: [
+      { label: 'ΓΝ Λαμίας ★ (155κ κατ. νομού)',
+        data: [238, 341, 241, 329, 306, 193],
+        borderColor: C.lamia, backgroundColor: C.lamiaL, fill: true,
+        tension: .35, pointRadius: 5, borderWidth: 2.5 },
+      { label: 'ΓΝ Τρικάλων (131κ) — Β-τύπος, ατελής',
+        data: [10, 0, 0, 0, null, 6],
+        borderColor: C.peers[0], backgroundColor: 'transparent',
+        tension: .35, pointRadius: 4, borderWidth: 1.5, borderDash: [4,4],
+        spanGaps: false },
+      { label: 'ΓΝ Σερρών (172κ) — ατελής κάλυψη',
+        data: [0, 1, 1, 2, 1, 3],
+        borderColor: C.peers[1], backgroundColor: 'transparent',
+        tension: .35, pointRadius: 4, borderWidth: 1.5, borderDash: [4,4] },
+    ]
+  },
+  options: {
+    plugins: {
+      legend: { position: 'bottom', labels: { boxWidth: 12 } },
+      tooltip: { callbacks: { label: c => ` €${c.raw ?? '—'}/κάτ. νομού` } }
+    },
+    scales: {
+      y: { beginAtZero: true, ticks: { callback: v => '€'+v }, grid: { color: '#f0f0f0' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// ── Budget per capita: DEYAs ──────────────────────────
+new Chart(document.getElementById('deyvaCapita'), {
+  type: 'line',
+  data: {
+    labels: ['2020','2021','2022','2023','2024','2025'],
+    datasets: [
+      { label: 'ΔΕΥΑ Λαμίας ★ (75κ)', data: [47, 162, 62, 9, 10, 9],
+        borderColor: C.lamia, backgroundColor: C.lamiaL, fill: true,
+        tension: .35, pointRadius: 5, borderWidth: 2.5 },
+      { label: 'ΔΕΥΑ Κοζάνης (47κ)', data: [177, 88, 142, 101, 94, 50],
+        borderColor: C.peers[1], backgroundColor: 'transparent',
+        tension: .35, pointRadius: 4, borderWidth: 2, borderDash: [5,3] },
+      { label: 'ΔΕΥΑ Καρδίτσας (58κ)', data: [44, 28, 66, 109, 93, 69],
+        borderColor: C.peers[3], backgroundColor: 'transparent',
+        tension: .35, pointRadius: 4, borderWidth: 2, borderDash: [5,3] },
+      { label: 'ΔΕΥΑ Τρικάλων (48κ)', data: [116, 65, 9, 22, 21, 23],
+        borderColor: C.peers[0], backgroundColor: 'transparent',
+        tension: .35, pointRadius: 4, borderWidth: 1.5, borderDash: [3,4] },
+    ]
+  },
+  options: {
+    plugins: {
+      legend: { position: 'bottom', labels: { boxWidth: 12 } },
+      tooltip: { callbacks: { label: c => ` ${c.dataset.label}: €${c.raw ?? '—'}/κάτ.` } }
+    },
+    scales: {
+      y: { beginAtZero: true, ticks: { callback: v => '€'+v }, grid: { color: '#f0f0f0' } },
+      x: { grid: { display: false } }
     }
   }
 });
