@@ -147,7 +147,21 @@ Beyond the 739 competitive-tender procedural steps identified earlier, two furth
 - **Negotiated contracts coded as ΑΝΑΘΕΣΗ:** UNISON Facility Services (cleaning) received 6 contracts in 2025–2026 totalling €3.24M, awarded under "negotiated procedure without prior publication" (Art. 32 § 2(c) of Law 4412/2016). These are large-value service contracts with ΕΑΔΗΣΥ oversight — legally distinct from below-threshold direct awards but classified identically in Diavgeia.
 - **Option exercises coded as ΑΝΑΘΕΣΗ:** Several ΑΝΑΘΕΣΗ entries are formal exercises of contractual option rights on competitively-awarded contracts (e.g., ΠΙΕΤΡΗΣ catering €660k, LINDE medical gases extensions). These are legitimate but inflate the ΑΝΑΘΕΣΗ count and amounts.
 
-*Key finding on UNISON:* ΓΝ Λαμίας has run no competitive tender for hospital-wide cleaning services at scale. A 2023 competitive award for cleaning (ΚΑΤΑΚΥΡΩΣΗ, €81k) appears to have covered a limited scope. From June 2025, the hospital has used the Art. 32§2γ emergency pathway repeatedly — awarding UNISON a 5-month contract (€680k), extending it twice, and awarding a further 5-month extension (€773k) in April 2026. Using emergency procedures for a recurring, foreseeable core service raises a compliance question independent of supplier identity.
+*Key finding on UNISON (verified against Diavgeia API):* ΓΝ Λαμίας has run no competitive tender for hospital-wide cleaning services at scale. A 2023 competitive award for cleaning (ΚΑΤΑΚΥΡΩΣΗ, €81k) covered a limited scope. The large-scale cleaning contract history:
+
+| ADA | Date | Amount | Decision |
+|-----|------|--------|----------|
+| ΨΠΗΓ4690ΒΜ-ΛΚ8 | 2025-07-02 | €680,859 | Award of cleaning services (Δ.1) |
+| ΨΜΧΥ4690ΒΜ-75Β | 2025-12-04 | €680,859 | ΕΑΔΗΣΥ consent for Art.32§2γ procedure |
+| 9ΗΡΣ4690ΒΜ-ΕΕ3 | 2026-02-25 | €482,701 | Contract modification |
+| 96Η04690ΒΜ-ΠΔ2 | 2026-02-27 | €483,309 | Cleaning services continuation |
+| 9Π3Γ4690ΒΜ-ΡΗΠ | 2026-05-25 | €772,767 | Second 5-month extension via negotiation |
+
+Two additional findings from Diavgeia detail records:
+1. **Late publication:** ADA `ΨΠΗΓ4690ΒΜ-ΛΚ8` was issued July 2, 2025 but published on Diavgeia November 2, 2025 — a 4-month delay. Greek law (Art. 3 § 3 of Law 3861/2010) requires publication within 15 days.
+2. **Sequence anomaly:** The ΕΑΔΗΣΥ consent (`ΨΜΧΥ4690ΒΜ-75Β`, December 2025) post-dates the initial award (`ΨΠΗΓ4690ΒΜ-ΛΚ8`, July 2025) by 5 months. For Art.32§2γ procedures, ΕΑΔΗΣΥ consent should precede the award. The December 2025 consent appears to authorise a *subsequent* 5-month extension, but the July 2025 award lacks documented prior regulatory authorisation in the Diavgeia record.
+
+Using emergency procedures for a recurring, foreseeable core service raises a compliance question independent of supplier identity. The ADA references above provide direct entry points for ΕΑΔΗΣΥ or Ελεγκτικό Συνέδριο review.
 
 **What requires further investigation:**
 
@@ -161,7 +175,7 @@ Beyond the 739 competitive-tender procedural steps identified earlier, two furth
 
 **Caveats:**
 
-- Lamia municipality data for 2022–2024 is likely undercounted (API cap of 500 decisions/month — windowed re-fetch pending). True volumes are probably ~40–50% higher.
+- Δήμος Λαμίας 2022–2024 data is **complete**: cross-check of monthly_summary vs decisions.csv shows 100% match for all 7 years. Earlier concern about API cap undercounting was resolved by the pipeline. Total 64,334 decisions, 10,388 ΑΝΑΘΕΣΗ confirmed.
 - ΓΝ Καρδίτσας and ΓΝ Κοζάνης use Β-type decision codes for procurement — not directly comparable with ΓΝ Λαμίας on ΑΝΑΘΕΣΗ counts.
 - All amounts are dependent on quality of original Diavgeia data entry and completeness of hydration.
 
