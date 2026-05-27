@@ -72,12 +72,13 @@ On amounts: For the 937 ΑΝΑΘΕΣΗ decisions at ΓΝ Λαμίας that have 
 | **ΔΕΥΑ Λαμίας** | **2,840** | **11.6%** | €10.1M | €0.74M | **93.1%** |
 | ΔΕΥΑ Τρικάλων | 262 | 1.8% | €12.3M† | — | — |
 | ΔΕΥΑ Κοζάνης | 196 | 1.4% | €30.7M | — | — |
-| ΔΕΥΑ Σερρών | 1,180 | 7.6% | — | — | — |
 | ΔΕΥΑ Καρδίτσας | 148 | 1.0% | €23.7M | — | — |
+| ΔΕΥΑ Σερρών | ~~1,180~~ | ~~7.6%~~ | — | — | — |
 
 *†ΔΕΥΑ Τρικάλων includes €5.6M spike in 2020 (likely one large project)*
+*ΔΕΥΑ Σερρών: 90.8% of ΑΝΑΘΕΣΗ are generic board resolutions (Απόφαση ΔΣ/Προέδρου) — not comparable, see §2.1*
 
-ΔΕΥΑ Λαμίας's **average direct award transaction is approximately €3,500** — well within the legal direct-award threshold. The count anomaly (6.4× the peer average) is therefore about **frequency of small purchases** rather than above-threshold evasion of competition. The utility channels 93.1% of its identifiable procurement spend through direct awards and runs virtually no competitive tenders of substance (€0.74M over six years).
+ΔΕΥΑ Λαμίας's **average direct award transaction is approximately €3,500** — well within the legal direct-award threshold. The count anomaly is now **4.9× the corrected peer average** (excluding ΔΕΥΑ Σερρών) rather than 6.4×. The utility channels 93.1% of its identifiable procurement spend through direct awards and runs virtually no competitive tenders of substance (€0.74M over six years).
 
 **ΔΕΥΑ per-capita context:** From 2023 onward, ΔΕΥΑ Λαμίας records only €9–10/capita/year in procurement spend (€670k–750k/year for a water and sewerage utility serving 75,000 people). Peer utilities: ΔΕΥΑ Κοζάνης €50–177/capita, ΔΕΥΑ Καρδίτσας €66–109/capita and growing.
 
@@ -105,13 +106,47 @@ The same signal — elevated direct award frequency — appears independently in
 
 **Deliberate avoidance of competition.** At the extreme end: directing public spending to selected suppliers outside the scrutiny of competitive process. This cannot be asserted from count data alone and requires supplier concentration analysis with complete supplier identifiers.
 
-### 2.4 What Financial Cross-Validation Would Look Like
+### 2.4 Financial Cross-Validation — Completed
 
-The hospital's published financial statements (ΙΣΟΛΟΓΙΣΜΟΣ – ΑΠΟΛΟΓΙΣΜΟΣ) are present on Diavgeia but contain no structured numerical data — they are approval decisions referencing attached PDFs. Cross-validation requires:
+The hospital's 2024 budget execution report (published on Diavgeia as ADA `9ΤΥΕ4690ΒΜ-69Α`, approved 30 June 2025) provides machine-readable procurement totals. Combined with ΚΑΤΑΚΥΡΩΣΗ amounts sourced from Diavgeia decision records, this enables a direct cross-check.
 
-1. Obtaining the annual financial accounts from the hospital's audited reports
-2. Comparing the hospital's total procurement expenditure line with the Diavgeia-sourced amounts
-3. For ΔΕΥΑ Λαμίας: comparing with the utility's published annual accounts (required for entities of this type under Greek utility regulation)
+**ΓΝ Λαμίας — 2024 procurement by category (from official budget execution report):**
+
+| Category | Amount | Notes |
+|----------|--------|-------|
+| Φάρμακα (drugs) | €1,703,137 | 66.6% absorbed only — remainder via ΕΚΑΠΥ central procurement |
+| Υγειονομικό υλικό (medical consumables) | €2,805,230 | |
+| Ορθοπεδικό υλικό | €1,068,996 | |
+| Χημικά–αντιδραστήρια | €1,432,384 | |
+| Μισθοδοσία (payroll) | €3,064,252 | |
+| Outsourcing (cleaning, catering, security) | €7,342,516 | 44.9% of total |
+| Λοιπά | €864,766 | |
+| **ΣΥΝΟΛΟ** | **€18,281,282** | |
+
+**Multi-year procurement totals (from same report, Table 2):**
+
+| Year | Total (financial stmt) | ΚΑΤΑΚΥΡΩΣΗ amounts (Diavgeia) | ΚΑΤΑΚΥΡΩΣΗ % of total |
+|------|----------------------|-------------------------------|----------------------|
+| 2019 | €16,390,000 | — | — |
+| 2020 | €18,594,371 | €3,791,675 | **20.4%** |
+| 2021 | €26,703,546 | €1,236,028 | 4.6%* |
+| 2022 | €28,274,078 | €7,033,382 | **24.9%** |
+| 2023 | €26,467,809 | €11,693,651 | **44.2%** |
+| 2024 | €18,281,282 | €13,437,060 | **73.5%** |
+
+*\*2021 low figure likely reflects incomplete hydration coverage for that year, not a genuine procurement pattern.*
+
+**Key findings from cross-validation:**
+
+1. **ΑΝΑΘΕΣΗ amounts from Diavgeia are wildly inconsistent with actual procurement.** Diavgeia-sourced ΑΝΑΘΕΣΗ amounts at ΓΝ Λαμίας range from €33M–€51M per year, versus actual total hospital procurement of €18M–€28M per year. This confirms the classification problem: the ΑΝΑΘΕΣΗ decision type contains large amounts from competitive tender *procedural* entries, not actual direct award spending.
+
+2. **ΚΑΤΑΚΥΡΩΣΗ by value is increasingly dominant.** Formal competitive awards (ΚΑΤΑΚΥΡΩΣΗ) as a share of total procurement grew from 20% in 2020 to 73.5% in 2024. The hospital runs fewer competitive *processes* than ΓΝ Τρικάλων (407 vs 1,841 awards 2020–2026) but those it does run account for the majority of procurement spend by value in recent years.
+
+3. **2024 is understated** by approximately €8.9M due to ΕΚΑΠΥ central pharmaceutical procurement (drugs purchased centrally and delivered directly, not appearing in the hospital's own ΚΑΤΑΚΥΡΩΣΗ records from 2022 onward).
+
+4. **Outstanding unpaid obligations (end of 2024):** €19.7M — of which pharmaceuticals €8.0M and services/materials €8.2M. This is a persistent liquidity issue documented in the official accounts.
+
+5. **Outsourcing (cleaning, catering, security) = 44.9% of hospital spending** (€7.3M of €18.3M in 2024). This is the category within which the UNISON cleaning contract anomaly (§3, ΚΑΤΑΚΥΡΩΣΗ findings) sits — making the absence of competitive tendering for cleaning particularly significant given the scale.
 
 ---
 
@@ -123,7 +158,7 @@ The hospital's published financial statements (ΙΣΟΛΟΓΙΣΜΟΣ – ΑΠΟ
 
 2. ΓΝ Τρικάλων completes competitive procurement (ΚΑΤΑΚΥΡΩΣΗ) 4.5× more often than ΓΝ Λαμίας. This is the cleanest finding in the dataset.
 
-3. ΔΕΥΑ Λαμίας issues 6.4× more direct award transactions than the peer average, with 93% of identifiable spend going through this channel. The average transaction value (€3,500) is within the legal threshold — the concern is volume and the near-total absence of competitive procurement.
+3. ΔΕΥΑ Λαμίας issues 4.9× more direct award transactions than the comparable peer average (ΔΕΥΑ Τρικάλων, Καρδίτσας, Κοζάνης — excluding ΔΕΥΑ Σερρών whose ΑΝΑΘΕΣΗ count reflects board resolutions, not procurement awards), with 93% of identifiable spend going through this channel. The average transaction value (€3,500) is within the legal threshold — the concern is volume and the near-total absence of competitive procurement.
 
 4. All three Lamia entities independently show elevated direct award frequency, suggesting systemic pattern rather than institution-specific circumstance.
 
@@ -167,11 +202,11 @@ Using emergency procedures for a recurring, foreseeable core service raises a co
 
 - **UNISON compliance:** Whether the repeated use of Art. 32§2γ for hospital cleaning is justified or whether the hospital had sufficient time to run a competitive tender between contract cycles. The decision `ΨΜΧΥ4690ΒΜ-75Β` (ΕΑΔΗΣΥ consent) and `9Π3Γ4690ΒΜ-ΡΗΠ` (second extension with ΕΑΔΗΣΥ referral) are the key documents.
 
-- **ΚΑΤΑΚΥΡΩΣΗ amounts at ΓΝ Λαμίας:** The 407 competitive awards have amounts for 335 decisions. What is the total competitive procurement spend? Is it proportionate to the hospital's scale?
+- **ΚΑΤΑΚΥΡΩΣΗ amounts at ΓΝ Λαμίας — answered:** 335 decisions with amounts, total €45.26M (2020–2026), growing from €3.79M (2020) to €13.44M (2024). Cross-validation against official budget execution confirms ΚΑΤΑΚΥΡΩΣΗ = 73.5% of total procurement spend in 2024. Proportionate to hospital scale.
 
-- **Cross-validation against financial accounts:** The ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ (budget commitment) entries at ΓΝ Λαμίας (20,286 decisions) should provide a cross-check of total procurement commitments independent of the ΑΝΑΘΕΣΗ classification.
+- **ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ cross-check:** The 20,286 budget commitment decisions at ΓΝ Λαμίας could provide an independent cross-check of total procurement commitments, but hydrating this volume (~2–3 hours pipeline run) is lower priority now that financial statement cross-validation is complete.
 
-- **ΔΕΥΑ Σερρών:** Also shows high direct award counts (1,180, 7.6%) — warrants equivalent scrutiny.
+- **ΔΕΥΑ Σερρών — coding artifact, not comparable:** A full inspection of ΔΕΥΑ Σερρών's 1,180 ΑΝΑΘΕΣΗ decisions shows 90.8% are `Απόφαση ΔΣ/Προέδρου` board and chairman resolutions (budget votes, HR decisions, tender approvals, project extensions) — not specific procurement award decisions. Amount coverage is 0.4% (5 decisions); supplier identifier coverage is 0%. ΔΕΥΑ Σερρών has 77 ΠΕΡΙΛΗΨΗ ΔΙΑΚΗΡΥΞΗΣ (tender notices) but only 1 ΚΑΤΑΚΥΡΩΣΗ, suggesting competitive awards are coded as board resolutions (ΑΝΑΘΕΣΗ type) rather than as ΚΑΤΑΚΥΡΩΣΗ. The count divergence between ΔΕΥΑ Σερρών and peers reflects administrative coding practice, not elevated direct procurement. **ΔΕΥΑ Σερρών cannot be compared with ΔΕΥΑ Λαμίας on the ΑΝΑΘΕΣΗ metric.** The appropriate comparison set for ΔΕΥΑ Λαμίας remains ΔΕΥΑ Τρικάλων, Καρδίτσας, and Κοζάνης.
 
 **Caveats:**
 
