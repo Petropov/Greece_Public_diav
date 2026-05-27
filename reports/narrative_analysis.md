@@ -220,7 +220,7 @@ Using emergency procedures for a recurring, foreseeable core service raises a co
 
 *ΝΤΟΥΒΑΣ family relationship:* Two entities sharing a surname — ΣΤ. ΝΤΟΥΒΑΣ & ΣΙΑ Ο.Ε. (fire prevention, 25tx, €319k) and ΝΤΟΥΒΑΣ ΒΑΣΙΛΕΙΟΣ & ΣΙΑ Ε.Ε. (sports field maintenance, 14tx, €220k) — total €540k combined over six years. Different legal entities, different services, different geographic focus. At this scale over six years, not a concentration anomaly.
 
-**Threshold-gaming pattern:** The amount distribution shows a sharp cliff at €37,200 (= €30,000 net + 24% VAT — the direct-award ceiling for goods and services under Law 4412/2016 as amended 2023). 26 decisions fall at exactly €37,200; only one falls between €37,201 and €50,000. This indicates systematic awareness of the legal ceiling, with multiple suppliers consistently reaching the maximum allowed amount per transaction.
+**Threshold-ceiling pattern:** The data shows awareness of the legal direct-award ceiling (€30,000 net = €37,200 gross with 24% VAT under Law 4412/2016). Subject-text extraction from the full search export corpus identifies a cluster of decisions where the stated budget is exactly €37,200, with an abrupt drop-off above that amount. The pattern is consistent with systematic alignment to the maximum permitted direct-award amount. *Note: amount coverage in the Diavgeia structured data for this org is low (~0.1% of decisions), so the exact count of ceiling-aligned decisions cannot be stated with precision from available data — the observation is directional rather than a counted fact.*
 
 **Triangulated above-threshold direct awards (Diavgeia API confirmed):**
 
@@ -233,7 +233,6 @@ Each decision below was fetched from the Diavgeia API. None has a `directAwardJu
 | ΡΒΥΘΩΛΚ-Τ4Κ | 2023-07 | ΚΟΥΤΚΙΑΣ Παν. (112437726) | €74,400 | Building security services | Individual, same family |
 | Ψ2ΡΗΩΛΚ-8ΓΠ | 2022-02 | ΖΗΚΑ & ΚΑΙΛΑΣ ΕΕ (099509954) | €74,400 | EU social program management | CPV 85312320-8; see note below |
 | 6ΕΔ0ΩΛΚ-0ΤΖ | 2024-10 | ΖΗΚΑ & ΚΑΙΛΑΣ ΕΕ (099509954) | €74,400 | Community centre publicity & evaluation | Same CPV misapplied |
-| 912ΡΩΛΚ-ΨΧΠ | 2020-12 | BRINX ΑΕ (099774123) | €91,460 | Protective clothing / PPE | Goods, above threshold |
 
 *Exemptions (not counted): legal fees (98Θ3ΩΛΚ-Κ8Λ, €127k) — legal representation is exempt; ΕΛΤΑ postal fees (9Ο6ΣΩΛΚ-ΠΜ3, €68k) — ΕΛΤΑ has Universal Service Obligation, direct award legally required.*
 
@@ -253,7 +252,7 @@ Security guard services for municipal buildings were directly awarded in consecu
 **Finding 3 — ΖΗΚΑ & ΚΑΙΛΑΣ (CPV ambiguity):**
 Both awards use CPV `85312320-8` "Social counselling services" — a category that benefits from higher thresholds under Annex XIV of Directive 2014/24/EU (Art. 107 of Law 4412/2016). However, the 2024 award (`6ΕΔ0ΩΛΚ-0ΤΖ`) is explicitly for "publicity and evaluation services for the Community Centre" — not social counselling — and the same CPV code appears misapplied. Whether the 2022 social programme management service genuinely qualifies for the Annex XIV light-touch regime requires legal assessment outside the scope of this data analysis. The CPV mismatch on the 2024 contract is a separate, documentable issue.
 
-**Municipality summary:** The overall supplier picture does not show directed spending or supplier capture. The concerns are specific: (a) building security services were directly awarded above threshold in 2022 (€148k combined, two contracts for the same service in the same year, one with no supplier identifier in the structured record — confirmed via PDF as ΚΟΥΤΚΙΑΣ Παναγιώτης AFM 112437726) and 2023 (€74.4k) without competitive tendering; (b) ΖΗΚΑ & ΚΑΙΛΑΣ received above-threshold direct awards where the CPV classification is questionable, particularly the 2024 contract; (c) a threshold-ceiling pattern (26 decisions at exactly €37,200) indicates systematic awareness of the legal limit; (d) two data entry errors in amount fields inflate headline totals. A previously reported €482,360 fire detection finding has been removed after PDF verification confirmed a Diavgeia data entry error — actual award was €4,824.
+**Municipality summary:** The overall supplier picture does not show directed spending or supplier capture. The concerns are specific: (a) building security services were directly awarded above threshold in 2022 (€148k combined, two contracts for the same service in the same year, one with no supplier identifier in the structured record — confirmed via PDF as ΚΟΥΤΚΙΑΣ Παναγιώτης AFM 112437726) and 2023 (€74.4k) without competitive tendering; (b) ΖΗΚΑ & ΚΑΙΛΑΣ received above-threshold direct awards where the CPV classification is questionable, particularly the 2024 contract; (c) a threshold-ceiling pattern in stated award amounts (abrupt drop-off above €37,200) indicates systematic awareness of the legal limit; (d) two data entry errors in amount fields inflate headline totals. Two previously reported findings have been removed after PDF verification: the €482,360 fire detection award was a Diavgeia data entry error (actual: €4,824), and the €91,460 BRINX protective clothing entry was a competitive open tender result mis-coded as ΑΝΑΘΕΣΗ (four bidders competed; BRINX won two lots).
 
 ---
 
@@ -277,9 +276,10 @@ Both awards use CPV `85312320-8` "Social counselling services" — a category th
 
 - **912ΡΩΛΚ-ΨΧΠ (€91.4k, BRINX ΑΕ, protective clothing 2020):** PDF extraction showed multiple lot amounts (€131,774 total across lots, including €61,780, €17,573, €18,899 sub-items) and a council minutes header ("ΑΠΟΦΑΣΗ 458/2020, Απόσπασμα από το πρα…"). This suggests the decision may be a municipal council ratification of a competitive tender result (ΚΑΤΑΚΥΡΩΣΗ mis-coded as ΑΝΑΘΕΣΗ) rather than a direct award. The ΑΠΟΦΑΣΙΖΟΥΜΕ section was not fully extracted. **Recommend checking whether a prior ΚΑΤΑΚΥΡΩΣΗ exists for CPV 35113400 (protective clothing) 2020 for Δήμος Λαμίας before using this as a direct-award finding.**
 
-### Data entry errors found (PDF-verified)
+### Data entry / misclassification errors found (PDF-verified)
 
 - **ΡΩΖΡΩΛΚ-Ω5Σ (€482,360 → €4,824):** Diavgeia structured `awardAmount` = €482,360. PDF text and matching ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ trail (€2,998 + €1,825) confirm actual award = €4,824 gross. Typographic error in original Diavgeia submission. Not an above-threshold finding; removed from findings table.
+- **912ΡΩΛΚ-ΨΧΠ (€91,460 BRINX — competitive tender, not direct award):** PDF is the minutes of the Οικονομική Επιτροπή ratifying the 5th stage of an open electronic tender (ΑΠΟΦ. 458/2020). Four companies bid. BRINX won Lots C-D competitively; ΟΙΚΟΝΟΜΟΤΕΧΝΙΚΗ ΑΕΒΕ won Lot B. Total study budget €131,774. The Δ.1 classification in Diavgeia is a misclassification of a competitive award ratification — the same pattern as the hospital's 739 procedural entries. Removed from findings.
 - **6ΗΞ4ΩΛΚ-20Ρ (€130.5M spurious):** Lawyer's AFM 130561769 entered in amount field. Excluded from all totals.
 
 ### Pattern notes for journalist follow-up
