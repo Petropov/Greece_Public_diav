@@ -228,8 +228,7 @@ Each decision below was fetched from the Diavgeia API. None has a `directAwardJu
 
 | ADA | Date | Supplier (AFM) | Amount | Service | Status |
 |-----|------|----------------|--------|---------|--------|
-| ΡΩΖΡΩΛΚ-Ω5Σ | 2025-08 | ΑΝΑΣΤΑΣΙΟΥ Χρ. (066850170) | **€482,360** | Fire detection system maintenance | No tender, no justification |
-| ΨΜΛΔΩΛΚ-ΘΙ0 | 2022-08 | **no supplier ID in Diavgeia** | €73,999 | Building security services | Second award same year, recipient unrecorded |
+| ΨΜΛΔΩΛΚ-ΘΙ0 | 2022-08 | ΚΟΥΤΚΙΑΣ Παν. (112437726) | €73,999 | Building security services | AFM absent from Diavgeia structured data; confirmed as ΚΟΥΤΚΙΑΣ via decision PDF. Second award same year. |
 | 6ΙΕΠΩΛΚ-05Η | 2022-07 | ΚΟΥΤΚΙΑΣ & ΣΙΑ ΕΕ (801089930) | €73,999 | Building security services | Same service, same year → combined €148k |
 | ΡΒΥΘΩΛΚ-Τ4Κ | 2023-07 | ΚΟΥΤΚΙΑΣ Παν. (112437726) | €74,400 | Building security services | Individual, same family |
 | Ψ2ΡΗΩΛΚ-8ΓΠ | 2022-02 | ΖΗΚΑ & ΚΑΙΛΑΣ ΕΕ (099509954) | €74,400 | EU social program management | CPV 85312320-8; see note below |
@@ -238,20 +237,23 @@ Each decision below was fetched from the Diavgeia API. None has a `directAwardJu
 
 *Exemptions (not counted): legal fees (98Θ3ΩΛΚ-Κ8Λ, €127k) — legal representation is exempt; ΕΛΤΑ postal fees (9Ο6ΣΩΛΚ-ΠΜ3, €68k) — ΕΛΤΑ has Universal Service Obligation, direct award legally required.*
 
-**Finding 1 — Fire detection maintenance (ΑΝΑΣΤΑΣΙΟΥ, €482k):**
-The municipality runs competitive tenders for fire system *installation and upgrade* (ΚΑΤΑΚΥΡΩΣΗ found: 2022 nurseries, 2023 study/measures). It never runs a competitive tender for fire system *maintenance* — the foreseeable recurring annual service. ΑΝΑΣΤΑΣΙΟΥ (registered activity: electronic lab and antenna installation) received small security-system jobs from the municipality (€404 in 2021, €4,359 in 2022, €242+€737 in 2024) before being directly awarded a €482,360 contract in August 2025 with no documented justification and no prior competitive process. No ΣΥΜΒΑΣΗ (formal contract decision, type Γ.3.4) for this award appears in the Diavgeia record — a separate publication obligation under Law 3861/2010.
+**Finding 1 — Fire detection maintenance (ΑΝΑΣΤΑΣΙΟΥ): ~~€482k~~ DATA ENTRY ERROR — corrected to €4,824**
 
-*Peer comparison (confirmed from same dataset):* Δήμος Τρικκαίων, Δήμος Καρδίτσας, and Δήμος Κοζάνης show **zero** above-threshold direct awards for fire detection maintenance in 2020–2026. Δήμος Τρικκαίων's single fire detection entry is an ΟΡΙΣΤΙΚΟΠΟΙΗΣΗ ΠΛΗΡΩΜΗΣ — a payment against a competitively-awarded contract. Δήμος Κοζάνης's one fire detection direct award was €2,671 — a single emergency repair, 180× smaller than Lamia's 2025 contract.
+PDF verification of ADA `ΡΩΖΡΩΛΚ-Ω5Σ` (August 2025) showed the actual awarded amounts are €2,418 + €1,472 net (= €4,824 gross, ~€3,823.44 net total). The Diavgeia structured `awardAmount` field contained €482,360 — a typographic error in the original data entry, likely transposing digits from a different field. Two ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ (budget commitment) entries for the same decision total €4,823.60 net, exactly confirming the PDF figures. **This decision is within the legal direct-award threshold and does not constitute a procurement irregularity.** It has been removed from the above-threshold findings table.
+
+ΑΝΑΣΤΑΣΙΟΥ's full award history at the municipality: €404 (2021), €4,359 (2022), €979 (2024), €4,824 (2025) — all well within the €30,000 net threshold. The ΓΕΜΗ-registered activity "electronic lab and antenna installation" is consistent with these small fire/security detection maintenance jobs. **No procurement anomaly identified for this contractor.**
+
+*Residual observation (not a finding):* The municipality runs competitive tenders for fire detection *installation* (ΚΑΤΑΚΥΡΩΣΗ entries found: 2022 nurseries, 2023 technical study) but awards maintenance via ΑΝΑΘΕΣΗ. Since all maintenance awards are under threshold, this is legally compliant operational practice — not an irregularity.
 
 **Finding 2 — Building security (ΚΟΥΤΚΙΑΣ family, €222k+):**
-Security guard services for municipal buildings were directly awarded in consecutive years. In 2022 alone, two contracts totalling ~€148k were issued: one to the company (ΚΟΥΤΚΙΑΣ & ΣΙΑ ΕΕ, 801089930, July) and one with no supplier identifier at all in the Diavgeia record (August, €74k unattributed). In 2023 the contract went to the same-surname individual (ΚΟΥΤΚΙΑΣ Παναγιώτης, 112437726). The same entities also appear for small amounts at ΔΕΥΑ Λαμίας (€2,349) and Δήμος Στυλίδας (€1.2–3k), confirming they are local contractors — not phantom entities. The security guard service pre-2022 was within threshold (€24–26k/year). The jump to €74k in 2022 without a competitive tender is a procedural issue independent of who the supplier is.
+Security guard services for municipal buildings were directly awarded in consecutive years. In 2022 alone, two contracts totalling ~€148k were issued: one to the company (ΚΟΥΤΚΙΑΣ & ΣΙΑ ΕΕ, 801089930, July, ADA `6ΙΕΠΩΛΚ-05Η`) and one to the same individual (ΚΟΥΤΚΙΑΣ Παναγιώτης, AFM 112437726, August, ADA `ΨΜΛΔΩΛΚ-ΘΙ0`) — the August decision had no supplier AFM in the Diavgeia structured data, confirmed via decision PDF. In 2023 the contract went to the same-surname individual (ΚΟΥΤΚΙΑΣ Παναγιώτης, 112437726). The same entities also appear for small amounts at ΔΕΥΑ Λαμίας (€2,349) and Δήμος Στυλίδας (€1.2–3k), confirming they are local contractors — not phantom entities. The security guard service pre-2022 was within threshold (€24–26k/year). The jump to €74k in 2022 without a competitive tender is a procedural issue independent of who the supplier is.
 
 *Peer comparison:* Δήμος Τρικκαίων and Δήμος Καρδίτσας show zero above-threshold security direct awards. Δήμος Κοζάνης has three security direct awards — all for specialized facilities (domestic violence shelters), all within threshold (€12–16k). No peer municipality shows building-wide security contracts above threshold issued as direct awards.
 
 **Finding 3 — ΖΗΚΑ & ΚΑΙΛΑΣ (CPV ambiguity):**
 Both awards use CPV `85312320-8` "Social counselling services" — a category that benefits from higher thresholds under Annex XIV of Directive 2014/24/EU (Art. 107 of Law 4412/2016). However, the 2024 award (`6ΕΔ0ΩΛΚ-0ΤΖ`) is explicitly for "publicity and evaluation services for the Community Centre" — not social counselling — and the same CPV code appears misapplied. Whether the 2022 social programme management service genuinely qualifies for the Annex XIV light-touch regime requires legal assessment outside the scope of this data analysis. The CPV mismatch on the 2024 contract is a separate, documentable issue.
 
-**Municipality summary:** The overall supplier picture does not show directed spending or supplier capture. The concerns are specific: (a) two recurring services (fire detection maintenance, building security) have never been competitively tendered and are now generating above-threshold direct awards — the fire detection contract at 13× the legal ceiling is the most significant single finding; (b) the 2022 security service has a €74k award with no supplier identity recorded; (c) a threshold-ceiling pattern (26 decisions at exactly €37,200) indicates systematic awareness of the legal limit; (d) two data entry errors in amount fields inflate headline totals.
+**Municipality summary:** The overall supplier picture does not show directed spending or supplier capture. The concerns are specific: (a) building security services were directly awarded above threshold in 2022 (€148k combined, two contracts for the same service in the same year, one with no supplier identifier in the structured record — confirmed via PDF as ΚΟΥΤΚΙΑΣ Παναγιώτης AFM 112437726) and 2023 (€74.4k) without competitive tendering; (b) ΖΗΚΑ & ΚΑΙΛΑΣ received above-threshold direct awards where the CPV classification is questionable, particularly the 2024 contract; (c) a threshold-ceiling pattern (26 decisions at exactly €37,200) indicates systematic awareness of the legal limit; (d) two data entry errors in amount fields inflate headline totals. A previously reported €482,360 fire detection finding has been removed after PDF verification confirmed a Diavgeia data entry error — actual award was €4,824.
 
 ---
 
@@ -260,6 +262,30 @@ Both awards use CPV `85312320-8` "Social counselling services" — a category th
 - Δήμος Λαμίας 2022–2024 data is **complete**: cross-check of monthly_summary vs decisions.csv shows 100% match for all 7 years. Earlier concern about API cap undercounting was resolved by the pipeline. Total 64,334 decisions, 10,388 ΑΝΑΘΕΣΗ confirmed.
 - ΓΝ Καρδίτσας and ΓΝ Κοζάνης use Β-type decision codes for procurement — not directly comparable with ΓΝ Λαμίας on ΑΝΑΘΕΣΗ counts.
 - All amounts are dependent on quality of original Diavgeia data entry and completeness of hydration.
+
+---
+
+---
+
+## Open Questions & Verification Notes
+
+*These items are not required for regulatory referral but would strengthen the record further.*
+
+### Confirmed but not fully resolved
+
+- **ΖΗΚΑ & ΚΑΙΛΑΣ — Annex XIV applicability:** CPV 85312320-8 "Social counselling services" potentially triggers the Annex XIV light-touch regime (Art. 107 of Law 4412/2016, threshold €750k for full competitive procedure). However: (a) direct award is still capped at €30k net under Art. 118 even for Annex XIV services; (b) the 2024 contract (€74.4k, "publicity and evaluation for the Community Centre") clearly does not qualify as social counselling. Requires legal assessment for the 2022 contracts; the 2024 award stands regardless.
+
+- **912ΡΩΛΚ-ΨΧΠ (€91.4k, BRINX ΑΕ, protective clothing 2020):** PDF extraction showed multiple lot amounts (€131,774 total across lots, including €61,780, €17,573, €18,899 sub-items) and a council minutes header ("ΑΠΟΦΑΣΗ 458/2020, Απόσπασμα από το πρα…"). This suggests the decision may be a municipal council ratification of a competitive tender result (ΚΑΤΑΚΥΡΩΣΗ mis-coded as ΑΝΑΘΕΣΗ) rather than a direct award. The ΑΠΟΦΑΣΙΖΟΥΜΕ section was not fully extracted. **Recommend checking whether a prior ΚΑΤΑΚΥΡΩΣΗ exists for CPV 35113400 (protective clothing) 2020 for Δήμος Λαμίας before using this as a direct-award finding.**
+
+### Data entry errors found (PDF-verified)
+
+- **ΡΩΖΡΩΛΚ-Ω5Σ (€482,360 → €4,824):** Diavgeia structured `awardAmount` = €482,360. PDF text and matching ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ trail (€2,998 + €1,825) confirm actual award = €4,824 gross. Typographic error in original Diavgeia submission. Not an above-threshold finding; removed from findings table.
+- **6ΗΞ4ΩΛΚ-20Ρ (€130.5M spurious):** Lawyer's AFM 130561769 entered in amount field. Excluded from all totals.
+
+### Pattern notes for journalist follow-up
+
+- ΚΟΥΤΚΙΑΣ rotation pattern: individual (112437726) and company (ΚΟΥΤΚΙΑΣ & ΣΙΑ ΕΕ, 801089930) alternating in consecutive contract years for identical building security service. August 2022 award had no supplier AFM in structured Diavgeia data — confirmed via PDF as ΚΟΥΤΚΙΑΣ ΠΑΝΑΓΙΩΤΗΣ ΙΔΙΩΤΙΚΗ ΕΠΙΧΕΙΡΗΣΗ ΠΑΡΟΧΗΣ ΥΠΗΡΕΣΙΩΝ ΑΣΦΑΛΕΙΑΣ, AFM 112437726. Same individual entity also appears at ΔΕΥΑ Λαμίας and Δήμος Στυλίδας for small amounts, confirming real operating contractor — the issue is procedural (no competitive tender), not phantom entity.
+- Total ΚΟΥΤΚΙΑΣ security spend at Δήμος Λαμίας 2022–2023: €222,397 across three decisions, zero competitive tenders.
 
 ---
 
