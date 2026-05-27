@@ -208,6 +208,37 @@ Using emergency procedures for a recurring, foreseeable core service raises a co
 
 - **ΔΕΥΑ Σερρών — coding artifact, not comparable:** A full inspection of ΔΕΥΑ Σερρών's 1,180 ΑΝΑΘΕΣΗ decisions shows 90.8% are `Απόφαση ΔΣ/Προέδρου` board and chairman resolutions (budget votes, HR decisions, tender approvals, project extensions) — not specific procurement award decisions. Amount coverage is 0.4% (5 decisions); supplier identifier coverage is 0%. ΔΕΥΑ Σερρών has 77 ΠΕΡΙΛΗΨΗ ΔΙΑΚΗΡΥΞΗΣ (tender notices) but only 1 ΚΑΤΑΚΥΡΩΣΗ, suggesting competitive awards are coded as board resolutions (ΑΝΑΘΕΣΗ type) rather than as ΚΑΤΑΚΥΡΩΣΗ. The count divergence between ΔΕΥΑ Σερρών and peers reflects administrative coding practice, not elevated direct procurement. **ΔΕΥΑ Σερρών cannot be compared with ΔΕΥΑ Λαμίας on the ΑΝΑΘΕΣΗ metric.** The appropriate comparison set for ΔΕΥΑ Λαμίας remains ΔΕΥΑ Τρικάλων, Καρδίτσας, and Κοζάνης.
 
+**Municipality supplier analysis — completed (May 2026):**
+
+*Coverage:* 39.2% of municipality ΑΝΑΘΕΣΗ decisions have a supplier tax identifier (4,066 of 10,388). Total identified spend: €24.7M of the stated €25.6M — once a single data entry error is excluded (ADA `6ΗΞ4ΩΛΚ-20Ρ`, where the lawyer's AFM `130561769` was entered as the amount field, creating a spurious €130.5M entry).
+
+*Supplier concentration:* 839 unique suppliers. Top-5 hold 19.6% of identified spend; top-10 hold 26.8%. No dominant supplier. The profile is consistent with dispersed operational procurement across many small local businesses and individuals.
+
+*Transaction composition:* 63.7% maintenance and repair, 15.5% supplies — consistent with genuine below-threshold operational spending. 41.1% of transactions are under €1,000; 73.6% are under €5,000.
+
+*Key identified suppliers (via ΓΕМΗ):* All local or regional businesses — electrical contractor (25248544, Δομοκός, 79tx at avg €4,486), HVAC engineer (112428914, Λαμία, 62tx), playground equipment manufacturer (103100437, Λαγύνα, 11tx), concrete supplier (094082639 ΑΤΛΑΣ ΜΠΕΤΟΝ, Λαμία, 10tx), state postal service ΕΛΤΑ (094026421, 6tx — legally required direct award to monopoly). The ΕΛΤΑ entry (€332k total) is normal and legally mandated.
+
+*ΝΤΟΥΒΑΣ family relationship:* Two entities sharing a surname — ΣΤ. ΝΤΟΥΒΑΣ & ΣΙΑ Ο.Ε. (fire prevention, 25tx, €319k) and ΝΤΟΥΒΑΣ ΒΑΣΙΛΕΙΟΣ & ΣΙΑ Ε.Ε. (sports field maintenance, 14tx, €220k) — total €540k combined over six years. Different legal entities, different services, different geographic focus. At this scale over six years, not a concentration anomaly.
+
+**Threshold-gaming pattern:** The amount distribution shows a sharp cliff at €37,200 (= €30,000 net + 24% VAT — the direct-award ceiling for goods and services under Law 4412/2016 as amended 2023). 26 decisions fall at exactly €37,200; only one falls between €37,201 and €50,000. This indicates systematic awareness of the legal ceiling, with multiple suppliers consistently reaching the maximum allowed amount per transaction.
+
+**Above-threshold direct awards (selected):**
+
+| ADA | Date | Supplier | Amount | Service | Issue |
+|-----|------|----------|--------|---------|-------|
+| ΡΩΖΡΩΛΚ-Ω5Σ | 2025-08 | 066850170 (ΑΝΑΣΤΑΣΙΟΥ Χρ.) | €482,360 | Fire detection maintenance | 13× threshold |
+| Ψ2ΡΗΩΛΚ-8ΓΠ | 2022-02 | 099509954 (ΖΗΚΑ & ΚΑΙΛΑΣ) | €74,400 | EU social program consulting | 2.5× threshold |
+| 6ΕΔ0ΩΛΚ-0ΤΖ | 2024-10 | 099509954 (ΖΗΚΑ & ΚΑΙΛΑΣ) | €74,400 | Community centre publicity | 2.5× threshold |
+| ΡΒΥΘΩΛΚ-Τ4Κ | 2023-07 | 112437726 | €74,400 | Building security services | 2.5× threshold |
+| 6ΙΕΠΩΛΚ-05Η | 2022-07 | 801089930 | €74,000 | Building security services | 2.5× threshold |
+| 912ΡΩΛΚ-ΨΧΠ | 2020-12 | 099774123 | €91,460 | Protective clothing | 3× threshold (2020 rules) |
+
+*Note: legal fees (€127k, ADA 98Θ3ΩΛΚ-Κ8Λ) and the ΕΛΤΑ postal contract (€68k, 9Ο6ΣΩΛΚ-ΠΜ3) are specifically exempt from competitive tendering under Greek law and are not counted here.*
+
+**Municipality summary:** The overall supplier picture does not show directed spending or supplier capture. The concerns are specific: (a) at least five service/goods contracts awarded directly above the legal threshold, with the 2025 fire detection contract (€482k) the most significant; (b) a clear threshold-ceiling pattern (26 decisions at exactly €37,200) indicating systematic threshold awareness; (c) two data entry errors in amount fields that inflate the headline ΑΝΑΘΕΣΗ total.
+
+---
+
 **Caveats:**
 
 - Δήμος Λαμίας 2022–2024 data is **complete**: cross-check of monthly_summary vs decisions.csv shows 100% match for all 7 years. Earlier concern about API cap undercounting was resolved by the pipeline. Total 64,334 decisions, 10,388 ΑΝΑΘΕΣΗ confirmed.
