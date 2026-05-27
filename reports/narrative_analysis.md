@@ -222,20 +222,32 @@ Using emergency procedures for a recurring, foreseeable core service raises a co
 
 **Threshold-gaming pattern:** The amount distribution shows a sharp cliff at €37,200 (= €30,000 net + 24% VAT — the direct-award ceiling for goods and services under Law 4412/2016 as amended 2023). 26 decisions fall at exactly €37,200; only one falls between €37,201 and €50,000. This indicates systematic awareness of the legal ceiling, with multiple suppliers consistently reaching the maximum allowed amount per transaction.
 
-**Above-threshold direct awards (selected):**
+**Triangulated above-threshold direct awards (Diavgeia API confirmed):**
 
-| ADA | Date | Supplier | Amount | Service | Issue |
-|-----|------|----------|--------|---------|-------|
-| ΡΩΖΡΩΛΚ-Ω5Σ | 2025-08 | 066850170 (ΑΝΑΣΤΑΣΙΟΥ Χρ.) | €482,360 | Fire detection maintenance | 13× threshold |
-| Ψ2ΡΗΩΛΚ-8ΓΠ | 2022-02 | 099509954 (ΖΗΚΑ & ΚΑΙΛΑΣ) | €74,400 | EU social program consulting | 2.5× threshold |
-| 6ΕΔ0ΩΛΚ-0ΤΖ | 2024-10 | 099509954 (ΖΗΚΑ & ΚΑΙΛΑΣ) | €74,400 | Community centre publicity | 2.5× threshold |
-| ΡΒΥΘΩΛΚ-Τ4Κ | 2023-07 | 112437726 | €74,400 | Building security services | 2.5× threshold |
-| 6ΙΕΠΩΛΚ-05Η | 2022-07 | 801089930 | €74,000 | Building security services | 2.5× threshold |
-| 912ΡΩΛΚ-ΨΧΠ | 2020-12 | 099774123 | €91,460 | Protective clothing | 3× threshold (2020 rules) |
+Each decision below was fetched from the Diavgeia API. None has a `directAwardJustification` or `directAwardType` field — no emergency exception was claimed. All are coded `documentType: ΠΡΑΞΗ` (administrative act = direct award). Confirmed by cross-checking the municipality's full competitive tender record (ΠΕΡΙΛΗΨΗ ΔΙΑΚΗΡΥΞΗΣ, ΚΑΤΑΚΥΡΩΣΗ types): **zero competitive tenders were ever published for building security or fire detection maintenance** in the 2020–2026 dataset.
 
-*Note: legal fees (€127k, ADA 98Θ3ΩΛΚ-Κ8Λ) and the ΕΛΤΑ postal contract (€68k, 9Ο6ΣΩΛΚ-ΠΜ3) are specifically exempt from competitive tendering under Greek law and are not counted here.*
+| ADA | Date | Supplier (AFM) | Amount | Service | Status |
+|-----|------|----------------|--------|---------|--------|
+| ΡΩΖΡΩΛΚ-Ω5Σ | 2025-08 | ΑΝΑΣΤΑΣΙΟΥ Χρ. (066850170) | **€482,360** | Fire detection system maintenance | No tender, no justification |
+| ΨΜΛΔΩΛΚ-ΘΙ0 | 2022-08 | **no supplier ID in Diavgeia** | €73,999 | Building security services | Second award same year, recipient unrecorded |
+| 6ΙΕΠΩΛΚ-05Η | 2022-07 | ΚΟΥΤΚΙΑΣ & ΣΙΑ ΕΕ (801089930) | €73,999 | Building security services | Same service, same year → combined €148k |
+| ΡΒΥΘΩΛΚ-Τ4Κ | 2023-07 | ΚΟΥΤΚΙΑΣ Παν. (112437726) | €74,400 | Building security services | Individual, same family |
+| Ψ2ΡΗΩΛΚ-8ΓΠ | 2022-02 | ΖΗΚΑ & ΚΑΙΛΑΣ ΕΕ (099509954) | €74,400 | EU social program management | CPV 85312320-8; see note below |
+| 6ΕΔ0ΩΛΚ-0ΤΖ | 2024-10 | ΖΗΚΑ & ΚΑΙΛΑΣ ΕΕ (099509954) | €74,400 | Community centre publicity & evaluation | Same CPV misapplied |
+| 912ΡΩΛΚ-ΨΧΠ | 2020-12 | BRINX ΑΕ (099774123) | €91,460 | Protective clothing / PPE | Goods, above threshold |
 
-**Municipality summary:** The overall supplier picture does not show directed spending or supplier capture. The concerns are specific: (a) at least five service/goods contracts awarded directly above the legal threshold, with the 2025 fire detection contract (€482k) the most significant; (b) a clear threshold-ceiling pattern (26 decisions at exactly €37,200) indicating systematic threshold awareness; (c) two data entry errors in amount fields that inflate the headline ΑΝΑΘΕΣΗ total.
+*Exemptions (not counted): legal fees (98Θ3ΩΛΚ-Κ8Λ, €127k) — legal representation is exempt; ΕΛΤΑ postal fees (9Ο6ΣΩΛΚ-ΠΜ3, €68k) — ΕΛΤΑ has Universal Service Obligation, direct award legally required.*
+
+**Finding 1 — Fire detection maintenance (ΑΝΑΣΤΑΣΙΟΥ, €482k):**
+The municipality runs competitive tenders for fire system *installation and upgrade* (ΚΑΤΑΚΥΡΩΣΗ found: 2022 nurseries, 2023 study/measures). It never runs a competitive tender for fire system *maintenance* — the foreseeable recurring annual service. ΑΝΑΣΤΑΣΙΟΥ (registered activity: electronic lab and antenna installation) received small security-system jobs from the municipality (€404 in 2021, €4,359 in 2022, €242+€737 in 2024) before being directly awarded a €482,360 contract in August 2025 with no documented justification and no prior competitive process.
+
+**Finding 2 — Building security (ΚΟΥΤΚΙΑΣ family, €222k+):**
+Security guard services for municipal buildings were directly awarded in consecutive years. In 2022 alone, two contracts totalling ~€148k were issued: one to the company (ΚΟΥΤΚΙΑΣ & ΣΙΑ ΕΕ, 801089930, July) and one with no supplier identifier at all in the Diavgeia record (August, €74k unattributed). In 2023 the contract went to the same-surname individual (ΚΟΥΤΚΙΑΣ Παναγιώτης, 112437726). The security guard service pre-2022 was within threshold (€24–26k/year). The jump to €74k in 2022 without a competitive tender is a procedural issue independent of who the supplier is.
+
+**Finding 3 — ΖΗΚΑ & ΚΑΙΛΑΣ (CPV ambiguity):**
+Both awards use CPV `85312320-8` "Social counselling services" — a category that benefits from higher thresholds under Annex XIV of Directive 2014/24/EU (Art. 107 of Law 4412/2016). However, the 2024 award (`6ΕΔ0ΩΛΚ-0ΤΖ`) is explicitly for "publicity and evaluation services for the Community Centre" — not social counselling — and the same CPV code appears misapplied. Whether the 2022 social programme management service genuinely qualifies for the Annex XIV light-touch regime requires legal assessment outside the scope of this data analysis. The CPV mismatch on the 2024 contract is a separate, documentable issue.
+
+**Municipality summary:** The overall supplier picture does not show directed spending or supplier capture. The concerns are specific: (a) two recurring services (fire detection maintenance, building security) have never been competitively tendered and are now generating above-threshold direct awards — the fire detection contract at 13× the legal ceiling is the most significant single finding; (b) the 2022 security service has a €74k award with no supplier identity recorded; (c) a threshold-ceiling pattern (26 decisions at exactly €37,200) indicates systematic awareness of the legal limit; (d) two data entry errors in amount fields inflate headline totals.
 
 ---
 
