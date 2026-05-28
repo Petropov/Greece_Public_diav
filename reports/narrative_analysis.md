@@ -146,7 +146,7 @@ The hospital's 2024 budget execution report (published on Diavgeia as ADA `9ΤΥ
 
 4. **Outstanding unpaid obligations (end of 2024):** €19.7M — of which pharmaceuticals €8.0M and services/materials €8.2M. This is a persistent liquidity issue documented in the official accounts.
 
-5. **Outsourcing (cleaning, catering, security) = 44.9% of hospital spending** (€7.3M of €18.3M in 2024). This is the category within which the UNISON cleaning contract anomaly (§3, ΚΑΤΑΚΥΡΩΣΗ findings) sits — making the absence of competitive tendering for cleaning particularly significant given the scale.
+5. **Outsourcing (cleaning, catering, security) = 44.9% of hospital spending** (€7.3M of €18.3M in 2024). This is the category within which the UNISON cleaning contracts sit (~€1.3M/year). See revised UNISON analysis below: the 2023 international open tender for cleaning services failed (no valid bids in two publications), justifying the Art.32§2γ negotiated procedure. The documented concern is the 4-month publication delay on the July 2025 award and the incumbency pattern (UNISON since 2020).
 
 ---
 
@@ -182,25 +182,49 @@ Beyond the 739 competitive-tender procedural steps identified earlier, two furth
 - **Negotiated contracts coded as ΑΝΑΘΕΣΗ:** UNISON Facility Services (cleaning) received 6 contracts in 2025–2026 totalling €3.24M, awarded under "negotiated procedure without prior publication" (Art. 32 § 2(c) of Law 4412/2016). These are large-value service contracts with ΕΑΔΗΣΥ oversight — legally distinct from below-threshold direct awards but classified identically in Diavgeia.
 - **Option exercises coded as ΑΝΑΘΕΣΗ:** Several ΑΝΑΘΕΣΗ entries are formal exercises of contractual option rights on competitively-awarded contracts (e.g., ΠΙΕΤΡΗΣ catering €660k, LINDE medical gases extensions). These are legitimate but inflate the ΑΝΑΘΕΣΗ count and amounts.
 
-*Key finding on UNISON (verified against Diavgeia API):* ΓΝ Λαμίας has run no competitive tender for hospital-wide cleaning services at scale. A 2023 competitive award for cleaning (ΚΑΤΑΚΥΡΩΣΗ, €81k) covered a limited scope. The large-scale cleaning contract history:
+*UNISON cleaning contract — full timeline (verified against Diavgeia API, May 2026):*
 
-| ADA | Date | Amount | Decision |
-|-----|------|--------|----------|
-| ΨΠΗΓ4690ΒΜ-ΛΚ8 | 2025-07-02 | €680,859 | Award of cleaning services (Δ.1) |
-| ΨΜΧΥ4690ΒΜ-75Β | 2025-12-04 | €680,859 | ΕΑΔΗΣΥ consent for Art.32§2γ procedure |
-| 9ΗΡΣ4690ΒΜ-ΕΕ3 | 2026-02-25 | €482,701 | Contract modification |
-| 96Η04690ΒΜ-ΠΔ2 | 2026-02-27 | €483,309 | Cleaning services continuation |
-| 9Π3Γ4690ΒΜ-ΡΗΠ | 2026-05-25 | €772,767 | Second 5-month extension via negotiation |
+**Previous versions of this analysis contained three errors that are now corrected:**
+- ~~"ΓΝ Λαμίας has run no competitive tender for cleaning services"~~ — a €4.386M international open tender WAS run (March–June 2023, two publications)
+- ~~"A 2023 ΚΑΤΑΚΥΡΩΣΗ of €81k covered limited cleaning scope"~~ — that award (ADA `6Υ674690ΒΜ-Γ0Δ`) was for HVAC duct cleaning and AC maintenance (ΕΣΗΔΗΣ 193738), not building cleaning services
+- ~~"Sequence anomaly: ΕΑΔΗΣΥ consent post-dated the July 2025 award"~~ — four ΕΑΔΗΣΥ consents for negotiated procedure existed BEFORE the July 2025 award (November 2023, March 2024, September 2024, January 2025)
 
-Two additional findings from Diavgeia detail records:
-1. **Late publication:** ADA `ΨΠΗΓ4690ΒΜ-ΛΚ8` was issued July 2, 2025 but published on Diavgeia November 2, 2025 — a 4-month delay. Greek law (Art. 3 § 3 of Law 3861/2010) requires publication within 15 days.
-2. **Sequence anomaly:** The ΕΑΔΗΣΥ consent (`ΨΜΧΥ4690ΒΜ-75Β`, December 2025) post-dates the initial award (`ΨΠΗΓ4690ΒΜ-ΛΚ8`, July 2025) by 5 months. For Art.32§2γ procedures, ΕΑΔΗΣΥ consent should precede the award. The December 2025 consent appears to authorise a *subsequent* 5-month extension, but the July 2025 award lacks documented prior regulatory authorisation in the Diavgeia record.
+**Corrected timeline:**
 
-Using emergency procedures for a recurring, foreseeable core service raises a compliance question independent of supplier identity. The ADA references above provide direct entry points for ΕΑΔΗΣΥ or Ελεγκτικό Συνέδριο review.
+| Date | ADA | Event |
+|------|-----|-------|
+| Oct 2020 | 01.1915/01-10-2020 | UNISON original cleaning contract (annual, from competitive tender) |
+| Oct 2021 | 01.1915Π/01-10-2021 | 2-year option exercised → contract to ~Oct 2023 |
+| Jan 2023 | ΨΒΛ84690ΒΜ-ΔΑΒ | Monthly extra hours above contract volume (COVID ward, ΚΕΦΙΑΠ) — €37,090/month |
+| Mar 2023 | ΨΤ5Ξ4690ΒΜ-Ν42 | **International open tender launched**, €4.386M (ΕΣΗΔΗΣ 175970) |
+| Jun 2023 | ΩΜΤΥ4690ΒΜ-ΗΚ1 | **Re-advertisement** (first round: no valid bids received) |
+| Nov 2023 | ΨΥΦΧ4690ΒΜ-ΒΛΑ | **ΕΑΔΗΣΥ 1st consent** — negotiated procedure without prior publication |
+| Dec 2023 | ΨΠΘΔ4690ΒΜ-ΣΕΜ | Hospital decision: failed tender, proceed to negotiation (ADAM 23PROC0123832701) |
+| Mar 2024 | 9ΥΗ64690ΒΜ-Σ5Ζ | **ΕΑΔΗΣΥ 2nd consent** — negotiated procedure |
+| Mar 2024 | 9ΝΔ34690ΒΜ-ΩΛ5 | Evaluation of negotiated procedure bids |
+| Sep 2024 | 6Φ7Χ4690ΒΜ-7ΩΠ | **ΕΑΔΗΣΥ 3rd consent** — negotiated procedure |
+| Sep 2024 | 98ΘΖ4690ΒΜ-ΕΦΕ | Bridge award to UNISON for 8 days (Oct 1–8, 2024) — €34,251 |
+| Jan 2025 | ΨΑ5Υ4690ΒΜ-ΘΦΤ | **ΕΑΔΗΣΥ 4th consent** — negotiated procedure |
+| Jul 2025 | 9Μ6Ο4690ΒΜ-ΣΥ6 | Price adjustment for UNISON provisional offer — €1,631,962 |
+| **Jul 2025** | **ΨΠΗΓ4690ΒΜ-ΛΚ8** | **Formal award to UNISON — €680,859 (published Nov 2025, 4-month delay)** |
+| Dec 2025 | ΨΜΧΥ4690ΒΜ-75Β | ΕΑΔΗΣΥ 5th consent — extension |
+| Feb 2026 | 9ΗΡΣ4690ΒΜ-ΕΕ3 | Contract modification €482,701 |
+| Feb 2026 | 96Η04690ΒΜ-ΠΔ2 | Continuation €483,309 |
+| May 2026 | 9Π3Γ4690ΒΜ-ΡΗΠ | Second 5-month extension €772,767 |
+
+**What remains documented:**
+
+1. **Late publication (confirmed):** ADA `ΨΠΗΓ4690ΒΜ-ΛΚ8` was issued July 2, 2025 but published on Diavgeia November 2, 2025 — a 4-month delay in breach of Art. 3 § 3 of Law 3861/2010 (15-day publication deadline).
+
+2. **Art.32§2γ basis is documented:** The hospital ran an international open tender that attracted no valid bids in two successive publications (March and June 2023). This constitutes a textbook justification for Art.32§2γ. The procedure was also authorised by ΕΑΔΗΣΥ four times before the formal award.
+
+3. **Incumbency pattern:** UNISON has held the cleaning contract continuously since October 2020 through a chain: original competitive contract → 2-year option → monthly extensions during tender process → negotiated award. Five years of incumbency in a contract worth ~€1.3M/year raises a factual question: did the 2023 competitive tender fail partly because UNISON's site knowledge and existing workforce created a barrier to competing bidders? This cannot be determined from Diavgeia data alone but warrants examination of the tender specifications.
+
+4. **Classification issue:** All entries in the 2023–2025 negotiated procedure and the final award are recorded under decision type Δ.1 (direct award). Negotiated procedures under Art.32§2γ should be coded as Δ.2.4 (negotiated contract). The systematic use of Δ.1 for these entries further inflates the ΑΝΑΘΕΣΗ count for ΓΝ Λαμίας (approximately 20–30 decisions for the UNISON process alone).
 
 **What requires further investigation:**
 
-- **UNISON compliance:** Whether the repeated use of Art. 32§2γ for hospital cleaning is justified or whether the hospital had sufficient time to run a competitive tender between contract cycles. The decision `ΨΜΧΥ4690ΒΜ-75Β` (ΕΑΔΗΣΥ consent) and `9Π3Γ4690ΒΜ-ΡΗΠ` (second extension with ΕΑΔΗΣΥ referral) are the key documents.
+- **UNISON incumbency and tender specifications:** Why did two international publications of a €4.386M tender attract no valid bids in 2023? Examination of the full tender documents (ΕΣΗΔΗΣ 175970 and 195241) would reveal whether the specifications or labour cost benchmarks were set in ways that disadvantaged new entrants.
 
 - **ΚΑΤΑΚΥΡΩΣΗ amounts at ΓΝ Λαμίας — answered:** 335 decisions with amounts, total €45.26M (2020–2026), growing from €3.79M (2020) to €13.44M (2024). Cross-validation against official budget execution confirms ΚΑΤΑΚΥΡΩΣΗ = 73.5% of total procurement spend in 2024. Proportionate to hospital scale.
 
@@ -358,7 +382,7 @@ Both awards use CPV `85312320-8` "Social counselling services" — a category th
 
 - **ΖΗΚΑ & ΚΑΙΛΑΣ — Annex XIV applicability:** CPV 85312320-8 "Social counselling services" potentially triggers the Annex XIV light-touch regime (Art. 107 of Law 4412/2016, threshold €750k for full competitive procedure). However: (a) direct award is still capped at €30k net under Art. 118 even for Annex XIV services; (b) the 2024 contract (€74.4k, "publicity and evaluation for the Community Centre") clearly does not qualify as social counselling. Requires legal assessment for the 2022 contracts; the 2024 award stands regardless.
 
-- **912ΡΩΛΚ-ΨΧΠ (€91.4k, BRINX ΑΕ, protective clothing 2020):** PDF extraction showed multiple lot amounts (€131,774 total across lots, including €61,780, €17,573, €18,899 sub-items) and a council minutes header ("ΑΠΟΦΑΣΗ 458/2020, Απόσπασμα από το πρα…"). This suggests the decision may be a municipal council ratification of a competitive tender result (ΚΑΤΑΚΥΡΩΣΗ mis-coded as ΑΝΑΘΕΣΗ) rather than a direct award. The ΑΠΟΦΑΣΙΖΟΥΜΕ section was not fully extracted. **Recommend checking whether a prior ΚΑΤΑΚΥΡΩΣΗ exists for CPV 35113400 (protective clothing) 2020 for Δήμος Λαμίας before using this as a direct-award finding.**
+- **912ΡΩΛΚ-ΨΧΠ (€91.4k, BRINX — resolved):** Confirmed competitive tender ratification; removed from findings. See data errors section below.
 
 ### Data entry / misclassification errors found (PDF-verified)
 
