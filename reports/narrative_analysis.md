@@ -1,15 +1,33 @@
 # Procurement Transparency in Lamia: What the Data Shows
 *Analysis of Diavgeia public procurement records, 2020–2026*
 *Data: Diavgeia OpenData API · Coverage: search exports + targeted detail hydration*
-*Revised: May 2026 — includes data quality audit findings*
+*Revised: May 2026 — complete analysis including ΑΝΑΛΗΨΗ cross-check and supplier identification*
 
 ---
 
 ## Executive Summary
 
-Across three distinct public entities in Lamia — the municipality, the general hospital, and the water utility — a consistent pattern emerges: direct contract awards (ΑΝΑΘΕΣΗ) are issued significantly more often than in comparable institutions elsewhere. The hospital shows the starkest divergence: 5,887 ΑΝΑΘΕΣΗ entries versus 187 for the comparable peer hospital in Trikala.
+This analysis covers six years of public procurement records (2020–2026) for three public entities in Lamia — the General Hospital (ΓΝ Λαμίας), the municipality (Δήμος Λαμίας), and the water utility (ΔΕΥΑ Λαμίας) — cross-validated against peer institutions of comparable size in Trikala, Karditsa, Kozani, and Serres.
 
-**However, a detailed audit of the underlying data substantially changes the interpretation of the financial figures.** The previously reported figure of €215.5M in "direct award spending" at ΓΝ Λαμίας contains ~€132.8M derived from committee decisions within *competitive* tender processes, not from direct awards. The most reliable financial signal is the ΚΑΤΑΚΥΡΩΣΗ count — ΓΝ Τρικάλων runs competitive tenders that result in formal awards (ΚΑΤΑΚΥΡΩΣΗ) at 4.5× the rate of ΓΝ Λαμίας (1,841 vs 407). This inversion is the cleanest finding in the dataset.
+**The core finding is not a single anomaly but a structural pattern:** all three Lamia entities independently show elevated direct-award frequency. The most analytically clean signal is the hospital's **competitive award (ΚΑΤΑΚΥΡΩΣΗ) count: 407 at ΓΝ Λαμίας versus 1,841 at the comparable ΓΝ Τρικάλων** — a 4.5× inversion, robust to any classification ambiguity. The root cause at the hospital is identified: a labour model that outsources cleaning, catering, and security to external contractors (€7.34M = 44.9% of the 2024 budget), versus ΓΝ Τρικάλων which employs these staff directly. The two hospitals spend almost identically per capita (€244 vs €246), but the outsourcing model generates large recurring service contracts requiring competitive tendering — and when those tenders fail or stall, incumbents entrench.
+
+**Five specific findings are documented with primary-source evidence:**
+
+1. **Hospital outsourcing incumbency (UNISON).** The hospital's cleaning contract has been held by UNISON (Metlen Energy & Metals subsidiary) since October 2020. A €4.4M international open tender for cleaning services was launched in March 2023 and failed twice (no valid bids). Four ΕΑΔΗΣΥ consents then authorised a negotiated procedure (Art. 32 § 2γ L.4412/2016). UNISON was formally awarded the negotiated contract in July 2025, with the award published four months late (November 2025). The Art.32§2γ procedure had documented procedural basis; the concern is the five-year incumbency during a period when no competitive tender succeeded, and the ongoing escalation (total UNISON commitment 2025–2026: ~€3.2M).
+
+2. **Hospital security cost escalation.** Security guard services (CPV 79713000-5) cost ~€390k/year during 2020–2021 bridge contracts (KOLOSSOS SECURITY). The first competitive contract (MYSECURITY AND FACILITY SYSTEMS ΑΕ, AFM 800872049, 2021–2023) ran at ~€750–800k/year; the current contract (ΗΦΑΙΣΤΟΣ ΕΠΕ, AFM 999436428, Heraklion, 2024–2026) is priced at ~€984k/year. Cumulative increase: 152% over four years, driven by workforce scale-up (COVID ward, vaccination centre) and minimum-wage adjustments. All three contracts ran through competitive international tenders; no procedural concern identified. The MYSECURITY entity was subsequently dissolved via merger.
+
+3. **Municipality: above-threshold security and building services without competitive tender.** The municipality directly awarded building security guard contracts above the €30,000 legal threshold in both 2022 (two contracts totalling ~€148k for the same service in the same year: ΚΟΥΤΚΙΑΣ & ΣΙΑ ΕΕ AFM 801089930 in July and ΚΟΥΤΚΙΑΣ Παναγιώτης AFM 112437726 in August) and 2023 (€74.4k). No competitive tender was ever published for building security in the 2020–2026 dataset. The same family entity also appears in a contract fragmentation pattern: two identical €24,435 same-day security awards on 8 April 2020. Peer municipalities show zero above-threshold direct awards for building security. The ΖΗΚΑ & ΚΑΙΛΑΣ entity received above-threshold direct awards for services of questionable CPV classification (€30k–€38k, 2022–2024), also without a competitive tender.
+
+4. **Municipality: contract fragmentation by geographic splitting (Δ.Ε.).** Rolling 60-day window analysis of all 10,388 ΑΝΑΘΕΣΗ decisions identifies 33 suppliers receiving combined awards that exceed the €30k threshold when summed, while each individual award is kept below. The most systematic: AFM 800458127 (electrical materials, €420k across 34 awards in rolling windows); AFM 112437726 (ΚΟΥΤΚΙΑΣ security, same-day identical awards); AFM 801793425 (a single above-threshold award of €37,195). Splitting contracts by Δημοτική Ενότητα to stay below threshold violates Art. 6§2 of Law 4412/2016.
+
+5. **ΔΕΥΑ Λαμίας: volume anomaly, but no concentration.** The utility issues 4.9× more direct awards than comparable peer utilities. However, all 310 identified suppliers are dispersed (highest-frequency supplier: 17 transactions / ~€14k total); the average transaction value (€3,500) is well within threshold; and the dominant categories are maintenance and consumables. The volume pattern suggests a procurement culture that defaults to direct awards rather than framework agreements, but the data does not support directed spending to specific contractors.
+
+**What the ΑΝΑΛΗΨΗ cross-check (budget commitment data) adds.** All 20,283 ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ decisions for ΓΝ Λαμίας (2020–2026) were hydrated and analysed by KAE expenditure code. The 2020–2024 totals (€45M–€100M/year) appear 2.4–5.1× higher than official payments — fully explained by (a) centrally-funded payroll commitments (KAE 1312 alone reaches €24.6M in 2024, exceeding the hospital's entire own-resource payment total) and (b) multi-year contract pre-reservations committed in the signing year. No undisclosed commitments, no anomalous gaps. The financial statements are confirmed by this independent data source.
+
+**What is not established.** The ΑΝΑΘΕΣΗ count divergence at ΓΝ Λαμίας (5,887 vs 187 for ΓΝ Τρικάλων) reflects a classification difference as much as a procurement behaviour difference: ~739 entries are committee steps within competitive processes, coded as ΑΝΑΘΕΣΗ by hospital administrative practice. The defensible direct-award figure is approximately €82.3M (the patient-specific and small procurement entries). Amount-based supplier concentration analysis is not possible: 63.5% of ΓΝ Λαμίας decisions with amounts have no supplier identifier in the Diavgeia structured fields.
+
+---
 
 ---
 
