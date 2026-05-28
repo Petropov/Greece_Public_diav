@@ -232,32 +232,31 @@ Beyond the 739 competitive-tender procedural steps identified earlier, two furth
 
 - **ΓΝ Τρικάλων 2024 budget execution report — obtained (May 2026):** ADA `Ψ4ΤΜ46907Φ-ΠΟΙ` (published 21 January 2025) covers 01/01/2024–31/12/2024. Total payments: **€19,899,933**. Budget appropriation (excl. reserve): €37,398,359 (51.6% execution rate — consistent with the Greek public hospital underspend pattern).
 
-  **Peer comparison — 2024 total hospital expenditure:**
+  **Peer comparison — 2024 total expenditure and per-capita breakdown:**
 
-  | Hospital | 2024 Total Payments | Budget | Execution | Source ADA |
-  |----------|---------------------|--------|-----------|------------|
-  | **ΓΝ Λαμίας** | **€18,281,282** | — | — | `9ΤΥΕ4690ΒΜ-69Α` |
-  | **ΓΝ Τρικάλων** | **€19,899,933** | €37,398,359 | 53.2% | `Ψ4ΤΜ46907Φ-ΠΟΙ` |
+  Population: Lamia ~75,000 · Trikala ~81,000. Both hospitals receive central 5th Regional Health Authority subsidies for medical/nursing staff (not reflected in figures below — both hospitals identical treatment).
 
-  ΓΝ Τρικάλων is approximately 9% larger by total payments in 2024. Both hospitals are roughly comparable in scale, making the procurement process divergence (407 vs 1,841 ΚΑΤΑΚΥΡΩΣΗ) all the more striking.
+  | | ΓΝ Λαμίας | €/capita | % | ΓΝ Τρικάλων | €/capita | % | Index |
+  |-|-----------|----------|---|-------------|----------|---|-------|
+  | **ΣΥΝΟΛΟ** | **€18,281,282** | **€244** | 100% | **€19,899,933** | **€246** | 100% | ≈ 1.01× |
+  | *— Medical supplies (comparable KAEs)* | | | | | | | |
+  | Φάρμακα | €1,703,137 | €22.7 | 9.3% | €2,230,497 | €27.5 | 11.2% | ↑1.21× |
+  | Υγειονομικό υλικό | €2,805,230 | €37.4 | 15.3% | €2,682,376 | €33.1 | 13.5% | ≈0.89× |
+  | Ορθοπεδικό υλικό | €1,068,996 | €14.3 | 5.8% | €695,677 | €8.6 | 3.5% | ↓0.60× |
+  | Χημικά / αντιδρ. | €1,432,384 | €19.1 | 7.8% | €1,187,724 | €14.7 | 6.0% | ↓0.77× |
+  | **Σύνολο ιατρ. προμηθειών** | **€7,009,747** | **€93.5** | **38.3%** | **€6,796,274** | **€83.9** | **34.1%** | ≈0.90× |
+  | *— Labour model (structural difference)* | | | | | | | |
+  | Μισθοδοσία (ίδιοι πόροι) | €3,064,252 | €41 | 16.8% | €5,164,517 | €64 | 26.0% | — |
+  | **Εξωτ. ανάδοχοι (καθ/σία, εστίαση, φύλαξη)** | **€7,342,516** | **€98** | **40.2%** | **~€515,434** | **€6** | **2.6%** | **15×** |
+  | Ενέργεια / καύσιμα | (εντός λοιπών) | — | — | €1,852,061 | €22.9 | 9.3% | — |
 
-  **ΓΝ Τρικάλων 2024 goods procurement breakdown (KAE 1xx):**
+  *Trikala outsourcing = KAE 043.9xx €306k + KAE 151.xxx food for in-house catering €209k. Trikala payroll includes ΙΔΟΧ cleaning/catering staff employed directly.*
 
-  | Category | Amount | % of total |
-  |----------|--------|-----------|
-  | Υγειονομικό υλικό | €2,682,376 | 13.5% |
-  | Φαρμακευτικό υλικό | €2,230,497 | 11.2% |
-  | Χημικά / αντιδραστήρια | €1,187,724 | 6.0% |
-  | Ενέργεια / καύσιμα | €1,852,061 | 9.3% |
-  | Ορθοπεδικό / εμφυτεύσιμα | €695,677 | 3.5% |
-  | Τρόφιμα / σίτιση | €209,113 | 1.1% |
-  | Καθαριστικά / αναλώσιμα | €84,473 | 0.4% |
-  | Ανταλλακτικά / συντήρηση | €263,176 | 1.3% |
-  | Γραφική ύλη / έντυπα | €86,821 | 0.4% |
-  | Λοιπές προμήθειες | €39,758 | 0.2% |
-  | **Σύνολο αγαθών** | **€9,331,675** | **46.9%** |
+  **Key finding from the per-capita comparison:**
 
-  Maintenance of equipment: €770,013 (3.9%); outsourced services (medical waste disposal, transport, etc.): €564,262 (2.8%); payroll (approx.): €5,164,517 (26.0%).
+  The two hospitals have **nearly identical total cost per capita** (€244 vs €246) — confirming true comparability. Medical supplies are within 10% per capita. The structural divergence is entirely in the labour model: ΓΝ Λαμίας spends €7.34M (40.2% of its budget) on outsourced cleaning, catering, and security versus ~€515k (2.6%) for ΓΝ Τρικάλων, which employs these staff directly on payroll. This 15× gap is the root cause of the outsourcing contract dynamic: the in-house model generates no large service contracts requiring competitive tendering; the outsourcing model creates contracts worth €1–4M per year that should go to open competition — and the UNISON case shows what happens when those tenders fail or are structured in ways that entrench incumbents.
+
+  ΓΝ Τρικάλων's higher ΚΑΤΑΚΥΡΩΣΗ count (1,841 vs 407) is driven primarily by its **medical supply procurement** running through proper competitive channels — not by any difference in cleaning/catering/security (which it does not tender out). The relevant comparison for procurement behaviour is the medical supplies channel, where Trikala completes 4.5× more competitive awards despite comparable spend levels.
 
 - **ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ cross-check for ΓΝ Λαμίας:** The 20,286 budget commitment decisions at ΓΝ Λαμίας could provide an independent cross-check of total procurement commitments, but hydrating this volume (~2–3 hours pipeline run) is lower priority now that financial statement cross-validation is complete.
 
