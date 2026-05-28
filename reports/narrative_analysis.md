@@ -220,6 +220,55 @@ Using emergency procedures for a recurring, foreseeable core service raises a co
 
 *ΝΤΟΥΒΑΣ family relationship:* Two entities sharing a surname — ΣΤ. ΝΤΟΥΒΑΣ & ΣΙΑ Ο.Ε. (fire prevention, 25tx, €319k) and ΝΤΟΥΒΑΣ ΒΑΣΙΛΕΙΟΣ & ΣΙΑ Ε.Ε. (sports field maintenance, 14tx, €220k) — total €540k combined over six years. Different legal entities, different services, different geographic focus. At this scale over six years, not a concentration anomaly.
 
+**Category-level comparison with peer municipalities — completed (May 2026):**
+
+A service-category breakdown of all ΑΝΑΘΕΣΗ decisions across four municipalities (Λαμία, Τρίκαλα, Καρδίτσα, Κοζάνη), using keyword matching on subject text, reveals that Lamia's elevated total ΑΝΑΘΕΣΗ count is driven by two specific categories, while performing better than peers in several others.
+
+| Category | Λαμία | Τρίκαλα | Καρδίτσα | Κοζάνη | Λαμία/max-peer | Λαμία ΚΑΤΑΚ |
+|---|---|---|---|---|---|---|
+| Οχήματα / συντήρηση | 6,232 | 3,631 | 304 | 336 | **1.7×** | 5 |
+| **Εκδηλώσεις / Διαφήμιση** | **1,210** | **247** | **67** | **124** | **4.9×** | **2** |
+| Πράσινο / Κήποι | 164 | 114 | 21 | 147 | 1.1× | 1 |
+| Υδραυλικά | 106 | 25 | 42 | 9 | **2.5×** | 1 |
+| Ηλεκτρολογικά | 56 | 51 | 38 | 19 | 1.1× | 0 |
+| Συντήρηση κτιρίων | 63 | 16 | 24 | 79 | 0.8× | 3 |
+| Πυρασφάλεια | 22 | 25 | 4 | 10 | 0.9× | 0 |
+| Φύλαξη / Ασφάλεια | 15 | 14 | 9 | 16 | 0.9× | 0 |
+| **Καθαριότητα** | **42** | **282** | **145** | **77** | **0.1×** | **10** |
+| **Καύσιμα / Λιπαντικά** | **8** | **79** | **155** | **29** | **0.1×** | **6** |
+| **Σίτιση / Τρόφιμα** | **15** | **20** | **135** | **47** | **0.1×** | **8** |
+
+*All four municipalities: 2020–2025, 77-month period, deduplicated by ADA.*
+
+**What this shows:**
+
+*Anomalous HIGH — Events and advertising (1,210 decisions, 4.9× peers):*
+Λαμία issues ~200 events-related direct awards per year — sound and light coverage (183), musical/artistic services (146), printing of posters and invitations (126), media advertising for events (66), fireworks (15), holiday lighting (5), and miscellaneous cultural programming. **Per capita, this is 6.5× Τρίκαλα and 9× Κοζάνη.** Only 2 competitive awards were run for this entire category over 6 years — a 2021 fireworks procurement and holiday electrical decoration. Supplier TID coverage for this category is very low (108 of 1,601 decisions = 7%), making independent audit of who receives these awards difficult from public data alone.
+
+Sub-breakdown of Λαμία events ΑΝΑΘΕΣΗ:
+- Ηχητική/φωτιστική κάλυψη εκδηλώσεων: 183
+- Μουσικές/καλλιτεχνικές υπηρεσίες: 146
+- Εκτυπώσεις, αφίσες, έντυπα: 126
+- Διαφήμιση και προβολή: 66
+- Τρόφιμα εκδηλώσεων (βασιλόπιτες, Κούλουμα κ.ά.): 26
+- Πυροτεχνήματα: 15
+- Εορταστικός φωτισμός: 5
+- Λοιπές εκδηλώσεις: 643
+
+Year trend: 145 (2020), 196 (2021), 213 (2022), 206 (2023), 150 (2024), 227 (2025) — consistently 4–10× above peer levels in every year.
+
+*Anomalous LOW — Lamia uses competitive tenders where peers use direct awards:*
+For three recurring high-value service categories, Λαμία runs competitive tenders while Τρίκαλα and Καρδίτσα do not:
+- **Καθαριότητα:** Λαμία 42 direct awards + **10 ΚΑΤΑΚΥΡΩΣΗ**. Τρίκαλα: 282 direct awards + 0 competitive.
+- **Καύσιμα:** Λαμία 8 direct awards + **6 ΚΑΤΑΚΥΡΩΣΗ**. Τρίκαλα: 79 direct awards + 0. Καρδίτσα: 155 direct awards + 0.
+- **Σίτιση/Τρόφιμα:** Λαμία 15 direct awards + **8 ΚΑΤΑΚΥΡΩΣΗ**. Καρδίτσα: 135 direct awards + 0.
+
+*Fire protection and building security:* Roughly equal across all municipalities (all in the range 9–25 decisions), no categorical divergence other than the specific above-threshold issues documented in §3.
+
+**Interpretation:** Λαμία's overall ΑΝΑΘΕΣΗ excess is not uniform across procurement categories. For operational necessities — cleaning contracts, fuel, catering for social programmes — Λαμία actually competes more than peers. The elevated count is driven by vehicle maintenance (plausibly explained by Λαμία's larger municipal fleet and the committee-based approval structure: "ΑΠΟΦΑΣΗ ΑΠΕΥΘΕΙΑΣ ΑΝΑΘΕΣΗΣ ΤΗΣ ΕΠΙΤΡΟΠΗΣ ΣΥΝΤΗΡΗΣΗΣ ΚΑΙ ΕΠΙΣΚΕΥΗΣ ΟΧΗΜΑΤΩΝ") and, more significantly, by events and cultural programming spending (1,210 decisions/6 years at 6.5× per-capita peer rate, with a 2-in-600 competitive award ratio).
+
+---
+
 **Threshold-ceiling pattern:** The data shows awareness of the legal direct-award ceiling (€30,000 net = €37,200 gross with 24% VAT under Law 4412/2016). Subject-text extraction from the full search export corpus identifies a cluster of decisions where the stated budget is exactly €37,200, with an abrupt drop-off above that amount. The pattern is consistent with systematic alignment to the maximum permitted direct-award amount. *Note: amount coverage in the Diavgeia structured data for this org is low (~0.1% of decisions), so the exact count of ceiling-aligned decisions cannot be stated with precision from available data — the observation is directional rather than a counted fact.*
 
 **Triangulated above-threshold direct awards (Diavgeia API confirmed):**
