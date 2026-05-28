@@ -228,7 +228,36 @@ Beyond the 739 competitive-tender procedural steps identified earlier, two furth
 
 - **ΚΑΤΑΚΥΡΩΣΗ amounts at ΓΝ Λαμίας — answered:** 335 decisions with amounts, total €45.26M (2020–2026), growing from €3.79M (2020) to €13.44M (2024). Cross-validation against official budget execution confirms ΚΑΤΑΚΥΡΩΣΗ = 73.5% of total procurement spend in 2024. Proportionate to hospital scale.
 
-- **ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ cross-check for ΓΝ Τρικάλων — attempted, blocked by data quality:** All 4,336 ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ decisions for ΓΝ Τρικάλων (2024) were hydrated from Diavgeia. The `extraFieldValues.amountWithVAT` field is consistently empty (`{'currency': 'EUR'}` with no `amount` key) and `amountWithKae` is an empty array across all fetched decisions. ΓΝ Τρικάλων does not populate monetary amounts in the Diavgeia structured fields for budget commitment decisions. Subject-text analysis of the 4,336 decisions confirms the expected hospital procurement pattern (medical supplies 34%, orthopaedic/implants 7%, lab reagents 3%, cleaning 2%, catering 2%) but no quantitative cross-validation is possible via this route. To obtain ΓΝ Τρικάλων's 2024 total procurement spend for direct comparison with ΓΝ Λαμίας's €18.28M, a separate search for ΓΝ Τρικάλων's budget execution report (Α.2 or equivalent financial disclosure) on Diavgeia or the hospital's own website would be required.
+- **ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ cross-check for ΓΝ Τρικάλων — attempted, blocked by data quality:** All 4,336 ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ decisions for ΓΝ Τρικάλων (2024) were hydrated from Diavgeia. The `extraFieldValues.amountWithVAT` field is consistently empty (`{'currency': 'EUR'}` with no `amount` key) and `amountWithKae` is an empty array across all fetched decisions. ΓΝ Τρικάλων does not populate monetary amounts in the Diavgeia structured fields for budget commitment decisions. Subject-text analysis of the 4,336 decisions confirms the expected hospital procurement pattern (medical supplies 34%, orthopaedic/implants 7%, lab reagents 3%, cleaning 2%, catering 2%) but no quantitative cross-validation is possible via this route. **Financial scale obtained via alternative route — see peer comparison below.**
+
+- **ΓΝ Τρικάλων 2024 budget execution report — obtained (May 2026):** ADA `Ψ4ΤΜ46907Φ-ΠΟΙ` (published 21 January 2025) covers 01/01/2024–31/12/2024. Total payments: **€19,899,933**. Budget appropriation (excl. reserve): €37,398,359 (51.6% execution rate — consistent with the Greek public hospital underspend pattern).
+
+  **Peer comparison — 2024 total hospital expenditure:**
+
+  | Hospital | 2024 Total Payments | Budget | Execution | Source ADA |
+  |----------|---------------------|--------|-----------|------------|
+  | **ΓΝ Λαμίας** | **€18,281,282** | — | — | `9ΤΥΕ4690ΒΜ-69Α` |
+  | **ΓΝ Τρικάλων** | **€19,899,933** | €37,398,359 | 53.2% | `Ψ4ΤΜ46907Φ-ΠΟΙ` |
+
+  ΓΝ Τρικάλων is approximately 9% larger by total payments in 2024. Both hospitals are roughly comparable in scale, making the procurement process divergence (407 vs 1,841 ΚΑΤΑΚΥΡΩΣΗ) all the more striking.
+
+  **ΓΝ Τρικάλων 2024 goods procurement breakdown (KAE 1xx):**
+
+  | Category | Amount | % of total |
+  |----------|--------|-----------|
+  | Υγειονομικό υλικό | €2,682,376 | 13.5% |
+  | Φαρμακευτικό υλικό | €2,230,497 | 11.2% |
+  | Χημικά / αντιδραστήρια | €1,187,724 | 6.0% |
+  | Ενέργεια / καύσιμα | €1,852,061 | 9.3% |
+  | Ορθοπεδικό / εμφυτεύσιμα | €695,677 | 3.5% |
+  | Τρόφιμα / σίτιση | €209,113 | 1.1% |
+  | Καθαριστικά / αναλώσιμα | €84,473 | 0.4% |
+  | Ανταλλακτικά / συντήρηση | €263,176 | 1.3% |
+  | Γραφική ύλη / έντυπα | €86,821 | 0.4% |
+  | Λοιπές προμήθειες | €39,758 | 0.2% |
+  | **Σύνολο αγαθών** | **€9,331,675** | **46.9%** |
+
+  Maintenance of equipment: €770,013 (3.9%); outsourced services (medical waste disposal, transport, etc.): €564,262 (2.8%); payroll (approx.): €5,164,517 (26.0%).
 
 - **ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ cross-check for ΓΝ Λαμίας:** The 20,286 budget commitment decisions at ΓΝ Λαμίας could provide an independent cross-check of total procurement commitments, but hydrating this volume (~2–3 hours pipeline run) is lower priority now that financial statement cross-validation is complete.
 
