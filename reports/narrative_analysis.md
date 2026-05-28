@@ -264,7 +264,28 @@ Beyond the 739 competitive-tender procedural steps identified earlier, two furth
 
   ΓΝ Τρικάλων's higher ΚΑΤΑΚΥΡΩΣΗ count (1,841 vs 407) is driven primarily by its **medical supply procurement** running through proper competitive channels — not by any difference in cleaning/catering/security (which it does not tender out). The relevant comparison for procurement behaviour is the medical supplies channel, where Trikala completes 4.5× more competitive awards despite comparable spend levels.
 
-- **ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ cross-check for ΓΝ Λαμίας:** The 20,286 budget commitment decisions at ΓΝ Λαμίας could provide an independent cross-check of total procurement commitments, but hydrating this volume (~2–3 hours pipeline run) is lower priority now that financial statement cross-validation is complete.
+- **ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ cross-check for ΓΝ Λαμίας (A3, partial — hydration in progress):** Hydration of 20,286 ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ decisions from Diavgeia is underway. Partial results (6,400/20,286 decisions, covering 2020–2021):
+
+  - **Amount coverage: ~100%.** 6,397/6,400 decisions have `amountWithVAT.amount` populated — this is the inverse of ΓΝ Τρικάλων where the same field was empty in all sampled decisions. ΓΝ Λαμίας populates budget commitment amounts consistently.
+
+  - **Commitment vs. payment ratio:** 2020 ΑΝΑΛΗΨΗ total = **€45.3M** vs official payments €18.6M (ratio 2.4×). 2021 = **€50.2M** vs €26.7M (ratio 1.9×). This is the **expected pattern** for budget commitments: ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ represent upfront reservations of funds — full-year payroll pre-commitments, multi-year contract values, and option provisions all inflate the commitment figure relative to actual cash payments in the same year.
+
+  - **KAE breakdown (2020–2021 combined):**
+
+    | KAE | Description | Total committed | Decisions |
+    |-----|-------------|-----------------|-----------|
+    | 1312 | Αποδοχές — πρόσθετες (additional payroll) | €24.1M | 80 |
+    | 1311 | Αποδοχές — τακτικές (regular salaries) | €9.9M | 1,357 |
+    | 0277 | (large external payments) | €6.8M | 31 |
+    | 1359 | Λοιπές αποδοχές | €4.9M | 353 |
+    | 0219 | Αμοιβές (fees) | €4.5M | 35 |
+    | 1313 | Εργοδοτικές εισφορές | €4.3M | 387 |
+    | **0439** | **Εξωτερικές υπηρεσίες (outsourcing)** | **€4.1M** | **273** |
+    | 0845/0849 | Υγειονομικό υλικό | €6.0M | 136 |
+
+  - **KAE 0439 (outsourcing commitments):** €4.1M across 273 decisions in 2020–2021 combined = ~€2M/year, consistent with the UNISON cleaning contract starting October 2020. The full 2024 KAE breakdown (awaiting complete hydration) should show a larger 0439 figure (~€7M+) given the hospital's documented €7.34M outsourcing total in 2024.
+
+  - **Interpretation:** ΑΝΑΛΗΨΗ amounts at ΓΝ Λαμίας are data-rich and structurally sound. They cannot serve as a simple cross-check of annual payments (they are 2–2.5× higher), but they are consistent with known financial statement figures and confirm the outsourcing KAE pattern. Full 2024 data pending completion of the 20,286-decision hydration.
 
 - **ΔΕΥΑ Σερρών — coding artifact, not comparable:** A full inspection of ΔΕΥΑ Σερρών's 1,180 ΑΝΑΘΕΣΗ decisions shows 90.8% are `Απόφαση ΔΣ/Προέδρου` board and chairman resolutions (budget votes, HR decisions, tender approvals, project extensions) — not specific procurement award decisions. Amount coverage is 0.4% (5 decisions); supplier identifier coverage is 0%. ΔΕΥΑ Σερρών has 77 ΠΕΡΙΛΗΨΗ ΔΙΑΚΗΡΥΞΗΣ (tender notices) but only 1 ΚΑΤΑΚΥΡΩΣΗ, suggesting competitive awards are coded as board resolutions (ΑΝΑΘΕΣΗ type) rather than as ΚΑΤΑΚΥΡΩΣΗ. The count divergence between ΔΕΥΑ Σερρών and peers reflects administrative coding practice, not elevated direct procurement. **ΔΕΥΑ Σερρών cannot be compared with ΔΕΥΑ Λαμίας on the ΑΝΑΘΕΣΗ metric.** The appropriate comparison set for ΔΕΥΑ Λαμίας remains ΔΕΥΑ Τρικάλων, Καρδίτσας, and Κοζάνης.
 
