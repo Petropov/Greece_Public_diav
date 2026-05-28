@@ -243,7 +243,38 @@ A service-category breakdown of all ΑΝΑΘΕΣΗ decisions across four municip
 **What this shows:**
 
 *Anomalous HIGH — Events and advertising (1,210 decisions, 4.9× peers):*
-Λαμία issues ~200 events-related direct awards per year — sound and light coverage (183), musical/artistic services (146), printing of posters and invitations (126), media advertising for events (66), fireworks (15), holiday lighting (5), and miscellaneous cultural programming. **Per capita, this is 6.5× Τρίκαλα and 9× Κοζάνη.** Only 2 competitive awards were run for this entire category over 6 years — a 2021 fireworks procurement and holiday electrical decoration. Supplier TID coverage for this category is very low (108 of 1,601 decisions = 7%), making independent audit of who receives these awards difficult from public data alone.
+Λαμία issues ~200 events-related direct awards per year — sound and light coverage (183), musical/artistic services (146), printing of posters and invitations (126), media advertising for events (66), fireworks (15), holiday lighting (5), and miscellaneous cultural programming. **Per capita, this is 6.5× Τρίκαλα and 9× Κοζάνη.** Only 2 competitive awards were run for this entire category over 6 years — a 2021 fireworks procurement and holiday electrical decoration.
+
+**Events/advertising supplier analysis — completed (May 2026, 98.4% TID coverage):**
+
+All 1,168 ΑΝΑΘΕΣΗ decisions in this category were hydrated from the Diavgeia API. Supplier tax identifiers (AFM) were recovered for 1,149 of 1,168 decisions (98.4%).
+
+*Key metrics:*
+- 253 unique suppliers received awards in this category (2020–2026)
+- Total awarded: **€1,904,844** (≈ €317k/year avg; 2025 was the highest at €400k)
+- Median award value: **€744** — 87% of decisions are under €2,000; zero decisions at or above the €37,200 direct-award ceiling (max single award: €36,754)
+- Top-10 suppliers receive 43.7% of decisions and 28.1% of captured spend
+
+*Supplier concentration by decision count (top 10):*
+
+| AFM | Name | Decisions | Total €| Avg € | Type |
+|-----|------|-----------|--------|-------|------|
+| 094182000 | ΛΑΜΙΑΚΟΣ ΤΥΠΟΣ ΑΕ | 118 | €32,556 | €276 | Print media — legal notice publications |
+| 122859064 | ΧΡΙΣΤΟΠΟΥΛΟΥ Μαρία | 77 | €110,546 | €1,436 | Sound/PA equipment rental |
+| 136850449 | ΓΚΟΥΡΝΕΛΟΥ Αθανασία | 58 | €118,866 | €2,049 | Sound/microphone installation |
+| 998917460 | ΘΕΜΗΣ ΧΕΙΜΑΡΑΣ ΚΑΙ ΣΙΑ ΕΕ | 55 | €50,593 | €920 | Printing (programs, posters, diplomas) |
+| 054108630 | ΝΤΕΛΗΣ Γεώργιος | 43 | €91,340 | €2,124 | Stage/bleacher/seating rental |
+| 094275277 | ΕΚΔΟΤΙΚΗ ΤΗΛΕΟΠΤΙΚΗ ΑΕ | 43 | €21,315 | €496 | Local TV station — announcement fees |
+| 999352104 | ΑΓΑΜ ΤΣΑΚΩΝΙΤΗΣ ΚΑΙ ΣΙΑ ΕΕ | 30 | €16,820 | €561 | Printing for co-organized cultural events |
+| 078120440 | ΠΑΠΑΣΤΑΜΑΤΗΣ Παναγιώτης | 28 | €32,462 | €1,159 | Branded merchandise/T-shirts |
+| 092553182 | ΑΔΕΛΦΟΙ ΑΝΤΖΟΥΛΗ & ΚΥΡΙΤΣΗΣ ΟΕ | 26 | €33,123 | €1,274 | Accommodation for judges/participants |
+| 101916025 | ΧΑΜΗΛΟΣ Δημήτριος | 24 | €22,173 | €924 | Laurel wreaths and ceremonial items |
+
+*Assessment:*
+
+The supplier pool is **diverse and local**: 253 entities across 1,168 decisions, mostly sole traders and small partnerships (ΑΤΟΜΙΚΗ, ΟΕ, ΕΕ) providing operational event services — sound equipment, printing, catering, seating. The top supplier (ΛΑΜΙΑΚΟΣ ΤΥΠΟΣ ΑΕ) is primarily receiving mandatory legal publication fees (average €276/award), not event programming. No single entity receives more than 10% of decisions or 7% of spend.
+
+The concern is **not supplier concentration or above-threshold awards** — neither is present. The concern is **volume relative to peers**: 1,210 direct awards for cultural and civic events compared to 67–247 for comparable municipalities, with almost no competitive procurement in this category regardless of how many events are organized. The pattern is consistent with fragmented event budgeting: rather than running a small number of competitive framework agreements for recurring services (sound, printing, stage hire), each event component is individually awarded as a below-threshold direct award.
 
 Sub-breakdown of Λαμία events ΑΝΑΘΕΣΗ:
 - Ηχητική/φωτιστική κάλυψη εκδηλώσεων: 183
@@ -266,6 +297,8 @@ For three recurring high-value service categories, Λαμία runs competitive t
 *Fire protection and building security:* Roughly equal across all municipalities (all in the range 9–25 decisions), no categorical divergence other than the specific above-threshold issues documented in §3.
 
 **Interpretation:** Λαμία's overall ΑΝΑΘΕΣΗ excess is not uniform across procurement categories. For operational necessities — cleaning contracts, fuel, catering for social programmes — Λαμία actually competes more than peers. The elevated count is driven by vehicle maintenance (plausibly explained by Λαμία's larger municipal fleet and the committee-based approval structure: "ΑΠΟΦΑΣΗ ΑΠΕΥΘΕΙΑΣ ΑΝΑΘΕΣΗΣ ΤΗΣ ΕΠΙΤΡΟΠΗΣ ΣΥΝΤΗΡΗΣΗΣ ΚΑΙ ΕΠΙΣΚΕΥΗΣ ΟΧΗΜΑΤΩΝ") and, more significantly, by events and cultural programming spending (1,210 decisions/6 years at 6.5× per-capita peer rate, with a 2-in-600 competitive award ratio).
+
+Full supplier analysis of the events category (May 2026) found 253 unique suppliers, a diverse local base with no concentration anomaly, and zero above-threshold awards (max single award €36,754, median €744). **The events anomaly is one of administrative process, not directed spending**: Lamia runs many small individual awards for every component of every event rather than using competitive framework agreements for recurring event services.
 
 ---
 
