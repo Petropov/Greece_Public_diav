@@ -3,2000 +3,813 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Διαφάνεια Προμηθειών Λαμίας — Αναλυτική Επισκόπηση</title>
+<title>Προμήθειες Λαμίας 2020–2026 — Ανάλυση</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-:root {
-  --red:     #c0392b;
-  --red-lt:  #f9ebea;
-  --red-md:  #e74c3c;
-  --blue:    #2471a3;
-  --blue-lt: #eaf2f8;
-  --grey:    #566573;
-  --grey-lt: #f2f3f4;
-  --green:   #1a7a4a;
-  --green-lt:#eafaf1;
-  --amber:   #d68910;
-  --amber-lt:#fef9e7;
-  --text:    #1a1a2e;
-  --border:  #dde1e7;
-  --radius:  10px;
-  --shadow:  0 2px 14px rgba(0,0,0,.08);
+:root{
+  --ink:#1a1a2e; --ink2:#3d4560; --ink3:#6b7280;
+  --red:#c0392b; --red-lt:#fdf3f2;
+  --amber:#b7791f; --amber-lt:#fffbeb;
+  --blue:#1d4ed8; --blue-lt:#eff6ff;
+  --green:#15803d; --green-lt:#f0fdf4;
+  --border:#e5e7eb; --bg:#f8f9fb;
+  --card:#fff;
+  --r:10px; --shadow:0 1px 6px rgba(0,0,0,.08);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f6fa;color:var(--text);line-height:1.6}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;
+     background:var(--bg);color:var(--ink);line-height:1.65;font-size:15px}
 
-/* ── HEADER ── */
-header{background:linear-gradient(135deg,#1a1a2e 0%,#16213e 55%,#0f3460 100%);color:#fff;padding:44px 40px 32px}
-header .kicker{font-size:10.5px;letter-spacing:2.5px;text-transform:uppercase;color:#7f8fa6;margin-bottom:10px}
-header h1{font-size:1.9rem;font-weight:800;line-height:1.2;margin-bottom:8px}
-header .sub{color:#a0aec0;font-size:.95rem;max-width:700px;margin-bottom:18px}
-header .meta{display:flex;gap:10px;flex-wrap:wrap}
-header .meta span{font-size:.74rem;color:#718096;background:rgba(255,255,255,.07);padding:4px 11px;border-radius:20px;border:1px solid rgba(255,255,255,.1)}
+/* ── HEADER ──────────────────────────────── */
+header{
+  background:linear-gradient(135deg,#0f1b35 0%,#1a2f5a 60%,#243b6e 100%);
+  color:#fff;padding:52px 40px 40px;
+}
+.kicker{font-size:.7rem;letter-spacing:3px;text-transform:uppercase;color:#7fa3d0;margin-bottom:12px}
+header h1{font-size:2.1rem;font-weight:800;line-height:1.2;margin-bottom:10px}
+.sub{color:#a8bfd6;font-size:.95rem;max-width:680px;margin-bottom:22px;line-height:1.7}
+.meta-row{display:flex;flex-wrap:wrap;gap:8px}
+.badge{font-size:.7rem;color:#8fb3d0;background:rgba(255,255,255,.09);
+       padding:4px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.14)}
 
-/* ── TABS ── */
-.tab-bar{background:#fff;border-bottom:2px solid var(--border);padding:0 32px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.05)}
-.tab-bar ul{display:flex;list-style:none;gap:0;overflow-x:auto}
-.tab-bar li a{display:block;padding:14px 18px;font-size:.84rem;font-weight:600;color:var(--grey);text-decoration:none;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:color .2s,border-color .2s}
-.tab-bar li a:hover{color:var(--text)}
-.tab-bar li a.active{color:var(--red);border-bottom-color:var(--red)}
+/* ── CHAPTER NAV ──────────────────────────────── */
+.chapter-nav{
+  background:#fff;border-bottom:2px solid var(--border);
+  padding:0 32px;position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 10px rgba(0,0,0,.06);
+}
+.chapter-nav ul{display:flex;list-style:none;overflow-x:auto}
+.chapter-nav a{
+  display:block;padding:16px 20px;font-size:.82rem;font-weight:600;
+  color:var(--ink3);text-decoration:none;
+  border-bottom:3px solid transparent;margin-bottom:-2px;
+  white-space:nowrap;transition:color .15s,border-color .15s;
+}
+.chapter-nav a:hover{color:var(--ink)}
+.chapter-nav a.active{color:var(--red);border-bottom-color:var(--red)}
+.ch-num{font-size:.65rem;letter-spacing:1px;text-transform:uppercase;
+        color:var(--ink3);display:block;margin-bottom:2px}
 
-/* ── PANES ── */
-.pane{display:none;max-width:1080px;margin:0 auto;padding:32px 24px 64px}
+/* ── PANES ──────────────────────────────── */
+.pane{display:none;max-width:1040px;margin:0 auto;padding:40px 24px 80px}
 .pane.active{display:block}
 
-/* ── ALERT ── */
-.alert{background:var(--red-lt);border-left:4px solid var(--red);border-radius:var(--radius);padding:16px 20px;margin-bottom:28px;font-size:.9rem}
-.alert strong{color:var(--red)}
-.alert.amber{background:var(--amber-lt);border-color:var(--amber)}
-.alert.amber strong{color:var(--amber)}
-.alert.blue{background:var(--blue-lt);border-color:var(--blue)}
-.alert.blue strong{color:var(--blue)}
+/* ── CHAPTER TITLE ──────────────────────────────── */
+.ch-title{margin-bottom:36px}
+.ch-label{font-size:.7rem;letter-spacing:2.5px;text-transform:uppercase;
+          color:var(--ink3);margin-bottom:6px}
+.ch-title h2{font-size:1.8rem;font-weight:800;line-height:1.2;margin-bottom:12px}
+.ch-title .lede{font-size:1.05rem;color:var(--ink2);max-width:720px;line-height:1.75}
 
-/* ── CARDS ── */
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:28px}
-.card{background:#fff;border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow);border-top:3px solid var(--border)}
-.card.red{border-top-color:var(--red)}
-.card.blue{border-top-color:var(--blue)}
-.card.green{border-top-color:var(--green)}
-.card.amber{border-top-color:var(--amber)}
-.card .label{font-size:.7rem;text-transform:uppercase;letter-spacing:.9px;color:var(--grey);margin-bottom:6px}
-.card .value{font-size:2.1rem;font-weight:900;line-height:1;margin-bottom:4px}
-.card.red   .value{color:var(--red)}
-.card.blue  .value{color:var(--blue)}
-.card.green .value{color:var(--green)}
-.card.amber .value{color:var(--amber)}
-.card .sub{font-size:.77rem;color:var(--grey);line-height:1.4}
+/* ── STAT CARDS ──────────────────────────────── */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;margin:28px 0}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:var(--r);
+      padding:20px 22px;box-shadow:var(--shadow)}
+.stat .n{font-size:2.2rem;font-weight:800;line-height:1;margin-bottom:6px}
+.stat .n.red{color:var(--red)}
+.stat .n.amber{color:var(--amber)}
+.stat .n.blue{color:var(--blue)}
+.stat .n.green{color:var(--green)}
+.stat .label{font-size:.78rem;color:var(--ink3);line-height:1.4}
 
-/* ── SECTION ── */
-section{margin-bottom:44px}
-section h2{font-size:1.05rem;font-weight:800;letter-spacing:.3px;margin-bottom:18px;padding-bottom:10px;border-bottom:2px solid var(--border);display:flex;align-items:center;gap:8px}
-section h2 .num{background:var(--text);color:#fff;font-size:.7rem;font-weight:700;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+/* ── PROSE ──────────────────────────────── */
+.prose{max-width:720px}
+.prose p{margin-bottom:1em;color:var(--ink2)}
+.prose p:last-child{margin-bottom:0}
+.prose strong{color:var(--ink)}
+.prose .note{font-size:.82rem;color:var(--ink3);border-left:3px solid var(--border);
+             padding-left:12px;margin-top:8px}
 
-/* ── CHART GRID ── */
-.chart-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px;margin-bottom:18px}
-.chart-box{background:#fff;border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow)}
-.chart-box h3{font-size:.76rem;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px}
-.chart-box canvas{max-height:250px}
+/* ── SECTION BLOCK ──────────────────────────────── */
+.section{background:var(--card);border:1px solid var(--border);border-radius:var(--r);
+         padding:28px 30px;margin-bottom:24px;box-shadow:var(--shadow)}
+.section h3{font-size:1.05rem;font-weight:700;margin-bottom:14px;color:var(--ink)}
+.section h4{font-size:.9rem;font-weight:600;margin-bottom:8px;color:var(--ink2)}
 
-/* ── TABLE ── */
-.tbl-wrap{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:18px}
-table{width:100%;border-collapse:collapse;font-size:.855rem}
-thead{background:var(--grey-lt)}
-thead th{padding:10px 14px;text-align:left;font-size:.69rem;text-transform:uppercase;letter-spacing:.6px;color:var(--grey);font-weight:700;white-space:nowrap}
-tbody tr{border-bottom:1px solid var(--border)}
-tbody tr:last-child{border-bottom:none}
-tbody tr.lamia{background:#fffbf5}
-tbody td{padding:10px 14px;vertical-align:middle}
-.badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:.7rem;font-weight:700}
-.badge.red{background:var(--red-lt);color:var(--red)}
-.badge.blue{background:var(--blue-lt);color:var(--blue)}
-.badge.green{background:var(--green-lt);color:var(--green)}
-.badge.grey{background:var(--grey-lt);color:var(--grey)}
-.badge.amber{background:var(--amber-lt);color:var(--amber)}
-.star{color:#e67e22}
+/* ── TABLES ──────────────────────────────── */
+.tbl-wrap{overflow-x:auto;margin:14px 0}
+table{border-collapse:collapse;width:100%;font-size:.83rem}
+th{background:#f3f4f6;padding:9px 12px;text-align:left;font-weight:600;
+   border-bottom:2px solid var(--border);color:var(--ink2)}
+td{padding:8px 12px;border-bottom:1px solid #f0f0f0;color:var(--ink2)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafafa}
+.td-r{text-align:right}
+.td-c{text-align:center}
+.red-cell{color:var(--red);font-weight:700}
+.green-cell{color:var(--green);font-weight:600}
+.amber-cell{color:var(--amber);font-weight:600}
 
-/* ── CALLOUT ── */
-.callout{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:20px 24px;margin-bottom:16px;display:flex;gap:16px;align-items:flex-start}
-.callout .icon{font-size:1.5rem;flex-shrink:0;margin-top:2px}
-.callout h4{font-size:.93rem;font-weight:700;margin-bottom:5px}
-.callout p{font-size:.855rem;color:var(--grey)}
-.callout p strong{color:var(--text)}
+/* ── PULLQUOTE ──────────────────────────────── */
+.pull{
+  border-left:4px solid var(--red);background:var(--red-lt);
+  padding:16px 20px;border-radius:0 var(--r) var(--r) 0;
+  margin:24px 0;font-size:.95rem;color:var(--ink2);
+}
+.pull.amber{border-color:var(--amber);background:var(--amber-lt)}
+.pull.blue{border-color:var(--blue);background:var(--blue-lt)}
+.pull.green{border-color:var(--green);background:var(--green-lt)}
 
-/* ── INSIGHT CARD ── */
-.insight-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-bottom:28px}
-.insight{background:#fff;border-radius:var(--radius);padding:22px 24px;box-shadow:var(--shadow);border-left:4px solid var(--border)}
-.insight.red{border-left-color:var(--red)}
-.insight.amber{border-left-color:var(--amber)}
-.insight.blue{border-left-color:var(--blue)}
-.insight.green{border-left-color:var(--green)}
-.insight .i-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.insight .i-icon{font-size:1.3rem}
-.insight h4{font-size:.93rem;font-weight:700}
-.insight p{font-size:.84rem;color:var(--grey);line-height:1.6}
-.insight p strong{color:var(--text)}
-.insight .i-num{font-size:1.5rem;font-weight:900;margin:8px 0 6px}
-.insight.red   .i-num{color:var(--red)}
-.insight.amber .i-num{color:var(--amber)}
-.insight.blue  .i-num{color:var(--blue)}
-.insight.green .i-num{color:var(--green)}
+/* ── TIMELINE ──────────────────────────────── */
+.timeline{list-style:none;padding:0;position:relative}
+.timeline::before{content:'';position:absolute;left:11px;top:4px;bottom:4px;
+                  width:2px;background:var(--border)}
+.timeline li{padding-left:36px;position:relative;margin-bottom:18px}
+.timeline li::before{content:'';position:absolute;left:4px;top:6px;
+                     width:16px;height:16px;border-radius:50%;
+                     background:#fff;border:3px solid var(--border)}
+.timeline li.highlight::before{border-color:var(--red);background:var(--red-lt)}
+.timeline li.ok::before{border-color:var(--green);background:var(--green-lt)}
+.timeline .t-date{font-size:.75rem;color:var(--ink3);font-weight:600;letter-spacing:.5px}
+.timeline .t-event{font-size:.88rem;color:var(--ink2);margin-top:2px}
 
-/* ── TIMELINE ── */
-.timeline{position:relative;padding-left:28px;margin-bottom:28px}
-.timeline::before{content:'';position:absolute;left:8px;top:4px;bottom:4px;width:2px;background:var(--border)}
-.tl-item{position:relative;margin-bottom:20px}
-.tl-item::before{content:'';position:absolute;left:-24px;top:4px;width:12px;height:12px;border-radius:50%;background:#fff;border:2px solid var(--border)}
-.tl-item.red::before{border-color:var(--red);background:var(--red-lt)}
-.tl-item.amber::before{border-color:var(--amber);background:var(--amber-lt)}
-.tl-item.green::before{border-color:var(--green);background:var(--green-lt)}
-.tl-item h4{font-size:.88rem;font-weight:700;margin-bottom:3px}
-.tl-item p{font-size:.82rem;color:var(--grey)}
+/* ── FINDING ──────────────────────────────── */
+.finding{display:flex;gap:16px;align-items:flex-start;
+         padding:18px 20px;border-radius:var(--r);margin-bottom:12px;
+         border:1px solid var(--border);background:var(--card)}
+.finding.red{border-color:#fca5a5;background:#fef2f2}
+.finding.amber{border-color:#fcd34d;background:#fffbeb}
+.finding.green{border-color:#86efac;background:#f0fdf4}
+.finding .icon{font-size:1.4rem;flex-shrink:0;margin-top:2px}
+.finding h4{font-size:.9rem;font-weight:700;margin-bottom:4px;color:var(--ink)}
+.finding p{font-size:.84rem;color:var(--ink2);margin:0}
 
-/* ── RESOURCES ── */
-.res-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:28px}
-.res-card{background:#fff;border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow);text-decoration:none;color:var(--text);transition:box-shadow .2s,transform .15s;display:block;border-top:3px solid var(--border)}
-.res-card:hover{box-shadow:0 4px 20px rgba(0,0,0,.13);transform:translateY(-2px)}
-.res-card.red{border-top-color:var(--red)}
-.res-card.blue{border-top-color:var(--blue)}
-.res-card.green{border-top-color:var(--green)}
-.res-card.grey{border-top-color:var(--grey)}
-.res-card .r-icon{font-size:1.6rem;margin-bottom:10px}
-.res-card h4{font-size:.9rem;font-weight:700;margin-bottom:6px}
-.res-card p{font-size:.8rem;color:var(--grey);line-height:1.5}
-.res-card .r-url{display:inline-block;margin-top:10px;font-size:.75rem;color:var(--blue);font-weight:600}
+/* ── BRIDGE ──────────────────────────────── */
+.bridge{
+  background:linear-gradient(135deg,#0f1b35,#1a2f5a);color:#fff;
+  border-radius:var(--r);padding:22px 26px;margin-top:32px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+}
+.bridge p{font-size:.9rem;color:#a8bfd6;max-width:500px}
+.bridge strong{color:#fff}
+.bridge .nxt{
+  flex-shrink:0;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);
+  color:#fff;padding:10px 18px;border-radius:6px;font-size:.82rem;font-weight:600;
+  cursor:pointer;transition:background .15s;white-space:nowrap;
+}
+.bridge .nxt:hover{background:rgba(255,255,255,.2)}
 
-.code-block{background:#1a1a2e;color:#a8d8ea;border-radius:var(--radius);padding:16px 20px;font-family:'SF Mono',Consolas,monospace;font-size:.8rem;line-height:1.7;margin-bottom:16px;overflow-x:auto}
-.code-block .comment{color:#566573}
-.code-block .cmd{color:#82e0aa}
+/* ── CHART BOX ──────────────────────────────── */
+.chart-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin:20px 0}
+.chart-box{background:var(--card);border:1px solid var(--border);border-radius:var(--r);
+           padding:20px;box-shadow:var(--shadow)}
+.chart-box h4{font-size:.84rem;font-weight:600;color:var(--ink2);margin-bottom:14px}
+.chart-box canvas{max-height:200px}
 
-.method-step{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 22px;margin-bottom:12px;display:flex;gap:14px;align-items:flex-start}
-.method-step .step-num{background:var(--text);color:#fff;font-size:.72rem;font-weight:800;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
-.method-step h4{font-size:.88rem;font-weight:700;margin-bottom:4px}
-.method-step p{font-size:.82rem;color:var(--grey)}
-
-.caveat{background:var(--grey-lt);border-radius:var(--radius);padding:14px 18px;font-size:.8rem;color:var(--grey);margin-top:14px}
-.caveat strong{color:var(--text)}
-
-footer{text-align:center;font-size:.74rem;color:var(--grey);padding:20px;border-top:1px solid var(--border);background:#fff}
+/* ── PROVEN / UNPROVEN BOX ──────────────────────────────── */
+.verdict-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0}
+.verdict{border-radius:var(--r);padding:20px 22px}
+.verdict.yes{background:var(--green-lt);border:1px solid #86efac}
+.verdict.no{background:#f9fafb;border:1px solid var(--border)}
+.verdict h4{font-size:.84rem;font-weight:700;margin-bottom:10px}
+.verdict.yes h4{color:var(--green)}
+.verdict.no h4{color:var(--ink3)}
+.verdict ul{font-size:.82rem;color:var(--ink2);padding-left:18px}
+.verdict ul li{margin-bottom:6px}
 
 @media(max-width:600px){
-  header{padding:28px 20px 24px}
-  header h1{font-size:1.4rem}
-  .pane{padding:20px 14px 48px}
-  .tab-bar{padding:0 8px}
-  .tab-bar li a{padding:12px 12px;font-size:.78rem}
+  header{padding:32px 20px 28px}
+  header h1{font-size:1.5rem}
+  .pane{padding:24px 16px 60px}
+  .verdict-grid{grid-template-columns:1fr}
+  .bridge{flex-direction:column}
 }
 </style>
 </head>
 <body>
 
-<!-- ════════════════════ HEADER ════════════════════ -->
 <header>
-  <div class="kicker">Ανάλυση Δημοσίων Προμηθειών · Διαύγεια OpenData · 2020–2026</div>
-  <h1>Διαφάνεια Προμηθειών στη Λαμία</h1>
-  <p class="sub">Συγκριτική ανάλυση σε δήμο, νοσοκομείο και ΔΕΥΑ έναντι ομότιμων φορέων
-     σε Τρίκαλα, Σέρρες, Καρδίτσα και Κοζάνη — με σταυροεπαλήθευση ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ και αναγνώριση αναδόχων.</p>
-  <div class="meta">
-    <span>📅 Ιανουάριος 2020 – Μάιος 2026</span>
-    <span>🏛️ 14 φορείς</span>
-    <span>📄 ~580.000 αποφάσεις</span>
-    <span>🔍 20.283 ΑΝΑΛΗΨΗ υδατοποιήθηκαν</span>
-    <span>Πηγή: diavgeia.gov.gr · businessportal.gr</span>
+  <div class="kicker">Ανάλυση Δεδομένων Διαύγεια</div>
+  <h1>Προμήθειες στη Λαμία, 2020–2026</h1>
+  <p class="sub">Ανάλυση 90.000+ αποφάσεων για τρεις δημόσιους φορείς: Γενικό Νοσοκομείο, Δήμο Λαμιέων και ΔΕΥΑ Λαμίας — με σταυροεπαλήθευση ομοτίμων, ταυτοποίηση αναδόχων και ανάλυση βάθους ανταγωνισμού.</p>
+  <div class="meta-row">
+    <span class="badge">Πηγή: Διαύγεια OpenData API</span>
+    <span class="badge">Ενημέρωση: Μάιος 2026</span>
+    <span class="badge">90.000+ αποφάσεις · 3 φορείς · 5 ομότιμοι</span>
   </div>
 </header>
 
-<!-- ════════════════════ TAB BAR ════════════════════ -->
-<div class="tab-bar">
+<nav class="chapter-nav">
   <ul>
-    <li><a href="#" class="active" data-tab="overview">🏠 Επισκόπηση</a></li>
-    <li><a href="#" data-tab="hospital">🏥 Νοσοκομεία</a></li>
-    <li><a href="#" data-tab="deyva">💧 ΔΕΥΑ</a></li>
-    <li><a href="#" data-tab="municipality">🏛️ Δήμοι</a></li>
-    <li><a href="#" data-tab="insights">💡 Συμπεράσματα</a></li>
-    <li><a href="#" data-tab="resources">📚 Πηγές & Κώδικας</a></li>
-    <li><a href="#" data-tab="budget">💶 Δαπάνη/Κάτοικο</a></li>
+    <li><a href="#" class="active" data-tab="ch1"><span class="ch-num">Κεφ. 1</span>Το Σήμα</a></li>
+    <li><a href="#" data-tab="ch2"><span class="ch-num">Κεφ. 2</span>Το Νοσοκομείο</a></li>
+    <li><a href="#" data-tab="ch3"><span class="ch-num">Κεφ. 3</span>Οι Ανάδοχοι</a></li>
+    <li><a href="#" data-tab="ch4"><span class="ch-num">Κεφ. 4</span>Ο Δήμος</a></li>
+    <li><a href="#" data-tab="ch5"><span class="ch-num">Κεφ. 5</span>Η ΔΕΥΑ</a></li>
+    <li><a href="#" data-tab="ch6"><span class="ch-num">Κεφ. 6</span>Τι Σημαίνει</a></li>
   </ul>
-</div>
+</nav>
 
-<!-- ════════════════════ PANE: OVERVIEW ════════════════════ -->
-<div class="pane active" id="pane-overview">
+<!-- ═══════════════════════════════════════════════════════
+     ΚΕΦΑΛΑΙΟ 1 — ΤΟ ΣΗΜΑ
+═══════════════════════════════════════════════════════ -->
+<div class="pane active" id="ch1">
 
-  <div class="alert">
-    <strong>Κύριο εύρημα:</strong> Και οι τρεις φορείς της Λαμίας εμφανίζουν ανεξάρτητα ο καθένας
-    υψηλότερη συχνότητα άμεσων αναθέσεων από τους ομότιμούς τους.
-    Το καθαρότερο σήμα: το ΓΝ Τρικάλων ολοκληρώνει ανταγωνιστικές κατακυρώσεις
-    <strong>4,5× πιο συχνά</strong> από το ΓΝ Λαμίας (1.841 vs 407) — παρά το σχεδόν πανομοιότυπο κόστος ανά κατοικό (€246 vs €244).
-    Η δομική αιτία: το ΓΝ Λαμίας δαπανά <strong>€7,34Μ (44,9% του προϋπολογισμού)</strong> σε εξωτερικούς αναδόχους για καθαριότητα/εστίαση/φύλαξη —
-    έναντι €515k (2,6%) για το ΓΝ Τρικάλων που απασχολεί αυτό το προσωπικό απευθείας.
-    Οι μεγάλες αυτές συμβάσεις υπηρεσιών απαιτούν ανταγωνιστικές διαδικασίες· όταν αυτές αποτυγχάνουν, οι ανάδοχοι παγιώνονται.
+  <div class="ch-title">
+    <div class="ch-label">Κεφάλαιο 1 · Η Αφετηρία</div>
+    <h2>Τρεις φορείς, μια πόλη — ένα επαναλαμβανόμενο πρότυπο</h2>
+    <p class="lede">Η ανάλυση ξεκινά από μια απλή παρατήρηση: το Νοσοκομείο, ο Δήμος και η ΔΕΥΑ Λαμίας — τρεις εντελώς ανεξάρτητοι φορείς με διαφορετικές διοικήσεις — εμφανίζουν όλοι ανυψωμένη συχνότητα άμεσων αναθέσεων σε σύγκριση με ομοτίμους τους σε άλλες πόλεις.</p>
   </div>
 
-  <section>
-    <h2><span class="num">1</span>Κύριοι Αριθμοί</h2>
-    <div class="cards">
-      <div class="card red">
-        <div class="label">ΓΝ Λαμίας — Άμεσες Αναθέσεις</div>
-        <div class="value">5.887</div>
-        <div class="sub">έναντι μ.ο. 93 για 4 ομότιμα νοσοκομεία<br><strong>63× υψηλότερο</strong></div>
-      </div>
-      <div class="card red">
-        <div class="label">ΓΝ Λαμίας — Ανταγωνιστικές vs Άμεσες</div>
-        <div class="value">4,5×</div>
-        <div class="sub">ΓΝ Τρικάλων: 1.841 κατακυρώσεις · ΓΝ Λαμίας: 407<br>Outsourcing €7,34Μ = 44,9% προϋπολογισμού</div>
-      </div>
-      <div class="card red">
-        <div class="label">ΔΕΥΑ Λαμίας — Δαπάνη μέσω Άμεσης</div>
-        <div class="value">93,1%</div>
-        <div class="sub">€10,1Μ απευθείας / €10,8Μ σύνολο<br>ΔΕΥΑ Καρδίτσας: 14,4%</div>
-      </div>
-      <div class="card blue">
-        <div class="label">Δήμος — Άμεσες Αναθέσεις</div>
-        <div class="value">10.388</div>
-        <div class="sub">16,1% των αποφάσεων<br>Και υψηλότερη ανταγωνιστική δαπάνη (€34Μ)</div>
-      </div>
-    </div>
-  </section>
-
-  <section>
-    <h2><span class="num">2</span>Το Πρότυπο ανά Φορέα</h2>
-    <div class="chart-box" style="margin-bottom:18px">
-      <h3>Ποσοστό Άμεσης Ανάθεσης (% επί συνόλου αποφάσεων) — όλοι οι φορείς</h3>
-      <canvas id="crossRate" style="max-height:270px"></canvas>
-    </div>
-    <div class="callout">
-      <div class="icon">🔗</div>
-      <div>
-        <h4>Συστημικό Πρότυπο — Όχι Μεμονωμένο Περιστατικό</h4>
-        <p>Το ίδιο σήμα εμφανίζεται ανεξάρτητα σε τρεις νομικά αυτοτελείς οντότητες:
-           δήμο (16,1%), νοσοκομείο (11,6%) και ΔΕΥΑ (11,6%).
-           Κανένας διοικητικός μηχανισμός δεν επιβάλλει και στους τρεις τις ίδιες επιλογές στις προμήθειες.
-           Η συνέπεια του σήματος σε ανεξάρτητους φορείς υποδηλώνει
-           <strong>συστημικό χαρακτηριστικό</strong> του τοπικού περιβάλλοντος προμηθειών.</p>
-      </div>
-    </div>
-  </section>
-
-  <section>
-    <h2><span class="num">3</span>Σύγκριση Δαπανών — Νοσοκομεία & ΔΕΥΑ</h2>
-    <div class="chart-grid">
-      <div class="chart-box">
-        <h3>Άμεσες vs Ανταγωνιστικές Αναθέσεις — Νοσοκομεία</h3>
-        <canvas id="hospDvC"></canvas>
-      </div>
-      <div class="chart-box">
-        <h3>% Δαπάνης μέσω Άμεσης Ανάθεσης — ΔΕΥΑ</h3>
-        <canvas id="deyvaPct"></canvas>
-      </div>
-    </div>
-  </section>
-
-</div><!-- /pane-overview -->
-
-<!-- ════════════════════ PANE: HOSPITAL ════════════════════ -->
-<div class="pane" id="pane-hospital">
-
-  <div class="alert">
-    <strong>Το πιο εντυπωσιακό εύρημα:</strong> Το ΓΝ Λαμίας εκδίδει 5.887 άμεσες αναθέσεις —
-    31× περισσότερες από το ΓΝ Τρικάλων (187), φορέα ίδιου μεγέθους, ίδιου τύπου, ίδιου νομικού πλαισίου.
-    Το ΓΝ Τρικάλων προτιμά τον ανταγωνισμό: 1.841 κατακυρώσεις έναντι 187 άμεσων.
-  </div>
-
-  <section>
-    <h2><span class="num">1</span>Αριθμοί Αποφάσεων 2020–2026</h2>
-    <div class="chart-grid">
-      <div class="chart-box">
-        <h3>Άμεσες Αναθέσεις (Δ.1) — σύνολο 2020–2026</h3>
-        <canvas id="hospDirectCount"></canvas>
-      </div>
-      <div class="chart-box">
-        <h3>Άμεσες vs Ανταγωνιστικές ανά Νοσοκομείο</h3>
-        <canvas id="hospStack"></canvas>
-      </div>
-    </div>
-
+  <div class="section">
+    <h3>Η καθαρότερη μέτρηση: ΚΑΤΑΚΥΡΩΣΗ ανταγωνιστικών αναθέσεων</h3>
+    <p class="prose" style="margin-bottom:16px">Η απόφαση τύπου <strong>ΚΑΤΑΚΥΡΩΣΗ</strong> (ανάδειξη αναδόχου μετά από ανοικτό διαγωνισμό) είναι η πιο αξιόπιστη μέτρηση ανταγωνιστικής προμήθειας — δεν επηρεάζεται από κωδικολογικές αμφισημίες που αφορούν τις ΑΝΑΘΕΣΗ. Το ΓΝ Τρικάλων, νοσοκομείο αντίστοιχης κλίμακας με το ΓΝ Λαμίας, ολοκληρώνει ανταγωνιστικές κατακυρώσεις <strong>4,5 φορές πιο συχνά</strong>.</p>
     <div class="tbl-wrap">
       <table>
-        <thead>
-          <tr>
-            <th>Νοσοκομείο</th>
-            <th>Σύνολο Αποφ.</th>
-            <th>Άμεσες (Δ.1)</th>
-            <th>Ποσοστό</th>
-            <th>Ανταγωνιστικές (Δ.2.2)</th>
-            <th>Αναλογία</th>
-            <th>Γνωστή δαπάνη άμεσων</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr class="lamia">
-            <td><strong>ΓΝ Λαμίας</strong> <span class="star">★</span></td>
-            <td>50.729</td>
-            <td><strong>5.887</strong></td>
-            <td><span class="badge red">11,6%</span></td>
-            <td>407</td>
-            <td><span class="badge red">14,5× άμεσες/ανταγ.</span></td>
-            <td><strong>€215,5Μ</strong> <span class="badge amber" title="Περιλαμβάνει €132,8Μ από βήματα ανταγωνιστικών διαδικασιών — βλ. σημ.">⚠️ αναθ. αθρ.</span></td>
-          </tr>
-          <tr>
-            <td>ΓΝ Τρικάλων</td>
-            <td>65.992</td>
-            <td>187</td>
-            <td><span class="badge green">0,3%</span></td>
-            <td><strong>1.841</strong></td>
-            <td><span class="badge green">0,1×</span></td>
-            <td><em>εκκρεμεί hydration</em></td>
-          </tr>
-          <tr>
-            <td>ΓΝ Σερρών</td>
-            <td>25.764</td>
-            <td>184</td>
-            <td><span class="badge green">0,7%</span></td>
-            <td>82</td>
-            <td><span class="badge blue">2,2×</span></td>
-            <td>€0,3Μ (7% κάλυψη)</td>
-          </tr>
-          <tr>
-            <td>ΓΝ Καρδίτσας</td>
-            <td>37.166</td>
-            <td colspan="4"><span class="badge grey">Χρησιμοποιεί Β-τύπους αποφάσεων — διαφορετική κωδικοποίηση, μη συγκρίσιμο απευθείας</span></td>
-            <td>—</td>
-          </tr>
-          <tr>
-            <td>ΓΝ Κοζάνης</td>
-            <td>35.381</td>
-            <td colspan="4"><span class="badge grey">Χρησιμοποιεί Β-τύπους αποφάσεων — διαφορετική κωδικοποίηση, μη συγκρίσιμο απευθείας</span></td>
-            <td>—</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <section>
-    <h2><span class="num">2</span>Ετήσια Εξέλιξη Άμεσων Αναθέσεων</h2>
-    <div class="chart-box">
-      <h3>Άμεσες Αναθέσεις ανά Έτος — Νοσοκομεία</h3>
-      <canvas id="hospYearly" style="max-height:230px"></canvas>
-    </div>
-  </section>
-
-  <section>
-    <h2><span class="num">3</span>Η «Αναστροφή Τρικάλων»</h2>
-    <div class="callout">
-      <div class="icon">🔄</div>
-      <div>
-        <h4>Ίδιο νομικό πλαίσιο, αντίθετη επιλογή</h4>
-        <p>Το ΓΝ Τρικάλων εξυπηρετεί πόλη ~81.000 κατοίκων (έναντι ~75.000 για τη Λαμία),
-           είναι ίδιου τύπου Γενικό Νοσοκομείο και λειτουργεί βάσει ίδιων εθνικών κανόνων
-           δημοσίων συμβάσεων. Παρ' όλα αυτά, η επιλογή είναι <strong>εντελώς αντίστροφη</strong>:
-           το ΓΝ Τρικάλων εκδίδει 1.841 ανταγωνιστικές κατακυρώσεις και μόλις 187 άμεσες αναθέσεις,
-           ενώ το ΓΝ Λαμίας εκδίδει 5.887 άμεσες και μόλις 407 κατακυρώσεις.
-           Το ίδιο νομικό πλαίσιο παράγει αντίθετη συμπεριφορά — η διαφορά είναι επιλογή, όχι ανάγκη.</p>
-      </div>
-    </div>
-    <div class="callout">
-      <div class="icon">💰</div>
-      <div>
-        <h4>Το οικονομικό μέγεθος — μετά έλεγχο ποιότητας</h4>
-        <p>Από τις 5.887 αποφάσεις τύπου ΑΝΑΘΕΣΗ, ταξινόμηση κατά θέμα δείχνει:
-           <strong>86,3% (5.081)</strong> είναι ειδικές προμήθειες ασθενών ή μικρές αγορές (€82,3Μ) ·
-           <strong>12,6% (739)</strong> είναι διαδικαστικές αποφάσεις επιτροπών <em>ανταγωνιστικών</em> διαγωνισμών, φέρουν εκτιμώμενη αξία €132,8Μ αλλά δεν αποτελούν απευθείας αναθέσεις.
-           Επιπλέον, μεγάλες διαπραγματευτικές συμβάσεις (π.χ. UNISON καθαριότητα €3,2Μ κατ' άρθρο 32§2γ)
-           κωδικοποιούνται ως ΑΝΑΘΕΣΗ αλλά είναι νομικά διαφορετικές. Η πιο αξιόπιστη σύγκριση είναι
-           η αναλογία ΚΑΤΑΚΥΡΩΣΗΣ: ΓΝ Τρικάλων εκδίδει ανταγωνιστικές κατακυρώσεις
-           <strong>4,5× πιο συχνά</strong> από το ΓΝ Λαμίας (1.841 vs 407).</p>
-      </div>
-    </div>
-
-    <div class="callout">
-      <div class="icon">🔎</div>
-      <div>
-        <h4>Ανάλυση Προμηθευτών — Αποτελέσματα (Μάιος 2026)</h4>
-        <p>Εντοπίστηκαν 55 μοναδικοί προμηθευτές στις ΚΑΤΑΚΥΡΩΣΕΙΣ του ΓΝ Λαμίας · <strong>53 αναγνωρίστηκαν
-           μέσω ΓΕΜΗ</strong>: όλοι εταιρείες ιατρικού εξοπλισμού/φαρμάκων (Abbott, bioMérieux, Baxter, κ.ά.).
-           Κανένας ανώμαλος ή μη-ιατρικός προμηθευτής στο ανταγωνιστικό κανάλι.
-           <strong>76% (42/55)</strong> εμφανίζονται και σε ΑΝΑΘΕΣΗ — αναμενόμενο, τα ποσά ΑΝΑΘΕΣΗ για
-           αυτούς είναι εντός ορίου (μ.ο. €13.100/ανάθεση).</p>
-        <p style="margin-top:8px"><strong>ΔΕΥΑ Λαμίας:</strong> 310 μοναδικοί προμηθευτές σε 2.840 αναθέσεις —
-           καμία συγκέντρωση. Ο πιο συχνός προμηθευτής: 17 αναθέσεις, σύνολο ~€14.000 σε 6 χρόνια.</p>
-      </div>
-    </div>
-
-    <div class="callout">
-      <div class="icon">📊</div>
-      <div>
-        <h4>Σταυροεπαλήθευση Οικονομικών Στοιχείων — Ολοκληρώθηκε (Μάιος 2026)</h4>
-        <p>Απολογισμός εκτέλεσης προϋπολογισμού 2024 (ΑΔΑ <code>9ΤΥΕ4690ΒΜ-69Α</code>):
-           σύνολο προμηθειών €18,28Μ · outsourcing (καθαριότητα/εστίαση/security) <strong>€7,34Μ = 44,9%</strong> του συνόλου.</p>
-        <p style="margin-top:8px">Εξέλιξη ΚΑΤΑΚΥΡΩΣΕΩΝ ως ποσοστό πραγματικής προμηθευτικής δαπάνης:</p>
-        <table style="font-size:.78rem;border-collapse:collapse;margin-top:6px;width:100%">
-          <thead><tr style="background:#f5f5f5">
-            <th style="padding:4px 8px;border:1px solid #e0e0e0;text-align:left">Έτος</th>
-            <th style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right">Σύνολο (ΙΣΟΛ.)</th>
-            <th style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right">ΚΑΤΑΚ. (Διαύγεια)</th>
-            <th style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right">% ανταγ.</th>
-          </tr></thead>
-          <tbody>
-            <tr><td style="padding:4px 8px;border:1px solid #e0e0e0">2020</td><td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right">€18,6Μ</td><td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right">€3,8Μ</td><td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right">20,4%</td></tr>
-            <tr><td style="padding:4px 8px;border:1px solid #e0e0e0">2021</td><td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right">€26,7Μ</td><td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right">€1,2Μ</td><td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right;color:#888">4,6%*</td></tr>
-            <tr><td style="padding:4px 8px;border:1px solid #e0e0e0">2022</td><td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right">€28,3Μ</td><td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right">€7,0Μ</td><td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right">24,9%</td></tr>
-            <tr><td style="padding:4px 8px;border:1px solid #e0e0e0">2023</td><td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right">€26,5Μ</td><td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right">€11,7Μ</td><td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right">44,2%</td></tr>
-            <tr style="background:#f0fff4"><td style="padding:4px 8px;border:1px solid #e0e0e0"><strong>2024</strong></td><td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right"><strong>€18,3Μ</strong></td><td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right"><strong>€13,4Μ</strong></td><td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right"><strong>73,5%</strong></td></tr>
-          </tbody>
-        </table>
-        <p style="margin-top:8px;font-size:.8rem;color:#666">*2021 υποεκτιμημένο λόγω ελλιπούς hydration. Το 2024 υποτιμάται κατά ~€8,9Μ λόγω ΕΚΑΠΥ κεντρικών φαρμακευτικών προμηθειών.
-        <br><strong>Ληξιπρόθεσμα υπόλοιπα τέλος 2024: €19,7Μ</strong> (φάρμακα €8,0Μ, υπηρεσίες/υλικά €8,2Μ).</p>
-        <p style="margin-top:8px"><strong>Διαπίστωση:</strong> Τα ποσά ΑΝΑΘΕΣΗ στη Διαύγεια (€33–51Μ/έτος) υπερεκτιμούν κατά πολύ την πραγματική δαπάνη (€18–28Μ/έτος) — επιβεβαιώνεται το πρόβλημα κωδικοποίησης. Οι ΚΑΤΑΚΥΡΩΣΕΙΣ ως ποσοστό πραγματικής δαπάνης αυξήθηκαν από 20% (2020) σε <strong>73,5% (2024)</strong>.</p>
-      </div>
-    </div>
-
-    <div class="callout">
-      <div class="icon">⚖️</div>
-      <div>
-        <h4>Σύγκριση ανά κατοικό — ΓΝ Λαμίας vs ΓΝ Τρικάλων 2024</h4>
-        <p style="margin-bottom:6px">Πηγές: ΓΝ Λαμίας ΑΔΑ <code>9ΤΥΕ4690ΒΜ-69Α</code> · ΓΝ Τρικάλων ΑΔΑ <code>Ψ4ΤΜ46907Φ-ΠΟΙ</code> (01/01–31/12/2024).
-        Πληθυσμός: Λαμία 75.000 · Τρίκαλα 81.000.</p>
-
-        <!-- Scale & medical supplies table -->
-        <table style="font-size:.77rem;border-collapse:collapse;width:100%;margin-top:4px">
-          <thead>
-            <tr style="background:#f0f4f8">
-              <th style="padding:5px 8px;border:1px solid #d0d8e4;text-align:left">Κατηγορία</th>
-              <th style="padding:5px 8px;border:1px solid #d0d8e4;text-align:right">ΓΝ Λαμίας</th>
-              <th style="padding:5px 8px;border:1px solid #d0d8e4;text-align:right">€/κατ.</th>
-              <th style="padding:5px 8px;border:1px solid #d0d8e4;text-align:right">% συν.</th>
-              <th style="padding:5px 8px;border:1px solid #d0d8e4;text-align:right">ΓΝ Τρικάλων</th>
-              <th style="padding:5px 8px;border:1px solid #d0d8e4;text-align:right">€/κατ.</th>
-              <th style="padding:5px 8px;border:1px solid #d0d8e4;text-align:right">% συν.</th>
-              <th style="padding:5px 8px;border:1px solid #d0d8e4;text-align:center">Δείκτης</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Medical supplies -->
-            <tr style="background:#f9f9f9"><td colspan="8" style="padding:3px 8px;border:1px solid #d0d8e4;font-weight:600;font-size:.73rem;color:#555;letter-spacing:.04em">ΙΑΤΡΙΚΕΣ ΠΡΟΜΗΘΕΙΕΣ (συγκρίσιμα KAE)</td></tr>
-            <tr>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0">Φάρμακα</td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right">€1.703.137</td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right">€22,7</td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right;color:#888">9,3%</td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right">€2.230.497</td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right">€27,5</td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right;color:#888">11,2%</td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:center">↑ 1,21×</td>
-            </tr>
-            <tr style="background:#fafafa">
-              <td style="padding:4px 8px;border:1px solid #e0e0e0">Υγειονομικό υλικό</td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right">€2.805.230</td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right">€37,4</td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right;color:#888">15,3%</td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right">€2.682.376</td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right">€33,1</td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right;color:#888">13,5%</td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:center">≈ 0,89×</td>
-            </tr>
-            <tr>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0">Ορθοπεδικό υλικό</td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right">€1.068.996</td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right">€14,3</td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right;color:#888">5,8%</td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right">€695.677</td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right">€8,6</td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right;color:#888">3,5%</td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:center">↓ 0,60×</td>
-            </tr>
-            <tr style="background:#fafafa">
-              <td style="padding:4px 8px;border:1px solid #e0e0e0">Χημικά / αντιδραστήρια</td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right">€1.432.384</td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right">€19,1</td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right;color:#888">7,8%</td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right">€1.187.724</td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right">€14,7</td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right;color:#888">6,0%</td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:center">↓ 0,77×</td>
-            </tr>
-            <tr style="background:#eef4fb;font-weight:600">
-              <td style="padding:4px 8px;border:1px solid #d0d8e4">Σύνολο ιατρ. προμηθειών</td>
-              <td style="padding:4px 8px;border:1px solid #d0d8e4;text-align:right">€7.009.747</td>
-              <td style="padding:4px 8px;border:1px solid #d0d8e4;text-align:right">€93,5</td>
-              <td style="padding:4px 8px;border:1px solid #d0d8e4;text-align:right">38,3%</td>
-              <td style="padding:4px 8px;border:1px solid #d0d8e4;text-align:right">€6.796.274</td>
-              <td style="padding:4px 8px;border:1px solid #d0d8e4;text-align:right">€83,9</td>
-              <td style="padding:4px 8px;border:1px solid #d0d8e4;text-align:right">34,1%</td>
-              <td style="padding:4px 8px;border:1px solid #d0d8e4;text-align:center">≈ 0,90×</td>
-            </tr>
-            <!-- Labor model -->
-            <tr style="background:#f9f9f9"><td colspan="8" style="padding:3px 8px;border:1px solid #d0d8e4;font-weight:600;font-size:.73rem;color:#555;letter-spacing:.04em">ΜΟΝΤΕΛΟ ΕΡΓΑΣΙΑΣ — ΔΟΜΙΚΗ ΔΙΑΦΟΡΑ</td></tr>
-            <tr>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0">Μισθοδοσία (ίδιοι πόροι)</td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right">€3.064.252</td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right">€41</td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right;color:#888">16,8%</td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right">€5.164.517</td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right">€64</td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right;color:#888">26,0%</td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:center">—</td>
-            </tr>
-            <tr style="background:#fff8e1">
-              <td style="padding:4px 8px;border:1px solid #e0e0e0"><strong>Εξωτερ. ανάδοχοι (καθ/σία, εστίαση, φύλαξη)</strong></td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right"><strong>€7.342.516</strong></td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right"><strong>€98</strong></td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right"><strong>40,2%</strong></td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right"><strong>~€515.434</strong></td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right"><strong>€6</strong></td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:right"><strong>2,6%</strong></td>
-              <td style="padding:4px 8px;border:1px solid #e0e0e0;text-align:center;color:#c0392b"><strong>15×</strong></td>
-            </tr>
-            <!-- Total -->
-            <tr style="background:#f0f4f8;font-weight:600">
-              <td style="padding:5px 8px;border:1px solid #d0d8e4">ΣΥΝΟΛΟ ΠΛΗΡΩΜΩΝ</td>
-              <td style="padding:5px 8px;border:1px solid #d0d8e4;text-align:right">€18.281.282</td>
-              <td style="padding:5px 8px;border:1px solid #d0d8e4;text-align:right">€244</td>
-              <td style="padding:5px 8px;border:1px solid #d0d8e4;text-align:right">100%</td>
-              <td style="padding:5px 8px;border:1px solid #d0d8e4;text-align:right">€19.899.933</td>
-              <td style="padding:5px 8px;border:1px solid #d0d8e4;text-align:right">€246</td>
-              <td style="padding:5px 8px;border:1px solid #d0d8e4;text-align:right">100%</td>
-              <td style="padding:5px 8px;border:1px solid #d0d8e4;text-align:center">≈ 1,01×</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div style="margin-top:10px;padding:8px 12px;background:#fff3cd;border-left:3px solid #f0ad4e;border-radius:3px;font-size:.8rem">
-          <strong>Βασικό συμπέρασμα:</strong> Τα δύο νοσοκομεία έχουν σχεδόν <strong>πανομοιότυπο συνολικό κόστος ανά κατοικό</strong> (€244 vs €246) — επιβεβαιώνεται η συγκρισιμότητά τους. Οι κλινικές προμήθειες (φάρμακα, υλικά, αντιδραστήρια) είναι εντός 10% σε ανά-κατοικό βάση. Η <strong>δομική διαφορά</strong> βρίσκεται στο μοντέλο εργασίας: το ΓΝ Λαμίας διαθέτει €7,34Μ (40,2% του προϋπολογισμού) σε εξωτερικούς αναδόχους για καθαριότητα / εστίαση / φύλαξη, έναντι ~€515k (2,6%) για το ΓΝ Τρικάλων που ενσωματώνει αυτές τις υπηρεσίες στο μισθολόγιο. Το outsourcing μοντέλο δημιουργεί <strong>μεγάλες συμβάσεις που χρειάζονται ανταγωνιστικές διαδικασίες</strong> — και η περίπτωση UNISON δείχνει τι συμβαίνει όταν αυτές δεν διεξάγονται αποτελεσματικά.
-        </div>
-
-        <p style="margin-top:8px;font-size:.78rem;color:#666">
-          <em>Σημ.</em> ΓΝ Τρικάλων outsourcing = KAE 043.9xx (λοιπές αμοιβές ΝΠ) €306k + KAE 151.xxx (τρόφιμα in-house εστίασης) €209k.
-          Μισθοδοσία Τρικάλων: KAE 021-029, περιλαμβάνει ΙΔΟΧ προσωπικό καθαριότητας.
-          Αμφότερα νοσοκομεία λαμβάνουν πρόσθετη κεντρική επιχορήγηση (5η ΥΠΕ) για ιατρονοσηλευτικό προσωπικό — δεν περιλαμβάνεται στους παραπάνω αριθμούς.
-          ΚΑΤΑΚΥΡΩΣΕΙΣ / ΑΝΑΘΕΣΕΙΣ: Διαύγεια 2020–2026.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <section>
-    <h2><span class="num">4</span>ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ Cross-Check &amp; Ανάλυση KAE (A3, πλήρης)</h2>
-    <p style="font-size:.85rem;color:#444;margin-bottom:10px">
-      Σύνολο 20.283 αποφάσεων ΑΝΑΛΗΨΗ υδατοποιήθηκαν από το Diavgeia. Κάλυψη ποσών: 95,8%.
-      Χρονική περίοδος: 2020–2026.
-    </p>
-
-    <div style="overflow-x:auto;margin-bottom:16px">
-      <table style="border-collapse:collapse;font-size:.82rem;width:100%">
-        <thead><tr style="background:#f0f4fb">
-          <th style="padding:5px 10px;border:1px solid #d0d8e4;text-align:left">Έτος</th>
-          <th style="padding:5px 10px;border:1px solid #d0d8e4;text-align:right">ΑΝΑΛΗΨΗ σύνολο</th>
-          <th style="padding:5px 10px;border:1px solid #d0d8e4;text-align:right">n αποφ.</th>
-          <th style="padding:5px 10px;border:1px solid #d0d8e4;text-align:right">Επίσημες πληρωμές</th>
-          <th style="padding:5px 10px;border:1px solid #d0d8e4;text-align:right">Λόγος</th>
+        <thead><tr>
+          <th>Φορέας</th><th>Τύπος</th>
+          <th class="td-r">ΑΝΑΘΕΣΗ (απευθείας)</th>
+          <th class="td-r">ΚΑΤΑΚΥΡΩΣΗ (ανταγ.)</th>
+          <th class="td-r">Αναλογία</th>
         </tr></thead>
         <tbody>
-          <tr><td style="padding:4px 10px;border:1px solid #e0e0e0">2020</td><td style="padding:4px 10px;border:1px solid #e0e0e0;text-align:right">€45.342.488</td><td style="padding:4px 10px;border:1px solid #e0e0e0;text-align:right">3.421</td><td style="padding:4px 10px;border:1px solid #e0e0e0;text-align:right">€18.594.371</td><td style="padding:4px 10px;border:1px solid #e0e0e0;text-align:right">2,44×</td></tr>
-          <tr style="background:#f9f9f9"><td style="padding:4px 10px;border:1px solid #e0e0e0">2021</td><td style="padding:4px 10px;border:1px solid #e0e0e0;text-align:right">€66.115.964</td><td style="padding:4px 10px;border:1px solid #e0e0e0;text-align:right">3.396</td><td style="padding:4px 10px;border:1px solid #e0e0e0;text-align:right">€26.703.546</td><td style="padding:4px 10px;border:1px solid #e0e0e0;text-align:right">2,48×</td></tr>
-          <tr><td style="padding:4px 10px;border:1px solid #e0e0e0">2022</td><td style="padding:4px 10px;border:1px solid #e0e0e0;text-align:right">€97.914.658</td><td style="padding:4px 10px;border:1px solid #e0e0e0;text-align:right">3.169</td><td style="padding:4px 10px;border:1px solid #e0e0e0;text-align:right">€28.274.078</td><td style="padding:4px 10px;border:1px solid #e0e0e0;text-align:right">3,46×</td></tr>
-          <tr style="background:#f9f9f9"><td style="padding:4px 10px;border:1px solid #e0e0e0">2023</td><td style="padding:4px 10px;border:1px solid #e0e0e0;text-align:right">€100.230.501</td><td style="padding:4px 10px;border:1px solid #e0e0e0;text-align:right">3.150</td><td style="padding:4px 10px;border:1px solid #e0e0e0;text-align:right">€26.467.809</td><td style="padding:4px 10px;border:1px solid #e0e0e0;text-align:right">3,79×</td></tr>
-          <tr><td style="padding:4px 10px;border:1px solid #e0e0e0"><strong>2024</strong></td><td style="padding:4px 10px;border:1px solid #e0e0e0;text-align:right"><strong>€93.525.451</strong></td><td style="padding:4px 10px;border:1px solid #e0e0e0;text-align:right"><strong>2.755</strong></td><td style="padding:4px 10px;border:1px solid #e0e0e0;text-align:right"><strong>€18.281.282</strong></td><td style="padding:4px 10px;border:1px solid #e0e0e0;text-align:right;color:#c62828"><strong>5,11×</strong></td></tr>
-          <tr style="background:#f9f9f9"><td style="padding:4px 10px;border:1px solid #e0e0e0;color:#666">2025</td><td style="padding:4px 10px;border:1px solid #e0e0e0;text-align:right;color:#666">€106.236.469†</td><td style="padding:4px 10px;border:1px solid #e0e0e0;text-align:right;color:#666">2.595</td><td style="padding:4px 10px;border:1px solid #e0e0e0;text-align:right;color:#666">—</td><td style="padding:4px 10px;border:1px solid #e0e0e0;text-align:right;color:#666">—</td></tr>
+          <tr><td><strong>ΓΝ Λαμίας</strong></td><td>Νοσοκομείο</td>
+              <td class="td-r">5.887</td><td class="td-r">407</td>
+              <td class="td-r red-cell">14,5 : 1</td></tr>
+          <tr><td>ΓΝ Τρικάλων</td><td>Νοσοκομείο (σύγκριση)</td>
+              <td class="td-r">187</td><td class="td-r">1.841</td>
+              <td class="td-r green-cell">0,1 : 1</td></tr>
+          <tr><td>ΓΝ Σερρών</td><td>Νοσοκομείο</td>
+              <td class="td-r">184</td><td class="td-r">82</td>
+              <td class="td-r">2,2 : 1</td></tr>
+          <tr style="border-top:2px solid var(--border)">
+              <td><strong>Δήμος Λαμίας</strong></td><td>ΟΤΑ</td>
+              <td class="td-r">10.388 (16,1%)</td><td class="td-r">—</td>
+              <td class="td-r amber-cell">υψηλότερος από ομ.</td></tr>
+          <tr><td><strong>ΔΕΥΑ Λαμίας</strong></td><td>Νομικό Πρόσωπο</td>
+              <td class="td-r">2.840 (11,6%)</td><td class="td-r">—</td>
+              <td class="td-r amber-cell">4,9× πάνω από μ.ο.</td></tr>
         </tbody>
       </table>
-      <p style="font-size:.74rem;color:#777;margin-top:4px">† Περιλαμβάνει €26,3Μ αρχειακής αναδημοσίευσης (budget 2011 δημοσιεύτηκε 2025). Εξαιρουμένης: €79,9Μ.</p>
+    </div>
+    <p class="prose" style="margin-top:14px"><span class="note">Σημ.: 739 από τις 5.887 ΑΝΑΘΕΣΗ του ΓΝ Λαμίας είναι αποφάσεις επιτροπών εντός ανταγωνιστικών διαδικασιών (κωδικολογικό artifact). Ακόμα και μετά την αφαίρεσή τους, η αναλογία παραμένει ~27×.</span></p>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="n red">4,5×</div>
+      <div class="label">Περισσότερες ανταγωνιστικές κατακυρώσεις στο ΓΝ Τρικάλων vs ΓΝ Λαμίας (1.841 vs 407)</div>
+    </div>
+    <div class="stat">
+      <div class="n amber">3 / 3</div>
+      <div class="label">Ανεξάρτητοι φορείς με ανυψωμένες άμεσες αναθέσεις — Νοσοκομείο, Δήμος, ΔΕΥΑ</div>
+    </div>
+    <div class="stat">
+      <div class="n blue">90.000+</div>
+      <div class="label">Αποφάσεις αναλύθηκαν από Διαύγεια, 2020–2026</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Γιατί αυτό είναι σημαντικό</h3>
+    <div class="prose">
+      <p>Τα τρία αυτά νομικά πρόσωπα δεν έχουν κοινή διοίκηση, κοινά όργανα ή κοινό προϋπολογισμό. Το γεγονός ότι και τα τρία ανεξάρτητα εμφανίζουν το ίδιο πρότυπο δεν εξηγείται από ατομικές αποφάσεις — υποδηλώνει κάτι δομικό στο τοπικό οικοσύστημα προμηθειών.</p>
+      <p>Σε αυτή την ανάλυση <strong>ξεκινάμε από το σήμα και αναζητούμε την εξήγηση</strong>. Σε κάθε κεφάλαιο που ακολουθεί εξετάζουμε έναν φορέα σε βάθος — τι οδηγεί τα νούμερα, ποιοι είναι οι ανάδοχοι, και τι μπορεί τεκμηριωμένα να λεχθεί.</p>
+    </div>
+  </div>
+
+  <div class="bridge">
+    <div>
+      <p><strong>Επόμενο:</strong> Το Νοσοκομείο — γιατί το ΓΝ Λαμίας έχει 14,5× περισσότερες άμεσες αναθέσεις από το ΓΝ Τρικάλων, παρά σχεδόν πανομοιότυπο συνολικό κόστος ανά κατοικό;</p>
+    </div>
+    <button class="nxt" onclick="goTab('ch2')">Κεφ. 2: Το Νοσοκομείο →</button>
+  </div>
+
+</div><!-- /ch1 -->
+
+<!-- ═══════════════════════════════════════════════════════
+     ΚΕΦΑΛΑΙΟ 2 — ΤΟ ΝΟΣΟΚΟΜΕΙΟ
+═══════════════════════════════════════════════════════ -->
+<div class="pane" id="ch2">
+
+  <div class="ch-title">
+    <div class="ch-label">Κεφάλαιο 2 · Το Νοσοκομείο</div>
+    <h2>Ίδιο συνολικό κόστος, εντελώς διαφορετικό μοντέλο εργασίας</h2>
+    <p class="lede">Το ΓΝ Λαμίας και το ΓΝ Τρικάλων ξοδεύουν σχεδόν το ίδιο ποσό ανά κατοικό (€244 vs €246 το 2024). Η διαφορά δεν είναι στο <em>πόσο</em> ξοδεύουν — είναι στο <em>πώς</em>. Ένα νοσοκομείο απασχολεί τις βοηθητικές υπηρεσίες απευθείας. Το άλλο τις αναθέτει σε εξωτερικούς αναδόχους. Αυτή η δομική επιλογή εξηγεί όλα τα επόμενα.</p>
+  </div>
+
+  <div class="section">
+    <h3>Η κρίσιμη σύγκριση: πού πηγαίνουν τα χρήματα</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>Κατηγορία δαπάνης (2024)</th>
+          <th class="td-r">ΓΝ Λαμίας</th><th class="td-r">€/κατ.</th>
+          <th class="td-r">ΓΝ Τρικάλων</th><th class="td-r">€/κατ.</th>
+          <th class="td-r">Δείκτης</th>
+        </tr></thead>
+        <tbody>
+          <tr><td><strong>Σύνολο</strong></td>
+              <td class="td-r"><strong>€18,28Μ</strong></td><td class="td-r">€244</td>
+              <td class="td-r"><strong>€19,9Μ</strong></td><td class="td-r">€246</td>
+              <td class="td-r green-cell">≈ 1,0×</td></tr>
+          <tr><td>Ιατρικές προμήθειες (φάρμακα, υλικά, αντιδρ.)</td>
+              <td class="td-r">€7,01Μ</td><td class="td-r">€93,5</td>
+              <td class="td-r">€6,80Μ</td><td class="td-r">€83,9</td>
+              <td class="td-r">≈ 0,9×</td></tr>
+          <tr><td>Μισθοδοσία (ίδιοι πόροι)</td>
+              <td class="td-r">€3,06Μ</td><td class="td-r">€41</td>
+              <td class="td-r">€5,16Μ</td><td class="td-r">€64</td>
+              <td class="td-r">—</td></tr>
+          <tr style="background:#fef2f2">
+              <td><strong>⚑ Εξωτερ. ανάδοχοι (καθ/σία, εστίαση, φύλαξη)</strong></td>
+              <td class="td-r red-cell"><strong>€7,34Μ</strong></td><td class="td-r red-cell"><strong>€98</strong></td>
+              <td class="td-r green-cell"><strong>~€515k</strong></td><td class="td-r green-cell"><strong>€6</strong></td>
+              <td class="td-r red-cell"><strong>15×</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="prose" style="margin-top:14px"><span class="note">Το ΓΝ Τρικάλων απασχολεί καθαρίστριες, τραπεζοκόμους και φύλακες στο μισθολόγιό του (εμφανίζονται στη γραμμή Μισθοδοσία). Το ΓΝ Λαμίας έχει αναθέσει και τις τρεις υπηρεσίες σε εξωτερικούς αναδόχους. Ούτε μοντέλο είναι παράνομο — αλλά έχουν εντελώς διαφορετικές προμηθευτικές συνέπειες.</span></p>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="n red">€7,34M</div>
+      <div class="label">Outsourcing ΓΝ Λαμίας 2024 — 44,9% του συνολικού προϋπολογισμού</div>
+    </div>
+    <div class="stat">
+      <div class="n red">15×</div>
+      <div class="label">Περισσότερο δαπανά το ΓΝ Λαμίας σε εξωτερικούς αναδόχους vs ΓΝ Τρικάλων (€98/κατ. vs €6/κατ.)</div>
+    </div>
+    <div class="stat">
+      <div class="n blue">73,5%</div>
+      <div class="label">Μερίδιο ανταγ. κατακυρώσεων στο σύνολο δαπανών 2024 (vs 20% το 2020) — αυξητική τάση</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Γιατί το outsourcing μοντέλο δημιουργεί το σήμα</h3>
+    <div class="prose">
+      <p>Κάθε φορά που τελειώνει μια σύμβαση καθαριότητας, φύλαξης ή εστίασης, το νοσοκομείο <em>οφείλει</em> να διεξάγει ανοικτό διαγωνισμό. Αν ο διαγωνισμός αποτύχει (π.χ. δεν κατατεθεί έγκυρη προσφορά), χρησιμοποιείται διαδικασία διαπραγμάτευσης. Αν η διαπραγμάτευση καθυστερήσει, εκδίδονται γεφυρωτικές συμβάσεις. Η ροή δημιουργεί δεκάδες αποφάσεις ΑΝΑΘΕΣΗ για κάθε υπηρεσία ανά κύκλο.</p>
+      <p>Το ΓΝ Τρικάλων — που απασχολεί τους ίδιους εργαζόμενους — δεν έχει αυτή την προμηθευτική τριβή. Εξ ου και 1.841 κατακυρώσεις εκεί (κυρίως ιατρικά υλικά και φάρμακα) έναντι 407 στη Λαμία, παρά <strong>παρόμοια κλινική δαπάνη</strong>.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Χρηματοοικονομική σταυροεπαλήθευση</h3>
+    <div class="prose">
+      <p>Η επίσημη έκθεση εκτέλεσης προϋπολογισμού 2024 (ΑΔΑ <code>9ΤΥΕ4690ΒΜ-69Α</code>) επιβεβαιώνει τα παραπάνω. Τα ποσά ΑΝΑΘΕΣΗ από Διαύγεια (€33–51Μ/έτος) είναι κατά πολύ υπερεκτιμημένα — περιλαμβάνουν αξίες συμβάσεων σε εξέλιξη ανταγωνιστικών διαδικασιών. Το πραγματικό σύνολο ετήσιων δαπανών: €18–28Μ ανάλογα το έτος.</p>
+      <p>Το <strong>ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ</strong> cross-check (20.283 αποφάσεις υδατοποιημένες) επιβεβαιώνει τους επίσημους αριθμούς — η προφανής υπέρβαση 5,1× το 2024 εξηγείται πλήρως από κεντρικά χρηματοδοτούμενα KAE μισθοδοσίας (μόνο KAE 1312: €24,6Μ) και πολυετείς προκαταβολικές δεσμεύσεις.</p>
+    </div>
+    <div class="tbl-wrap" style="margin-top:16px">
+      <table>
+        <thead><tr><th>Έτος</th><th class="td-r">Επίσημη δαπάνη</th><th class="td-r">ΚΑΤΑΚΥΡΩΣΗ (Διαύγεια)</th><th class="td-r">% ανταγωνιστικά</th></tr></thead>
+        <tbody>
+          <tr><td>2020</td><td class="td-r">€18,59Μ</td><td class="td-r">€3,79Μ</td><td class="td-r">20%</td></tr>
+          <tr><td>2022</td><td class="td-r">€28,27Μ</td><td class="td-r">€7,03Μ</td><td class="td-r">25%</td></tr>
+          <tr><td>2023</td><td class="td-r">€26,47Μ</td><td class="td-r">€11,69Μ</td><td class="td-r">44%</td></tr>
+          <tr style="background:#f0fdf4"><td><strong>2024</strong></td><td class="td-r"><strong>€18,28Μ</strong></td><td class="td-r"><strong>€13,44Μ</strong></td><td class="td-r green-cell"><strong>73,5%</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="prose"><span class="note">Θετική τάση: οι ανταγωνιστικές κατακυρώσεις ως ποσοστό δαπανών τετραπλασιάστηκαν από 2020 σε 2024. Αυτό αντικατοπτρίζει κυρίως την κατάκτηση νέων συμβάσεων ιατρικών προμηθειών μέσω ΕΣΗΔΗΣ.</span></p>
+  </div>
+
+  <div class="bridge">
+    <div>
+      <p><strong>Επόμενο:</strong> Ποιοι ανάδοχοι παρέχουν τις €7,34Μ υπηρεσίες; Τι αποκαλύπτει η ανάλυση κόστους ανά κλίνη και χρόνου παρουσίας τους;
+      </p>
+    </div>
+    <button class="nxt" onclick="goTab('ch3')">Κεφ. 3: Οι Ανάδοχοι →</button>
+  </div>
+
+</div><!-- /ch2 -->
+
+<!-- ═══════════════════════════════════════════════════════
+     ΚΕΦΑΛΑΙΟ 3 — ΟΙ ΑΝΑΔΟΧΟΙ
+═══════════════════════════════════════════════════════ -->
+<div class="pane" id="ch3">
+
+  <div class="ch-title">
+    <div class="ch-label">Κεφάλαιο 3 · Οι Ανάδοχοι</div>
+    <h2>UNISON και ΗΦΑΙΣΤΟΣ: πέντε χρόνια παρουσίας και κόστος 2–4× πάνω από ομοτίμους</h2>
+    <p class="lede">Τα €7,34Μ outsourcing του ΓΝ Λαμίας κατανέμονται σε τρεις υπηρεσίες: καθαριότητα (UNISON), εστίαση (ΠΙΕΤΡΗΣ) και φύλαξη (ΗΦΑΙΣΤΟΣ). Η ανάλυση αναδόχων αποκαλύπτει δύο παρόμοια μοτίβα: ισχυρή παρουσία ανάδοχου, δυσκολία εναλλαγής, και κόστος σαφώς πάνω από αντίστοιχα νοσοκομεία.</p>
+  </div>
+
+  <!-- UNISON -->
+  <div class="section">
+    <h3>Καθαριότητα — UNISON Facility Services (θυγατρική Metlen/Mytilineos)</h3>
+    <div class="prose" style="margin-bottom:18px">
+      <p>Η UNISON κατέχει τη σύμβαση καθαριότητας από τον Οκτώβριο 2020 — πρώτα μέσω ανταγωνιστικής σύμβασης, μετά μέσω επέκτασης, και τελικά μέσω διαπραγμάτευσης αφού <strong>δύο διεθνείς διαγωνισμοί</strong> (Μαρτ. + Ιουν. 2023) δεν έλαβαν έγκυρες προσφορές.</p>
     </div>
 
-    <div class="callout" style="border-left:4px solid var(--amber);margin-bottom:14px">
-      <div class="icon">📊</div>
-      <div>
-        <strong>Γιατί ο λόγος 2024 φτάνει το 5,11×:</strong><br>
-        <em>(1) Μισθοδοσία κεντρικής χρηματοδότησης (KAE 13xx):</em> ΓΝ Λαμίας κάνει ΑΝΑΛΗΨΗ για
-        μισθοδοσία που χρηματοδοτείται από 5η ΥΠΕ — δεν εμφανίζεται στις «επίσημες πληρωμές» του νοσοκομείου.
-        Το KAE 1312 μόνο αγγίζει <strong>€24,6Μ το 2024</strong> — υπερβαίνει το σύνολο των επίσημων πληρωμών.
-        <em>(2) Πολυετείς προκαταβολικές δεσμεύσεις:</em> Νέα σύμβαση ΗΦΑΙΣΤΟΣ φύλαξης (€1,97Μ/2 έτη + προαίρεση €731k) και συμβάσεις UNISON δεσμεύτηκαν πλήρως το 2024.
-        Αφαιρουμένων KAE 13xx + μεγάλων ιατρικών εφοδίων (0842/0845/0849): λόγος πέφτει στο ~1,5–1,7×.
-      </div>
-    </div>
-
-    <h3 style="font-size:.88rem;font-weight:600;margin:14px 0 8px;color:#333">KAE 0277 — Εξωτερικές Υπηρεσίες (Η/Μ, Φύλαξη, Απόβλητα)</h3>
-    <p style="font-size:.82rem;color:#555;margin-bottom:8px">
-      Συνολικά €21,3Μ σε 117 αποφάσεις (2020–2025). Τρία συστατικά:
-    </p>
-    <ul style="font-size:.82rem;color:#444;margin:0 0 10px 18px;line-height:1.6">
-      <li><strong>Η/Μ συντήρηση:</strong> ΙΝΤΕΡΚΑΤ Α.Ε. (AFM 999917261) — ακριβώς €166.666,67/μήνα = €2Μ/έτος, σταθερό ρυθμό. ΕΣΗΔΗΣ 95109.</li>
-      <li><strong>Υπηρεσίες φύλαξης (CPV 79713000-5):</strong> βλ. πίνακα παρακάτω.</li>
-      <li><strong>Διαχείριση αποβλήτων (CPV 90500000-2):</strong> ~€800k/έτος.</li>
+    <ul class="timeline">
+      <li class="ok">
+        <div class="t-date">Οκτ 2020</div>
+        <div class="t-event">UNISON — αρχική σύμβαση από ανταγωνιστικό διαγωνισμό</div>
+      </li>
+      <li class="ok">
+        <div class="t-date">Οκτ 2021</div>
+        <div class="t-event">Ενεργοποίηση 2ετούς προαίρεσης → σύμβαση έως Οκτ 2023</div>
+      </li>
+      <li class="highlight">
+        <div class="t-date">Μαρ–Ιουν 2023</div>
+        <div class="t-event"><strong>Διεθνής διαγωνισμός €4,39Μ — δύο δημοσιεύσεις, μηδεν έγκυρες προσφορές</strong></div>
+      </li>
+      <li class="ok">
+        <div class="t-date">Νοε 2023–Ιαν 2025</div>
+        <div class="t-event">4 εγκρίσεις ΕΑΔΗΣΥ για διαδικασία διαπραγμάτευσης (Αρθ. 32§2γ Ν.4412/2016)</div>
+      </li>
+      <li class="highlight">
+        <div class="t-date">Ιούλ 2025</div>
+        <div class="t-event"><strong>Επίσημη κατακύρωση στη UNISON €680.859 — δημοσιεύτηκε 4 μήνες αργότερα (Νοε 2025)</strong><br><span style="font-size:.8rem;color:var(--red)">Η καθυστέρηση δημοσίευσης παραβαίνει το άρθρο 3§3 Ν.3861/2010 (προθεσμία 15 ημερών)</span></div>
+      </li>
+      <li>
+        <div class="t-date">Μάιος 2026</div>
+        <div class="t-event">Σύνολο UNISON 2025–2026: ~€3,24Μ — δεύτερη παράταση 5 μηνών €773k εγκρίθηκε</div>
+      </li>
     </ul>
 
-    <div style="overflow-x:auto;margin-bottom:16px">
-      <table style="border-collapse:collapse;font-size:.81rem;width:100%">
-        <caption style="text-align:left;font-size:.78rem;font-weight:600;margin-bottom:5px;color:#555">Ιστορικό Συμβάσεων Φύλαξης ΓΝ Λαμίας (CPV 79713000-5)</caption>
-        <thead><tr style="background:#f0f4fb">
-          <th style="padding:5px 10px;border:1px solid #d0d8e4">Περίοδος</th>
-          <th style="padding:5px 10px;border:1px solid #d0d8e4">Ανάδοχος</th>
-          <th style="padding:5px 10px;border:1px solid #d0d8e4">ΑΦΜ</th>
-          <th style="padding:5px 10px;border:1px solid #d0d8e4;text-align:right">Ετήσιο κόστος</th>
-          <th style="padding:5px 10px;border:1px solid #d0d8e4;text-align:center">Προσφορές</th>
-        </tr></thead>
-        <tbody>
-          <tr><td style="padding:4px 10px;border:1px solid #e0e0e0">Ιουν 2020–Οκτ 2021 (προσωρινή)</td><td style="padding:4px 10px;border:1px solid #e0e0e0">ΚΟΡΙΑΝΙΤΗΣ Α. — KOLOSSOS SECURITY</td><td style="padding:4px 10px;border:1px solid #e0e0e0">—</td><td style="padding:4px 10px;border:1px solid #e0e0e0;text-align:right">~€390k</td><td style="padding:4px 10px;border:1px solid #e0e0e0;text-align:center">—</td></tr>
-          <tr style="background:#f9f9f9"><td style="padding:4px 10px;border:1px solid #e0e0e0">Νοε 2021–Νοε 2023 (2 έτη + 1 προαίρεση)</td><td style="padding:4px 10px;border:1px solid #e0e0e0">MYSECURITY AND FACILITY SYSTEMS ΑΕ <em style="font-size:.75rem;color:#888">(συγχωνεύθηκε/διαγράφηκε)</em></td><td style="padding:4px 10px;border:1px solid #e0e0e0">800872049</td><td style="padding:4px 10px;border:1px solid #e0e0e0;text-align:right"><strong>€486k</strong> <em style="font-size:.75rem;color:#888">(€972k/2yr)</em></td><td style="padding:4px 10px;border:1px solid #e0e0e0;text-align:center;color:#c0392b"><strong>6 εγκρίθηκαν → 1 κατακυρώθηκε</strong></td></tr>
-          <tr><td style="padding:4px 10px;border:1px solid #e0e0e0">Νοε 2024–Νοε 2026 (1 έτος + 2 προαίρεση)</td><td style="padding:4px 10px;border:1px solid #e0e0e0">ΗΦΑΙΣΤΟΣ ΙΔΙΩΤΙΚΗ ΕΠΕ ΠΑΡΟΧΗΣ ΥΠΗΡΕΣΙΩΝ ΑΣΦΑΛΕΙΑΣ (Ηράκλειο)</td><td style="padding:4px 10px;border:1px solid #e0e0e0">999436428</td><td style="padding:4px 10px;border:1px solid #e0e0e0;text-align:right"><strong>€656k</strong> <em style="font-size:.75rem;color:#888">(€1,97M/3yr)</em></td><td style="padding:4px 10px;border:1px solid #e0e0e0;text-align:center"><strong>2 προσφορές</strong></td></tr>
-        </tbody>
-      </table>
+    <div class="pull amber" style="margin-top:20px">
+      <strong>Τεκμηριωμένο εύρημα:</strong> 5 χρόνια συνεχούς παρουσίας UNISON χωρίς επιτυχή ανταγωνιστικό διαγωνισμό. Το αρ. 32§2γ εφαρμόστηκε με πλήρη τεκμηρίωση — αλλά ο χαρακτηρισμός επαναλαμβανόμενης βασικής υπηρεσίας ως «κατεπείγουσας» εγείρει ερωτήματα συμμόρφωσης. Επιπλέον, η 4μηνη καθυστέρηση δημοσίευσης της κατακύρωσης είναι παράβαση που επιδέχεται τεκμηρίωση.
     </div>
-    <p style="font-size:.78rem;color:#666;margin-top:4px">
-      Κόστος φύλαξης: +68% από προσωρινές συμβάσεις (€390k/έτος) στην τρέχουσα σύμβαση (€656k/έτος) — κυρίως λόγω αύξησης προσωπικού (+50% ΙΣΕ, 19→29 φύλακες) και αυξήσεων κατώτατου μισθού. Η MYSECURITY AND FACILITY SYSTEMS ΑΕ (αν. εταιρεία, Καλλιθέα) διαγράφηκε από ΓΕΜΗ λόγω συγχώνευσης κατά τη διάρκεια εκτέλεσης σύμβασης.
-    </p>
-
-    <div style="background:#fef9e7;border:1px solid #f0c040;border-radius:8px;padding:14px 18px;margin-top:14px">
-      <strong style="font-size:.88rem">Benchmark ανά κλίνη — ΓΝ Λαμίας vs ομότιμα νοσοκομεία:</strong>
-      <table style="width:100%;font-size:.82rem;border-collapse:collapse;margin-top:8px">
-        <thead><tr style="background:#fef3cd">
-          <th style="padding:4px 8px;border:1px solid #e8d060;text-align:left">Νοσοκομείο</th>
-          <th style="padding:4px 8px;border:1px solid #e8d060;text-align:right">Ετήσιο κόστος φύλαξης</th>
-          <th style="padding:4px 8px;border:1px solid #e8d060;text-align:right">Κλίνες (ανεπτ.)</th>
-          <th style="padding:4px 8px;border:1px solid #e8d060;text-align:right">€ / κλίνη / έτος</th>
-          <th style="padding:4px 8px;border:1px solid #e8d060;text-align:center">Δείκτης</th>
-        </tr></thead>
-        <tbody>
-          <tr style="background:#fff3cd"><td style="padding:4px 8px;border:1px solid #e8d060"><strong>ΓΝ Λαμίας</strong></td><td style="padding:4px 8px;border:1px solid #e8d060;text-align:right"><strong>€656.000</strong></td><td style="padding:4px 8px;border:1px solid #e8d060;text-align:right">307</td><td style="padding:4px 8px;border:1px solid #e8d060;text-align:right"><strong style="color:#c0392b">€2.136</strong></td><td style="padding:4px 8px;border:1px solid #e8d060;text-align:center">—</td></tr>
-          <tr><td style="padding:4px 8px;border:1px solid #e8d060">ΓΝ Τρικάλων (εκτίμ.)</td><td style="padding:4px 8px;border:1px solid #e8d060;text-align:right">~€174.000</td><td style="padding:4px 8px;border:1px solid #e8d060;text-align:right">~307</td><td style="padding:4px 8px;border:1px solid #e8d060;text-align:right">~€565</td><td style="padding:4px 8px;border:1px solid #e8d060;text-align:center;color:#c0392b"><strong>3,8×</strong></td></tr>
-          <tr style="background:#f9f9f9"><td style="padding:4px 8px;border:1px solid #e8d060">ΓΝ Καρδίτσας (εκτίμ.)</td><td style="padding:4px 8px;border:1px solid #e8d060;text-align:right">~€269.000</td><td style="padding:4px 8px;border:1px solid #e8d060;text-align:right">~307</td><td style="padding:4px 8px;border:1px solid #e8d060;text-align:right">~€876</td><td style="padding:4px 8px;border:1px solid #e8d060;text-align:center;color:#c0392b"><strong>2,4×</strong></td></tr>
-        </tbody>
-      </table>
-      <p style="font-size:.75rem;color:#888;margin-top:6px">Οι προδιαγραφές 2023 (ΑΔΑ <code>6ΒΘ84690ΒΜ-464</code>) προβλέπουν 21 ταυτόχρονες 8ωρες βάρδιες/24ωρο (7 πρωί + 7 απόγ + 6 νύχτα + 1 επόπτης) = 28+1 ΙΣΕ για 7ήμερη κάλυψη. Στις προδιαγραφές 2021: 19 ΙΣΕ. Αύξηση 50% χωρίς τεκμηριωμένη λειτουργική αιτιολόγηση. Κόστος βάσει ΚΑΤΑΚΥΡΩΣΗ αποφάσεων.</p>
-    </div>
-  </section>
-
-</div><!-- /pane-hospital -->
-
-<!-- ════════════════════ PANE: DEYVA ════════════════════ -->
-<div class="pane" id="pane-deyva">
-
-  <div class="alert">
-    <strong>Εύρημα ΔΕΥΑ:</strong> Η ΔΕΥΑ Λαμίας εκδίδει 2.840 άμεσες αναθέσεις —
-    <strong>4,9× τον μ.ο. συγκρίσιμων ομοτίμων</strong> (Τρίκαλα/Καρδίτσα/Κοζάνη — η ΔΕΥΑ Σερρών
-    εξαιρέθηκε λόγω μη συγκρίσιμης κωδικοποίησης) — και διοχετεύει το 93,1% της γνωστής
-    δαπάνης της μέσω άμεσων αναθέσεων. Η ΔΕΥΑ Καρδίτσας, συγκρίσιμη σε μέγεθος, λειτουργεί
-    αντίθετα: 85,6% της δαπάνης της περνά μέσω ανταγωνιστικών διαδικασιών.
   </div>
 
-  <section>
-    <h2><span class="num">1</span>Αριθμοί Αποφάσεων 2020–2026</h2>
-    <div class="chart-grid">
-      <div class="chart-box">
-        <h3>Άμεσες Αναθέσεις (Δ.1) — σύνολο</h3>
-        <canvas id="deyvaCount"></canvas>
-      </div>
-      <div class="chart-box">
-        <h3>% Δαπάνης μέσω Άμεσης Ανάθεσης</h3>
-        <canvas id="deyvaPctTab"></canvas>
-      </div>
+  <!-- ΗΦΑΙΣΤΟΣ -->
+  <div class="section" style="margin-top:24px">
+    <h3>Φύλαξη — ΗΦΑΙΣΤΟΣ ΕΠΕ (Ηράκλειο) — κόστος 2,4–3,8× πάνω από ομοτίμους</h3>
+    <div class="prose" style="margin-bottom:18px">
+      <p>Οι υπηρεσίες φύλαξης (CPV 79713000-5) παρέχονται από διαδοχικούς αναδόχους μέσω ανταγωνιστικών διαγωνισμών — δεν υπάρχει νομικό πρόβλημα στη διαδικασία. Αλλά το <strong>κόστος ανά κλίνη</strong> είναι εκτός φάσματος σε σύγκριση με ομότιμα νοσοκομεία.</p>
     </div>
 
     <div class="tbl-wrap">
       <table>
-        <thead>
-          <tr>
-            <th>ΔΕΥΑ</th>
-            <th>Άμεσες</th>
-            <th>Ποσοστό</th>
-            <th>Ανταγωνιστικές</th>
-            <th>Δαπάνη Άμεσων</th>
-            <th>Δαπάνη Ανταγ.</th>
-            <th>% Άμεσων</th>
-          </tr>
-        </thead>
+        <thead><tr>
+          <th>Περίοδος</th><th>Ανάδοχος</th>
+          <th class="td-r">Ετήσιο κόστος</th>
+          <th class="td-r">Σύνολο σύμβ.</th>
+          <th class="td-c">Προσφορές</th>
+        </tr></thead>
         <tbody>
-          <tr class="lamia">
-            <td><strong>ΔΕΥΑ Λαμίας</strong> <span class="star">★</span></td>
-            <td><strong>2.840</strong></td>
-            <td><span class="badge red">11,6%</span></td>
-            <td>210</td>
-            <td><strong>€10,1Μ</strong></td>
-            <td>€0,74Μ</td>
-            <td><span class="badge red">93,1%</span></td>
+          <tr>
+            <td>Ιουν 2020–Οκτ 2021</td>
+            <td>KOLOSSOS SECURITY (γεφυρωτική)</td>
+            <td class="td-r">~€390k</td><td class="td-r">—</td>
+            <td class="td-c">—</td>
+          </tr>
+          <tr style="background:#f9f9f9">
+            <td>Νοε 2021–Νοε 2023</td>
+            <td>MYSECURITY AND FACILITY SYSTEMS ΑΕ <em style="font-size:.75rem;color:var(--ink3)">(διαγράφηκε λόγω συγχώνευσης)</em></td>
+            <td class="td-r">€486k</td>
+            <td class="td-r">€973k / 2 έτη</td>
+            <td class="td-c amber-cell"><strong>6 εγκρ. → 1 κατακ.</strong></td>
           </tr>
           <tr>
-            <td>ΔΕΥΑ Τρικάλων</td>
-            <td>262</td>
-            <td><span class="badge green">1,8%</span></td>
-            <td>38</td>
-            <td>€2,2Μ*</td>
-            <td>€0,06Μ*</td>
-            <td><span class="badge grey">χαμηλή κάλυψη</span></td>
-          </tr>
-          <tr>
-            <td>ΔΕΥΑ Κοζάνης</td>
-            <td>196</td>
-            <td><span class="badge green">1,4%</span></td>
-            <td><strong>157</strong></td>
-            <td>€61,5Μ</td>
-            <td>€36,7Μ</td>
-            <td><span class="badge blue">62,6%</span></td>
-          </tr>
-          <tr style="opacity:.6">
-            <td>ΔΕΥΑ Σερρών <span class="badge grey" title="90.8% των ΑΝΑΘΕΣΗ είναι Αποφάσεις ΔΣ/Προέδρου — μη συγκρίσιμες">⚠️ κωδικ.</span></td>
-            <td>1.180</td>
-            <td><span class="badge grey">7,6%</span></td>
-            <td>1</td>
-            <td>—</td>
-            <td>—</td>
-            <td><span class="badge grey">μη συγκρίσιμη</span></td>
-          </tr>
-          <tr>
-            <td>ΔΕΥΑ Καρδίτσας</td>
-            <td>148</td>
-            <td><span class="badge green">1,0%</span></td>
-            <td>29</td>
-            <td>€5,1Μ</td>
-            <td>€30,6Μ</td>
-            <td><span class="badge green">14,4%</span></td>
+            <td>Νοε 2024–Νοε 2026</td>
+            <td>ΗΦΑΙΣΤΟΣ ΙΔΙΩΤΙΚΗ ΕΠΕ (ΑΦΜ 999436428, Ηράκλειο)</td>
+            <td class="td-r"><strong>€656k</strong></td>
+            <td class="td-r">€1,97Μ / 3 έτη</td>
+            <td class="td-c">2 προσφορές</td>
           </tr>
         </tbody>
       </table>
     </div>
-    <p style="font-size:.76rem;color:var(--grey);margin-top:6px">* Χαμηλή κάλυψη ποσών — εξαγωγή ακόμη σε εξέλιξη.</p>
-  </section>
 
-  <section>
-    <h2><span class="num">2</span>Δύο Μοντέλα Προμήθειας ΔΕΥΑ</h2>
-    <div class="callout">
-      <div class="icon">💧</div>
-      <div>
-        <h4>ΔΕΥΑ Καρδίτσας: το αντίθετο μοντέλο</h4>
-        <p>Η ΔΕΥΑ Καρδίτσας εκτελεί το 85,6% των προμηθειών της μέσω ανταγωνιστικών διαδικασιών
-           (€30,6Μ ανταγωνιστικά έναντι €5,1Μ άμεσα).
-           Η <strong>ΔΕΥΑ Κοζάνης</strong> λειτουργεί μεγάλο και τεκμηριωμένο πρόγραμμα προμηθειών
-           (~€98Μ συνολικά) με ενεργή χρήση και των δύο διαύλων.
-           Η <strong>ΔΕΥΑ Λαμίας</strong> εκτελεί 2.840 άμεσες αναθέσεις μέσου ύψους ~€3.500 —
-           περίπου <strong>μία ανά εργάσιμη μέρα</strong> — και ουσιαστικά καμία σημαντική
-           ανταγωνιστική διαδικασία (€0,74Μ σε έξι χρόνια).</p>
-      </div>
-    </div>
-    <div class="alert blue" style="margin-top:4px">
-      <strong>ΔΕΥΑ Σερρών — κωδικοποίηση, όχι εύρημα:</strong> Διερευνήθηκε πλήρως (Μάιος 2026).
-      Το 90,8% των 1.180 «ΑΝΑΘΕΣΗ» αποφάσεων είναι γενικές αποφάσεις ΔΣ/Προέδρου
-      (ψήφιση προϋπολογισμού, εγκρίσεις τεχνικών φακέλων, ανθρώπινο δυναμικό κ.λπ.) —
-      όχι αποφάσεις απευθείας ανάθεσης προμηθειών. Κάλυψη ποσών: 0,4%. Κάλυψη ΑΦΜ προμηθευτή: 0%.
-      <strong>Δεν συγκρίνεται με τη ΔΕΥΑ Λαμίας.</strong>
-    </div>
-  </section>
-
-  <section>
-    <h2><span class="num">3</span>Μοντέλο Εξωτερικής Ανάθεσης — Σύγκριση με ΓΝ Λαμίας (A4)</h2>
-    <div class="callout" style="border-left:4px solid var(--green)">
-      <div class="icon">🔍</div>
-      <div>
-        <h4>Η ΔΕΥΑ <em>δεν</em> χρησιμοποιεί μεγάλες εξωτερικές αναθέσεις για υποστηρικτικές υπηρεσίες</h4>
-        <p>Ανάλυση των 1.459 αποφάσεων «ΑΝΑΘΕΣΗ ΕΡΓΩΝ / ΠΡΟΜΗΘΕΙΩΝ / ΥΠΗΡΕΣΙΩΝ / ΜΕΛΕΤΩΝ» της ΔΕΥΑ Λαμίας
-           επιβεβαιώνει ότι η υπηρεσία <strong>δεν ακολουθεί το μοντέλο μεγάλης εξωτερικής ανάθεσης</strong>
-           που χαρακτηρίζει το ΓΝ Λαμίας:</p>
-        <ul style="font-size:.85rem;margin-top:8px;padding-left:16px;line-height:1.8">
-          <li><strong>Καθαριότητα:</strong> 35 αναθέσεις · σύνολο €244k (6 χρόνια) — κυρίως προμήθεια υλικών καθαριότητας για παιδικούς σταθμούς, όχι σύμβαση υπηρεσίας καθαρισμού</li>
-          <li><strong>Φύλαξη:</strong> 6 αναθέσεις · σύνολο €20k</li>
-          <li><strong>Εστίαση / τρόφιμα:</strong> 4 αναθέσεις · σύνολο €119k</li>
-        </ul>
-        <p style="margin-top:8px">
-          <strong>Συμπέρασμα:</strong> Το μοντέλο υπεργολαβίας που δημιουργεί τη δυναμική τύπου UNISON —
-          σύμβαση υπηρεσίας €1,3–4Μ/έτος που απαιτεί ανοιχτό διαγωνισμό — είναι
-          <strong>χαρακτηριστικό αποκλειστικά του ΓΝ Λαμίας</strong>.
-          Η ΔΕΥΑ απασχολεί το υποστηρικτικό προσωπικό άμεσα.
-          Τα τρία νομικά πρόσωπα της Λαμίας αντιπροσωπεύουν τρία διαφορετικά λειτουργικά μοντέλα,
-          όχι ένα κοινό σχέδιο υπεργολαβίας.
-        </p>
-      </div>
-    </div>
-  </section>
-
-</div><!-- /pane-deyva -->
-
-<!-- ════════════════════ PANE: MUNICIPALITY ════════════════════ -->
-<div class="pane" id="pane-municipality">
-
-  <div class="alert blue">
-    <strong>Πιο σύνθετη εικόνα στο επίπεδο δήμου:</strong> Ο Δήμος Λαμίας εκδίδει
-    τις περισσότερες άμεσες αναθέσεις κατ' αριθμό (10.388), αλλά τρέχει και
-    τις περισσότερες ανταγωνιστικές προμήθειες κατ' αξία (€34,3Μ).
-    Τρίκαλα και Σέρρες διοχετεύουν >98% της δαπάνης τους μέσω άμεσων.
-  </div>
-
-  <section>
-    <h2><span class="num">1</span>Αριθμοί Αποφάσεων 2020–2026</h2>
-    <div class="chart-grid">
-      <div class="chart-box">
-        <h3>Άμεσες Αναθέσεις ανά Δήμο</h3>
-        <canvas id="muniCount"></canvas>
-      </div>
-      <div class="chart-box">
-        <h3>Κατανομή Δαπάνης (€Μ)</h3>
-        <canvas id="muniSpend"></canvas>
-      </div>
-    </div>
-
-    <div class="tbl-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Δήμος</th>
-            <th>Σύνολο Αποφ.</th>
-            <th>Άμεσες (Δ.1)</th>
-            <th>Ποσοστό</th>
-            <th>Ανταγωνιστικές</th>
-            <th>Δαπάνη Άμεσων</th>
-            <th>Δαπάνη Ανταγ.</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr class="lamia">
-            <td><strong>Δήμος Λαμίας</strong> <span class="star">★</span></td>
-            <td>64.334 ⚠️</td>
-            <td><strong>10.388</strong></td>
-            <td><span class="badge red">16,1%</span></td>
-            <td><strong>214</strong></td>
-            <td>€25,6Μ</td>
-            <td><strong>€34,3Μ</strong></td>
-          </tr>
-          <tr>
-            <td>Δήμος Τρικκαίων</td>
-            <td>60.749</td>
-            <td>6.991</td>
-            <td><span class="badge blue">11,5%</span></td>
-            <td>36</td>
-            <td>€24,1Μ</td>
-            <td>€0,35Μ</td>
-          </tr>
-          <tr>
-            <td>Δήμος Σερρών</td>
-            <td>61.688</td>
-            <td>1.586</td>
-            <td><span class="badge green">2,6%</span></td>
-            <td>24</td>
-            <td>€23,1Μ</td>
-            <td>€0,38Μ</td>
-          </tr>
-          <tr>
-            <td>Δήμος Καρδίτσας</td>
-            <td>59.326</td>
-            <td>2.709</td>
-            <td><span class="badge green">4,6%</span></td>
-            <td>7</td>
-            <td>€0,1Μ*</td>
-            <td>—</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <p style="font-size:.76rem;color:var(--grey);margin-top:6px">⚠️ Τα δεδομένα 2022–2024 για τη Λαμία είναι πιθανώς υποεκτιμημένα κατά ~40-50% λόγω ορίου API (windowed refetch εκκρεμεί). * Χαμηλή κάλυψη ποσών.</p>
-  </section>
-
-  <section>
-    <h2><span class="num">2</span>Ετήσια Εξέλιξη Άμεσων Αναθέσεων</h2>
-    <div class="chart-box">
-      <h3>Άμεσες Αναθέσεις ανά Έτος — Δήμοι</h3>
-      <canvas id="muniYearly" style="max-height:230px"></canvas>
-    </div>
-  </section>
-
-  <section>
-    <h2><span class="num">3</span>Ερμηνεία</h2>
-    <div class="callout">
-      <div class="icon">🏛️</div>
-      <div>
-        <h4>Και τα δύο άκρα ταυτόχρονα</h4>
-        <p>Ο Δήμος Λαμίας εκδίδει <strong>τις περισσότερες άμεσες αναθέσεις κατ' αριθμό</strong>
-           (10.388 σε 6 χρόνια ≈ 1.700/έτος) αλλά τρέχει και
-           <strong>τις περισσότερες ανταγωνιστικές προμήθειες κατ' αξία</strong> (€34,3Μ).
-           Αυτό υποδηλώνει συνδυασμό πολλών μικρών άμεσων αγορών μαζί με
-           μεγάλες ανταγωνιστικές συμβάσεις.</p>
-      </div>
-    </div>
-
-    <div class="callout">
-      <div class="icon">🔎</div>
-      <div>
-        <h4>Ανάλυση Προμηθευτών — Αποτελέσματα (Μάιος 2026)</h4>
-        <p><strong>Δεν παρατηρείται συγκέντρωση:</strong> 839 μοναδικοί προμηθευτές σε 4.066 αναγνωρισμένες αναθέσεις.
-           Οι Top-5 λαμβάνουν μόνο <strong>19,6%</strong> της γνωστής δαπάνης.
-           Κυριαρχεί η συντήρηση/επισκευή (63,7%) — χαρακτηριστικό δήμων.
-           73,6% των αναθέσεων είναι κάτω από €5.000.</p>
-        <p style="margin-top:8px"><strong>Εντοπίστηκε σφάλμα:</strong> ADA <code>6ΗΞ4ΩΛΚ-20Ρ</code> — ο ΑΦΜ
-           δικηγόρου <code>130.561.769</code> καταχωρήθηκε ως ποσό (€130,5Μ).
-           Αφαιρώντας αυτό, η πραγματική αναγνωρισμένη δαπάνη ΑΝΑΘΕΣΗ: €24,7Μ.</p>
-      </div>
-    </div>
-
-    <div class="callout" style="border-left:4px solid #6c5ce7">
-      <div class="icon">📊</div>
-      <div>
-        <h4>Σύγκριση ανά Κατηγορία Δαπάνης (Μάιος 2026)</h4>
-        <p>Η υπέρβαση αναθέσεων της Λαμίας <strong>δεν είναι ομοιόμορφη</strong> σε όλες τις κατηγορίες:</p>
-        <table style="font-size:.82rem;width:100%;border-collapse:collapse;margin-top:8px">
-          <thead>
-            <tr style="background:#f0eeff;text-align:left">
-              <th style="padding:4px 8px">Κατηγορία</th>
-              <th style="padding:4px 8px;text-align:right">Λαμία</th>
-              <th style="padding:4px 8px;text-align:right">Τρίκαλα</th>
-              <th style="padding:4px 8px;text-align:right">Καρδίτσα</th>
-              <th style="padding:4px 8px;text-align:right">Λ/max</th>
-              <th style="padding:4px 8px;text-align:right">Λαμία ΚΑΤΑΚ</th>
-            </tr>
-          </thead>
+    <div style="margin-top:20px">
+      <h4 style="margin-bottom:12px;color:var(--ink2)">Benchmark ανά κλίνη (ανεπτυγμένες κλίνες, πηγή ΥπΥγ 2025):</h4>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr>
+            <th>Νοσοκομείο</th>
+            <th class="td-r">Ετήσιο κόστος φύλαξης</th>
+            <th class="td-r">Κλίνες</th>
+            <th class="td-r">€ / κλίνη / έτος</th>
+            <th class="td-c">vs Λαμία</th>
+          </tr></thead>
           <tbody>
-            <tr style="background:#fff8f8"><td style="padding:3px 8px"><strong>Εκδηλώσεις / Διαφήμιση</strong></td><td style="text-align:right;color:#c0392b"><strong>1.210</strong></td><td style="text-align:right">247</td><td style="text-align:right">67</td><td style="text-align:right;color:#c0392b"><strong>4,9×</strong></td><td style="text-align:right">2</td></tr>
-            <tr><td style="padding:3px 8px">Οχήματα / Συντήρηση</td><td style="text-align:right">6.232</td><td style="text-align:right">3.631</td><td style="text-align:right">304</td><td style="text-align:right">1,7×</td><td style="text-align:right">5</td></tr>
-            <tr><td style="padding:3px 8px">Υδραυλικά</td><td style="text-align:right">106</td><td style="text-align:right">25</td><td style="text-align:right">42</td><td style="text-align:right">2,5×</td><td style="text-align:right">1</td></tr>
-            <tr style="background:#f0fff4"><td style="padding:3px 8px"><em>Καθαριότητα ↓</em></td><td style="text-align:right;color:#27ae60">42</td><td style="text-align:right">282</td><td style="text-align:right">145</td><td style="text-align:right;color:#27ae60">0,1×</td><td style="text-align:right;color:#27ae60"><strong>10</strong></td></tr>
-            <tr style="background:#f0fff4"><td style="padding:3px 8px"><em>Καύσιμα ↓</em></td><td style="text-align:right;color:#27ae60">8</td><td style="text-align:right">79</td><td style="text-align:right">155</td><td style="text-align:right;color:#27ae60">0,1×</td><td style="text-align:right;color:#27ae60"><strong>6</strong></td></tr>
-            <tr style="background:#f0fff4"><td style="padding:3px 8px"><em>Σίτιση/Τρόφιμα ↓</em></td><td style="text-align:right;color:#27ae60">15</td><td style="text-align:right">20</td><td style="text-align:right">135</td><td style="text-align:right;color:#27ae60">0,1×</td><td style="text-align:right;color:#27ae60"><strong>8</strong></td></tr>
-            <tr><td style="padding:3px 8px">Πυρασφάλεια</td><td style="text-align:right">22</td><td style="text-align:right">25</td><td style="text-align:right">4</td><td style="text-align:right">0,9×</td><td style="text-align:right">0</td></tr>
-            <tr><td style="padding:3px 8px">Φύλαξη</td><td style="text-align:right">15</td><td style="text-align:right">14</td><td style="text-align:right">9</td><td style="text-align:right">0,9×</td><td style="text-align:right">0</td></tr>
+            <tr style="background:#fef2f2">
+              <td><strong>ΓΝ Λαμίας</strong></td>
+              <td class="td-r red-cell"><strong>€656.000</strong></td>
+              <td class="td-r">307</td>
+              <td class="td-r red-cell"><strong>€2.136</strong></td>
+              <td class="td-c">—</td>
+            </tr>
+            <tr>
+              <td>ΓΝ Τρικάλων (εκτίμ.)</td>
+              <td class="td-r">~€174.000</td>
+              <td class="td-r">~307</td>
+              <td class="td-r">~€565</td>
+              <td class="td-c red-cell"><strong>3,8× φθηνότερο</strong></td>
+            </tr>
+            <tr style="background:#f9f9f9">
+              <td>ΓΝ Καρδίτσας (εκτίμ.)</td>
+              <td class="td-r">~€269.000</td>
+              <td class="td-r">~307</td>
+              <td class="td-r">~€876</td>
+              <td class="td-c red-cell"><strong>2,4× φθηνότερο</strong></td>
+            </tr>
           </tbody>
         </table>
-        <p style="margin-top:8px;font-size:.82rem">
-          <span style="color:#c0392b">■</span> <strong>Εκδηλώσεις/Διαφήμιση</strong> — 4,9× ομότιμοι, 6,5× κατά κεφαλή vs Τρίκαλα.
-          Μόνο 2 ανταγωνιστικοί διαγωνισμοί σε 1.210 αναθέσεις (2020–2025).
-          Ηχητική κάλυψη, ορχήστρες, αφίσες, πυροτεχνήματα — όλα μέσω απευθείας ανάθεσης.<br>
-          <strong>Ανάλυση προμηθευτών (Μάιος 2026, κάλυψη ΑΦΜ 98,4%):</strong>
-          253 μοναδικοί προμηθευτές · σύνολο δαπάνης €1,9Μ (~€317k/έτος) · διάμεσος ανά ανάθεση €744 ·
-          87% αναθέσεων κάτω από €2.000 · <em>μηδέν</em> αναθέσεις στο ή πάνω από το όριο €37.200.
-          <strong>Δεν διαπιστώθηκε συγκέντρωση προμηθευτών</strong> (Top-10: 44% αναθέσεων, 28% δαπάνης).
-          Το πρόβλημα είναι ο <em>όγκος</em> (1.210 vs 67–247 ομοτίμων) και η <em>απουσία ανταγωνιστικών
-          πλαισίων-συμβάσεων</em> για επαναλαμβανόμενες υπηρεσίες (ηχητική, εκτυπώσεις, εξοπλισμός),
-          όχι κατευθυνόμενη δαπάνη σε συγκεκριμένους παραλήπτες.<br>
-          <span style="color:#27ae60">■</span> <strong>Καθαριότητα, Καύσιμα, Τρόφιμα</strong> — Λαμία <em>καλύτερη</em> από ομοτίμους:
-          χρησιμοποιεί ανταγωνιστικές συμβάσεις ενώ Τρίκαλα/Καρδίτσα εκδίδουν εκατοντάδες απευθείας αναθέσεις.
-        </p>
       </div>
     </div>
 
-    <div class="callout" style="border-left:4px solid var(--amber)">
-      <div class="icon">⚠️</div>
-      <div>
-        <h4>Υπερβάσεις ορίου — Σταυροεπαληθευμένα (Διαύγεια API + PDF)</h4>
-        <p>Κανένα από τα παρακάτω δεν φέρει πεδίο «αιτιολόγηση απευθείας ανάθεσης» στο API.
-           <strong>Μηδενικοί ανταγωνιστικοί διαγωνισμοί</strong> για φύλαξη στο σύνολο 2020–2026.</p>
-        <ul style="font-size:.84rem;margin-top:6px;padding-left:16px">
-          <li>
-            <strong>€74.000 + €74.000 = €148.000 σε ένα έτος για φύλαξη (2022)</strong><br>
-            <span style="color:#666">Ιούλιος: ΚΟΥΤΚΙΑΣ &amp; ΣΙΑ ΕΕ (801089930, ΑΔΑ <code>6ΙΕΠΩΛΚ-05Η</code>) ·
-            Αύγουστος: ΚΟΥΤΚΙΑΣ Παναγιώτης (112437726, ΑΔΑ <code>ΨΜΛΔΩΛΚ-ΘΙ0</code>) — ΑΦΜ απουσίαζε από
-            δομημένα πεδία Διαύγεια, επιβεβαιώθηκε μέσω PDF απόφασης ·
-            2023: ίδια ατομική επιχείρηση €74.400 — σύνολο 3 αναθέσεων €222.397 χωρίς διαγωνισμό</span>
-          </li>
-          <li style="margin-top:6px">
-            <strong>€74.400 × 2 + €74.400 — ΖΗΚΑ &amp; ΚΑΙΛΑΣ ΕΕ (2022, 2022, 2024)</strong><br>
-            <span style="color:#666">CPV 85312320-8 «Κοινωνική Συμβουλευτική» · η ανάθεση 2024 αφορά «δημοσιότητα και αξιολόγηση» —
-            διαφορετική υπηρεσία, ίδιος CPV · νομική ασάφεια για τo Παράρτημα XIV (αξιολόγηση από νομικό)</span>
-          </li>
-        </ul>
-        <p style="margin-top:8px"><strong>Πρότυπο «ψαλίδα ορίου»:</strong> Cluster αποφάσεων
-           ακριβώς στα €37.200 (= €30.000 καθαρό + ΦΠΑ 24% — το ανώτατο νόμιμο όριο απευθείας
-           ανάθεσης), με απότομη πτώση άνω αυτού. Δείχνει συστηματική γνώση του ορίου.</p>
-        <p style="margin-top:6px;font-size:.82rem;background:#fff3f3;padding:8px 10px;border-radius:4px">
-          <strong>⚠️ Διορθωμένο εύρημα:</strong> ΑΔΑ <code>ΡΩΖΡΩΛΚ-Ω5Σ</code> — η δομημένη τιμή «€482.360»
-          αποδείχθηκε σφάλμα καταχώρισης. Επαλήθευση PDF: πραγματικό ποσό <strong>€4.824</strong> (εντός ορίου).
-          Αφαιρέθηκε από ευρήματα.
-        </p>
-        <p style="margin-top:8px;font-size:.82rem;background:#fffbf0;padding:8px 10px;border-radius:4px">
-          <strong>Ομότιμη σύγκριση (ίδιο dataset):</strong>
-          Δήμος Τρικκαίων, Καρδίτσας, Κοζάνης: <strong>μηδέν</strong> υπερβάσεις ορίου σε φύλαξη κτιρίων.
-          Ο Δήμος Τρικκαίων χρησιμοποιεί ανταγωνιστικές συμβάσεις για φύλαξη.
-          Ο Δήμος Κοζάνης έχει τρεις αναθέσεις φύλαξης — και οι τρεις εντός ορίου (€12–16k, εξειδικευμένες εγκαταστάσεις).
-        </p>
-      </div>
+    <div class="pull" style="margin-top:20px">
+      <strong>Γιατί τόσοι φύλακες;</strong> Οι τεχνικές προδιαγραφές 2023 (ΑΔΑ <code>6ΒΘ84690ΒΜ-464</code>) ορίζουν 21 ταυτόχρονες 8ωρες βάρδιες/24ωρο: 7 πρωί + 7 απόγευμα + 6 νύχτα + 1 επόπτης. Αυτό απαιτεί <strong>28+1 ΙΣΕ</strong> για 7ήμερη κάλυψη. Το 2021 οι προδιαγραφές όριζαν 19 ΙΣΕ. <strong>Η αύξηση 53% δεν τεκμηριώνεται λειτουργικά</strong> — τα αρχεία της επιτροπής δείχνουν ότι αυξήθηκε πρώτα ο προϋπολογισμός και ζητήθηκε μετά από την επιτροπή να προτείνει αριθμό προσωπικού συμβατό με το νέο πλαφόν.
     </div>
-
-    <div class="callout" style="border-left:4px solid var(--amber)">
-      <div class="icon">🗺️</div>
-      <div>
-        <h4>Κατακερματισμός συμβάσεων — ανάλυση κυλιόμενου παραθύρου 60 ημερών (A2)</h4>
-        <p>Ανάλυση 4.067 αποφάσεων ανά προμηθευτή σε κυλιόμενο παράθυρο 60 ημερών εντόπισε
-           <strong>33 προμηθευτές</strong> με συνολικές αναθέσεις άνω των €30.000 (κάθε ατομική ανάθεση κάτω ορίου).
-           Ο κύριος μηχανισμός: <strong>γεωγραφική κατάτμηση κατά Δημοτική Ενότητα</strong> —
-           η ίδια υπηρεσία/αγαθό αναθέτεται στον ίδιο προμηθευτή για διαφορετικές Δ.Ε. (Λαμίας, Γοργοποτάμου,
-           Υπάτης, Λιανοκλαδίου, Παυλιανής) ταυτόχρονα ή σε συνεχόμενες ημέρες.
-           Το άρθρο 6§2 Ν. 4412/2016 απαγορεύει την κατάτμηση ομοιογενούς ανάγκης για παράκαμψη κατωφλίου.</p>
-        <div class="tbl-wrap" style="margin-top:12px">
-          <table>
-            <thead>
-              <tr>
-                <th>ΑΦΜ</th>
-                <th>Τύπος υπηρεσίας / αγαθού</th>
-                <th>Χαρακτηριστικό παράδειγμα</th>
-                <th>Σύνολο εντοπισθέν</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr style="background:#fff8e1">
-                <td><strong>800458127</strong></td>
-                <td>Ηλεκτρολογικά υλικά</td>
-                <td>23/2/2023: €19.989 (Δ.Ε. Λαμίας) + €19.992 (Δ.Ε. Γοργοποτάμου) — ίδια ημέρα, ίδιος προμηθευτής, ίδια κατηγορία · επαναλαμβάνεται σε πολλά έτη</td>
-                <td><strong>€420.989</strong> / 34 αναθέσεις</td>
-              </tr>
-              <tr style="background:#fff0f0">
-                <td><strong>112437726</strong></td>
-                <td>Υπηρεσίες φύλαξης κτιρίων</td>
-                <td>8/4/2020: €24.435 + €24.435 ίδια ημέρα = <strong>€48.870</strong> (+ υπερβάσεις ορίου 2022–2023)</td>
-                <td>—</td>
-              </tr>
-              <tr>
-                <td><strong>801793425</strong></td>
-                <td>Συντήρηση γηπέδου ποδοσφαίρου</td>
-                <td>22/5/2022: <strong>€37.195</strong> για μόνο Δ.Ε. Λαμίας (υπερβαίνει το καθαρό όριο €30k)</td>
-                <td>€37.195</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <p style="font-size:.82rem;color:var(--grey);margin-top:6px">
-          <em>Σημ.:</em> ΑΦΜ 112437726 (ΚΟΥΤΚΙΑΣ Παναγιώτης) εμφανίζεται τόσο στην ανάλυση κατακερματισμού (2020)
-          όσο και στα ευρήματα υπέρβασης ορίου (2022–2023) — πενταετές πρότυπο σχέσης χωρίς ανταγωνιστικές διαδικασίες.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <section>
-    <h2><span class="num">4</span>Βάθος Ανταγωνισμού σε Μεγάλες Συμβάσεις (Μάιος 2026)</h2>
-
-    <div class="callout" style="border-left:4px solid var(--amber)">
-      <div class="icon">⛽</div>
-      <div>
-        <h4>Καύσιμα — ΧΑΛΚΙΑΣ OIL ΑΕ (ΑΦΜ 094275382): 4 συνεχόμενες κατακυρώσεις, μηδενικός ανταγωνισμός ανά ομάδα</h4>
-        <p>Ο Δήμος Λαμίας έχει κατακυρώσει τη σύμβαση καυσίμων στην <strong>ΧΑΛΚΙΑΣ OIL ΑΕ</strong> σε 4 συνεχόμενους κύκλους:
-          2020 (€1,93Μ), 2021 (€2,24Μ), 2023, 2025 (€2,22Μ) — σύνολο <strong>&gt;€6,4Μ</strong> σε 5 χρόνια.
-          Σε κάθε διαγωνισμό οι προσφορές κατανέμονται ανά ομάδα καυσίμου:
-        </p>
-        <div class="tbl-wrap" style="margin-top:10px">
-          <table style="font-size:.82rem">
-            <thead><tr style="background:#fef9e7">
-              <th style="padding:4px 8px;border:1px solid #e8d060">Ομάδα</th>
-              <th style="padding:4px 8px;border:1px solid #e8d060">Καύσιμο</th>
-              <th style="padding:4px 8px;border:1px solid #e8d060">2020</th>
-              <th style="padding:4px 8px;border:1px solid #e8d060">2021</th>
-            </tr></thead>
-            <tbody>
-              <tr><td style="padding:4px 8px;border:1px solid #e8d060">Α</td><td style="padding:4px 8px;border:1px solid #e8d060">Βενζίνη αμόλυβδη</td><td style="padding:4px 8px;border:1px solid #e8d060;color:#c0392b"><strong>Μόνο ΧΑΛΚΙΑΣ OIL</strong></td><td style="padding:4px 8px;border:1px solid #e8d060;color:#c0392b"><strong>Μόνο ΧΑΛΚΙΑΣ OIL</strong></td></tr>
-              <tr style="background:#f9f9f9"><td style="padding:4px 8px;border:1px solid #e8d060">Β</td><td style="padding:4px 8px;border:1px solid #e8d060">Πετρέλαιο κίνησης</td><td style="padding:4px 8px;border:1px solid #e8d060;color:#c0392b"><strong>Μόνο ΧΑΛΚΙΑΣ OIL</strong></td><td style="padding:4px 8px;border:1px solid #e8d060;color:#c0392b"><strong>Μόνο ΧΑΛΚΙΑΣ OIL</strong></td></tr>
-              <tr><td style="padding:4px 8px;border:1px solid #e8d060">Γ</td><td style="padding:4px 8px;border:1px solid #e8d060">Πετρέλαιο θέρμανσης</td><td style="padding:4px 8px;border:1px solid #e8d060">Μόνο VD TRANS OIL</td><td style="padding:4px 8px;border:1px solid #e8d060">Μόνο VD TRANS OIL</td></tr>
-              <tr style="background:#f9f9f9"><td style="padding:4px 8px;border:1px solid #e8d060">Δ</td><td style="padding:4px 8px;border:1px solid #e8d060">Υγραέριο κίνησης (LPG)</td><td style="padding:4px 8px;border:1px solid #e8d060;color:#c0392b">Μόνο ΧΑΛΚΙΑΣ OIL</td><td style="padding:4px 8px;border:1px solid #e8d060">—</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <p style="font-size:.8rem;color:#666;margin-top:8px">
-          Το 2020 υποβλήθηκαν 2 προσφορές συνολικά — καθεμία για μη-επικαλυπτόμενες ομάδες.
-          Ουσιαστικά <strong>μηδενικός ανταγωνισμός</strong> για κινητήρια καύσιμα (Ομάδες Α, Β) και στους 4 κύκλους.
-          Πιθανή εξήγηση: τοπικό δυοπώλιο — ΧΑΛΚΙΑΣ OIL (1ο χλμ Λαμίας-Αθηνών) και VD TRANS OIL (Τσαρουχόκαμπος Λαμία)
-          είναι οι μόνοι διανομείς στην περιοχή. Ο Δήμος δεν έχει μηχανισμό αγοραίας επαλήθευσης τιμής.
-        </p>
-      </div>
-    </div>
-
-    <div class="callout" style="border-left:4px solid var(--amber);margin-top:16px">
-      <div class="icon">🏗️</div>
-      <div>
-        <h4>Σκυρόδεμα — ΑΤΛΑΣ ΜΠΕΤΟΝ ΑΒΕΕ (ΑΦΜ 094082639): Μοναδικός προσφέρων για έτοιμο σκυρόδεμα</h4>
-        <p>Στη μεγαλύτερη σύμβαση του Δήμου (ΑΔΑ <code>9Π7ΡΩΛΚ-9Κ5</code>, ΚΑΤΑΚΥΡΩΣΗ €13,05Μ για 4 χρόνια, 2020):
-           υποβλήθηκαν 2 προσφορές συνολικά —
-           <strong>ΑΤΛΑΣ ΜΠΕΤΟΝ</strong> για Ομάδα Α (Έτοιμο Σκυρόδεμα) και ΚΑΛΤΣΑΣ ΤΕΧΝΙΚΗ ΑΕ για Ομάδα Β (Αδρανή Υλικά).
-           Καμία εταιρεία δεν ανταγωνίστηκε τον ΑΤΛΑΣ ΜΠΕΤΟΝ στο σκυρόδεμα.
-           Πιθανή εξήγηση: <strong>γεωγραφικό μονοπώλιο</strong> (ο ΑΤΛΑΣ ΜΠΕΤΟΝ εδρεύει στη Λαμία — μόνο βιώσιμη απόσταση αποστολής).
-           Αντιπρόσωπος αδρανών υλικών: ΚΑΛΤΣΑΣ ΤΕΧΝΙΚΗ ΑΕ (ΑΦΜ 094140715, Λαμία).
-        </p>
-      </div>
-    </div>
-
-    <div class="callout" style="border-left:4px solid var(--blue);margin-top:16px">
-      <div class="icon">💻</div>
-      <div>
-        <h4>Πληροφορική — ΜΑΝΤΕΣ-ΤΣΑΜΗΣ ΟΕ (ΑΦΜ 082785679): 49 αποφάσεις, πρότυπο «ψαλίδα ορίου»</h4>
-        <p>49 αποφάσεις Διαύγεια σε 6 χρόνια. Σύνθεση:</p>
-        <ul style="font-size:.84rem;margin:6px 0 0 16px">
-          <li><strong>ΚΑΤΑΚΥΡΩΣΗ (ανταγωνιστικές νίκες):</strong> 9 αποφάσεις — €52k, €57k, €60k, €66k, €71k, €72k, €74k, €147k, €172k — σύνολο ~€771k</li>
-          <li><strong>ΑΝΑΘΕΣΗ ακριβώς στα €37.196–37.200</strong> (ανώτατο νόμιμο όριο): 6 αποφάσεις (2022×3, 2023, 2024, 2025) — σύνολο ~€222k</li>
-        </ul>
-        <p style="font-size:.8rem;color:#666;margin-top:8px">
-          Ο συνδυασμός ανταγωνιστικών νικών και επαναλαμβανόμενων αναθέσεων-ορίου για ετήσιες υπηρεσίες ΤΠ
-          πληροί τα κριτήρια κατακερματισμού του άρθρου 6§2 Ν. 4412/2016 αν οι 6 αναθέσεις καλύπτουν ομοιογενείς συνεχόμενες υπηρεσίες.
-        </p>
-      </div>
-    </div>
-
-  </section>
-
-</div><!-- /pane-municipality -->
-
-<!-- ════════════════════ PANE: INSIGHTS ════════════════════ -->
-<div class="pane" id="pane-insights">
-
-  <section>
-    <h2><span class="num">1</span>Τι Βλέπουμε</h2>
-    <div class="insight-grid">
-
-      <div class="insight red">
-        <div class="i-head"><div class="i-icon">🏥</div><h4>Το νοσοκομείο ως κεντρικό εύρημα</h4></div>
-        <div class="i-num">4,5×</div>
-        <p>Το ΓΝ Τρικάλων εκδίδει ανταγωνιστικές κατακυρώσεις <strong>4,5× πιο συχνά</strong> από το ΓΝ Λαμίας
-           (1.841 vs 407). Αυτό είναι το πιο αξιόπιστο ποσοτικό εύρημα — ο τύπος ΚΑΤΑΚΥΡΩΣΗ δεν υπόκειται
-           στα ζητήματα κωδικοποίησης που επηρεάζουν τις ΑΝΑΘΕΣΕΙΣ.
-           Στις άμεσες: ΓΝ Λαμίας <strong>31×</strong> υψηλότερα από ΓΝ Τρικάλων (5.887 vs 187).</p>
-      </div>
-
-      <div class="insight red">
-        <div class="i-head"><div class="i-icon">💧</div><h4>ΔΕΥΑ: 1 άμεση ανάθεση ανά εργάσιμη μέρα</h4></div>
-        <div class="i-num">93%</div>
-        <p>Η ΔΕΥΑ Λαμίας εκτελεί κατά μέσο όρο <strong>μία άμεση ανάθεση κάθε εργάσιμη ημέρα</strong>
-           για έξι χρόνια. Το 93,1% της γνωστής δαπάνης της πηγαίνει απευθείας —
-           ουσιαστικά <strong>καμία ανταγωνιστική διαδικασία ουσίας</strong> (€0,74Μ σε 6 χρόνια).
-           Για αντιπαράθεση: ΔΕΥΑ Καρδίτσας = 14,4% άμεσα, ΔΕΥΑ Κοζάνης = 62,6%.
-           (ΔΕΥΑ Σερρών εξαιρείται — διαφορετική κωδικοποίηση, μη συγκρίσιμη.)</p>
-      </div>
-
-      <div class="insight amber">
-        <div class="i-head"><div class="i-icon">🔗</div><h4>Τρεις φορείς, ένα πρότυπο</h4></div>
-        <div class="i-num">3/3</div>
-        <p>Δήμος (16,1%), Νοσοκομείο (11,6%), ΔΕΥΑ (11,6%) — <strong>και οι τρεις ανεξάρτητοι
-           φορείς</strong> της Λαμίας εμφανίζουν ανυψωμένα ποσοστά άμεσης ανάθεσης.
-           Δεν υπάρχει κοινή διοίκηση που να εξηγεί αυτή τη σύμπτωση.
-           Υποδηλώνει ένα <strong>χαρακτηριστικό του τοπικού οικοσυστήματος</strong>
-           προμηθειών, όχι ατομικές αποφάσεις.</p>
-      </div>
-
-      <div class="insight blue">
-        <div class="i-head"><div class="i-icon">🔄</div><h4>Η ανεστραμμένη αναλογία</h4></div>
-        <div class="i-num">1:10</div>
-        <p>ΓΝ Τρικάλων: <strong>1 άμεση ανάθεση ανά 10 ανταγωνιστικές κατακυρώσεις</strong>.
-           ΓΝ Λαμίας: <strong>14,5 άμεσες ανά κατακύρωση</strong>.
-           Ίδιο νομικό πλαίσιο, ίδιος τύπος φορέα, ίδια περιοχή.
-           Η διαφορά δεν μπορεί να αποδοθεί σε λειτουργική ανάγκη.</p>
-      </div>
-
-    </div>
-  </section>
-
-  <section>
-    <h2><span class="num">2</span>Τι Σημαίνει</h2>
-
-    <div class="callout">
-      <div class="icon">⚖️</div>
-      <div>
-        <h4>Το νομικό πλαίσιο — και γιατί έχει σημασία</h4>
-        <p>Στις ελληνικές δημόσιες προμήθειες (Ν. 4412/2016), οι άμεσες αναθέσεις επιτρέπονται
-           κάτω από ορισμένα κατώφλια: γενικά ~€30.000 για αγαθά/υπηρεσίες. Πάνω από αυτά,
-           απαιτείται ανταγωνιστική διαδικασία εκτός αν συντρέχουν ρητές εξαιρέσεις (π.χ. άρθρο 32§2γ για
-           διαπραγμάτευση λόγω επείγοντος). Ο <em>φαινόμενος</em> μέσος ~€84.000/ανάθεση στο ΓΝ Λαμίας
-           αντικατοπτρίζει εν μέρει λανθασμένη κωδικοποίηση (αποφάσεις επιτροπών ανταγωνιστικών
-           διαδικασιών + μεγάλες διαπραγματευτικές συμβάσεις). Το πραγματικό μέσο για εντοπισμένες
-           κάτω-ορίου αγορές είναι ~€13.100. Ωστόσο, η επανειλημμένη χρήση της εξαίρεσης Art. 32§2γ
-           για βασικές υπηρεσίες (π.χ. καθαριότητα) εγείρει ερώτημα συμμόρφωσης.</p>
-      </div>
-    </div>
-
-    <div class="callout">
-      <div class="icon">🧩</div>
-      <div>
-        <h4>Πιθανές εξηγήσεις — από το λιγότερο στο πιο ανησυχητικό</h4>
-        <p>
-          <strong>1. Διοικητική προτίμηση:</strong> Ορισμένες διοικήσεις προτιμούν την ταχύτητα
-          της άμεσης ανάθεσης έναντι του διοικητικού φόρτου των διαγωνισμών.
-          Νόμιμο αλλά μπορεί να υποβαθμίσει την αξία για τον φορολογούμενο.<br><br>
-          <strong>2. Λειτουργική ανάγκη:</strong> Τα νοσοκομεία κάνουν επείγουσες αγορές αναλωσίμων.
-          Ωστόσο, το ΓΝ Τρικάλων αντιμετωπίζει τις ίδιες ανάγκες και χρησιμοποιεί ανταγωνισμό 10×
-          πιο συχνά.<br><br>
-          <strong>3. Τμηματοποίηση συμβάσεων:</strong> Μεγάλη αγορά κατατεμαχισμένη σε μικρότερα
-          τμήματα, καθένα κάτω από το όριο. Παράγει πολλές εγγραφές άμεσης ανάθεσης αλλά αποτελεί
-          παράβαση εφόσον η συνολική αξία υπερβαίνει το όριο.<br><br>
-          <strong>4. Στοχευμένη παράκαμψη ανταγωνισμού:</strong> Στο ακραίο σενάριο,
-          υψηλός όγκος άμεσων αναθέσεων σε επιλεγμένους προμηθευτές μπορεί να αποτελεί μηχανισμό
-          διοχέτευσης δημόσιου χρήματος εκτός ανταγωνιστικής εποπτείας.</p>
-      </div>
-    </div>
-  </section>
-
-  <section>
-    <h2><span class="num">3</span>Συμπεράσματα & Επόμενα Βήματα</h2>
-
-    <div class="timeline">
-      <div class="tl-item red">
-        <h4>Τι έχει τεκμηριωθεί (εκτός ποσοτικής αμφισβήτησης)</h4>
-        <p>ΓΝ Τρικάλων 4,5× περισσότερες ΚΑΤΑΚΥΡΩΣΕΙΣ από ΓΝ Λαμίας (1.841 vs 407) —
-           αναστροφή ιδίου τύπου φορέα · ΓΝ Λαμίας 31× περισσότερες άμεσες αναθέσεις από ΓΝ Τρικάλων ·
-           ΔΕΥΑ Λαμίας: 93,1% δαπάνης χωρίς ανταγωνισμό · 3 ανεξάρτητοι φορείς, ίδιο πρότυπο.</p>
-      </div>
-      <div class="tl-item green">
-        <h4>✅ Ανάλυση Προμηθευτών — Ολοκληρώθηκε (Μάιος 2026)</h4>
-        <p>53 εταιρείες αναγνωρίστηκαν μέσω ΓΕΜΗ: αποκλειστικά ιατρικές/φαρμακευτικές.
-           Καμία συγκέντρωση στη ΔΕΥΑ Λαμίας (310 μοναδικοί, μέγ. €14κ/προμηθευτή σε 6 χρόνια).
-           <strong>Σημείωση UNISON:</strong> Διεθνής διαγωνισμός €4,4Μ κηρύχθηκε άγονος (2023) —
-           η Art.32§2γ για UNISON είχε τεκμηριωμένη βάση. Βλ. παρακάτω για λεπτομέρειες.</p>
-      </div>
-      <div class="tl-item amber">
-        <h4>⚠️ UNISON — Αναθεωρημένη Εκτίμηση (Μάιος 2026)</h4>
-        <p>
-          <strong>Διόρθωση προηγούμενης ανάλυσης:</strong> Υπήρξε διεθνής ανοιχτός διαγωνισμός
-          €4,4Μ (Μάρτιος–Ιούνιος 2023, ΕΣΗΔΗΣ 175970) που <em>κηρύχθηκε άγονος δύο φορές</em>.
-          Η ΕΑΔΗΣΥ έδωσε σύμφωνη γνώμη για διαπραγμάτευση <strong>4 φορές πριν</strong>
-          την ανάθεση (Νοέμβριος 2023, Μάρτιος 2024, Σεπτέμβριος 2024, Ιανουάριος 2025).
-          Ο ισχυρισμός «μηδενικός ανοιχτός διαγωνισμός» και η «αναστροφή σειράς ΕΑΔΗΣΥ»
-          <strong>ήταν λανθασμένοι και αποσύρονται</strong>.<br><br>
-          <strong>Τι παραμένει:</strong><br>
-          <strong>1. Καθυστέρηση ανάρτησης (επαληθευμένη):</strong> Η ανάθεση €680κ (02-07-2025,
-          ΑΔΑ <code>ΨΠΗΓ4690ΒΜ-ΛΚ8</code>) αναρτήθηκε στις 02-11-2025 —
-          <strong>4 μήνες αργότερα</strong> (νόμιμο όριο 15 ημέρες, Ν. 3861/2010 αρθ. 3§3).<br><br>
-          <strong>2. Πέντε χρόνια ανάδοχος:</strong> Η UNISON κατέχει τη σύμβαση από Οκτώβριο 2020.
-          Ο άγονος διαγωνισμός 2023 θέτει ερώτημα: προδιέγραψαν οι τεχνικές προδιαγραφές
-          ή τα εργασιακά κόστη την υφιστάμενη ανάδοχο;<br><br>
-          <strong>3. Κωδικοποίηση Δ.1 αντί Δ.2.4:</strong> ~20–30 αποφάσεις της διαπραγμάτευσης
-          καταχωρήθηκαν ως ΑΝΑΘΕΣΗ (Δ.1) αντί για ΔΙΑΠΡΑΓΜΑΤΕΥΣΗ (Δ.2.4),
-          φουσκώνοντας τον αριθμό ΑΝΑΘΕΣΗ του ΓΝ Λαμίας.
-        </p>
-      </div>
-      <div class="tl-item green">
-        <h4>✅ ΔΕΥΑ Σερρών — Ολοκληρώθηκε (Μάιος 2026)</h4>
-        <p>90,8% των ΑΝΑΘΕΣΗ είναι Αποφάσεις ΔΣ/Προέδρου — κωδικοποίηση, όχι εύρημα.
-           Μηδενική κάλυψη ποσών και προμηθευτών. <strong>Δεν συγκρίνεται με ΔΕΥΑ Λαμίας.</strong>
-           Ο διορθωμένος λόγος για ΔΕΥΑ Λαμίας: 4,9× τον μ.ο. ομοτίμων (χωρίς Σέρρες).</p>
-      </div>
-      <div class="tl-item green">
-        <h4>✅ Σταυροεπαλήθευση Οικονομικών Λογαριασμών — Ολοκληρώθηκε (Μάιος 2026)</h4>
-        <p>Απολογισμός εκτέλεσης 2024 (ΑΔΑ <code>9ΤΥΕ4690ΒΜ-69Α</code>) επαληθεύει:
-           τα ποσά ΑΝΑΘΕΣΗ στη Διαύγεια υπερεκτιμούν κατά πολύ την πραγματική δαπάνη —
-           επιβεβαιώνεται το πρόβλημα κωδικοποίησης. Οι ΚΑΤΑΚΥΡΩΣΕΙΣ ως ποσοστό πραγματικής
-           δαπάνης: <strong>20% (2020) → 73,5% (2024)</strong>. Ληξιπρόθεσμα €19,7Μ τέλος 2024.</p>
-      </div>
-      <div class="tl-item green">
-        <h4>🏛️ Αποστολή στον Ελεγκτικό Μηχανισμό</h4>
-        <p>Τα ευρήματα σε αυτή τη μορφή είναι κατάλληλα για υποβολή σε ΕΑΔΗΣΥ
-           (Ενιαία Αρχή Δημοσίων Συμβάσεων) ή Ελεγκτικό Συνέδριο
-           για περαιτέρω διερεύνηση.</p>
-      </div>
-    </div>
-
-    <div class="caveat">
-      <strong>Επιφυλάξεις ποιότητας δεδομένων (ενημερωμένες Μάιος 2026):</strong>
-      Ο τύπος ΑΝΑΘΕΣΗ στο ΓΝ Λαμίας περιλαμβάνει: (α) πραγματικές κάτω-ορίου άμεσες αναθέσεις,
-      (β) διαδικαστικές αποφάσεις επιτροπών ανταγωνιστικών διαγωνισμών (~739 αποφάσεις, €132,8Μ),
-      (γ) μεγάλες διαπραγματευτικές συμβάσεις Art.32§2γ (π.χ. UNISON €3,2Μ),
-      (δ) ενεργοποιήσεις δικαιωμάτων προαίρεσης. Το ποσό €215,5Μ δεν αντιστοιχεί αποκλειστικά
-      σε κάτω-ορίου απευθείας αναθέσεις. Η πιο αξιόπιστη σύγκριση είναι ο αριθμός ΚΑΤΑΚΥΡΩΣΕΩΝ
-      (4,5× χαμηλότερος από ΓΝ Τρικάλων).
-      ΓΝ Καρδίτσας / ΓΝ Κοζάνης χρησιμοποιούν Β-τύπους (δεν συγκρίνονται άμεσα).
-      Δήμος Λαμίας: <strong>πλήρη δεδομένα</strong> (64.334 αποφάσεις, 100% κάλυψη 2020–2026 επαληθεύτηκε).
-    </div>
-  </section>
-
-</div><!-- /pane-insights -->
-
-<!-- ════════════════════ PANE: RESOURCES ════════════════════ -->
-<div class="pane" id="pane-resources">
-
-  <section>
-    <h2><span class="num">1</span>Κώδικας & Δεδομένα</h2>
-
-    <div class="res-grid">
-      <a class="res-card blue" href="https://github.com/Petropov/Greece_Public_diav" target="_blank">
-        <div class="r-icon">🐙</div>
-        <h4>GitHub — Greece_Public_diav</h4>
-        <p>Πλήρης κώδικας pipeline, scripts εξαγωγής και ανάλυσης, κανονικοποιημένα CSVs,
-           αναφορές. Ελεύθερη χρήση για δημοσιογράφους, ερευνητές, πολίτες.</p>
-        <span class="r-url">github.com/Petropov/Greece_Public_diav →</span>
-      </a>
-
-      <a class="res-card green" href="https://diavgeia.gov.gr/opendata" target="_blank">
-        <div class="r-icon">🏛️</div>
-        <h4>Διαύγεια OpenData API</h4>
-        <p>Πρωτογενής πηγή δεδομένων. Δωρεάν API για πρόσβαση σε >100 εκ. αποφάσεις
-           Ελλήνων δημόσιων φορέων από το 2010.</p>
-        <span class="r-url">diavgeia.gov.gr/opendata →</span>
-      </a>
-
-      <a class="res-card red" href="https://www.eaadisy.gr" target="_blank">
-        <div class="r-icon">⚖️</div>
-        <h4>ΕΑΔΗΣΥ</h4>
-        <p>Ενιαία Αρχή Δημοσίων Συμβάσεων — αρμόδιος φορέας εποπτείας δημοσίων προμηθειών.
-           Δέχεται αναφορές για παρατυπίες.</p>
-        <span class="r-url">eaadisy.gr →</span>
-      </a>
-
-      <a class="res-card grey" href="https://www.elsyn.gr" target="_blank">
-        <div class="r-icon">📋</div>
-        <h4>Ελεγκτικό Συνέδριο</h4>
-        <p>Ανώτατο ελεγκτικό όργανο του ελληνικού κράτους — εξετάζει νομιμότητα
-           δαπανών δημόσιων φορέων.</p>
-        <span class="r-url">elsyn.gr →</span>
-      </a>
-    </div>
-  </section>
-
-  <section>
-    <h2><span class="num">2</span>Πώς Λειτουργεί το Pipeline</h2>
-
-    <div class="method-step">
-      <div class="step-num">1</div>
-      <div>
-        <h4>Συλλογή Search Exports (digest_monthly)</h4>
-        <p>Για κάθε φορέα και μήνα, λήψη έως 500 αποφάσεων από το API της Διαύγειας.
-           Αποθήκευση ως <code>search_export.json</code>.</p>
-      </div>
-    </div>
-    <div class="method-step">
-      <div class="step-num">2</div>
-      <div>
-        <h4>Windowed Refetch — Σπάσιμο Ορίου 500</h4>
-        <p>Μήνες με ακριβώς 500 αποφάσεις (API cap) επανασυλλέγονται με παράθυρα 7 ημερών.
-           Ανάκτηση +22.000–24.000 κρυφών αποφάσεων ανά δήμο.</p>
-      </div>
-    </div>
-    <div class="method-step">
-      <div class="step-num">3</div>
-      <div>
-        <h4>Στοχευμένη Hydration (hydrate_by_type)</h4>
-        <p>Για τύπους Δ.1 (άμεση ανάθεση), Δ.2.2 (κατακύρωση), Γ.3.4 (σύμβαση),
-           λήψη πλήρους JSON κάθε απόφασης για εξαγωγή ποσών (<code>awardAmount</code>)
-           και ΑΦΜ προμηθευτή.</p>
-      </div>
-    </div>
-    <div class="method-step">
-      <div class="step-num">4</div>
-      <div>
-        <h4>Κανονικοποίηση & Lifecycle Linking</h4>
-        <p>Παραγωγή <code>decisions.csv</code>, <code>contracts.csv</code>, <code>lifecycle.csv</code>
-           ανά φορέα. Lifecycle linking: σύνδεση σταδίων ίδιας προμήθειας (έγκριση → κατακύρωση
-           → σύμβαση → πληρωμή) μέσω ΑΦΜ + ποσό ±2% εντός 180 ημερών.</p>
-      </div>
-    </div>
-    <div class="method-step">
-      <div class="step-num">5</div>
-      <div>
-        <h4>Συγκριτική Ανάλυση</h4>
-        <p>Scripts <code>build_hospital_deyva_comparison.py</code> και
-           <code>build_normalized_tables.py</code> παράγουν αναφορές Markdown και CSV
-           συγκρίνοντας 14 φορείς σε κοινά μετρικά.</p>
-      </div>
-    </div>
-
-    <div class="code-block">
-<span class="comment"># Εκτέλεση ολόκληρου pipeline για έναν φορέα</span>
-<span class="cmd">python scripts/pipeline.py</span> --org 99221923 --months 2020-01:2026-05 \
-    --normalize-format csv
-
-<span class="comment"># Στοχευμένη hydration για προμήθειες</span>
-<span class="cmd">python scripts/hydrate_by_type.py</span> --orgs 99221923 50304 \
-    --type-uids Δ.1 Δ.2.2 Γ.3.4
-
-<span class="comment"># Δημιουργία συγκριτικής αναφοράς νοσοκομείων/ΔΕΥΑ</span>
-<span class="cmd">python scripts/build_hospital_deyva_comparison.py</span>
-    </div>
-  </section>
-
-  <section>
-    <h2><span class="num">3</span>Φορείς που Αναλύθηκαν</h2>
-    <div class="tbl-wrap">
-      <table>
-        <thead>
-          <tr><th>Οργ. ID</th><th>Φορέας</th><th>Τύπος</th><th>Αποφάσεις</th><th>Περίοδος</th></tr>
-        </thead>
-        <tbody>
-          <tr class="lamia"><td>6166</td><td><strong>Δήμος Λαμίας</strong> ★</td><td>Δήμος</td><td>64.334</td><td>2020–2026</td></tr>
-          <tr><td>6298</td><td>Δήμος Τρικκαίων</td><td>Δήμος</td><td>60.749</td><td>2020–2026</td></tr>
-          <tr><td>6272</td><td>Δήμος Σερρών</td><td>Δήμος</td><td>61.688</td><td>2020–2026</td></tr>
-          <tr><td>6135</td><td>Δήμος Καρδίτσας</td><td>Δήμος</td><td>59.326</td><td>2020–2026</td></tr>
-          <tr class="lamia"><td>99221923</td><td><strong>ΓΝ Λαμίας</strong> ★</td><td>Νοσοκομείο</td><td>50.729</td><td>2020–2026</td></tr>
-          <tr><td>99221946</td><td>ΓΝ Τρικάλων</td><td>Νοσοκομείο</td><td>65.992</td><td>2020–2026</td></tr>
-          <tr><td>99221913</td><td>ΓΝ Καρδίτσας</td><td>Νοσοκομείο</td><td>37.166</td><td>2020–2026</td></tr>
-          <tr><td>99221920</td><td>ΓΝ Κοζάνης (Μαμάτσειο)</td><td>Νοσοκομείο</td><td>35.381</td><td>2020–2026</td></tr>
-          <tr><td>99221942</td><td>ΓΝ Σερρών</td><td>Νοσοκομείο</td><td>25.764</td><td>2020–2026</td></tr>
-          <tr class="lamia"><td>50304</td><td><strong>ΔΕΥΑ Λαμίας</strong> ★</td><td>ΔΕΥΑ</td><td>24.433</td><td>2020–2026</td></tr>
-          <tr><td>51546</td><td>ΔΕΥΑ Τρικάλων</td><td>ΔΕΥΑ</td><td>14.653</td><td>2020–2026</td></tr>
-          <tr><td>50449</td><td>ΔΕΥΑ Κοζάνης</td><td>ΔΕΥΑ</td><td>13.977</td><td>2020–2026</td></tr>
-          <tr><td>50621</td><td>ΔΕΥΑ Σερρών</td><td>ΔΕΥΑ</td><td>15.625</td><td>2020–2026</td></tr>
-          <tr><td>50432</td><td>ΔΕΥΑ Καρδίτσας</td><td>ΔΕΥΑ</td><td>14.558</td><td>2020–2026</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p style="font-size:.76rem;color:var(--grey);margin-top:6px">
-      ★ = Φορέας αναφοράς (Λαμία)
-    </p>
-  </section>
-
-  <section>
-    <h2><span class="num">4</span>Άδεια Χρήσης & Επαναχρησιμοποίηση</h2>
-    <div class="callout">
-      <div class="icon">🔓</div>
-      <div>
-        <h4>Ελεύθερα για επαναχρησιμοποίηση</h4>
-        <p>Ο κώδικας και τα παράγωγα δεδομένα διατίθενται ελεύθερα για δημοσιογράφους,
-           ερευνητές, ΜΚΟ και πολίτες. Τα πρωτογενή δεδομένα προέρχονται από τη Διαύγεια
-           (δημόσια πληροφορία, ανοιχτή άδεια). Για την επέκταση της ανάλυσης σε άλλους
-           δήμους ή φορείς, αρκεί η αλλαγή του <code>--org</code> ID στο pipeline script.
-           Κάθε ελληνικός δημόσιος φορέας με Diavgeia UID μπορεί να αναλυθεί με τον ίδιο τρόπο.</p>
-      </div>
-    </div>
-  </section>
-
-</div><!-- /pane-resources -->
-
-<!-- ════════════════════ PANE: BUDGET PER CAPITA ════════════════════ -->
-<div class="pane" id="pane-budget">
-
-  <div class="alert blue">
-    <strong>Γνωστή προμηθευτική δαπάνη Διαύγειας (ΑΝΑΘΕΣΗ + ΚΑΤΑΚΥΡΩΣΗ + ΣΥΜΒΑΣΗ) ανά κάτοικο, ανά έτος.</strong>
-    Περιλαμβάνονται <em>όλοι</em> οι τύποι ανάθεσης — άμεσες, ανταγωνιστικές κατακυρώσεις και συμβάσεις —
-    για συνολική εικόνα. Τα ποσά προέρχονται μόνο από αποφάσεις με συμπληρωμένο πεδίο ποσού
-    (<em>δεν αντιπροσωπεύουν τον συνολικό προϋπολογισμό</em> του φορέα).
-    Νοσοκομεία: πληθυσμός νομού · Δήμοι &amp; ΔΕΥΑ: πληθυσμός πόλης.
   </div>
 
-  <!-- ── Municipalities ── -->
-  <section>
-    <h2><span class="num">1</span>Δήμοι — Συνολική Δαπάνη ανά Κάτοικο / Έτος</h2>
-
-    <div class="alert amber">
-      <strong>Σημείωση κωδικοποίησης:</strong> Δήμος Λαμίας και Τρικκαίων χρησιμοποιούν ΑΝΑΘΕΣΗ για
-      μικρές απευθείας αναθέσεις και ΚΑΤΑΚΥΡΩΣΗ για ανταγωνιστικά έργα — σύγκριση άμεση.
-      Δήμος Καρδίτσας κωδικοποιεί και τα μεγάλα ανταγωνιστικά έργα ως ΑΝΑΘΕΣΗ (μ.ο. €302κ/απόφαση),
-      οπότε εξαιρείται από το γράφημα ως μη συγκρίσιμος. Δήμος Σερρών: κάλυψη ποσών &lt;1%.
+  <div class="bridge">
+    <div>
+      <p><strong>Επόμενο:</strong> Παρόμοια πρότυπα — ισχυρή παρουσία αναδόχου, thin ανταγωνισμός — εμφανίζονται και στον Δήμο Λαμίας, σε μεγαλύτερες όμως συμβάσεις (καύσιμα €6,4Μ, σκυρόδεμα €13Μ).</p>
     </div>
-
-    <div class="chart-grid">
-      <div class="chart-box" style="grid-column:1/-1">
-        <h3>€ Διαύγεια ανά κάτοικο — Δήμοι Λαμίας &amp; Τρικκαίων (2020–2025)</h3>
-        <canvas id="muniCapita" style="max-height:280px"></canvas>
-      </div>
-    </div>
-
-    <div class="tbl-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Δήμος (πληθυσμός)</th>
-            <th>2020</th><th>2021</th><th>2022</th><th>2023</th><th>2024</th><th>2025</th>
-            <th>Σύνολο</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr class="lamia">
-            <td><strong>★ Λαμίας</strong> <span class="badge grey">75.000 κατ.</span></td>
-            <td>€42</td><td>€19</td><td>€22</td><td>€55</td><td>€45</td><td>€24</td>
-            <td><strong>€15,6M</strong></td>
-          </tr>
-          <tr>
-            <td>Τρικκαίων <span class="badge grey">81.000 κατ.</span></td>
-            <td>€19</td><td>€69</td><td>€32</td><td>€51</td><td>€30</td><td>€23</td>
-            <td>€18,2M</td>
-          </tr>
-          <tr>
-            <td>Σερρών <span class="badge grey">57.000 κατ.</span></td>
-            <td>€1</td><td>€0</td><td>—</td><td>€0</td><td>€0</td><td>—</td>
-            <td>€0,1M <span class="badge grey">&lt;1% κάλ.</span></td>
-          </tr>
-          <tr>
-            <td>Καρδίτσας <span class="badge grey">~58.000 κατ.</span></td>
-            <td colspan="6" style="color:var(--grey);font-style:italic">Εξαιρείται — διαφορετική κωδικοποίηση (μεγάλα έργα ως ΑΝΑΘΕΣΗ)</td>
-            <td>€778,9M* ⚠️</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="callout">
-      <div class="icon">📊</div>
-      <div>
-        <h4>Λαμία και Τρίκαλα σε παρόμοιο εύρος — αλλά με διαφορετική σύνθεση</h4>
-        <p>Ο Δήμος Λαμίας και ο Δήμος Τρικκαίων δαπανούν παρόμοια σε €/κάτοικο/έτος (€19–€69 vs €19–€55).
-        Η διαφορά βρίσκεται στη <strong>σύνθεση</strong>: Λαμία €25,6Μ άμεσες vs €34,3Μ ανταγωνιστικές·
-        Τρίκαλα έχει σχεδόν μηδενικές ανταγωνιστικές στα ποσά που είναι διαθέσιμα στη Διαύγεια
-        (πιθανώς υποκάλυψη στα ποσά ΚΑΤΑΚΥΡΩΣΗΣ λόγω ατελούς hydration).</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── Hospitals ── -->
-  <section>
-    <h2><span class="num">2</span>Νοσοκομεία — Συνολική Δαπάνη ανά Κάτοικο Νομού / Έτος</h2>
-
-    <div class="alert amber">
-      <strong>Σημείωση κωδικοποίησης:</strong> ΓΝ Τρικάλων, Καρδίτσας, Κοζάνης χρησιμοποιούν
-      κυρίως Β-τύπους (ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ) αντί Δ.1 για τεκμηρίωση προμηθειών.
-      Αποκλείοντας ΑΝΑΛΗΨΗ (για αποφυγή διπλοκαταμέτρησης), οι τιμές τους είναι τεχνητά
-      χαμηλές σε αυτό το γράφημα. ΓΝ Σερρών: ελάχιστη κάλυψη ποσών ΑΝΑΘΕΣΗΣ.
-      Το ΓΝ Λαμίας είναι ο μόνος φορέας με αξιόπιστη κάλυψη (43,6% των αποφάσεων Δ.1).
-    </div>
-
-    <div class="chart-grid">
-      <div class="chart-box" style="grid-column:1/-1">
-        <h3>Νοσοκομεία — € Διαύγεια ανά κάτοικο νομού (2020–2025)</h3>
-        <canvas id="hospCapita" style="max-height:280px"></canvas>
-      </div>
-    </div>
-
-    <div class="tbl-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Νοσοκομείο (πληθυσμός νομού)</th>
-            <th>2020</th><th>2021</th><th>2022</th><th>2023</th><th>2024</th><th>2025</th>
-            <th>Σύνολο</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr class="lamia">
-            <td><strong>★ ΓΝ Λαμίας</strong> <span class="badge grey">155.000 κατ.</span></td>
-            <td>€238</td><td>€341</td><td>€241</td><td>€329</td><td>€306</td><td>€193</td>
-            <td><strong>€255,5M</strong> <span class="badge red">43,6% κάλ.</span></td>
-          </tr>
-          <tr>
-            <td>ΓΝ Τρικάλων <span class="badge grey">131.000 κατ.</span></td>
-            <td>€10</td><td>€0</td><td>€0</td><td>€0</td><td>—</td><td>€6</td>
-            <td>€2,1M <span class="badge grey">Β-τύπος</span></td>
-          </tr>
-          <tr>
-            <td>ΓΝ Σερρών <span class="badge grey">172.000 κατ.</span></td>
-            <td>€0</td><td>€1</td><td>€1</td><td>€2</td><td>€1</td><td>€3</td>
-            <td>€1,3M <span class="badge grey">ατελής</span></td>
-          </tr>
-          <tr>
-            <td>ΓΝ Καρδίτσας / Κοζάνης</td>
-            <td colspan="6" style="color:var(--grey);font-style:italic">Β-τύποι κωδικοποίησης (ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ) — εξαιρούνται για αποφυγή διπλοκαταμέτρησης</td>
-            <td>—</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="callout" style="margin-top:8px">
-      <div class="icon">📌</div>
-      <div>
-        <h4>ΓΝ Λαμίας: €274/κάτοικο/έτος — σταθερά υψηλή δαπάνη, με αντεστραμμένη αναλογία ανταγωνισμού</h4>
-        <p>Από τα €255,5Μ συνολικής καταγεγραμμένης δαπάνης, €45,3Μ αφορούν ανταγωνιστικές κατακυρώσεις
-        και €215,5Μ αποφάσεις τύπου ΑΝΑΘΕΣΗ (εκ των οποίων ~€132,8Μ είναι βήματα ανταγωνιστικών
-        διαδικασιών που κωδικοποιήθηκαν λανθασμένα). Η σταθερά χαμηλή αναλογία
-        ανταγωνιστικών κατακυρώσεων (407 σε 6 χρόνια) παραμένει το βασικό εύρημα.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── DEYAs ── -->
-  <section>
-    <h2><span class="num">3</span>ΔΕΥΑ — Συνολική Δαπάνη ανά Κάτοικο / Έτος</h2>
-
-    <div class="chart-grid">
-      <div class="chart-box" style="grid-column:1/-1">
-        <h3>€ Διαύγεια ανά κάτοικο — ΔΕΥΑ (2020–2025)</h3>
-        <canvas id="deyvaCapita" style="max-height:290px"></canvas>
-      </div>
-    </div>
-
-    <div class="tbl-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>ΔΕΥΑ (πληθυσμός)</th>
-            <th>2020</th><th>2021</th><th>2022</th><th>2023</th><th>2024</th><th>2025</th>
-            <th>Σύνολο</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr class="lamia">
-            <td><strong>★ ΔΕΥΑ Λαμίας</strong> <span class="badge grey">75.000</span></td>
-            <td>€47</td><td>€162</td><td>€62</td><td>€9</td><td>€10</td><td>€9</td>
-            <td><strong>€22,3M</strong></td>
-          </tr>
-          <tr>
-            <td>ΔΕΥΑ Κοζάνης <span class="badge grey">47.000</span></td>
-            <td>€177</td><td>€88</td><td>€142</td><td>€101</td><td>€94</td><td>€50</td>
-            <td>€30,7M</td>
-          </tr>
-          <tr>
-            <td>ΔΕΥΑ Καρδίτσας <span class="badge grey">58.000</span></td>
-            <td>€44</td><td>€28</td><td>€66</td><td>€109</td><td>€93</td><td>€69</td>
-            <td>€23,7M</td>
-          </tr>
-          <tr>
-            <td>ΔΕΥΑ Τρικάλων <span class="badge grey">~48.000</span></td>
-            <td>€116</td><td>€65</td><td>€9</td><td>€22</td><td>€21</td><td>€23</td>
-            <td>€12,3M</td>
-          </tr>
-          <tr>
-            <td>ΔΕΥΑ Σερρών <span class="badge grey">~57.000</span></td>
-            <td>—</td><td>€1</td><td>€1</td><td>—</td><td>—</td><td>—</td>
-            <td>€0,2M <span class="badge grey">&lt;1% κάλ.</span></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="callout" style="margin-top:8px">
-      <div class="icon">💡</div>
-      <div>
-        <h4>Η ΔΕΥΑ Λαμίας δαπανά σχεδόν μηδέν από το 2022 — ενώ οι ομότιμοι επενδύουν</h4>
-        <p>Μετά από μια ακμή το 2021 (€162/κάτ., €12,1Μ — πιθανώς ένα μεγάλο έργο),
-        η ΔΕΥΑ Λαμίας κατρακυλά σε <strong>€9–€10/κάτοικο/έτος</strong> (€670κ–750κ/έτος) από το 2023.
-        Σε αντίθεση, η ΔΕΥΑ Κοζάνης διατηρεί <strong>€50–€177/κάτοικο</strong> σταθερά όλη την περίοδο,
-        η ΔΕΥΑ Καρδίτσας <em>αυξάνει</em> τη δαπάνη (€44→€109), και η ΔΕΥΑ Τρικάλων παρουσίασε
-        μεγάλο έργο το 2020 (€116/κάτ.). Για μια υδρευτική εταιρεία, €9/κάτοικο/έτος σε
-        καταγεγραμμένη προμηθευτική δαπάνη είναι εξαιρετικά χαμηλό.</p>
-      </div>
-    </div>
-  </section>
-
-  <div class="caveat">
-    <strong>Μεθοδολογική σημείωση:</strong>
-    Τύποι απόφασης που περιλαμβάνονται: ΑΝΑΘΕΣΗ + ΚΑΤΑΚΥΡΩΣΗ + ΣΥΜΒΑΣΗ (εξαιρούνται ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ
-    και ΕΓΚΡΙΣΗ ΔΑΠΑΝΗΣ για αποφυγή διπλοκαταμέτρησης με B-τύπους).
-    Αποκλεισμός ανά συναλλαγή: &gt;€5Μ για δήμους/ΔΕΥΑ, &gt;€50Μ για νοσοκομεία.
-    Πληθυσμός νοσοκομείων = νομός (ΕΛΣΤΑΤ 2021). Ημερομηνία από Unix timestamp ή ISO.
-    Τα στοιχεία 2026 δεν εμφανίζονται (ατελές έτος).
+    <button class="nxt" onclick="goTab('ch4')">Κεφ. 4: Ο Δήμος →</button>
   </div>
 
-</div><!-- /pane-budget -->
+</div><!-- /ch3 -->
 
-<footer>
-  Δεδομένα: Διαύγεια OpenData API (diavgeia.gov.gr) · Επεξεργασία: Μάιος 2026 ·
-  Pipeline: search-export + windowed refetch + στοχευμένη hydration ·
-  14 φορείς · ~560.000 αποφάσεις ·
-  <a href="https://github.com/Petropov/Greece_Public_diav" style="color:var(--blue)">GitHub</a>
-</footer>
+<!-- ═══════════════════════════════════════════════════════
+     ΚΕΦΑΛΑΙΟ 4 — Ο ΔΗΜΟΣ
+═══════════════════════════════════════════════════════ -->
+<div class="pane" id="ch4">
 
-<!-- ════════════════════ JS ════════════════════ -->
+  <div class="ch-title">
+    <div class="ch-label">Κεφάλαιο 4 · Ο Δήμος</div>
+    <h2>Τρία διαφορετικά μοτίβα: ψαλίδα ορίου, ανεπαρκής ανταγωνισμός, υπέρβαση ορίου</h2>
+    <p class="lede">Ο Δήμος Λαμίας εκδίδει 10.388 άμεσες αναθέσεις (16,1% του συνόλου) — το υψηλότερο ποσοστό από τους τέσσερις ομοτίμους που εξετάστηκαν. Αλλά δεν είναι ένα ενιαίο πρόβλημα: τρεις κατηγορίες βρέθηκαν να χρήζουν προσοχής, η κάθε μία για διαφορετικό λόγο.</p>
+  </div>
+
+  <!-- Finding 1: Threshold gaming -->
+  <div class="finding red">
+    <div class="icon">✂️</div>
+    <div>
+      <h4>Εύρημα 1: Ψαλίδα ορίου — €37.200 (= €30.000 + ΦΠΑ 24%)</h4>
+      <p>Αποφάσεις ακριβώς στο νόμιμο ανώτατο όριο (€37.200) εμφανίζονται 26 φορές στο dataset. Μεγαλύτερος αριθμός από τους ομοτίμους και με απότομη πτώση αμέσως πάνω από αυτό. Δείχνει συστηματική γνώση του ορίου — ο νόμος γνωρίζεται, το ερώτημα είναι αν εφαρμόζεται σωστά.</p>
+    </div>
+  </div>
+
+  <!-- Finding 2: Above-threshold without tender -->
+  <div class="finding red" style="margin-top:8px">
+    <div class="icon">🚫</div>
+    <div>
+      <h4>Εύρημα 2: Φύλαξη κτιρίων €222k χωρίς διαγωνισμό (2020–2023)</h4>
+      <p>Τρεις αναθέσεις στην ίδια οικογένεια επιχειρήσεων (ΚΟΥΤΚΙΑΣ) για υπηρεσίες φύλαξης δημοτικών κτιρίων: €74k (Ιούλ 2022, ΑΔΑ <code>6ΙΕΠΩΛΚ-05Η</code>), €74k (Αυγ 2022, ΑΔΑ <code>ΨΜΛΔΩΛΚ-ΘΙ0</code>), €74,4k (2023) — σύνολο €222k υπεράνω ορίου χωρίς ανταγωνιστική διαδικασία. Κανένας ομότιμος Δήμος δεν έχει ανάλογη υπέρβαση για φύλαξη κτιρίων.</p>
+    </div>
+  </div>
+
+  <!-- Finding 3: Contract fragmentation -->
+  <div class="finding amber" style="margin-top:8px">
+    <div class="icon">🗺️</div>
+    <div>
+      <h4>Εύρημα 3: Κατάτμηση κατά Δημοτική Ενότητα — 33 προμηθευτές σε κυλιόμενο παράθυρο 60 ημερών</h4>
+      <p>Ανάλυση κυλιόμενου παραθύρου 60 ημερών σε 4.067 αποφάσεις εντόπισε 33 προμηθευτές με αθροιστικές αναθέσεις >€30k ενώ κάθε μεμονωμένη ανάθεση παραμένει εντός ορίου. Ο βασικός μηχανισμός: η ίδια υπηρεσία αναθέτεται στον ίδιο προμηθευτή ταυτόχρονα για διαφορετικές Δ.Ε. (Λαμίας, Γοργοποτάμου, Υπάτης, Λιανοκλαδίου, Παυλιανής). Το αρ. 6§2 Ν.4412/2016 απαγορεύει ρητώς αυτή την πρακτική.</p>
+    </div>
+  </div>
+
+  <div class="section" style="margin-top:24px">
+    <h3>Καύσιμα: 4 συνεχόμενες κατακυρώσεις, ουσιαστικά μηδενικός ανταγωνισμός</h3>
+    <div class="prose" style="margin-bottom:16px">
+      <p>Η ΧΑΛΚΙΑΣ OIL ΑΕ (ΑΦΜ 094275382) έχει κερδίσει όλα τα τελευταία tender καυσίμων του Δήμου: 2020 (€1,93Μ), 2021 (€2,24Μ), 2023, 2025 (€2,22Μ). Αλλά η δομή κάθε διαγωνισμού αποκαλύπτει το πρόβλημα: οι δύο τοπικοί διανομείς υποβάλλουν προσφορές για <em>διαφορετικές</em> ομάδες καυσίμου — ποτέ δεν ανταγωνίζονται μεταξύ τους.</p>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>Ομάδα</th><th>Καύσιμο</th>
+          <th class="td-c">2020 — Προσφορές</th>
+          <th class="td-c">2021 — Προσφορές</th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td>Α</td><td>Βενζίνη αμόλυβδη</td>
+            <td class="td-c red-cell"><strong>Μόνο ΧΑΛΚΙΑΣ OIL</strong></td>
+            <td class="td-c red-cell"><strong>Μόνο ΧΑΛΚΙΑΣ OIL</strong></td>
+          </tr>
+          <tr style="background:#f9f9f9">
+            <td>Β</td><td>Πετρέλαιο κίνησης</td>
+            <td class="td-c red-cell"><strong>Μόνο ΧΑΛΚΙΑΣ OIL</strong></td>
+            <td class="td-c red-cell"><strong>Μόνο ΧΑΛΚΙΑΣ OIL</strong></td>
+          </tr>
+          <tr>
+            <td>Γ</td><td>Πετρέλαιο θέρμανσης</td>
+            <td class="td-c">Μόνο VD TRANS OIL</td>
+            <td class="td-c">Μόνο VD TRANS OIL</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="prose" style="margin-top:12px"><span class="note">Πιθανότατη εξήγηση: τοπικό δυοπώλιο — ΧΑΛΚΙΑΣ OIL (1ο χλμ Λαμίας–Αθηνών) και VD TRANS OIL (Τσαρουχόκαμπος) είναι οι μόνοι διανομείς στη λογική ακτίνα παράδοσης. Δεν είναι νομικό πρόβλημα, αλλά ο Δήμος δεν έχει καμία αγοραία επαλήθευση τιμής για κινητήρια καύσιμα στους τέσσερις κύκλους.</span></p>
+  </div>
+
+  <div class="section" style="margin-top:20px">
+    <h3>Σκυρόδεμα (€13Μ/4 έτη) και Πληροφορική (ΜΑΝΤΕΣ-ΤΣΑΜΗΣ)</h3>
+    <div class="prose" style="margin-bottom:14px">
+      <p>Στη μεγαλύτερη σύμβαση (ΑΔΑ <code>9Π7ΡΩΛΚ-9Κ5</code>, €13,05Μ για έτοιμο σκυρόδεμα και αδρανή υλικά, 2020): <strong>2 συνολικά προσφορές — καμία επικάλυψη ανά ομάδα</strong>. ΑΤΛΑΣ ΜΠΕΤΟΝ ΑΒΕΕ (AFM 094082639, Λαμία) ήταν ο μόνος προσφέρων για έτοιμο σκυρόδεμα. Γεωγραφικό μονοπώλιο — η πλησιέστερη εναλλακτική είναι εκτός οικονομικής απόστασης.</p>
+      <p>Στην Πληροφορική: ΜΑΝΤΕΣ-ΤΣΑΜΗΣ ΟΕ (ΑΦΜ 082785679) — 49 αποφάσεις σε 6 χρόνια. Συνδυάζει νόμιμες ανταγωνιστικές νίκες (9 ΚΑΤΑΚΥΡΩΣΗ ~€771k) με <strong>6 αναθέσεις ακριβώς στα €37.200</strong> (2022–2025). Το μοτίβο αυτό πληροί τα τυπικά κριτήρια κατάτμησης αν οι αναθέσεις καλύπτουν συνεχόμενες ετήσιες υπηρεσίες.</p>
+    </div>
+  </div>
+
+  <div class="section" style="margin-top:20px">
+    <h3>Ωστόσο: Καθαριότητα, Καύσιμα, Τρόφιμα — καλύτερη επίδοση από ομοτίμους</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>Κατηγορία ΑΝΑΘΕΣΗ</th>
+          <th class="td-r">Λαμία</th><th class="td-r">Τρίκαλα</th>
+          <th class="td-r">Δείκτης</th><th class="td-r">ΚΑΤΑΚΥΡΩΣΗ</th>
+        </tr></thead>
+        <tbody>
+          <tr style="background:#f0fff4">
+            <td>Καθαριότητα</td>
+            <td class="td-r green-cell"><strong>42</strong></td>
+            <td class="td-r">282</td>
+            <td class="td-r green-cell">0,1× <em>(Λαμία καλύτερη)</em></td>
+            <td class="td-r">10</td>
+          </tr>
+          <tr style="background:#f0fff4">
+            <td>Καύσιμα / Λιπαντικά</td>
+            <td class="td-r green-cell"><strong>8</strong></td>
+            <td class="td-r">79</td>
+            <td class="td-r green-cell">0,1× <em>(Λαμία καλύτερη)</em></td>
+            <td class="td-r">6</td>
+          </tr>
+          <tr style="background:#fef2f2">
+            <td>Εκδηλώσεις / Διαφήμιση</td>
+            <td class="td-r red-cell"><strong>1.210</strong></td>
+            <td class="td-r">247</td>
+            <td class="td-r red-cell">4,9× <em>(Λαμία υψηλότερη)</em></td>
+            <td class="td-r">2</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="prose" style="margin-top:10px"><span class="note">Οι 1.210 αναθέσεις εκδηλώσεων (~200/χρόνο) — ήχος, εκτυπώσεις, εξέδρες, υπηρεσίες επικοινωνίας — είναι η κύρια πηγή του ανυψωμένου ποσοστού ΑΝΑΘΕΣΗ. Από 253 προμηθευτές, κανείς δεν κατέχει >10% των αποφάσεων. Δεν υπάρχει συγκέντρωση, αλλά υπάρχει <strong>πλήρης απουσία ανταγωνιστικών πλαισίων-συμβάσεων</strong> για επαναλαμβανόμενες υπηρεσίες.</span></p>
+  </div>
+
+  <div class="bridge">
+    <div>
+      <p><strong>Επόμενο:</strong> Η ΔΕΥΑ Λαμίας έχει 4,9× περισσότερες άμεσες αναθέσεις από τον μέσο όρο ομοτίμων — αλλά ο λόγος διαφέρει εντελώς από τους άλλους δύο φορείς.</p>
+    </div>
+    <button class="nxt" onclick="goTab('ch5')">Κεφ. 5: Η ΔΕΥΑ →</button>
+  </div>
+
+</div><!-- /ch4 -->
+
+<!-- ═══════════════════════════════════════════════════════
+     ΚΕΦΑΛΑΙΟ 5 — Η ΔΕΥΑ
+═══════════════════════════════════════════════════════ -->
+<div class="pane" id="ch5">
+
+  <div class="ch-title">
+    <div class="ch-label">Κεφάλαιο 5 · Η ΔΕΥΑ</div>
+    <h2>Μεγάλος όγκος, μηδενική συγκέντρωση — διαφορετικό πρόβλημα</h2>
+    <p class="lede">Η ΔΕΥΑ Λαμίας εκδίδει 4,9× περισσότερες άμεσες αναθέσεις από τον μέσο όρο συγκρίσιμων υδραυλικών εταιριών. Αλλά σε αντίθεση με το Νοσοκομείο, εδώ δεν βρίσκουμε ούτε ισχυρούς αναδόχους, ούτε μεγάλες συμβάσεις, ούτε κατεύθυνση δαπανών σε συγκεκριμένους παραλήπτες. Ο μέσος όρος συναλλαγής είναι €3.500.</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="n amber">2.840</div>
+      <div class="label">Άμεσες αναθέσεις ΔΕΥΑ Λαμίας 2020–2026 — 4,9× πάνω από μ.ο. ομοτίμων</div>
+    </div>
+    <div class="stat">
+      <div class="n green">310</div>
+      <div class="label">Μοναδικοί προμηθευτές — μέγιστος ανάδοχος: 17 συναλλαγές / ~€14k σε 6 χρόνια</div>
+    </div>
+    <div class="stat">
+      <div class="n blue">€3.500</div>
+      <div class="label">Μέσος όρος συναλλαγής — εντός νόμιμου ορίου άμεσης ανάθεσης</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Σύγκριση με ομοτίμους υδρευτικές εταιρίες</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>ΔΕΥΑ</th>
+          <th class="td-r">Άμεσες αναθέσεις</th>
+          <th class="td-r">% συνολικών αποφ.</th>
+          <th class="td-r">% δαπάνης</th>
+          <th class="td-r">Μ.Ο. συναλλαγής</th>
+        </tr></thead>
+        <tbody>
+          <tr style="background:#fffbeb">
+            <td><strong>ΔΕΥΑ Λαμίας</strong></td>
+            <td class="td-r amber-cell"><strong>2.840</strong></td>
+            <td class="td-r amber-cell"><strong>11,6%</strong></td>
+            <td class="td-r amber-cell"><strong>93,1%</strong></td>
+            <td class="td-r">€3.500</td>
+          </tr>
+          <tr><td>ΔΕΥΑ Τρικάλων</td><td class="td-r">262</td><td class="td-r">1,8%</td><td class="td-r">—</td><td class="td-r">—</td></tr>
+          <tr style="background:#f9f9f9"><td>ΔΕΥΑ Κοζάνης</td><td class="td-r">196</td><td class="td-r">1,4%</td><td class="td-r">37,4%</td><td class="td-r">—</td></tr>
+          <tr><td>ΔΕΥΑ Καρδίτσας</td><td class="td-r">148</td><td class="td-r">1,0%</td><td class="td-r">14,4%</td><td class="td-r">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section" style="margin-top:20px">
+    <h3>Τι δείχνει η ανάλυση αναδόχων</h3>
+    <div class="prose">
+      <p>Από 310 μοναδικούς προμηθευτές σε 2.840 αναθέσεις: ο συχνότερος έχει 17 συναλλαγές (~€14k σύνολο σε 6 χρόνια). Οι κορυφαίοι 5 καλύπτουν μόλις 15% των αναθέσεων. <strong>Δεν υπάρχει κατεύθυνση δαπανών σε συγκεκριμένους παραλήπτες.</strong></p>
+      <p>Η κατηγορία προμηθειών είναι συνεπής με τη λειτουργία μιας υδραυλικής εταιρίας: 63,7% συντήρηση και επισκευή, 15,5% εφόδια. 41,1% των συναλλαγών είναι κάτω από €1.000.</p>
+      <p>Η ΔΕΥΑ Λαμίας <strong>δεν ακολουθεί το εξωτερικής ανάδοσης μοντέλο</strong> του Νοσοκομείου. Δεν εμφανίζεται σύμβαση καθαριότητας, φύλαξης ή εστίασης μεγάλης κλίμακας στα δεδομένα. Το ανυψωμένο ποσοστό αντικατοπτρίζει μάλλον μια <strong>κουλτούρα προμηθειών που προτιμά την ταχύτητα της άμεσης ανάθεσης</strong> αντί της διαχείρισης συμβάσεων πλαίσιο — όχι κατευθυνόμενη δαπάνη.</p>
+    </div>
+  </div>
+
+  <div class="pull green" style="margin-top:8px">
+    <strong>Συμπέρασμα ΔΕΥΑ:</strong> Ο μεγάλος αριθμός άμεσων αναθέσεων (2.840) είναι αξιοσημείωτος, αλλά η <strong>απουσία συγκέντρωσης προμηθευτών, η διασπορά σε 310 παραλήπτες και το χαμηλό μέσο ποσό</strong> κάθε συναλλαγής δεν υποστηρίζουν σενάριο κατευθυνόμενης δαπάνης. Η ανησυχία είναι η παντελής απουσία ανταγωνιστικών πλαισίων-συμβάσεων (€0,74Μ σε 6 χρόνια vs €12–31Μ για ομοτίμους).
+  </div>
+
+  <div class="bridge">
+    <div>
+      <p><strong>Επόμενο:</strong> Τι μπορεί τεκμηριωμένα να λεχθεί — και τι δεν μπορεί. Ποια ευρήματα είναι ισχυρά, ποια χρήζουν περαιτέρω έρευνας.</p>
+    </div>
+    <button class="nxt" onclick="goTab('ch6')">Κεφ. 6: Τι Σημαίνει →</button>
+  </div>
+
+</div><!-- /ch5 -->
+
+<!-- ═══════════════════════════════════════════════════════
+     ΚΕΦΑΛΑΙΟ 6 — ΤΙ ΣΗΜΑΙΝΕΙ
+═══════════════════════════════════════════════════════ -->
+<div class="pane" id="ch6">
+
+  <div class="ch-title">
+    <div class="ch-label">Κεφάλαιο 6 · Σύνθεση</div>
+    <h2>Τι είναι αποδεδειγμένο, τι χρήζει περαιτέρω έρευνας</h2>
+    <p class="lede">Τα δεδομένα Διαύγεια επιτρέπουν ισχυρά ποσοτικά συμπεράσματα για πρότυπα — αλλά δεν αποδεικνύουν πρόθεση. Κάθε εύρημα κατατάσσεται παρακάτω σύμφωνα με την αποδεικτική βαρύτητά του.</p>
+  </div>
+
+  <div class="verdict-grid">
+    <div class="verdict yes">
+      <h4>✓ Τεκμηριωμένο από πρωτογενείς πηγές</h4>
+      <ul>
+        <li>ΓΝ Τρικάλων: 4,5× περισσότερες ΚΑΤΑΚΥΡΩΣΗ (1.841 vs 407) — ίδιος τύπος φορέα, ίδιο πλαίσιο</li>
+        <li>ΓΝ Λαμίας outsourcing €7,34Μ = 44,9% προϋπολογισμού vs €515k (2,6%) ΓΝ Τρικάλων — 15× χάσμα</li>
+        <li>UNISON: 5 χρόνια παρουσίας · δύο αποτυχημένοι διαγωνισμοί 2023 · κατακύρωση 4 μήνες αργά</li>
+        <li>ΗΦΑΙΣΤΟΣ: €2.136/κλίνη vs €565–876 ομοτίμων · 53% αύξηση ΙΣΕ χωρίς τεκμηρίωση · reversed causality στα πρακτικά 2020</li>
+        <li>ΚΟΥΤΚΙΑΣ: €222k φύλαξη υπεράνω ορίου χωρίς διαγωνισμό 2020–2023</li>
+        <li>ΧΑΛΚΙΑΣ OIL: 4 συνεχόμενες κατακυρώσεις, μοναδικός προσφέρων ανά ομάδα κινητηρίων καυσίμων</li>
+        <li>ΔΕΥΑ: 4,9× πάνω από μ.ο. ομοτίμων · 310 προμηθευτές, μέγιστος €14k — χωρίς συγκέντρωση</li>
+        <li>Τρεις ανεξάρτητοι φορείς, μία πόλη — ίδιο πρότυπο</li>
+      </ul>
+    </div>
+    <div class="verdict no">
+      <h4>○ Χρήζει περαιτέρω έρευνας</h4>
+      <ul>
+        <li>Γιατί δεν κατατέθηκαν έγκυρες προσφορές στους 2 διαγωνισμούς UNISON 2023; (απαιτεί ΕΣΗΔΗΣ portal ή επικοινωνία με promithies@hosplam.gr)</li>
+        <li>Ποια ακριβώς είναι η λειτουργική αιτιολόγηση για 28+1 φύλακες στα 307 κλίνη; (δεν υπάρχει σε Διαύγεια)</li>
+        <li>Αξιολόγηση κόστους/αποδοτικότητας: in-house vs outsourcing στα ελληνικά δημόσια νοσοκομεία</li>
+        <li>Κατακερματισμός Δήμου: επαλήθευση αν οι 33 ανάδοχοι «κυλιόμενου παραθύρου» παρείχαν αδιαίρετη ομοιογενή υπηρεσία</li>
+        <li>ΧΑΛΚΙΑΣ OIL: σύγκριση τιμών με παρατηρητήριο — αν οι τιμές είναι αγοραία δικαιολογημένες, το πρόβλημα διαφορετικοποιείται</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section" style="margin-top:24px">
+    <h3>Η δομική ερμηνεία</h3>
+    <div class="prose">
+      <p>Το πιο ισχυρό εύρημα αυτής της ανάλυσης δεν είναι ένα μεμονωμένο περιστατικό — είναι ότι <strong>τρεις ανεξάρτητοι φορείς με διαφορετικές διοικήσεις</strong> εμφανίζουν παράλληλα υψηλά ποσοστά άμεσης ανάθεσης. Αυτό δεν εξηγείται από κοινή αποτυχία ηγεσίας.</p>
+      <p>Μία εύλογη ερμηνεία: <strong>η διοικητική αδράνεια της άμεσης ανάθεσης</strong> (ταχύτητα, απλότητα) εναντίον της διοικητικής επιβάρυνσης του ανοικτού διαγωνισμού (χρόνος, γραφειοκρατία, κίνδυνος ενστάσεων) δημιουργεί ένα τοπικό προμηθευτικό τοπίο που επιλέγει συστηματικά τον πρώτο δρόμο — ακόμα και σε περιπτώσεις που ο νόμος απαιτεί τον δεύτερο.</p>
+      <p>Η αντίθεση με το ΓΝ Τρικάλων είναι ιδιαίτερα αποκαλυπτική: <strong>ίδιο νομικό πλαίσιο, ίδιος τύπος φορέα, ίδια περιοχή, ίδιο κόστος — εντελώς διαφορετική προμηθευτική κουλτούρα</strong>. Αυτό δείχνει ότι το πρόβλημα δεν είναι αναπόφευκτο.</p>
+    </div>
+  </div>
+
+  <div class="section" style="margin-top:20px">
+    <h3>Μεθοδολογικές επιφυλάξεις</h3>
+    <div class="prose">
+      <p>Η ανάλυση βασίζεται αποκλειστικά σε δημόσια δεδομένα Διαύγεια. Οι ακόλουθοι περιορισμοί έχουν εντοπιστεί και τεκμηριωθεί:</p>
+      <ul style="padding-left:20px;margin-top:8px">
+        <li style="margin-bottom:6px"><strong>Κωδικολογικό artifact:</strong> ~739 ΑΝΑΘΕΣΗ στο ΓΝ Λαμίας είναι βήματα επιτροπών σε ανταγωνιστικές διαδικασίες — αφαίρεση τους δεν αλλάζει ουσιωδώς τη σύγκριση</li>
+        <li style="margin-bottom:6px"><strong>Ποσά ΑΝΑΘΕΣΗ:</strong> Δεν εκπροσωπούν αξιόπιστα την πραγματική δαπάνη — σταυροεπαλήθευση με επίσημο απολογισμό 2024 επιβεβαίωσε αυτό</li>
+        <li style="margin-bottom:6px"><strong>Αναγνωριστικά ΑΦΜ:</strong> 63,5% αποφάσεων με ποσά στο ΓΝ Λαμίας δεν έχουν ΑΦΜ προμηθευτή — ανάλυση συγκέντρωσης δεν είναι εφαρμόσιμη σε αυτά</li>
+        <li><strong>Β-νοσοκομεία:</strong> ΓΝ Καρδίτσας/Κοζάνης χρησιμοποιούν ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ αντί ΑΝΑΘΕΣΗ για προμήθειες — μηδενική ΑΝΑΘΕΣΗ ≠ μηδενικές άμεσες αναθέσεις</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section" style="margin-top:20px;background:#f8f9fb">
+    <h3>Πηγές και στοιχεία</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;font-size:.82rem;color:var(--ink2)">
+      <div>
+        <strong style="display:block;margin-bottom:6px">Δεδομένα</strong>
+        Διαύγεια OpenData API (search exports + hydration) · ΑΔΑ αποφάσεων επαληθεύτηκαν απευθείας · ΓΕΜΗ API για ταυτοποίηση αναδόχων · Επίσημος απολογισμός 2024 (ΑΔΑ 9ΤΥΕ4690ΒΜ-69Α)
+      </div>
+      <div>
+        <strong style="display:block;margin-bottom:6px">Φορείς</strong>
+        ΓΝ Λαμίας (org 99221923) · ΓΝ Τρικάλων (99221946) · ΓΝ Καρδίτσας (99221913) · ΓΝ Κοζάνης (99221920) · ΓΝ Σερρών (99221942) · Δήμος Λαμιέων (6166) · Δήμος Τρικκαίων (6079) · ΔΕΥΑ Λαμίας / Τρικάλων / Καρδίτσας / Κοζάνης
+      </div>
+      <div>
+        <strong style="display:block;margin-bottom:6px">Κάλυψη</strong>
+        2020–2026 · 90.000+ αποφάσεις · 20.283 ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ υδατοποιημένες · Επαλήθευση PDF σε επιλεγμένες αποφάσεις
+      </div>
+    </div>
+  </div>
+
+</div><!-- /ch6 -->
+
 <script>
-// ── Tab switching ──────────────────────────────────────
-document.querySelectorAll('.tab-bar a').forEach(a => {
-  a.addEventListener('click', e => {
-    e.preventDefault();
-    document.querySelectorAll('.tab-bar a').forEach(x => x.classList.remove('active'));
-    document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
-    a.classList.add('active');
-    document.getElementById('pane-' + a.dataset.tab).classList.add('active');
-    window.scrollTo({top:0,behavior:'smooth'});
-  });
-});
-
-// ── Colours ────────────────────────────────────────────
-const C = {
-  lamia:  '#c0392b',
-  lamiaL: 'rgba(192,57,43,.15)',
-  blue:   '#2471a3',
-  green:  '#1a7a4a',
-  purple: '#7d3c98',
-  amber:  '#d68910',
-  peers:  ['#2471a3','#1a7a4a','#7d3c98','#ca6f1e'],
-};
-Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
-Chart.defaults.font.size   = 12;
-
-function bar(id, labels, data, colors, opts={}) {
-  const ctx = document.getElementById(id);
-  if (!ctx) return;
-  new Chart(ctx, {
-    type: 'bar',
-    data: { labels, datasets: [{ data, backgroundColor: colors, borderRadius: 6 }] },
-    options: {
-      plugins: { legend: { display: false } },
-      scales: {
-        y: { beginAtZero: true, grid: { color: '#f0f0f0' } },
-        x: { grid: { display: false } },
-        ...opts.scales
-      },
-      ...opts
-    }
-  });
+function goTab(id){
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.chapter-nav a').forEach(a=>a.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelector(`[data-tab="${id}"]`).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
 }
-
-// ── Overview: cross-rate ───────────────────────────────
-new Chart(document.getElementById('crossRate'), {
-  type: 'bar',
-  data: {
-    labels: ['ΓΝ\nΛαμίας','ΔΕΥΑ\nΛαμίας','Δήμος\nΛαμίας',
-             'ΓΝ\nΤρικάλων','ΔΕΥΑ\nΤρικάλων','Δήμος\nΤρικάλων',
-             'ΓΝ\nΣερρών','ΔΕΥΑ\nΣερρών','Δήμος\nΣερρών',
-             'ΔΕΥΑ\nΚοζάνης','ΔΕΥΑ\nΚαρδίτσας','Δήμος\nΚαρδίτσας'],
-    datasets: [{
-      data: [11.6,11.6,16.1, 0.3,1.8,11.5, 0.7,7.6,2.6, 1.4,1.0,4.6],
-      backgroundColor: [
-        C.lamia,C.lamia,C.lamia,
-        C.peers[0],C.peers[0],C.peers[0],
-        C.peers[1],C.peers[1],C.peers[1],
-        C.peers[2],C.peers[3],C.peers[3],
-      ],
-      borderRadius: 5,
-    }]
-  },
-  options: {
-    plugins: { legend: { display: false },
-      tooltip: { callbacks: { label: c => ` ${c.raw}% αποφάσεων` } }
-    },
-    scales: {
-      y: { beginAtZero: true, ticks: { callback: v => v+'%' }, grid: { color: '#f0f0f0' } },
-      x: { grid: { display: false }, ticks: { font: { size: 10.5 } } }
-    }
-  }
-});
-
-// ── Overview: hosp direct vs competitive ──────────────
-new Chart(document.getElementById('hospDvC'), {
-  type: 'bar',
-  data: {
-    labels: ['ΓΝ Λαμίας ★','ΓΝ Τρικάλων','ΓΝ Σερρών'],
-    datasets: [
-      { label: 'Άμεσες (ΑΝΑΘΕΣΗ)', data:[5887,187,184],
-        backgroundColor:[C.lamia,C.peers[0],C.peers[1]], borderRadius:5, stack:'s' },
-      { label: 'Ανταγωνιστικές (ΚΑΤΑΚΥΡΩΣΗ)', data:[407,1841,82],
-        backgroundColor:['rgba(192,57,43,.3)','rgba(36,113,163,.3)','rgba(26,122,74,.3)'],
-        borderRadius:5, stack:'s' }
-    ]
-  },
-  options: {
-    plugins: { legend: { position:'bottom', labels:{ boxWidth:12 } } },
-    scales: {
-      y: { beginAtZero:true, stacked:true, grid:{ color:'#f0f0f0' } },
-      x: { stacked:true, grid:{ display:false } }
-    }
-  }
-});
-
-// ── Overview: deyva pct ────────────────────────────────
-new Chart(document.getElementById('deyvaPct'), {
-  type: 'bar',
-  data: {
-    labels: ['ΔΕΥΑ Λαμίας ★','ΔΕΥΑ Κοζάνης','ΔΕΥΑ Καρδίτσας'],
-    datasets: [
-      { label:'Άμεσες %', data:[93.1,62.6,14.4],
-        backgroundColor:[C.lamia,C.peers[1],C.peers[3]], borderRadius:5, stack:'s' },
-      { label:'Ανταγωνιστικές %', data:[6.9,37.4,85.6],
-        backgroundColor:['rgba(192,57,43,.25)','rgba(26,122,74,.25)','rgba(202,111,30,.25)'],
-        borderRadius:5, stack:'s' }
-    ]
-  },
-  options: {
-    plugins: { legend:{ position:'bottom', labels:{ boxWidth:12 } } },
-    scales: {
-      y: { beginAtZero:true, max:100, stacked:true,
-           ticks:{ callback: v => v+'%' }, grid:{ color:'#f0f0f0' } },
-      x: { stacked:true, grid:{ display:false } }
-    }
-  }
-});
-
-// ── Hospital tab: count ────────────────────────────────
-bar('hospDirectCount',
-  ['ΓΝ Λαμίας ★','ΓΝ Τρικάλων','ΓΝ Σερρών'],
-  [5887,187,184],
-  [C.lamia,C.peers[0],C.peers[1]]
-);
-
-// ── Hospital tab: stacked ─────────────────────────────
-new Chart(document.getElementById('hospStack'), {
-  type: 'bar',
-  data: {
-    labels: ['ΓΝ Λαμίας ★','ΓΝ Τρικάλων','ΓΝ Σερρών'],
-    datasets: [
-      { label:'Άμεσες', data:[5887,187,184],
-        backgroundColor:[C.lamia,C.peers[0],C.peers[1]], borderRadius:5, stack:'s' },
-      { label:'Ανταγωνιστικές', data:[407,1841,82],
-        backgroundColor:['rgba(192,57,43,.3)','rgba(36,113,163,.3)','rgba(26,122,74,.3)'],
-        borderRadius:5, stack:'s' }
-    ]
-  },
-  options: {
-    plugins: { legend:{ position:'bottom', labels:{ boxWidth:12 } } },
-    scales: {
-      y: { stacked:true, beginAtZero:true, grid:{ color:'#f0f0f0' } },
-      x: { stacked:true, grid:{ display:false } }
-    }
-  }
-});
-
-// ── Hospital yearly ───────────────────────────────────
-new Chart(document.getElementById('hospYearly'), {
-  type: 'line',
-  data: {
-    labels: ['2020','2021','2022','2023','2024','2025'],
-    datasets: [
-      { label:'ΓΝ Λαμίας', data:[831,1080,972,871,991,850],
-        borderColor:C.lamia, backgroundColor:C.lamiaL, fill:true,
-        tension:.35, pointRadius:4, borderWidth:2.5 },
-      { label:'ΓΝ Τρικάλων', data:[28,29,33,29,47,17],
-        borderColor:C.peers[0], backgroundColor:'transparent',
-        tension:.35, pointRadius:3, borderWidth:2, borderDash:[5,3] },
-      { label:'ΓΝ Σερρών', data:[27,22,27,32,28,45],
-        borderColor:C.peers[1], backgroundColor:'transparent',
-        tension:.35, pointRadius:3, borderWidth:2, borderDash:[5,3] },
-    ]
-  },
-  options: {
-    plugins: { legend:{ position:'bottom', labels:{ boxWidth:12 } } },
-    scales: {
-      y: { beginAtZero:true, grid:{ color:'#f0f0f0' } },
-      x: { grid:{ display:false } }
-    }
-  }
-});
-
-// ── DEYVA tab ──────────────────────────────────────────
-new Chart(document.getElementById('deyvaCount'), {
-  type:'bar',
-  data: {
-    labels:['ΔΕΥΑ Λαμίας ★','ΔΕΥΑ Τρικάλων','ΔΕΥΑ Κοζάνης','ΔΕΥΑ Σερρών','ΔΕΥΑ Καρδίτσας'],
-    datasets:[{ data:[2840,262,196,1180,148],
-      backgroundColor:[C.lamia,C.peers[0],C.peers[1],C.peers[2],C.peers[3]], borderRadius:6 }]
-  },
-  options: {
-    indexAxis:'y',
-    plugins:{ legend:{ display:false } },
-    scales:{
-      x:{ beginAtZero:true, grid:{ color:'#f0f0f0' } },
-      y:{ grid:{ display:false } }
-    }
-  }
-});
-
-new Chart(document.getElementById('deyvaPctTab'), {
-  type:'bar',
-  data: {
-    labels:['ΔΕΥΑ Λαμίας ★','ΔΕΥΑ Κοζάνης','ΔΕΥΑ Καρδίτσας'],
-    datasets:[
-      { label:'Άμεσες %', data:[93.1,62.6,14.4],
-        backgroundColor:[C.lamia,C.peers[1],C.peers[3]], borderRadius:5, stack:'s' },
-      { label:'Ανταγωνιστικές %', data:[6.9,37.4,85.6],
-        backgroundColor:['rgba(192,57,43,.25)','rgba(26,122,74,.25)','rgba(202,111,30,.25)'],
-        borderRadius:5, stack:'s' }
-    ]
-  },
-  options:{
-    plugins:{ legend:{ position:'bottom', labels:{ boxWidth:12 } } },
-    scales:{
-      y:{ beginAtZero:true, max:100, stacked:true,
-          ticks:{ callback:v=>v+'%' }, grid:{ color:'#f0f0f0' } },
-      x:{ stacked:true, grid:{ display:false } }
-    }
-  }
-});
-
-// ── Municipality ───────────────────────────────────────
-bar('muniCount',
-  ['Λαμία ★','Τρίκαλα','Σέρρες','Καρδίτσα'],
-  [10388,6991,1586,2709],
-  [C.lamia,C.peers[0],C.peers[1],C.peers[3]]
-);
-
-new Chart(document.getElementById('muniSpend'), {
-  type:'bar',
-  data:{
-    labels:['Λαμία ★','Τρίκαλα','Σέρρες'],
-    datasets:[
-      { label:'Άμεσες (€Μ)', data:[25.6,24.1,23.1],
-        backgroundColor:[C.lamia,C.peers[0],C.peers[1]], borderRadius:5, stack:'s' },
-      { label:'Ανταγωνιστικές (€Μ)', data:[34.3,0.35,0.38],
-        backgroundColor:['rgba(192,57,43,.3)','rgba(36,113,163,.3)','rgba(26,122,74,.3)'],
-        borderRadius:5, stack:'s' }
-    ]
-  },
-  options:{
-    plugins:{ legend:{ position:'bottom', labels:{ boxWidth:12 } } },
-    scales:{
-      y:{ beginAtZero:true, stacked:true,
-          ticks:{ callback:v=>'€'+v+'Μ' }, grid:{ color:'#f0f0f0' } },
-      x:{ stacked:true, grid:{ display:false } }
-    }
-  }
-});
-
-// ── Budget per capita: municipalities ─────────────────
-new Chart(document.getElementById('muniCapita'), {
-  type: 'line',
-  data: {
-    labels: ['2020','2021','2022','2023','2024','2025'],
-    datasets: [
-      { label: 'Λαμία ★ (75κ κατ.)', data: [42, 19, 22, 55, 45, 24],
-        borderColor: C.lamia, backgroundColor: C.lamiaL, fill: true,
-        tension: .35, pointRadius: 5, borderWidth: 2.5 },
-      { label: 'Τρίκαλα (81κ)', data: [19, 69, 32, 51, 30, 23],
-        borderColor: C.peers[0], backgroundColor: 'transparent',
-        tension: .35, pointRadius: 4, borderWidth: 2, borderDash: [6,3] },
-    ]
-  },
-  options: {
-    plugins: {
-      legend: { position: 'bottom', labels: { boxWidth: 12 } },
-      tooltip: { callbacks: { label: c => ` ${c.dataset.label}: €${c.raw ?? '—'}/κάτ.` } }
-    },
-    scales: {
-      y: { beginAtZero: true, ticks: { callback: v => '€'+v }, grid: { color: '#f0f0f0' } },
-      x: { grid: { display: false } }
-    }
-  }
-});
-
-// ── Budget per capita: hospitals ──────────────────────
-new Chart(document.getElementById('hospCapita'), {
-  type: 'line',
-  data: {
-    labels: ['2020','2021','2022','2023','2024','2025'],
-    datasets: [
-      { label: 'ΓΝ Λαμίας ★ (155κ κατ. νομού)',
-        data: [238, 341, 241, 329, 306, 193],
-        borderColor: C.lamia, backgroundColor: C.lamiaL, fill: true,
-        tension: .35, pointRadius: 5, borderWidth: 2.5 },
-      { label: 'ΓΝ Τρικάλων (131κ) — Β-τύπος, ατελής',
-        data: [10, 0, 0, 0, null, 6],
-        borderColor: C.peers[0], backgroundColor: 'transparent',
-        tension: .35, pointRadius: 4, borderWidth: 1.5, borderDash: [4,4],
-        spanGaps: false },
-      { label: 'ΓΝ Σερρών (172κ) — ατελής κάλυψη',
-        data: [0, 1, 1, 2, 1, 3],
-        borderColor: C.peers[1], backgroundColor: 'transparent',
-        tension: .35, pointRadius: 4, borderWidth: 1.5, borderDash: [4,4] },
-    ]
-  },
-  options: {
-    plugins: {
-      legend: { position: 'bottom', labels: { boxWidth: 12 } },
-      tooltip: { callbacks: { label: c => ` €${c.raw ?? '—'}/κάτ. νομού` } }
-    },
-    scales: {
-      y: { beginAtZero: true, ticks: { callback: v => '€'+v }, grid: { color: '#f0f0f0' } },
-      x: { grid: { display: false } }
-    }
-  }
-});
-
-// ── Budget per capita: DEYAs ──────────────────────────
-new Chart(document.getElementById('deyvaCapita'), {
-  type: 'line',
-  data: {
-    labels: ['2020','2021','2022','2023','2024','2025'],
-    datasets: [
-      { label: 'ΔΕΥΑ Λαμίας ★ (75κ)', data: [47, 162, 62, 9, 10, 9],
-        borderColor: C.lamia, backgroundColor: C.lamiaL, fill: true,
-        tension: .35, pointRadius: 5, borderWidth: 2.5 },
-      { label: 'ΔΕΥΑ Κοζάνης (47κ)', data: [177, 88, 142, 101, 94, 50],
-        borderColor: C.peers[1], backgroundColor: 'transparent',
-        tension: .35, pointRadius: 4, borderWidth: 2, borderDash: [5,3] },
-      { label: 'ΔΕΥΑ Καρδίτσας (58κ)', data: [44, 28, 66, 109, 93, 69],
-        borderColor: C.peers[3], backgroundColor: 'transparent',
-        tension: .35, pointRadius: 4, borderWidth: 2, borderDash: [5,3] },
-      { label: 'ΔΕΥΑ Τρικάλων (48κ)', data: [116, 65, 9, 22, 21, 23],
-        borderColor: C.peers[0], backgroundColor: 'transparent',
-        tension: .35, pointRadius: 4, borderWidth: 1.5, borderDash: [3,4] },
-    ]
-  },
-  options: {
-    plugins: {
-      legend: { position: 'bottom', labels: { boxWidth: 12 } },
-      tooltip: { callbacks: { label: c => ` ${c.dataset.label}: €${c.raw ?? '—'}/κάτ.` } }
-    },
-    scales: {
-      y: { beginAtZero: true, ticks: { callback: v => '€'+v }, grid: { color: '#f0f0f0' } },
-      x: { grid: { display: false } }
-    }
-  }
-});
-
-new Chart(document.getElementById('muniYearly'), {
-  type:'line',
-  data:{
-    labels:['2020','2021','2022','2023','2024','2025'],
-    datasets:[
-      { label:'Λαμία', data:[1132,918,745,905,555,753],
-        borderColor:C.lamia, backgroundColor:C.lamiaL, fill:true,
-        tension:.35, pointRadius:4, borderWidth:2.5 },
-      { label:'Τρίκαλα', data:[1345,1238,1067,1076,1056,923],
-        borderColor:C.peers[0], backgroundColor:'transparent',
-        tension:.35, pointRadius:3, borderWidth:2, borderDash:[5,3] },
-      { label:'Σέρρες', data:[229,224,227,247,275,319],
-        borderColor:C.peers[1], backgroundColor:'transparent',
-        tension:.35, pointRadius:3, borderWidth:2, borderDash:[5,3] },
-      { label:'Καρδίτσα', data:[399,465,567,506,418,246],
-        borderColor:C.peers[3], backgroundColor:'transparent',
-        tension:.35, pointRadius:3, borderWidth:2, borderDash:[5,3] },
-    ]
-  },
-  options:{
-    plugins:{ legend:{ position:'bottom', labels:{ boxWidth:12 } } },
-    scales:{
-      y:{ beginAtZero:true, grid:{ color:'#f0f0f0' } },
-      x:{ grid:{ display:false } }
-    }
-  }
+document.querySelectorAll('.chapter-nav a').forEach(a=>{
+  a.addEventListener('click',e=>{
+    e.preventDefault();
+    goTab(a.dataset.tab);
+  });
 });
 </script>
 </body>
