@@ -15,7 +15,7 @@ This analysis covers six years of public procurement records (2020–2026) for t
 
 1. **Hospital outsourcing incumbency (UNISON).** The hospital's cleaning contract has been held by UNISON (Metlen Energy & Metals subsidiary) since October 2020. A €4.4M international open tender for cleaning services was launched in March 2023 and failed twice (no valid bids). Four ΕΑΔΗΣΥ consents then authorised a negotiated procedure (Art. 32 § 2γ L.4412/2016). UNISON was formally awarded the negotiated contract in July 2025, with the award published four months late (November 2025). The Art.32§2γ procedure had documented procedural basis; the concern is the five-year incumbency during a period when no competitive tender succeeded, and the ongoing escalation (total UNISON commitment 2025–2026: ~€3.2M).
 
-2. **Hospital security cost escalation.** Security guard services (CPV 79713000-5) cost ~€390k/year during 2020–2021 bridge contracts (KOLOSSOS SECURITY). The first competitive contract (MYSECURITY AND FACILITY SYSTEMS ΑΕ, AFM 800872049, 2021–2023) ran at ~€750–800k/year; the current contract (ΗΦΑΙΣΤΟΣ ΕΠΕ, AFM 999436428, Heraklion, 2024–2026) is priced at ~€984k/year. Cumulative increase: 152% over four years, driven by workforce scale-up (COVID ward, vaccination centre) and minimum-wage adjustments. All three contracts ran through competitive international tenders; no procedural concern identified. The MYSECURITY entity was subsequently dissolved via merger.
+2. **Hospital security cost escalation and staffing model.** Security guard services (CPV 79713000-5) cost ~€390k/year during 2020–2021 bridge contracts (KOLOSSOS SECURITY). The first competitive contract (MYSECURITY AND FACILITY SYSTEMS ΑΕ, AFM 800872049, 2021–2023) was awarded at €486k/year (€972,854 incl. VAT for 2 years); the current contract (ΗΦΑΙΣΤΟΣ ΕΠΕ, AFM 999436428, Heraklion, 2024–2026) runs at €656k/year (€1,968,000 incl. VAT for 3 years). That is a **+35% increase in contract rate** from 2021 to 2024 and **+68% from the bridge-contract baseline**. The underlying driver is a structural staffing increase: the 2023 tender specifications (ADA `6ΒΘ84690ΒΜ-464`) commit to 21 concurrent 8-hour shift-slots per day (7 morning + 7 afternoon + 6 night + 1 supervisor on weekdays), requiring **28+1 FTE on permanent rotation** — up from 19 FTE specified in the 2021 tender. No clinical or operational justification for the 50% headcount increase is documented in the 2023 Board approval. At €656k/year and 307 beds, the per-bed cost is **€2,136/bed/year** — 2.4× to 3.8× the peer hospital range (see benchmark, Part A3). In the 2024 tender: 2 bidders submitted (ARGOS SECURITY ΑΕ and ΗΦΑΙΣΤΟΣ). In 2021: 6 companies technically qualified; only MYSECURITY remained for award. The MYSECURITY entity was subsequently dissolved via merger.
 
 3. **Municipality: above-threshold security and building services without competitive tender.** The municipality directly awarded building security guard contracts above the €30,000 legal threshold in both 2022 (two contracts totalling ~€148k for the same service in the same year: ΚΟΥΤΚΙΑΣ & ΣΙΑ ΕΕ AFM 801089930 in July and ΚΟΥΤΚΙΑΣ Παναγιώτης AFM 112437726 in August) and 2023 (€74.4k). No competitive tender was ever published for building security in the 2020–2026 dataset. The same family entity also appears in a contract fragmentation pattern: two identical €24,435 same-day security awards on 8 April 2020. Peer municipalities show zero above-threshold direct awards for building security. The ΖΗΚΑ & ΚΑΙΛΑΣ entity received above-threshold direct awards for services of questionable CPV classification (€30k–€38k, 2022–2024), also without a competitive tender.
 
@@ -336,15 +336,35 @@ UNISON Facility Services is a subsidiary of **Metlen Energy & Metals** (formerly
 
   KAE 0277 carries three large service contracts: (a) H/M electromechanical maintenance (ΙΝΤΕΡΚΑΤ Α.Ε. / ΑΦΟΙ ΠΑΠΑΙΩΑΝΝΟΥ ΑΤΕΒΕ, AFM 999917261, exactly €166,666.67/month = €2M/year flat rate, ΕΣΗΔΗΣ 95109); (b) security guard services (CPV 79713000-5); (c) hazardous waste management (CPV 90500000-2, ~€800k/year). The declining per-decision average from 2022 onward reflects the security contract structure shifting to a new contractor with smaller quarterly commitment entries.
 
-  **Security contract history (CPV 79713000-5):**
+  **Security contract history (CPV 79713000-5) — corrected figures (May 2026):**
 
-  | Period | Contractor | AFM | Annual value |
-  |--------|-----------|-----|-------------|
-  | Jun 2020–Oct 2021 (bridge) | ΚΟΡΙΑΝΙΤΗΣ Α. — KOLOSSOS SECURITY | — | ~€390k/yr |
-  | Nov 2021–Nov 2023 (+1yr option) | MYSECURITY AND FACILITY SYSTEMS ΑΕ | 800872049 | ~€750–800k/yr |
-  | Nov 2024–Nov 2026 (+1yr option) | ΗΦΑΙΣΤΟΣ ΙΔΙΩΤΙΚΗ ΕΠΕ ΥΠΗΡΕΣΙΩΝ ΑΣΦΑΛΕΙΑΣ | 999436428 | ~€984k/yr |
+  | Period | Contractor | AFM | ΚΑΤΑΚΥΡΩΣΗ amount | Annual rate | Bidders |
+  |--------|-----------|-----|-------------------|------------|---------|
+  | Jun 2020–Oct 2021 (bridge) | ΚΟΡΙΑΝΙΤΗΣ Α. — KOLOSSOS SECURITY | — | — | ~€390k/yr | — |
+  | Nov 2021–Nov 2023 (+1yr option) | MYSECURITY AND FACILITY SYSTEMS ΑΕ | 800872049 | €972,854 incl. VAT / 2yr | **€486k/yr** | 6 qualified → **1 awarded** |
+  | Nov 2024–Nov 2026 (+1yr option) | ΗΦΑΙΣΤΟΣ ΙΔΙΩΤΙΚΗ ΕΠΕ ΥΠΗΡΕΣΙΩΝ ΑΣΦΑΛΕΙΑΣ | 999436428 | €1,968,000 incl. VAT / 3yr | **€656k/yr** | **2 bidders** |
 
-  Security costs doubled from bridge-contract rates (~€390k/yr) to the current contract (~€984k/yr) over four years — a 152% increase, driven largely by workforce scale-up (more security personnel deployed post-COVID) and minimum-wage increases (two upward price adjustments were formally approved within the MYSECURITY contract). The 2024 ΑΝΑΛΗΨΗ KAE 0277 of €3.12M includes the ΗΦΑΙΣΤΟΣ new contract pre-committed across three years (€1.97M for 2yr + €731k option year). MYSECURITY AND FACILITY SYSTEMS ΑΕ was subsequently dissolved via merger ("Διαγραφή λόγω συγχώνευσης" — ΓΕΜΗ arGemi 143546501000); it had also operated cleaning, catering, waste management, and HR services. A February 2024 board decision records "MY SERVICES AE" providing written explanations to hospital management regarding a monitoring-committee report — a service quality dispute during the contract wind-down period.
+  *Note: Previous versions of this analysis overstated the MYSECURITY rate as "~€750–800k/yr" — this was the ΑΝΑΛΗΨΗ committed amount (which includes multi-year pre-reservations), not the annual contract rate.*
+
+  **Security staffing model — benchmark analysis (May 2026):**
+
+  The 2023 tender specifications (ADA `6ΒΘ84690ΒΜ-464`, Board approval 14 December 2023) mandate **21 concurrent 8-hour shift-slots per day** on a 24/7 basis, broken down as: 7 guards (morning 06:00–14:00) + 7 guards (afternoon 14:00–22:00) + 6 guards (night 22:00–06:00) + 1 supervisor (weekday mornings). At 40 work-hours/week per employee and 7-day coverage, this structure requires **28 guards + 1 supervisor = 29 FTE**. The document itself contains a discrepancy: the text says "twenty-five (21)" shift-slots — the numeral word (twenty-five) and parenthetic figure (21) disagree; the actual count in the breakdown table is 21.
+
+  The 2021 specifications (ADA `6ΧΚ84690ΒΜ-ΞΙΖ`) originally called for 17 guards, revised to 19 after a Covid-linked budget increase. The revision documentation shows **the budget was raised first, and the committee was then asked to propose new staffing numbers consistent with the higher budget** — i.e., budget drove headcount rather than operational need determining budget. Between the 2021 and 2023 tenders, the deployed FTE increased from 19 to 28+1: a 50% increase with no documented operational audit or clinical justification.
+
+  **Per-bed cost benchmark — ΓΝ Λαμίας vs peers:**
+
+  | Hospital | Security annual cost | Beds | €/bed/yr | vs. Λαμία |
+  |----------|---------------------|------|----------|-----------|
+  | **ΓΝ Λαμίας** | **€656,000** | **307** | **€2,136** | — |
+  | ΓΝ Τρικάλων (est.) | ~€174,000 | ~307 | **~€565** | **3.8×** |
+  | ΓΝ Καρδίτσας (est.) | ~€269,000 | ~307 | **~€876** | **2.4×** |
+
+  *Peer security costs estimated from KAE 0277 ΑΝΑΛΗΨΗ proportional allocation; beds figure from MoH 2025 (ανεπτυγμένες κλίνες).*
+
+  ΓΝ Λαμίας spends 2.4–3.8× more per bed on security than comparable 5th Health Region hospitals. The gap is structural: the staffing model (7+7+6+1 = 21 concurrent posts) implies a perimeter and patient-flow control philosophy that is materially more intensive than peer hospitals of identical bed-count. No external audit or accreditation requirement documented in the Diavgeia decision chain explains this intensity.
+
+  Security costs grew from bridge-contract rates (~€390k/yr) to the current contract (€656k/yr) over four years — a 68% increase — driven by: (1) headcount expansion (+50% FTE), (2) minimum-wage adjustments during the MYSECURITY contract (two formally approved price adjustments in 2022), and (3) rising market labour costs for CPV 79713000-5 contractors. The 2024 ΑΝΑΛΗΨΗ KAE 0277 of €3.12M includes the ΗΦΑΙΣΤΟΣ contract pre-committed across three years (€1.97M for 2yr + €731k option year). MYSECURITY AND FACILITY SYSTEMS ΑΕ was subsequently dissolved via merger ("Διαγραφή λόγω συγχώνευσης" — ΓΕΜΗ 143546501000); a February 2024 board decision records "MY SERVICES AE" providing written explanations regarding a monitoring-committee report — a service quality dispute during the contract wind-down period.
 
   **Validation outcome:** The ΑΝΑΛΗΨΗ data **confirms rather than challenges** the official financial statements. The 2024 ratio of 5.1× is fully explained by centrally-funded payroll (KAE 1312: €24.6M alone) and multi-year contract pre-reservations (KAE 0842: €12.4M), not by anomalous or undisclosed commitments. The KAE breakdown is consistent with the known hospital procurement profile across all years.
 
@@ -358,7 +378,40 @@ UNISON Facility Services is a subsidiary of **Metlen Energy & Metals** (formerly
 
 *Transaction composition:* 63.7% maintenance and repair, 15.5% supplies — consistent with genuine below-threshold operational spending. 41.1% of transactions are under €1,000; 73.6% are under €5,000.
 
-*Key identified suppliers (via ΓΕМΗ):* All local or regional businesses — electrical contractor (25248544, Δομοκός, 79tx at avg €4,486), HVAC engineer (112428914, Λαμία, 62tx), playground equipment manufacturer (103100437, Λαγύνα, 11tx), concrete supplier (094082639 ΑΤΛΑΣ ΜΠΕΤΟΝ, Λαμία, 10tx), state postal service ΕΛΤΑ (094026421, 6tx — legally required direct award to monopoly). The ΕΛΤΑ entry (€332k total) is normal and legally mandated.
+*Key identified suppliers (via ΓΕΜΗ):* All local or regional businesses — electrical contractor (25248544, Δομοκός, 79tx at avg €4,486), HVAC engineer (112428914, Λαμία, 62tx), playground equipment manufacturer (103100437, Λαγύνα, 11tx), concrete supplier (094082639 ΑΤΛΑΣ ΜΠΕΤΟΝ, Λαμία, 10tx), state postal service ΕΛΤΑ (094026421, 6tx — legally required direct award to monopoly). The ΕΛΤΑ entry (€332k total) is normal and legally mandated.
+
+**Municipality large-tender competitive depth — ΧΑΛΚΙΑΣ OIL and ΑΤΛΑΣ ΜΠΕΤΟΝ (May 2026):**
+
+The two largest competitive spend categories at Δήμος Λαμίας — fuel procurement and concrete/aggregate supply — show a consistent pattern of de-facto single-bidder competition per group, confirmed by primary document review of the ΚΑΤΑΚΥΡΩΣΗ evaluation records.
+
+*Fuel procurement (ΧΑΛΚΙΑΣ OIL ΑΝΩΝΥΜΗ ΕΤΑΙΡΕΙΑ, AFM 094275382):*
+
+ΧΑΛΚΙΑΣ OIL has won the Δήμος Λαμίας fuel tender in four consecutive procurement cycles: 2020 (€1,926,685), 2021 (€2,242,866), 2023, and 2025 (€2,222,423). Total awarded: **>€6.4M over 5 years**. The tender is divided into groups by fuel type:
+
+| Group | Fuel type | 2020 bidders | 2021 bidders |
+|-------|-----------|-------------|-------------|
+| A | Βενζίνη αμόλυβδη | **ΧΑΛΚΙΑΣ OIL only** | **ΧΑΛΚΙΑΣ OIL only** |
+| B | Πετρέλαιο κίνησης | **ΧΑΛΚΙΑΣ OIL only** | **ΧΑΛΚΙΑΣ OIL only** |
+| C | Πετρέλαιο θέρμανσης | VD TRANS OIL only | VD TRANS OIL only |
+| D | Υγραέριο κίνησης (LPG) | ΧΑΛΚΙΑΣ OIL only | — |
+
+In both 2020 and 2021, the evaluation committee received **exactly 2 offers**: ΧΑΛΚΙΑΣ OIL for motor fuels, VD TRANS OIL for heating oil. Each bid on non-overlapping groups, meaning **neither faced a competing bid for any group they entered**. The "competition" was nominally compliant but structurally zero: ΧΑΛΚΙΑΣ OIL was the sole bidder for all motor fuel groups in every verified tender year.
+
+This is consistent with a **local duopoly** in fuel supply: ΧΑΛΚΙΑΣ OIL operates at 1 km Λαμία–Αθηνών, VD TRANS OIL at Τσαρουχόκαμπος Λαμία. No other fuel distributor has entered any tender group in any of the four cycles reviewed. The 2023 ΚΑΤΑΚΥΡΩΣΗ (`ΨΘΗΑΩΛΚ-ΠΡΠ`) shows a zero-amount structured field — the actual awarded amount for this cycle is not captured in the normalized dataset.
+
+*Concrete and aggregate supply (ΑΤΛΑΣ ΜΠΕΤΟΝ ΑΒΕΕ, AFM 094082639):*
+
+ΑΤΛΑΣ ΜΠΕΤΟΝ won the primary group (Group A — Έτοιμο Σκυρόδεμα) in the 2020 multi-year tender (ADA `9Π7ΡΩΛΚ-9Κ5`, ΚΑΤΑΚΥΡΩΣΗ €13,052,203 for 4 years). The evaluation record shows **2 offers total** — ΑΤΛΑΣ ΜΠΕΤΟΝ for Group A (ready-mix concrete), ΚΑΛΤΣΑΣ ΤΕΧΝΙΚΗ ΑΕ (AFM 094140715) for Group B (aggregate/quarry materials). Again, no overlap — **ΑΤΛΑΣ ΜΠΕΤΟΝ was the only bidder for ready-mix concrete**.
+
+ΑΤΛΑΣ ΜΠΕΤΟΝ is physically located at Γλύνες-Ν. Μαγνησία, Λαμία — likely the only ready-mix plant within economical delivery distance of municipal construction sites. This is a geographic monopoly, not a procurement failure. However, since no competing bid exists, the municipality has no market-based price verification mechanism for concrete over this 4-year period.
+
+*IT procurement — ΜΑΝΤΕΣ-ΤΣΑΜΗΣ ΟΕ (AFM 082785679):*
+
+49 total Diavgeia decisions attributed to AFM 082785679 across the 2020–2025 period. Decision type breakdown:
+- ΚΑΤΑΚΥΡΩΣΗ (competitive wins): €52k, €57k, €60k, €66k, €71k, €72k, €74k, €147k, €172k — aggregate ~€771k across 9 competitive awards
+- ΑΝΑΘΕΣΗ (direct awards): Multiple entries at **exactly €37,196–37,200** (the €37,200 direct-award ceiling for IT services) in 2022 (3× at €37,200), 2023 (1× at €37,199), 2024 (1× at €37,200), 2025 (1× at €37,200); plus smaller entries under €10k
+
+The pattern of recurring threshold-ceiling awards alongside competitive wins shows that ΜΑΝΤΕΣ-ΤΣΑΜΗΣ both wins competitive tenders legitimately and receives direct awards at the legal maximum. The six threshold-ceiling awards total ~€222k — each individually legal, but collectively structured to avoid competitive review on repeat annual IT procurement. This pattern satisfies the criteria for contract fragmentation under Art. 6§2 of L.4412/2016 if the awards cover continuing or routine services across years.
 
 *ΝΤΟΥΒΑΣ family relationship:* Two entities sharing a surname — ΣΤ. ΝΤΟΥΒΑΣ & ΣΙΑ Ο.Ε. (fire prevention, 25tx, €319k) and ΝΤΟΥΒΑΣ ΒΑΣΙΛΕΙΟΣ & ΣΙΑ Ε.Ε. (sports field maintenance, 14tx, €220k) — total €540k combined over six years. Different legal entities, different services, different geographic focus. At this scale over six years, not a concentration anomaly.
 
