@@ -354,15 +354,17 @@ UNISON Facility Services is a subsidiary of **Metlen Energy & Metals** (formerly
 
   **Per-bed cost benchmark — ΓΝ Λαμίας vs peers:**
 
-  | Hospital | Security annual cost | Beds | €/bed/yr | vs. Λαμία |
-  |----------|---------------------|------|----------|-----------|
-  | **ΓΝ Λαμίας** | **€656,000** | **307** | **€2,136** | — |
-  | ΓΝ Τρικάλων (est.) | ~€174,000 | ~307 | **~€565** | **3.8×** |
-  | ΓΝ Καρδίτσας (est.) | ~€269,000 | ~307 | **~€876** | **2.4×** |
+  | Hospital | Security annual cost | Beds | €/bed/yr | vs. Λαμία | Source |
+  |----------|---------------------|------|----------|-----------|--------|
+  | **ΓΝ Λαμίας** | **€656,000** | **307** | **€2,136** | — | ΚΑΤΑΚΥΡΩΣΗ ΗΦΑΙΣΤΟΣ 2024 |
+  | ΓΝ Τρικάλων | ~€145,800 | ~307 | **~€475** | **4.5×** | ΑΝΑΛΗΨΗ PDF contract 15/2024 (€118,356/9.8mo × 12) |
+  | ΓΝ Καρδίτσας | ~€197,000 | ~307 | **~€641** | **3.3×** | ΧΕ PDFs CRONOS SECURITY ΕΠΕ (AFM 099598725) Aug–Sep 2024 |
 
-  *Peer security costs estimated from KAE 0277 ΑΝΑΛΗΨΗ proportional allocation; beds figure from MoH 2025 (ανεπτυγμένες κλίνες).*
+  *Peer security costs sourced from ΑΝΑΛΗΨΗ commitment PDFs and payment order (ΧΕ) documents on Diavgeia, verified May 2026. ΓΝ Τρικάλων used own employed guards (ΙΔΟΧ ΔΕ Φυλάκων) until early 2023, then switched to external contractor (contract 29/2023, subsequently contract 15/2024 after competitive tender). ΓΝ Καρδίτσας contractor: CRONOS SECURITY ΕΠΕ, contract 321/2022 → 346/2023, KAE 0892.01. Beds figure from MoH 2025 (ανεπτυγμένες κλίνες).*
 
-  ΓΝ Λαμίας spends 2.4–3.8× more per bed on security than comparable 5th Health Region hospitals. The gap is structural: the staffing model (7+7+6+1 = 21 concurrent posts) implies a perimeter and patient-flow control philosophy that is materially more intensive than peer hospitals of identical bed-count. No external audit or accreditation requirement documented in the Diavgeia decision chain explains this intensity.
+  *Earlier drafts of this analysis stated peer costs of ~€174k (Trikala) and ~€269k (Karditsa) from KAE 0277 ΑΝΑΛΗΨΗ proportional estimates — those estimates were incorrect. The actual figures from primary documents are lower for both peers, meaning the gap is larger than previously stated.*
+
+  ΓΝ Λαμίας spends 3.3–4.5× more per bed on security than comparable 5th Health Region hospitals. The gap is structural: the staffing model (7+7+6+1 = 21 concurrent posts) implies a perimeter and patient-flow control philosophy that is materially more intensive than peer hospitals of identical bed-count. No external audit or accreditation requirement documented in the Diavgeia decision chain explains this intensity.
 
   Security costs grew from bridge-contract rates (~€390k/yr) to the current contract (€656k/yr) over four years — a 68% increase — driven by: (1) headcount expansion (+50% FTE), (2) minimum-wage adjustments during the MYSECURITY contract (two formally approved price adjustments in 2022), and (3) rising market labour costs for CPV 79713000-5 contractors. The 2024 ΑΝΑΛΗΨΗ KAE 0277 of €3.12M includes the ΗΦΑΙΣΤΟΣ contract pre-committed across three years (€1.97M for 2yr + €731k option year). MYSECURITY AND FACILITY SYSTEMS ΑΕ was subsequently dissolved via merger ("Διαγραφή λόγω συγχώνευσης" — ΓΕΜΗ 143546501000); a February 2024 board decision records "MY SERVICES AE" providing written explanations regarding a monitoring-committee report — a service quality dispute during the contract wind-down period.
 
