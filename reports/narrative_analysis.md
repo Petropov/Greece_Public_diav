@@ -11,7 +11,7 @@ This analysis covers six years of public procurement records (2020–2026) for t
 
 **The core finding is not a single anomaly but a structural pattern:** all three Lamia entities independently show elevated direct-award frequency. The most analytically clean signal is the hospital's **competitive award (ΚΑΤΑΚΥΡΩΣΗ) count: 407 at ΓΝ Λαμίας versus 1,841 at the comparable ΓΝ Τρικάλων** — a 4.5× inversion, robust to any classification ambiguity. The root cause at the hospital is identified: a labour model that outsources cleaning, catering, and security to external contractors (€7.34M = 44.9% of the 2024 budget), versus ΓΝ Τρικάλων which employs these staff directly. The two hospitals spend almost identically per capita (€244 vs €246), but the outsourcing model generates large recurring service contracts requiring competitive tendering — and when those tenders fail or stall, incumbents entrench.
 
-**Five specific findings are documented with primary-source evidence:**
+**Six specific findings are documented with primary-source evidence:**
 
 1. **Hospital outsourcing incumbency (UNISON).** The hospital's cleaning contract has been held by UNISON (Metlen Energy & Metals subsidiary) since October 2020. A €4.4M international open tender for cleaning services was launched in March 2023 and failed twice (no valid bids). Four ΕΑΔΗΣΥ consents then authorised a negotiated procedure (Art. 32 § 2γ L.4412/2016). UNISON was formally awarded the negotiated contract in July 2025, with the award published four months late (November 2025). The Art.32§2γ procedure had documented procedural basis; the concern is the five-year incumbency during a period when no competitive tender succeeded, and the ongoing escalation (total UNISON commitment 2025–2026: ~€3.2M).
 
@@ -23,9 +23,11 @@ This analysis covers six years of public procurement records (2020–2026) for t
 
 5. **ΔΕΥΑ Λαμίας: volume anomaly, but no concentration.** The utility issues 4.9× more direct awards than comparable peer utilities. However, all 310 identified suppliers are dispersed (highest-frequency supplier: 17 transactions / ~€14k total); the average transaction value (€3,500) is well within threshold; and the dominant categories are maintenance and consumables. The volume pattern suggests a procurement culture that defaults to direct awards rather than framework agreements, but the data does not support directed spending to specific contractors.
 
+6. **Hospital H/M maintenance: sole-bidder incumbency (ΙΝΤΕΡΚΑΤ).** The €2.46M electromechanical maintenance contract (CPV 50710000-5, ΕΣΗΔΗΣ 345751) was won in November 2024 by ΑΦΟΙ ΠΑΠΑΪΩΑΝΝΟΥ ΑΤΕΒΕ (trade name ΙΝΤΕΡΚΑΤ ΑΕ, AFM 999917261, Γραβιά, Φωκίδα) — the only remaining bidder, having held the contract since at least 2018. The previous competitive tender for the same service (ΕΣΗΔΗΣ 95109, 2021) also attracted only one bidder — ΙΝΤΕΡΚΑΤ. The company's primary ΓΕΜΗ-registered activities are quarrying and mining; it qualifies by borrowing technical credentials from subcontractors under Art.78 L.4412/2016. Two consecutive tenders with a single bidder, combined with a pre-existing incumbency dating to 2018, raises the same structural concern as the UNISON cleaning situation: whether tender specifications are drafted in ways that preclude new entrants. Unlike the security and catering channels (which attracted 2 genuine bidders each in their most recent tenders), the H/M maintenance channel has produced no price competition in any documented procurement cycle.
+
 **What the ΑΝΑΛΗΨΗ cross-check (budget commitment data) adds.** All 20,283 ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ decisions for ΓΝ Λαμίας (2020–2026) were hydrated and analysed by KAE expenditure code. The 2020–2024 totals (€45M–€100M/year) appear 2.4–5.1× higher than official payments — fully explained by (a) centrally-funded payroll commitments (KAE 1312 alone reaches €24.6M in 2024, exceeding the hospital's entire own-resource payment total) and (b) multi-year contract pre-reservations committed in the signing year. No undisclosed commitments, no anomalous gaps. The financial statements are confirmed by this independent data source.
 
-**What is not established.** The ΑΝΑΘΕΣΗ count divergence at ΓΝ Λαμίας (5,887 vs 187 for ΓΝ Τρικάλων) reflects a classification difference as much as a procurement behaviour difference: ~739 entries are committee steps within competitive processes, coded as ΑΝΑΘΕΣΗ by hospital administrative practice. The defensible direct-award figure is approximately €82.3M (the patient-specific and small procurement entries). Amount-based supplier concentration analysis is not possible: 63.5% of ΓΝ Λαμίας decisions with amounts have no supplier identifier in the Diavgeia structured fields.
+**What is not established.** The ΑΝΑΘΕΣΗ count divergence at ΓΝ Λαμίας (5,887 vs 187 for ΓΝ Τρικάλων) reflects a classification difference as much as a procurement behaviour difference: ~739 entries are committee steps within competitive processes, coded as ΑΝΑΘΕΣΗ by hospital administrative practice. The defensible direct-award figure is approximately €82.3M (the patient-specific and small procurement entries). Amount-based supplier concentration analysis is limited: 63.5% of ΓΝ Λαμίας ΑΝΑΘΕΣΗ decisions with amounts have no supplier identifier in the Diavgeia structured fields; for ΚΑΤΑΚΥΡΩΣΗ, the large-tender amounts (>€200k, totalling €39.6M) also lack structured supplier identifiers and required PDF-level verification to identify winners (completed May 2026 for the five largest service contracts).
 
 ---
 
@@ -201,6 +203,23 @@ All 53 are legitimate medical device, pharmaceutical, diagnostic, or equipment c
 
 *ΔΕΥΑ Λαμίας — no concentration found:* 310 unique suppliers across 2,840 direct award transactions. The highest-frequency supplier (17 transactions) has a total spend of ~€14k over six years. No supplier dominates the channel. The pattern is consistent with genuine dispersed operational procurement (maintenance, small parts, consumables), not directed spending.
 
+*ΓΝ Λαμίας service contract competitive history — all major tenders (May 2026):*
+
+| Service | CPV | Most recent tender | Winner | AFM | Contract value | Bidders | Notes |
+|---------|-----|-------------------|--------|-----|----------------|---------|-------|
+| Cleaning | 90911200-8 | ΕΣΗΔΗΣ 195241 (Jun 2023) | UNISON Facility Services | 094081864 | ~€1.3M/yr (negotiated) | 0 bids — suspended by appeals | Art.32§2γ negotiated; incumbent since 2020. New competitive tender pending; provisional winner 3G FACILITIES-SERVICES ΑΕ (AFM 997645083, €1.632M revised bid) |
+| Security | 79713000-5 | ΕΣΗΔΗΣ 262133 (Dec 2023) | ΗΦΑΙΣΤΟΣ ΙΔΙΩΤΙΚΗ ΕΠΕ | 999436428 | €1,968,000 / 3yr | **2 bidders** (ΑΡΓΟΣ + ΗΦΑΙΣΤΟΣ) | Competitive. ARGOS SECURITY ΑΕ also bid 2021 and 2024 |
+| H/M maintenance | 50710000-5 | ΕΣΗΔΗΣ 345751 (Mar 2024) | ΑΦΟΙ ΠΑΠΑΪΩΑΝΝΟΥ ΑΤΕΒΕ (ΙΝΤΕΡΚΑΤ) | 999917261 | €2,459,912 / 3yr | **1 bidder** | Sole bidder — same result in prior tender ΕΣΗΔΗΣ 95109 (2021) |
+| Catering | 55523000-2 | ΕΣΗΔΗΣ 178111 (Apr 2023) | ΠΙΕΤΡΗΣ ΕΣΤΙΑΣΗ ΑΕ | 999404941 | €2,241,000 / 3yr | **2 bidders** (ΓΙΑΝΝΙΤΣΗΣ + ΠΙΕΤΡΗΣ) | Competitive. ΓΙΑΝΝΙΤΣΗΣ LOGISTICS ΑΕ won 2020 contract (ΕΣΗΔΗΣ 89416) |
+| Natural gas | 09121200-5 | ΕΣΗΔΗΣ 171343 (Sep 2022) | ΦΥΣΙΚΟ ΑΕΡΙΟ-ΕΛΛΗΝΙΚΗ ΕΤΑΙΡΕΙΑ ΕΝΕΡΓΕΙΑΣ ΑΕ | — | €4,500,000 / 3yr | **2 bidders** (ΦΥΣΙΚΟ ΑΕΡΙΟ + ZENITH GAS & LIGHT) | Competitive |
+| Immunology reagents | 85145000-7 | ΕΣΗΔΗΣ (2025) | Unknown (no supplier in structured fields) | — | €2,213,052 / 3yr | Unknown | Large medical supply tender |
+
+*Sources: ΚΑΤΑΚΥΡΩΣΗ PDFs fetched May 2026 for all 5 identified service contract ADAs. Cross-referenced against ΑΝΑΘΕΣΗ decisions identifying option exercises and contract modifications.*
+
+**Cross-entity supplier overlap (ΓΝ Λαμίας ↔ Δήμος Λαμίας):**
+- **ΠΙΕΤΡΗΣ ΕΣΤΙΑΣΗ ΑΕ (AFM 999404941)** holds the hospital catering contract (€2.24M, 2023) AND won a Δήμος Λαμίας school meals tender in 2025 (€0.20M, ΚΑΤΑΚΥΡΩΣΗ ADA in org=6166). Both contracts are competitively awarded; no improper concentration is implied — ΠΙΕΤΡΗΣ is a national catering company with operations across multiple public entities. This is noted for transparency.
+- No hospital service contractors (ΙΝΤΕΡΚΑΤ, ΗΦΑΙΣΤΟΣ, UNISON, 3G FACILITIES) appear in the Δήμος or ΔΕΥΑ procurement records.
+
 *ΑΝΑΘΕΣΗ classification — additional categories identified:*
 Beyond the 739 competitive-tender procedural steps identified earlier, two further categories inflate the ΑΝΑΘΕΣΗ figures:
 - **Negotiated contracts coded as ΑΝΑΘΕΣΗ:** UNISON Facility Services (cleaning) received 6 contracts in 2025–2026 totalling €3.24M, awarded under "negotiated procedure without prior publication" (Art. 32 § 2(c) of Law 4412/2016). These are large-value service contracts with ΕΑΔΗΣΥ oversight — legally distinct from below-threshold direct awards but classified identically in Diavgeia.
@@ -334,7 +353,20 @@ UNISON Facility Services is a subsidiary of **Metlen Energy & Metals** (formerly
   | 2024 | €3,120,139 | 22 | €141,824 |
   | 2025 | €2,849,555 | 23 | €123,894 |
 
-  KAE 0277 carries three large service contracts: (a) H/M electromechanical maintenance (ΙΝΤΕΡΚΑΤ Α.Ε. / ΑΦΟΙ ΠΑΠΑΙΩΑΝΝΟΥ ΑΤΕΒΕ, AFM 999917261, exactly €166,666.67/month = €2M/year flat rate, ΕΣΗΔΗΣ 95109); (b) security guard services (CPV 79713000-5); (c) hazardous waste management (CPV 90500000-2, ~€800k/year). The declining per-decision average from 2022 onward reflects the security contract structure shifting to a new contractor with smaller quarterly commitment entries.
+  KAE 0277 carries three large service contracts: (a) H/M electromechanical maintenance (ΙΝΤΕΡΚΑΤ Α.Ε. / ΑΦΟΙ ΠΑΠΑΙΩΑΝΝΟΥ ΑΤΕΒΕ, AFM 999917261, ΕΣΗΔΗΣ 345751, €1,983,800 excl. VAT/yr); (b) security guard services (CPV 79713000-5); (c) hazardous waste management (CPV 90500000-2, ~€800k/year). The declining per-decision average from 2022 onward reflects the security contract structure shifting to a new contractor with smaller quarterly commitment entries.
+
+  **H/M maintenance contract history (CPV 50710000-5) — ΙΝΤΕΡΚΑΤ sole-bidder pattern (verified May 2026):**
+
+  | Period | Contractor | AFM | Tender | Contract value | Bidders |
+  |--------|-----------|-----|--------|----------------|---------|
+  | ≥2018–Jul 2020 | ΑΦΟΙ ΠΑΠΑΪΩΑΝΝΟΥ ΑΤΕΒΕ (ΙΝΤΕΡΚΑΤ) | 999917261 | Pre-2020 | €889,824 incl. VAT/yr (approx.) | Unknown |
+  | 2020–2021 (bridge, direct) | ΙΝΤΕΡΚΑΤ ΑΕ | 999917261 | ΑΝΑΘΕΣΗ — απευθείας ανάθεση | €35,506/month excl. VAT | — |
+  | Nov 2021–Oct 2023 (+1yr option) | ΑΦΟΙ ΠΑΠΑΪΩΑΝΝΟΥ ΑΤΕΒΕ (ΙΝΤΕΡΚΑΤ) | 999917261 | ΕΣΗΔΗΣ 95109 | €1,400,000 incl. VAT / 2yr | **1 bid — sole bidder** |
+  | Nov 2024–Nov 2025 (+2yr option) | ΑΦΟΙ ΠΑΠΑΪΩΑΝΝΟΥ ΑΤΕΒΕ (ΙΝΤΕΡΚΑΤ) | 999917261 | ΕΣΗΔΗΣ 345751 | €1,983,800 excl. VAT = **€2,459,912 incl. VAT** / 1yr | **1 remaining bidder — sole** |
+
+  Source: ΚΑΤΑΚΥΡΩΣΗ PDFs ADA `6ΕΖΟ4690ΒΜ-ΠΩ5` (2021) and `9ΟΗ84690ΒΜ-Δ5Ε` (2024). Both explicitly confirm "μοναδικός οικονομικός φορέας" / "εναπομείνασα συμμετέχουσα εταιρεία."
+
+  **Key concern — ΙΝΤΕΡΚΑΤ ΑΕ company profile:** ΑΦΟΙ ΠΑΠΑΪΩΑΝΝΟΥ ΑΝΩΝΥΜΟΣ ΤΕΧΝΙΚΗ ΕΜΠΟΡΙΚΗ ΚΑΙ ΒΙΟΜΗΧΑΝΙΚΗ ΕΤΑΙΡΕΙΑ (ΓΕΜΗ: 14003556000, Γραβιά, Φωκίδα) is a **local quarrying/mining company** whose primary ΓΕΜΗ-registered activities are "Άλλες Εξορυκτικές και Λατομικές Δραστηριότητες" (mining/quarrying) and "Εξόρυξη λιγνίτη." The company qualifies for H/M hospital maintenance by borrowing technical credentials from subcontractors (ΔΑΝΕΙΣΜΟΣ ΕΜΠΕΙΡΑΣ — borrowed expertise under Art.78 L.4412/2016 from ΠΟΛΛΙΩΝ ΕΠΕ, AMCO ELECTRIK ΜΟΝ ΕΠΕ, ΣΤΡΙΓΚΛΗΣ ΟΕ, FD SYSTEMS). Two consecutive open competitive tenders for the same service (ΕΣΗΔΗΣ 95109 in 2021, ΕΣΗΔΗΣ 345751 in 2024) produced sole-bidder results. This is the strongest example in the dataset of a recurring high-value service contract awarded without effective price competition. Unlike UNISON (where at least one genuine competitor — IFS IPIROTIKI — filed appeals), no other company has bid on any H/M maintenance tender at ΓΝ Λαμίας since 2021.
 
   **Security contract history (CPV 79713000-5) — corrected figures (May 2026):**
 
