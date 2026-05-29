@@ -390,16 +390,17 @@ The two largest competitive spend categories at Δήμος Λαμίας — fuel
 
 ΧΑΛΚΙΑΣ OIL has won the Δήμος Λαμίας fuel tender in four consecutive procurement cycles: 2020 (€1,926,685), 2021 (€2,242,866), 2023, and 2025 (€2,222,423). Total awarded: **>€6.4M over 5 years**. The tender is divided into groups by fuel type:
 
-| Group | Fuel type | 2020 bidders | 2021 bidders |
-|-------|-----------|-------------|-------------|
-| A | Βενζίνη αμόλυβδη | **ΧΑΛΚΙΑΣ OIL only** | **ΧΑΛΚΙΑΣ OIL only** |
-| B | Πετρέλαιο κίνησης | **ΧΑΛΚΙΑΣ OIL only** | **ΧΑΛΚΙΑΣ OIL only** |
-| C | Πετρέλαιο θέρμανσης | VD TRANS OIL only | VD TRANS OIL only |
-| D | Υγραέριο κίνησης (LPG) | ΧΑΛΚΙΑΣ OIL only | — |
+| Group | Fuel type | 2020 bidders | 2021 bidders | 2023 bidders |
+|-------|-----------|-------------|-------------|-------------|
+| A | Βενζίνη αμόλυβδη | **ΧΑΛΚΙΑΣ OIL only** | **ΧΑΛΚΙΑΣ OIL only** | **ΧΑΛΚΙΑΣ OIL only** (3.31%) |
+| B | Πετρέλαιο κίνησης / θέρμανση | **ΧΑΛΚΙΑΣ OIL only** | **ΧΑΛΚΙΑΣ OIL only** | ΧΑΛΚΙΑΣ (5.20%) + **ΚΡΕΤΣΗΣ Μ. & ΣΙΑ Ε.Ε.** (3.5%) — ΧΑΛΚΙΑΣ wins |
+| Γ/C | Πετρέλαιο θέρμανσης | VD TRANS OIL only | VD TRANS OIL only | VD TRANS OIL only |
+| D | Υγραέριο κίνησης (LPG) | ΧΑΛΚΙΑΣ OIL only | — | *(not in 2023 tender)* |
+| E | Καύσιμα ΝΠ | — | — | **ΧΑΛΚΙΑΣ OIL only** (3.31%) |
 
-In both 2020 and 2021, the evaluation committee received **exactly 2 offers**: ΧΑΛΚΙΑΣ OIL for motor fuels, VD TRANS OIL for heating oil. Each bid on non-overlapping groups, meaning **neither faced a competing bid for any group they entered**. The "competition" was nominally compliant but structurally zero: ΧΑΛΚΙΑΣ OIL was the sole bidder for all motor fuel groups in every verified tender year.
+In 2020 and 2021, the evaluation committee received **exactly 2 offers**: ΧΑΛΚΙΑΣ OIL for motor fuels, VD TRANS OIL for heating oil — neither faced a competing bid for any group. In **2023** (ΕΣΗΔΗΣ 186819, `ΨΘΗΑΩΛΚ-ΠΡΠ`), a third company appeared: **ΚΡΕΤΣΗΣ ΜΙΧΑΛΗΣ & ΣΙΑ Ε.Ε.** bid on Group B (heating oil / diesel) at 3.5% discount. ΧΑΛΚΙΑΣ bid 5.20% on the same group and won on merit. Groups Α and Ε (motor fuels) remained uncontested by any competitor.
 
-This is consistent with a **local duopoly** in fuel supply: ΧΑΛΚΙΑΣ OIL operates at 1 km Λαμία–Αθηνών, VD TRANS OIL at Τσαρουχόκαμπος Λαμία. No other fuel distributor has entered any tender group in any of the four cycles reviewed. The 2023 ΚΑΤΑΚΥΡΩΣΗ (`ΨΘΗΑΩΛΚ-ΠΡΠ`) shows a zero-amount structured field — the actual awarded amount for this cycle is not captured in the normalized dataset.
+The corrected characterisation: ΧΑΛΚΙΑΣ OIL faces structural zero competition on motor fuel groups across all verified cycles. The heating oil group attracted a genuine competitor in 2023. VD TRANS OIL (AFM 099509143, Τσαρουχόκαμπος) remains sole bidder on its group in all cycles. The 2023 structured amount field is zero — actual awarded amount not captured in the normalized dataset.
 
 *Concrete and aggregate supply (ΑΤΛΑΣ ΜΠΕΤΟΝ ΑΒΕΕ, AFM 094082639):*
 
