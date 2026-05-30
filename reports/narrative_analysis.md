@@ -43,12 +43,13 @@ Greek municipalities are required to publish all procurement decisions on the Di
 |---|---|---|---|---|
 | **Lamia** | **10,388** | **16.1%** | €25.6M | €34.3M |
 | Trikala | 6,991 | 11.5% | €24.1M | €0.4M |
-| Serres | 1,586 | 2.6% | €23.1M | €0.4M |
+| Kozani | 4,380 | 9.6% | — | — |
 | Karditsa | 2,709 | 4.6% | — | — |
+| Serres | 1,586 | 2.6% | €23.1M | €0.4M |
 
-*Note: Karditsa municipality codes competitive works as ΑΝΑΘΕΣΗ (avg €302k/decision vs €11k for Lamia/Trikala) — amounts are not comparable.*
+*Note: The ΑΝΑΘΕΣΗ "rate" (direct awards as % of all published decisions) is the most consistent cross-municipality comparative metric. The ΚΑΤΑΚΥΡΩΣΗ/ΑΝΑΘΕΣΗ ratio — used as the primary signal for the hospital comparison — is NOT applied to municipalities: different municipalities encode competitive award outcomes under different decision types (ΚΑΤΑΚΥΡΩΣΗ vs ΣΥΜΒΑΣΗ vs ΕΓΚΡΙΣΗ), producing ratios that reflect classification practice rather than procurement quality. For reference: Karditsa's ratio is 387×, Trikala's is 194× — both substantially worse than Lamia's 49× — despite both having lower ΑΝΑΘΕΣΗ rates. Karditsa municipality also codes some competitive works as ΑΝΑΘΕΣΗ (avg €302k/decision vs €11k for Lamia/Trikala) — amounts are not comparable.*
 
-Lamia issues the most direct award decisions by count (10,388) and the highest rate (16.1% of all published decisions), compared to 11.5% for Trikala and 2.6–4.6% for the others. The municipality also has €34.3M in competitive procurement — the most of any peer — making the picture more nuanced than the hospital or utility.
+Lamia issues the most direct award decisions by count (10,388) and the highest rate (16.1% of all published decisions), compared to 11.5% for Trikala, 9.6% for Kozani, 4.6% for Karditsa, and 2.6% for Serres. The municipality also has €34.3M in competitive procurement — the most of any peer — making the picture more nuanced than the hospital or utility.
 
 **Municipality summary:** High absolute count of direct awards (10,388 over 6 years ≈ 1,700/year) warrants examination of whether these are genuinely below-threshold or represent fragmented larger contracts. The average transaction value for ΑΝΑΘΕΣΗ decisions with amounts is €11k, consistent with the legal direct-award threshold.
 
