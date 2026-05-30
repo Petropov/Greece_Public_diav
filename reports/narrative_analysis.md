@@ -269,6 +269,17 @@ Beyond the 739 competitive-tender procedural steps identified earlier, two furth
 
 UNISON Facility Services is a subsidiary of **Metlen Energy & Metals** (formerly Mytilineos Group — one of the largest industrial conglomerates in Greece, listed on ASE). The company holds **14 international certifications** and operates at national scale. Its public client list includes **ΓΝ Λαμίας, ΓΝ Βόλου, and Metropolitan General Hospital** — confirming it is an established Greek hospital cleaning services provider, not a local or ad-hoc contractor. A second documented market participant is **IFS IPIROTIKI FACILITY SERVICES SA**, which filed a preliminary appeal against the June 2023 re-advertisement — demonstrating active competitive interest in this contract. The Greek hospital FM market is concentrated but not monopolistic at this contract scale.
 
+**Per-bed cost benchmark — cleaning services (CPV 90911200-8), ΓΝ Λαμίας vs peers (May 2026):**
+
+| Hospital | Cleaning annual cost | Beds | €/bed/yr | vs. Λαμία | Source / notes |
+|----------|---------------------|------|----------|-----------|----------------|
+| **ΓΝ Λαμίας** | **~€1,300k** | **307** | **~€4,235** | — | UNISON negotiated Art.32§2γ (2025–2026 rate) |
+| ΓΝ Τρικάλων | €755k | **300** | **~€2,519** | **1.7×** | Contract 10/2025 with ΓΕΝ ΚΑ ΑΕ (AFM 094510036, ADA ΨΕΗΠ46907Φ-Ψ6Φ). Note: covers hospital + psychiatric rehab units + ΔΙΕΚ — multiple buildings; per-hospital-bed rate is lower. |
+| ΓΝ Καρδίτσας | ~€600k | **266** | **~€2,256** | **1.9×** | Contract 178/2023 €565k/yr; 2024 option €601k; 2025 Art.32§2γ bridge €266k (~5 mo) + 2026 budget commitment ~€640k. Also used Art.32§2γ in 2022 (ΡΡΨΕ469071-5ΞΡ) and 2025 (6ΧΓ64690ΒΙ-Λ4Π). |
+| ΓΝ Σερρών | Not quantified | ~283 | — | — | Mix of ΙΔΟΧ cleaning staff (contract extensions) and outsourced contracts via Art.32§2γ (ΡΡΨΕ469071-5ΞΡ, 2022). 2023 tender estimated at €1,246k (multi-year; ADA 68ΚΝ469071-4Ρ9); monthly ΧΕ payments present but amounts not structured in Diavgeia fields. |
+
+*Lamia is 1.7–1.9× more expensive per bed than the two quantifiable peers. All three hospitals with outsourced cleaning used Art.32§2γ negotiated procedures at some point during 2022–2026 — suggesting the Greek hospital cleaning market experiences recurring tender difficulties beyond just ΓΝ Λαμίας. The premium at Lamia may partly reflect UNISON's scale and certifications, the specific scope of the contract, or incumbency pricing. It cannot be attributed to UNISON misconduct on current evidence.*
+
 **What requires further investigation:**
 
 - **UNISON tender specifications — what the appeals reveal (CORRECTED):** The 2023 tenders did not "fail" due to absence of interest. Both were suspended by preliminary appeals BEFORE bid submission. The June re-advertisement attracted preliminary appeals from **two parties: UNISON (the incumbent) and IFS IPIROTIKI FACILITY SERVICES SA (a competitor)**. This confirms market interest existed. The remaining open question is: what did the appeals contest? Both UNISON's and IFS IPIROTIKI's appeal briefs are on the ΕΑΔΗΣΥ registry but require portal access. The full tender specifications (ΕΣΗΔΗΣ 175970 and 195241) remain on `portal.eprocurement.gov.gr` (F5 bot-protection) — direct inspection would reveal whether qualification criteria, pricing minimums, or scope definitions were contested. **IFS IPIROTIKI FACILITY SERVICES SA should be confirmed as the losing party in a future competitive award — their appeal demonstrates they qualify as a bidder in this market.**
@@ -367,6 +378,17 @@ UNISON Facility Services is a subsidiary of **Metlen Energy & Metals** (formerly
   Source: ΚΑΤΑΚΥΡΩΣΗ PDFs ADA `6ΕΖΟ4690ΒΜ-ΠΩ5` (2021) and `9ΟΗ84690ΒΜ-Δ5Ε` (2024). Both explicitly confirm "μοναδικός οικονομικός φορέας" / "εναπομείνασα συμμετέχουσα εταιρεία."
 
   **Key concern — ΙΝΤΕΡΚΑΤ ΑΕ company profile:** ΑΦΟΙ ΠΑΠΑΪΩΑΝΝΟΥ ΑΝΩΝΥΜΟΣ ΤΕΧΝΙΚΗ ΕΜΠΟΡΙΚΗ ΚΑΙ ΒΙΟΜΗΧΑΝΙΚΗ ΕΤΑΙΡΕΙΑ (ΓΕΜΗ: 14003556000, Γραβιά, Φωκίδα) is a **local quarrying/mining company** whose primary ΓΕΜΗ-registered activities are "Άλλες Εξορυκτικές και Λατομικές Δραστηριότητες" (mining/quarrying) and "Εξόρυξη λιγνίτη." The company qualifies for H/M hospital maintenance by borrowing technical credentials from subcontractors (ΔΑΝΕΙΣΜΟΣ ΕΜΠΕΙΡΑΣ — borrowed expertise under Art.78 L.4412/2016 from ΠΟΛΛΙΩΝ ΕΠΕ, AMCO ELECTRIK ΜΟΝ ΕΠΕ, ΣΤΡΙΓΚΛΗΣ ΟΕ, FD SYSTEMS). Two consecutive open competitive tenders for the same service (ΕΣΗΔΗΣ 95109 in 2021, ΕΣΗΔΗΣ 345751 in 2024) produced sole-bidder results. This is the strongest example in the dataset of a recurring high-value service contract awarded without effective price competition. Unlike UNISON (where at least one genuine competitor — IFS IPIROTIKI — filed appeals), no other company has bid on any H/M maintenance tender at ΓΝ Λαμίας since 2021.
+
+  **Per-bed cost benchmark — H/M maintenance (CPV 50710000-5), ΓΝ Λαμίας vs peers (May 2026):**
+
+  | Hospital | H/M outsourcing annual cost | Beds | €/bed/yr | vs. Λαμία | Source / notes |
+  |----------|----------------------------|------|----------|-----------|----------------|
+  | **ΓΝ Λαμίας** | **€820k** (excl. VAT = €983k incl.) | **307** | **~€2,671** | — | ΚΑΤΑΚΥΡΩΣΗ ΙΝΤΕΡΚΑΤ 2024 (ΕΣΗΔΗΣ 345751): €2,459,912 incl. VAT / 3yr = €820k/yr |
+  | ΓΝ Τρικάλων | **€0 single contract** | **300** | — | — | No outsourced H/M contract found. Total maintenance budget commitment 2026: **€263k** for all machinery maintenance (KAE 24203040000002, ADA Ψ3ΟΗ46907Φ-Ν6Η). In-house technical staff handle building H/M. |
+  | ΓΝ Καρδίτσας | **€0 single contract** | **266** | — | — | No outsourced H/M building maintenance contract found. Only small renovation/improvement projects (€24–36k each). In-house technical department. |
+  | ΓΝ Σερρών | **~€122k** (single 2023 contract) | ~283 | ~€431 | **6.2×** | ADA ΩΖΔΦ469071-ΟΛ2 (2023, below-threshold). No full outsourcing contract. |
+
+  *ΓΝ Λαμίας is the **only hospital among peers that outsources building H/M maintenance to a single contractor at scale**. Trikala and Karditsa manage electromechanical maintenance in-house via their technical departments. The ~€820k/yr ΙΝΤΕΡΚΑΤ contract has no functional equivalent at any peer hospital. The comparison of €820k vs the Trikala total maintenance budget of €263k/yr (3.1×) is directionally indicative but not strictly comparable — in-house staff labour costs are not reflected in the procurement data. What can be stated is that ΓΝ Λαμίας has made a structural choice to fully outsource a service that comparable hospitals manage internally, and that the chosen contractor wins repeatedly as the sole bidder.*
 
   **Security contract history (CPV 79713000-5) — corrected figures (May 2026):**
 
