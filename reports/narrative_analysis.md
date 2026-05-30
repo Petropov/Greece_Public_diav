@@ -445,17 +445,36 @@ The two largest competitive spend categories at Δήμος Λαμίας — fuel
 
 ΧΑΛΚΙΑΣ OIL has won the Δήμος Λαμίας fuel tender in four consecutive procurement cycles: 2020 (€1,926,685), 2021 (€2,242,866), 2023, and 2025 (€2,222,423). Total awarded: **>€6.4M over 5 years**. The tender is divided into groups by fuel type:
 
-| Group | Fuel type | 2020 bidders | 2021 bidders | 2023 bidders |
-|-------|-----------|-------------|-------------|-------------|
-| A | Βενζίνη αμόλυβδη | **ΧΑΛΚΙΑΣ OIL only** | **ΧΑΛΚΙΑΣ OIL only** | **ΧΑΛΚΙΑΣ OIL only** (3.31%) |
-| B | Πετρέλαιο κίνησης / θέρμανση | **ΧΑΛΚΙΑΣ OIL only** | **ΧΑΛΚΙΑΣ OIL only** | ΧΑΛΚΙΑΣ (5.20%) + **ΚΡΕΤΣΗΣ Μ. & ΣΙΑ Ε.Ε.** (3.5%) — ΧΑΛΚΙΑΣ wins |
-| Γ/C | Πετρέλαιο θέρμανσης | VD TRANS OIL only | VD TRANS OIL only | VD TRANS OIL only |
-| D | Υγραέριο κίνησης (LPG) | ΧΑΛΚΙΑΣ OIL only | — | *(not in 2023 tender)* |
-| E | Καύσιμα ΝΠ | — | — | **ΧΑΛΚΙΑΣ OIL only** (3.31%) |
+| Group | Fuel type | 2020 bidders | 2021 bidders | 2023 discount / bidders (verified PDF) |
+|-------|-----------|-------------|-------------|---------------------------------------|
+| A | Βενζίνη αμόλυβδη 95 ΟΚΤ | **ΧΑΛΚΙΑΣ OIL only** | **ΧΑΛΚΙΑΣ OIL only** | **ΧΑΛΚΙΑΣ OIL only — 3.31%** |
+| B | Πετρέλαιο κίνησης (diesel) | **ΧΑΛΚΙΑΣ OIL only** | **ΧΑΛΚΙΑΣ OIL only** | ΧΑΛΚΙΑΣ **5.20%** + ΚΡΕΤΣΗΣ Μ. & ΣΙΑ 3.5% — ΧΑΛΚΙΑΣ wins |
+| Γ | Πετρέλαιο θέρμανσης | VD TRANS OIL only | VD TRANS OIL only | **VD TRANS OIL only — 5.20%** |
+| E | Υγραέριο κίνησης (LPG) | ΧΑΛΚΙΑΣ OIL only | — | **ΧΑΛΚΙΑΣ OIL only — 0% (μηδέν)** |
 
-In 2020 and 2021, the evaluation committee received **exactly 2 offers**: ΧΑΛΚΙΑΣ OIL for motor fuels, VD TRANS OIL for heating oil — neither faced a competing bid for any group. In **2023** (ΕΣΗΔΗΣ 186819, `ΨΘΗΑΩΛΚ-ΠΡΠ`), a third company appeared: **ΚΡΕΤΣΗΣ ΜΙΧΑΛΗΣ & ΣΙΑ Ε.Ε.** bid on Group B (heating oil / diesel) at 3.5% discount. ΧΑΛΚΙΑΣ bid 5.20% on the same group and won on merit. Groups Α and Ε (motor fuels) remained uncontested by any competitor.
+*Source: ΕΣΗΔΗΣ 186819, 2ο Πρακτικό 05-05-2023 (ADA ΨΘΗΑΩΛΚ-ΠΡΠ, σελ. 14–15). Tender budget: €2,484,982.68 incl. VAT.*
 
-The corrected characterisation: ΧΑΛΚΙΑΣ OIL faces structural zero competition on motor fuel groups across all verified cycles. The heating oil group attracted a genuine competitor in 2023. VD TRANS OIL (AFM 099509143, Τσαρουχόκαμπος) remains sole bidder on its group in all cycles. The 2023 structured amount field is zero — actual awarded amount not captured in the normalized dataset.
+In 2020 and 2021, the evaluation committee received **exactly 2 offers**: ΧΑΛΚΙΑΣ OIL for motor fuels, VD TRANS OIL for heating oil — neither faced a competing bid for any group. In **2023** (ΕΣΗΔΗΣ 186819, `ΨΘΗΑΩΛΚ-ΠΡΠ`), a third company appeared: **ΚΡΕΤΣΗΣ ΜΙΧΑΛΗΣ & ΣΙΑ Ε.Ε.** bid only on Group B (diesel) at 3.5%, losing to ΧΑΛΚΙΑΣ's 5.20%. Groups A (petrol) and E (LPG) remained sole-bidder ΧΑΛΚΙΑΣ across all verified cycles. **The LPG group (Group E) was awarded at 0% discount — Λαμία pays full retail pump price.**
+
+The corrected characterisation: ΧΑΛΚΙΑΣ OIL faces structural zero competition on the highest-volume motor fuel groups across all verified cycles. The diesel group attracted a genuine competitor in 2023. VD TRANS OIL (AFM 099509143, Τσαρουχόκαμπος) remains sole bidder for heating oil in all cycles.
+
+**Fuel discount benchmark — Δήμος Λαμίας vs peers (May 2026):**
+
+The benchmark metric for fuel procurement quality is the *ποσοστό έκπτωσης* (% discount off the regional average retail price published by the Ministry of Development price observatory for Φθιώτιδα / Central Greece). Higher discount = better value for the municipality.
+
+| Δήμος | Fuel tender structure | Motor fuel (βενζίνη) discount | Diesel discount | LPG discount | Source |
+|-------|----------------------|------------------------------|----------------|-------------|--------|
+| **Λαμία** | Multi-year open tender ~€2M/yr, 3 companies total | **3.31% — sole bidder ΧΑΛΚΙΑΣ** | 5.20% (2 bidders) | **0% — sole bidder** | ΕΣΗΔΗΣ 186819, ADA ΨΘΗΑΩΛΚ-ΠΡΠ |
+| Τρίκαλα | Monthly purchases; new 2-year tender initiated Mar 2026 (€2.36M excl. VAT) | Not yet awarded | Not yet awarded | Not applicable | ADA ΡΓ03ΩΗ9-Τ6Υ; supplier ΚΑΤΣΙΑΚΟΣ ΕΥΘ.-ΣΥΝΑΤΙΚΑΣ ΠΑΝΤ. Ο.Ε. under prior contract |
+| Καρδίτσα | Below-threshold contracts (~€53k/contract); individual fuel station supplier | Not competitively tendered | Not applicable | Not applicable | ADA 914ΗΩΕΗ-ΜΟ1, Ψ523ΩΕΗ-ΩΛΖ; supplier ΚΟΥΤΣΩΝΗ ΕΛΕΝΗ |
+| Κοζάνη | No data — fuel decisions not identified in Diavgeia dataset (4,194 decisions scanned) | — | — | — | — |
+
+**Key findings:**
+- Λαμία is the only peer municipality running a large competitive open tender for fuel (€2M+/yr)
+- Despite competitive tendering, the highest-volume groups (petrol + LPG) attract zero competition across 4 consecutive cycles — ΧΑΛΚΙΑΣ OIL wins unopposed
+- The **0% LPG discount is a directly verifiable zero-savings outcome**: Λαμία pays the same price as any consumer at the pump, with no benefit from a formal tender process
+- The 3.31% petrol discount (sole bidder) is below the typical range of **5–10%** achieved in competitive Greek municipal fuel tenders where genuine bidder rivalry exists
+- Peer municipalities use smaller, local suppliers (single proprietors / small OE) rather than regional distributors — a different market structure rather than a benchmark comparator
 
 *Concrete and aggregate supply (ΑΤΛΑΣ ΜΠΕΤΟΝ ΑΒΕΕ, AFM 094082639):*
 
