@@ -1,4 +1,4 @@
-# Δήμος Λαμιέων (org=99221920) — Procurement Intelligence Report
+# ΓΝ Κοζάνης (Μαμάτσειο) (org=99221920) — Procurement Intelligence Report
 
 > Data range: **2020–2026** · Decisions: **35,381** · Procurements: **15,417** · Known suppliers: **0** · Clean spend (deduplicated): **€19.22M** · Raw (with multi-stage): **€40.16M**
 

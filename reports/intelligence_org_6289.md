@@ -1,4 +1,4 @@
-# Δήμος Λαμιέων (org=6289) — Procurement Intelligence Report
+# Δήμος Στυλίδας (org=6289) — Procurement Intelligence Report
 
 > Data range: **2020–2026** · Decisions: **21,906** · Procurements: **6,197** · Known suppliers: **0** · Clean spend (deduplicated): **€12.19M** · Raw (with multi-stage): **€16.47M**
 

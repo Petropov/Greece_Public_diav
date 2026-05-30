@@ -1,4 +1,4 @@
-# Δήμος Λαμιέων (org=50449) — Procurement Intelligence Report
+# ΔΕΥΑ Κοζάνης (org=50449) — Procurement Intelligence Report
 
 > Data range: **2020–2026** · Decisions: **13,977** · Procurements: **3,672** · Known suppliers: **161** · Clean spend (deduplicated): **€282.62M** · Raw (with multi-stage): **€349.27M**
 

@@ -1,4 +1,4 @@
-# Δήμος Λαμιέων (org=6202) — Procurement Intelligence Report
+# Δήμος Καμένων Βούρλων (org=6202) — Procurement Intelligence Report
 
 > Data range: **2020–2026** · Decisions: **29,041** · Procurements: **11,068** · Known suppliers: **0** · Clean spend (deduplicated): **€42.54M** · Raw (with multi-stage): **€43.04M**
 

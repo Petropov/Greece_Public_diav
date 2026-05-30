@@ -1,4 +1,4 @@
-# Δήμος Λαμιέων (org=50621) — Procurement Intelligence Report
+# ΔΕΥΑ Σερρών (org=50621) — Procurement Intelligence Report
 
 > Data range: **2020–2026** · Decisions: **15,625** · Procurements: **2,819** · Known suppliers: **0** · Clean spend (deduplicated): **€3.75M** · Raw (with multi-stage): **€3.80M**
 

@@ -1,4 +1,4 @@
-# Δήμος Λαμιέων (org=6176) — Procurement Intelligence Report
+# Δήμος Λοκρών (org=6176) — Procurement Intelligence Report
 
 > Data range: **2020–2026** · Decisions: **49,159** · Procurements: **28,855** · Known suppliers: **0** · Clean spend (deduplicated): **€42.57M** · Raw (with multi-stage): **€55.64M**
 

@@ -1,4 +1,4 @@
-# Δήμος Λαμιέων (org=99221946) — Procurement Intelligence Report
+# ΓΝ Τρικάλων (org=99221946) — Procurement Intelligence Report
 
 > Data range: **2020–2026** · Decisions: **65,992** · Procurements: **44,240** · Known suppliers: **0** · Clean spend (deduplicated): **€8.96M** · Raw (with multi-stage): **€11.83M**
 

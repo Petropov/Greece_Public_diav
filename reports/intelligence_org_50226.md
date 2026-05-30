@@ -1,4 +1,4 @@
-# Δήμος Λαμιέων (org=50226) — Procurement Intelligence Report
+# Λιμενικό Ταμείο Φθιώτιδας (org=50226) — Procurement Intelligence Report
 
 > Data range: **2020–2026** · Decisions: **4,494** · Procurements: **1,026** · Known suppliers: **0** · Clean spend (deduplicated): **€10.05M** · Raw (with multi-stage): **€10.05M**
 

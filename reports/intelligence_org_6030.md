@@ -1,4 +1,4 @@
-# Δήμος Λαμιέων (org=6030) — Procurement Intelligence Report
+# Δήμος Αμφίκλειας-Ελάτειας (org=6030) — Procurement Intelligence Report
 
 > Data range: **2020–2026** · Decisions: **23,913** · Procurements: **6,810** · Known suppliers: **0** · Clean spend (deduplicated): **€34.12M** · Raw (with multi-stage): **€44.62M**
 

@@ -1,4 +1,4 @@
-# Δήμος Λαμιέων (org=6298) — Procurement Intelligence Report
+# Δήμος Τρικκαίων (org=6298) — Procurement Intelligence Report
 
 > Data range: **2020–2026** · Decisions: **60,749** · Procurements: **21,681** · Known suppliers: **0** · Clean spend (deduplicated): **€132.75M** · Raw (with multi-stage): **€216.16M**
 

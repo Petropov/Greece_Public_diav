@@ -1,4 +1,4 @@
-# Δήμος Λαμιέων (org=50432) — Procurement Intelligence Report
+# ΔΕΥΑ Καρδίτσας (org=50432) — Procurement Intelligence Report
 
 > Data range: **2020–2026** · Decisions: **14,558** · Procurements: **7,656** · Known suppliers: **0** · Clean spend (deduplicated): **€35.85M** · Raw (with multi-stage): **€68.97M**
 
