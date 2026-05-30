@@ -22,6 +22,33 @@ from typing import Any
 DEFAULT_INPUT_DIR = Path("data/normalized")
 DEFAULT_OUTPUT_DIR = Path("reports")
 
+# Verified org → name mapping (Diavgeia API, May 2026)
+ORG_NAMES: dict[str, str] = {
+    "6166":     "Δήμος Λαμιέων",
+    "6272":     "Δήμος Σερρών",
+    "6298":     "Δήμος Τρικκαίων",
+    "6154":     "Δήμος Κοζάνης",
+    "6135":     "Δήμος Καρδίτσας",
+    "6176":     "Δήμος Λοκρών",
+    "6079":     "Δήμος Δομοκού",
+    "6030":     "Δήμος Αμφίκλειας-Ελάτειας",
+    "6179":     "Δήμος Μακρακώμης",
+    "6202":     "Δήμος Καμένων Βούρλων",
+    "6289":     "Δήμος Στυλίδας",
+    "50304":    "ΔΕΥΑ Λαμίας",
+    "51546":    "ΔΕΥΑ Τρικάλων",
+    "50432":    "ΔΕΥΑ Καρδίτσας",
+    "50449":    "ΔΕΥΑ Κοζάνης",
+    "50621":    "ΔΕΥΑ Σερρών",
+    "50200":    "Αποκεντρωμένη Διοίκηση Θεσσαλίας-Στερεάς Ελλάδας",
+    "50226":    "Λιμενικό Ταμείο Φθιώτιδας",
+    "99221923": "ΓΝ Λαμίας",
+    "99221946": "ΓΝ Τρικάλων",
+    "99221913": "ΓΝ Καρδίτσας",
+    "99221920": "ΓΝ Κοζάνης (Μαμάτσειο)",
+    "99221942": "ΓΝ Σερρών",
+}
+
 
 def read_csv(path: Path) -> list[dict[str, Any]]:
     with path.open("r", encoding="utf-8", newline="") as f:
@@ -99,7 +126,8 @@ def build_report(
     if contracts:
         clean_amount = sum(safe_float(c.get("amount", 0)) for c in contracts if safe_float(c.get("amount", 0)) > 0)
 
-    sections.append(f"# Δήμος Λαμιέων (org={org}) — Procurement Intelligence Report\n")
+    org_label = ORG_NAMES.get(str(org), f"Org {org}")
+    sections.append(f"# {org_label} (org={org}) — Procurement Intelligence Report\n")
     spend_note = (
         f"Clean spend (deduplicated): **{eur(clean_amount)}** · Raw (with multi-stage): **{eur(total_amount)}**"
         if clean_amount is not None
