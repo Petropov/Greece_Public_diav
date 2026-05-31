@@ -135,6 +135,8 @@ The outsourcing model that creates the UNISON-type dynamic — a €1.3–4M/yea
 
 **Methodological limitation:** The regional authority covers five provincial units, not just Fthiotida/Lamia. Its procurement profile is aggregated across a 600k-population area. Any Lamia-specific concentration within the regional entity's decisions would require a further breakdown by project location — beyond the scope of this analysis.
 
+**Also checked: Αποκεντρωμένη Διοίκηση Θεσσαλίας–Στερεάς Ελλάδας (org=50200).** This is a separate entity from the Περιφέρεια — a state-appointed supervisory body covering both Thessaly and Στερεά Ελλάδα. Its ΑΝΑΘΕΣΗ rate is **2.52%** (81,782 total decisions, 2,061 ΑΝΑΘΕΣΗ), against peers: Αποκεντρ. Ηπείρου–Δυτ. Μακεδονίας 2.4%, Αποκεντρ. Πελοποννήσου–Δυτ. Ελλάδας–Ιονίου 2.0%. No elevation. 45% of its decisions are ΛΟΙΠΕΣ ΑΤΟΜΙΚΕΣ ΔΙΟΙΚΗΤΙΚΕΣ ΠΡΑΞΕΙΣ — administrative/supervisory acts (environmental permits, spatial planning approvals, local authority oversight) rather than procurement. **Negative result: Αποκεντρωμένη Διοίκηση does not extend the pattern.**
+
 **Assessment:** ΣΤΕΡΕΑ ΕΛΛΑΔΑ shows the weakest of the four signals identified in this analysis. It ranks first among regional peers on ΑΝΑΘΕΣΗ rate, but the margin is smaller than for any of the three core entities. The finding is supplementary: it extends the "higher-than-peers" pattern to a fourth entity, but does not independently constitute a regulatory referral-level finding in the way the hospital ΚΑΤΑΚΥΡΩΣΗ inversion or the municipality above-threshold security awards do.
 
 ---
