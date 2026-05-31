@@ -50,14 +50,16 @@ Each finding below is rated by **evidence quality**:
 | **Referral to** | **ΕΑΑΔΗΣΥ** (tender specification review — whether criteria preclude new entrants); **ΕΣ** (9-year incumbent, no price competition) |
 | **Supporting ADAs** | `6ΕΖΟ4690ΒΜ-ΠΩ5` (2021 ΚΑΤΑΚΥΡΩΣΗ); `9ΟΗ84690ΒΜ-Δ5Ε` (2024 ΚΑΤΑΚΥΡΩΣΗ) — both explicitly state "μοναδικός οικονομικός φορέας" |
 
-### Finding H4 — Security staffing increase: 50% FTE expansion, undocumented 🟡
+### Finding H4 — Security staffing increase: 50% FTE expansion, undocumented 🔴
 | | |
 |---|---|
-| **What** | Concurrent security posts increased from 17 FTE (2020 bridge) → 19 FTE (2021 tender) → 28+1 FTE (2023 tender, ADA `6ΒΘ84690ΒΜ-464`). The 2021 revision documentation shows budget was increased first, then the committee was asked to propose headcount consistent with the higher budget — i.e., money drove staffing, not operational need |
+| **What** | Concurrent security posts increased: **17 (2019 original specs) → 19 (2020 revision, COVID-19 justified) → 21 slots / 28+1 FTE (2023 tender, ADA `6ΒΘ84690ΒΜ-464`)**. The 2020 revision explicitly documented budget-then-headcount logic ("προσαρμοσμένη στις ανάγκες Covid-19"). The 2023 revision contains **no reference to the prior contract, no operational audit, no comparison with 2021 staffing** — the Board voted unanimously without any documented justification for the additional 2 concurrent posts. **Primary-source confirmed** from extracted PDFs of both Board decisions. |
+| **Additional anomalies (primary source)** | (a) Both spec documents share the same word/numeral inconsistency ("δεκαεπτά (19)" in 2020; "ΕΙΚΟΣΙ ΠΕΝΤΕ (21)" in 2023), indicating verbatim copy-paste template reuse across both cycles by the **same committee appointed in October 2019** (ADA `9ΡΧΙ4690ΒΜ-ΟΣΩ`). (b) The 2023 specs include **EU Digital COVID Certificate (EUDCC, Regulation 2021/953) as a mandatory exclusion criterion** for all security staff — the EUDCC scheme expired **30 June 2023**, six months before the December 2023 Board approval. This exclusion criterion either renders the 2023 tender legally defective or, if ignored by the evaluation committee, creates an undocumented discretionary standard. |
 | **Cost impact** | Annual rate: ~€361k (2020) → €529k excl. VAT (2024) = **+47% excl. VAT**; per-bed cost **2.9–4.4× peer hospitals** (ΓΝ Τρικάλων ~€145k/yr, ΓΝ Καρδίτσας ~€197k/yr) |
-| **Legal basis** | Art. 68 Law 4412/2016 (technical specifications must be proportionate to genuine needs) |
-| **Referral to** | **ΕΣ** (expenditure regularity); **ΕΑΑΔΗΣΥ** (specification proportionality review) |
-| **Supporting ADAs** | `6ΒΘ84690ΒΜ-464` (2023 Board approval of tender specs) |
+| **Legal basis** | Art. 68 Law 4412/2016 (technical specifications must be proportionate to genuine needs); Art. 54 Law 4412/2016 (exclusion criteria must reference valid, enforceable requirements) |
+| **Referral to** | **ΕΣ** (expenditure regularity — 2.9–4.4× peer cost, unsupported by documentation); **ΕΑΑΔΗΣΥ** (specification proportionality; expired exclusion criterion in 2023 tender) |
+| **Supporting ADAs** | `6ΒΘ84690ΒΜ-464` (2023 Board decision, 14 Dec 2023); `6ΧΚ84690ΒΜ-ΞΙΖ` (2020 Board decision, 21 Jul 2020); `9ΡΧΙ4690ΒΜ-ΟΣΩ` (2019 committee appointment) |
+| **Confidence** | 🔴 Primary-source confirmed (both PDFs extracted and compared, May/June 2026) |
 | **Note** | Tender has attracted 2 genuine bidders in each cycle (ARGOS, ΗΦΑΙΣΤΟΣ) — the competition concern is specification inflation, not absence of competition |
 
 ### Finding H5 — Structural: ΚΑΤΑΚΥΡΩΣΗ inversion vs peer hospital 🟡

@@ -464,7 +464,23 @@ UNISON Facility Services is a subsidiary of **Metlen Energy & Metals** (formerly
 
   The 2023 tender specifications (ADA `6ΒΘ84690ΒΜ-464`, Board approval 14 December 2023) mandate **21 concurrent 8-hour shift-slots per day** on a 24/7 basis, broken down as: 7 guards (morning 06:00–14:00) + 7 guards (afternoon 14:00–22:00) + 6 guards (night 22:00–06:00) + 1 supervisor (weekday mornings). At 40 work-hours/week per employee and 7-day coverage, this structure requires **28 guards + 1 supervisor = 29 FTE**. The document itself contains a discrepancy: the text says "twenty-five (21)" shift-slots — the numeral word (twenty-five) and parenthetic figure (21) disagree; the actual count in the breakdown table is 21.
 
-  The 2021 specifications (ADA `6ΧΚ84690ΒΜ-ΞΙΖ`) originally called for 17 guards, revised to 19 after a Covid-linked budget increase. The revision documentation shows **the budget was raised first, and the committee was then asked to propose new staffing numbers consistent with the higher budget** — i.e., budget drove headcount rather than operational need determining budget. Between the 2021 and 2023 tenders, the deployed FTE increased from 19 to 28+1: a 50% increase with no documented operational audit or clinical justification.
+  **Primary-source comparison (July 2026, PDFs extracted):**
+
+  The specs history has been traced to primary documents for all three cycles:
+
+  | Cycle | Board decision | Specs staff | Budget/yr excl. VAT | COVID cert? | Presiding official |
+  |-------|---------------|-------------|---------------------|-------------|-------------------|
+  | 2019 original | Β/22136/14-10-19 (ADA `9ΡΧΙ4690ΒΜ-ΟΣΩ`) | **17 guards** (from committee Β/24260/04-11-2019) | ~€373k | No | Committee appointment only |
+  | 2020 revision | Board 18/21-07-2020 (ADA `6ΧΚ84690ΒΜ-ΞΙΖ`) | **19 guards** (from committee Β/15538/15-07-2020) — text says "δεκαεπτά (19)" — word and numeral disagree | €403k (from €462k → €500k/yr incl. VAT, explicitly for COVID-19) | No (EUDCC did not yet exist) | Κολοκυθάς Ανδρέας (Acting Administrator, ref ΦΕΚ 164/ΥΟΔΔ/06-04-2017) |
+  | 2023 specs | Board 35/14-12-2023 (ADA `6ΒΘ84690ΒΜ-464`) | **21 concurrent slots** (1+7+7+6) → ~29 FTE — text says "ΕΙΚΟΣΙ ΠΕΝΤΕ (21)" — word and numeral disagree | n/a (new tender, budget ~€529k/yr excl. VAT) | **Yes — mandatory EUDCC, expired 6 months prior** | Κολοκυθάς Ανδρέας (Administrator, ΦΕΚ 856/ΥΟΔΔ/14-10-2020) |
+
+  All three Board decisions (2019 appointment, 2020 revision, 2023 approval) reference the **same drafting committee** (appointed Β/22136/14-10-19, ADA `9ΡΧΙ4690ΒΜ-ΟΣΩ`) — a 4-year-old committee that was used unchanged across two tender cycles.
+
+  The 2020 revision documentation shows **the budget was raised first (item 6 in the 2020 Board minutes: "προσαρμοσμένη στις ανάγκες … Covid-19"), and the committee was then asked to propose new staffing numbers consistent with the higher budget (item 11)** — i.e., budget drove headcount rather than operational need determining budget. This same structural pattern (budget pre-set, then specs written to fit) cannot be confirmed for 2023 because the 2023 Board minutes contain no reference to the prior contract, no operational audit, and no comparison with 2021 staffing levels.
+
+  The word/numeral inconsistency in BOTH specs documents ("δεκαεπτά (19)" in 2020, "ΕΙΚΟΣΙ ΠΕΝΤΕ (21)" in 2023) is consistent with template copy-paste: in both cases, the written word appears to be the number from the prior cycle (17 in 2020, 25 is unexplained in 2023), while the numeral was updated. This supports the inference that the 2023 specifications were drafted by incremental modification of the 2020 text, without fresh deliberation.
+
+  Between the 2020 and 2023 tenders, deployed FTE increased from 19 to 28+1: a 50% increase with no documented operational audit or clinical justification. The COVID certificate requirement added in the 2023 specs — for all security staff "επί ποινή αποκλεισμού" — references Regulation (EU) 2021/953 (EUDCC), which expired **30 June 2023**, six months before the December 2023 Board approval. Whether this was negligent copy-paste or a deliberate exclusion criterion requires legal assessment.
 
   **Per-bed cost benchmark — ΓΝ Λαμίας vs peers:**
 
