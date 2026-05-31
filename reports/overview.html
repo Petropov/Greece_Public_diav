@@ -167,6 +167,35 @@ tr:hover td{background:#fafafa}
 .src{font-size:.72rem;color:var(--ink3);background:#f3f4f6;border:1px solid var(--border);
      padding:2px 8px;border-radius:4px;font-family:monospace;white-space:nowrap}
 
+/* ── INLINE STATUS TAGS (for use inside content, not header) ──────────────────────────────── */
+.tag{display:inline-block;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:12px;
+     vertical-align:middle;margin-left:6px;white-space:nowrap}
+.tag.red{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}
+.tag.amber{background:#fef3c7;color:#92400e;border:1px solid #fcd34d}
+.tag.green{background:#dcfce7;color:#166534;border:1px solid #86efac}
+.tag.blue{background:#dbeafe;color:#1e40af;border:1px solid #93c5fd}
+
+/* ── FINDINGS DASHBOARD ──────────────────────────────── */
+.findings-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin:20px 0}
+.finding-card{background:var(--card);border-radius:var(--r);padding:16px 18px;
+              border-left:4px solid var(--border);box-shadow:var(--shadow);cursor:pointer;
+              transition:box-shadow .15s,transform .1s}
+.finding-card:hover{box-shadow:0 4px 18px rgba(0,0,0,.12);transform:translateY(-1px)}
+.finding-card.red{border-left-color:var(--red)}
+.finding-card.amber{border-left-color:var(--amber)}
+.finding-card.green{border-left-color:var(--green)}
+.finding-card .fc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.finding-card .fc-entity{font-size:.68rem;text-transform:uppercase;letter-spacing:1px;color:var(--ink3);font-weight:600}
+.finding-card .fc-status{font-size:.72rem;font-weight:700;padding:2px 7px;border-radius:10px}
+.finding-card.red .fc-status{background:#fee2e2;color:#991b1b}
+.finding-card.amber .fc-status{background:#fef3c7;color:#92400e}
+.finding-card h4{font-size:.87rem;font-weight:700;color:var(--ink);margin-bottom:5px;line-height:1.35}
+.finding-card p{font-size:.78rem;color:var(--ink3);margin:0;line-height:1.5}
+
+/* ── READING PROGRESS ──────────────────────────────── */
+#progress-bar{position:fixed;top:0;left:0;height:3px;background:var(--red);
+              width:0%;transition:width .1s linear;z-index:999;pointer-events:none}
+
 @media(max-width:600px){
   header{padding:32px 20px 28px}
   header h1{font-size:1.7rem}
@@ -191,17 +220,18 @@ tr:hover td{background:#fafafa}
 
 <nav class="chapter-nav">
   <ul>
-    <li><a href="#" class="active" data-tab="ch1"><span class="ch-num">Κεφ. 1</span>Το Εύρημα</a></li>
-    <li><a href="#" data-tab="ch2"><span class="ch-num">Κεφ. 2</span>Η Σύμβαση</a></li>
-    <li><a href="#" data-tab="ch3"><span class="ch-num">Κεφ. 3</span>Ο Λατόμος</a></li>
-    <li><a href="#" data-tab="ch4"><span class="ch-num">Κεφ. 4</span>Η Φρουρά</a></li>
-    <li><a href="#" data-tab="ch5"><span class="ch-num">Κεφ. 5</span>Ο Δήμος</a></li>
-    <li><a href="#" data-tab="ch6"><span class="ch-num">Κεφ. 6</span>Η ΔΕΥΑ</a></li>
-    <li><a href="#" data-tab="ch9"><span class="ch-num">Κεφ. 9</span>Η Περιφέρεια</a></li>
-    <li><a href="#" data-tab="ch7"><span class="ch-num">Κεφ. 7</span>Ο Λογαριασμός</a></li>
-    <li><a href="#" data-tab="ch8"><span class="ch-num">Κεφ. 8</span>Μέθοδος</a></li>
+    <li><a href="#" class="active" data-tab="ch1"><span class="ch-num">Κεφ. 1</span>Ευρήματα</a></li>
+    <li><a href="#" data-tab="ch2"><span class="ch-num">Κεφ. 2</span>UNISON — Καθαριότητα</a></li>
+    <li><a href="#" data-tab="ch3"><span class="ch-num">Κεφ. 3</span>ΙΝΤΕΡΚΑΤ — Η/Μ Συντήρηση</a></li>
+    <li><a href="#" data-tab="ch4"><span class="ch-num">Κεφ. 4</span>ΗΦΑΙΣΤΟΣ — Φύλαξη</a></li>
+    <li><a href="#" data-tab="ch5"><span class="ch-num">Κεφ. 5</span>Δήμος — Άμεσες Αναθέσεις</a></li>
+    <li><a href="#" data-tab="ch6"><span class="ch-num">Κεφ. 6</span>ΔΕΥΑ — Όγκος</a></li>
+    <li><a href="#" data-tab="ch9"><span class="ch-num">Κεφ. 7</span>Περιφέρεια</a></li>
+    <li><a href="#" data-tab="ch7"><span class="ch-num">Κεφ. 8</span>Προϋπολογισμός</a></li>
+    <li><a href="#" data-tab="ch8"><span class="ch-num">Κεφ. 9</span>Μέθοδος & Πηγές</a></li>
   </ul>
 </nav>
+<div id="progress-bar"></div>
 
 
 <!-- ═══════════════════════════════════════════════════════
@@ -218,6 +248,54 @@ tr:hover td{background:#fafafa}
   <div class="prose" style="margin-bottom:32px">
     <p>Το Γενικό Νοσοκομείο, ο Δήμος Λαμιέων, η ΔΕΥΑ Λαμίας και η Περιφέρεια Στερεάς Ελλάδας δεν μοιράζονται διοίκηση, προϋπολογισμό ή προμηθευτικές επιτροπές. Οι αποφάσεις τους λαμβάνονται ανεξάρτητα, σε διαφορετικά νομικά πλαίσια. Και όμως, και τα τέσσερα εμφανίζουν ανυψωμένη συχνότητα άμεσων αναθέσεων σε σύγκριση με συγκρίσιμους φορείς σε Τρίκαλα, Καρδίτσα, Κοζάνη, Σέρρες και 7 ομότιμες περιφέρειες.</p>
     <p>Αυτό δεν εξηγείται από μια κακή απόφαση ή έναν συγκεκριμένο υπάλληλο. Υποδηλώνει κάτι δομικό — μια κουλτούρα, ένα οικοσύστημα, ένα σύνολο κινήτρων που παράγει το ίδιο αποτέλεσμα ανεξάρτητα από το ποιος κάθεται στο τιμόνι.</p>
+  </div>
+
+  <!-- FINDINGS DASHBOARD -->
+  <div class="section">
+    <h3>Τα ευρήματα — μια ματιά</h3>
+    <p style="font-size:.82rem;color:var(--ink3);margin-bottom:16px">Κάντε κλικ σε κάθε κάρτα για να πλοηγηθείτε στο αντίστοιχο κεφάλαιο. <span style="color:var(--red)">🔴 Πρωτογενής πηγή επαληθευμένη</span> · <span style="color:var(--amber)">🟡 Βάση δεδομένων / API</span></p>
+    <div class="findings-grid">
+      <div class="finding-card red" onclick="goTab('ch2')">
+        <div class="fc-header"><span class="fc-entity">ΓΝ Λαμίας · Καθαριότητα</span><span class="fc-status">🔴 H1</span></div>
+        <h4>Καθυστέρηση δημοσίευσης 4 μηνών</h4>
+        <p>Κατακύρωση €680k στη UNISON εκδόθηκε Ιούλ 2025, αναρτήθηκε Νοέμ 2025. Νόμος: 15 ημέρες.</p>
+      </div>
+      <div class="finding-card red" onclick="goTab('ch2')">
+        <div class="fc-header"><span class="fc-entity">ΓΝ Λαμίας · Καθαριότητα</span><span class="fc-status">🔴 H2</span></div>
+        <h4>Λανθασμένη κωδικολόγηση διαπραγμάτευσης</h4>
+        <p>6 συμβάσεις UNISON ~€3,24Μ (Art.32§2γ) καταχωρήθηκαν ως Δ.1 — έπρεπε Δ.2.4.</p>
+      </div>
+      <div class="finding-card red" onclick="goTab('ch3')">
+        <div class="fc-header"><span class="fc-entity">ΓΝ Λαμίας · Η/Μ Συντήρηση</span><span class="fc-status">🔴 H3</span></div>
+        <h4>ΙΝΤΕΡΚΑΤ — μοναδικός προσφέρων ×2 διαγωνισμοί</h4>
+        <p>€2,46Μ σύμβαση σε λατομείο Φωκίδας. Μηδέν ανταγωνισμός σε 2 συνεχείς κύκλους (2021, 2024).</p>
+      </div>
+      <div class="finding-card red" onclick="goTab('ch4')">
+        <div class="fc-header"><span class="fc-entity">ΓΝ Λαμίας · Φύλαξη</span><span class="fc-status">🔴 H4</span></div>
+        <h4>+71% FTE χωρίς τεκμηρίωση · εκπνευσμένο κριτήριο EUDCC</h4>
+        <p>17→29 φύλακες σε 4 χρόνια · 2,9–4,4× πάνω από ομότιμα · COVID πιστοποιητικό στις προδιαγραφές 6 μήνες μετά τη λήξη του.</p>
+      </div>
+      <div class="finding-card amber" onclick="goTab('ch4')">
+        <div class="fc-header"><span class="fc-entity">ΓΝ Λαμίας · Δομικό</span><span class="fc-status">🟡 H5</span></div>
+        <h4>ΚΑΤΑΚΥΡΩΣΗ 4,9× λιγότερες από ομότιμο</h4>
+        <p>ΓΝ Τρικάλων: 1.991 · ΓΝ Λαμίας: 407. Ίδια κλίμακα, ίδιο μοντέλο εξωτερικής ανάθεσης.</p>
+      </div>
+      <div class="finding-card red" onclick="goTab('ch5')">
+        <div class="fc-header"><span class="fc-entity">Δήμος Λαμίας · Φύλαξη</span><span class="fc-status">🔴 M1</span></div>
+        <h4>Άνω ορίου αναθέσεις χωρίς διαγωνισμό</h4>
+        <p>ΚΟΥΤΚΙΑΣ: €148k (2022) + €74k (2023) άμεσα, ίδια υπηρεσία. Κανένας ομότιμος δήμος δεν το κάνει.</p>
+      </div>
+      <div class="finding-card red" onclick="goTab('ch5')">
+        <div class="fc-header"><span class="fc-entity">Δήμος Λαμίας · Κατάτμηση</span><span class="fc-status">🔴 M2</span></div>
+        <h4>Κατάτμηση συμβάσεων κατά Δ.Ε.</h4>
+        <p>ΚΑΝΑΒΕΤΑΣ-ΚΑΡΑΔΗΜΑΣ: €420k σε 34 αναθέσεις. 33 προμηθευτές σε κυλιόμενα παράθυρα 60 ημ.</p>
+      </div>
+      <div class="finding-card amber" onclick="goTab('ch6')">
+        <div class="fc-header"><span class="fc-entity">ΔΕΥΑ Λαμίας</span><span class="fc-status">🟡 D1</span></div>
+        <h4>14,1× όγκος άμεσων αναθέσεων vs ομοτίμων</h4>
+        <p>2.840 αναθέσεις vs μ.ο. 202. Χαμηλή συγκέντρωση — κουλτούρα διαδικασίας, όχι στοχευμένη κατανομή.</p>
+      </div>
+    </div>
   </div>
 
   <div class="section">
@@ -601,7 +679,7 @@ tr:hover td{background:#fafafa}
   </div>
 
   <div class="section">
-    <h3>Η αύξηση που δεν εξηγείται: από 17 σε 29 φύλακες <span class="badge red">🔴 Πρωτογενής πηγή</span></h3>
+    <h3>Η αύξηση που δεν εξηγείται: από 17 σε 29 φύλακες <span class="tag red">🔴 Πρωτογενής πηγή</span></h3>
     <div class="prose" style="margin-bottom:16px">
       <p>Το 2021, ο διαγωνισμός φύλαξης προέβλεπε 17 ΙΣΕ — αναθεωρήθηκε σε 19 το 2020 λόγω COVID-19 (τεκμηριωμένο). Το 2023, οι τεχνικές προδιαγραφές αναθεωρήθηκαν ξανά: 21 ταυτόχρονες βάρδιες ανά 24ωρο, 7 ημέρες/εβδομάδα — μεταφράζεται σε <strong>28+1 ΙΣΕ</strong>. Ο νέος διαγωνισμός προσέλκυσε <strong>2 προσφορές</strong>.</p>
       <p>Και τα δύο PDF αποφάσεων εξήχθησαν και συγκρίθηκαν (Ιούνιος 2026).</p>
@@ -1069,26 +1147,36 @@ tr:hover td{background:#fafafa}
   </div>
 
   <div class="section">
-    <h3>Τι δεν μπορεί να απαντηθεί από τα δεδομένα Διαύγεια</h3>
-    <div class="finding amber">
-      <div class="icon">?</div>
+    <h3>Τι έχει απαντηθεί — και τι παραμένει ανοιχτό</h3>
+
+    <p style="font-size:.82rem;color:var(--ink3);margin-bottom:14px">Ενημέρωση Ιούνιος 2026 — μετά από πρωτογενή ανάλυση PDFs.</p>
+
+    <div class="finding green">
+      <div class="icon">✓</div>
       <div>
-        <h4>Τεχνικές προδιαγραφές — απαιτεί ΕΣΗΔΗΣ portal</h4>
-        <p>Αν οι προδιαγραφές ΙΝΤΕΡΚΑΤ ή ΗΦΑΙΣΤΟΣ αποτρέπουν ανταγωνιστές απαιτεί ανάγνωση τευχών από ΕΣΗΔΗΣ — δεν εμφανίζονται στη Διαύγεια.</p>
+        <h4>Ποιος αποφάσισε την αύξηση των φυλάκων και πότε — ΑΠΑΝΤΗΘΗΚΕ</h4>
+        <p>Πρακτικό ΔΣ 35/14-12-2023 (ADA <code>6ΒΘ84690ΒΜ-464</code>): Κολοκυθάς Ανδρέας, ομόφωνη ψηφοφορία, μηδέν τεκμηρίωση. Σύγκριση με πρακτικό ΔΣ 18/21-07-2020 (ADA <code>6ΧΚ84690ΒΜ-ΞΙΖ</code>) αποκαλύπτει copy-paste προτύπου από 4 χρόνια πριν.</p>
+      </div>
+    </div>
+    <div class="finding green">
+      <div class="icon">✓</div>
+      <div>
+        <h4>GAK 1094/1095 — ποιοι ήταν οι εκκαλούντες — ΑΠΑΝΤΗΘΗΚΕ</h4>
+        <p>Ήταν προσφυγές κατά του διαγωνισμού <em>καθαριότητας</em> (ΕΣΗΔΗΣ 195241, Ιούν 2023) — όχι φύλαξης. Κατατέθηκαν 18 Ιουλ 2023 από την UNISON (εκκρεμής ανάδοχος) και την IFS IPIROTIKI FACILITY SERVICES SA (ανταγωνιστής).</p>
       </div>
     </div>
     <div class="finding amber">
       <div class="icon">?</div>
       <div>
-        <h4>Αποφάσεις προδικαστικών προσφυγών — απαιτεί ΕΑΔΗΣΥ portal</h4>
-        <p>Οι λόγοι αναστολής των διαγωνισμών UNISON 2023 (GAK 1094/1095) βρίσκονται στο ΕΑΔΗΣΥ portal.</p>
+        <h4>Τεχνικές προδιαγραφές ΙΝΤΕΡΚΑΤ — απαιτεί ΕΣΗΔΗΣ portal</h4>
+        <p>Αν οι προδιαγραφές Η/Μ συντήρησης (ΕΣΗΔΗΣ 345751, 95109) αποτρέπουν ανταγωνιστές απαιτεί ανάγνωση τευχών. Το portal.eprocurement.gov.gr έχει F5 bot protection.</p>
       </div>
     </div>
     <div class="finding amber">
       <div class="icon">?</div>
       <div>
-        <h4>Απόφαση για τον αριθμό φυλάκων — απαιτεί πρακτικά ΔΣ</h4>
-        <p>Ποιο όργανο αποφάσισε την αύξηση από 17 σε 29 φύλακες, πότε, και με ποια αιτιολόγηση — απαιτεί πρακτικά ΔΣ νοσοκομείου.</p>
+        <h4>Περιεχόμενο GAK 1094/1095 — τι αμφισβητήθηκε ακριβώς</h4>
+        <p>Οι λόγοι των προσφυγών (ποιοι όροι του διαγωνισμού αμφισβητήθηκαν) βρίσκονται στο ΕΑΔΗΣΥ portal — απαιτεί browser πρόσβαση.</p>
       </div>
     </div>
   </div>
@@ -1115,6 +1203,7 @@ tr:hover td{background:#fafafa}
           <tr><td>ΑΝΑΛΗΨΗ χρηματ. cross-check</td><td><span class="src">ADA 9ΤΥΕ4690ΒΜ-69Α</span></td><td style="color:var(--green)">✓ 20.283 αποφάσεις</td></tr>
           <tr><td>Τιμές καυσίμων EU Oil Bulletin</td><td>EC Energy data.ec.europa.eu, GR col idx 98</td><td style="color:var(--green)">✓ Επαληθεύτηκε Μάιος 2026</td></tr>
           <tr><td>Benford / ορόφους / επιτάχυνση / υπογράφοντες</td><td>CSV 148.089 γραμμές — deep_analysis.py Μάιος 2026</td><td style="color:var(--green)">✓ Αρνητικό — κανένα νέο εύρημα</td></tr>
+          <tr><td>Σύγκριση προδιαγραφών φύλαξης 2020 vs 2023</td><td><span class="src">ADA 6ΧΚ84690ΒΜ-ΞΙΖ</span> + <span class="src">ADA 6ΒΘ84690ΒΜ-464</span> — PDF εξαγωγή pdftotext Ιούν 2026</td><td style="color:var(--green)">✓ Επαληθεύτηκαν · Εύρημα H4 → 🔴</td></tr>
         </tbody>
       </table>
     </div>
@@ -1124,6 +1213,9 @@ tr:hover td{background:#fafafa}
 
 
 <script>
+const tabs=['ch1','ch2','ch3','ch4','ch5','ch6','ch9','ch7','ch8'];
+let currentTab='ch1';
+
 function goTab(id){
   document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.chapter-nav a').forEach(a=>a.classList.remove('active'));
@@ -1131,14 +1223,33 @@ function goTab(id){
   const link=document.querySelector('[data-tab="'+id+'"]');
   if(pane) pane.classList.add('active');
   if(link) link.classList.add('active');
+  currentTab=id;
+  updateProgress();
   window.scrollTo({top:0,behavior:'smooth'});
 }
+
+function updateProgress(){
+  const idx=tabs.indexOf(currentTab);
+  const pct=idx<0?0:Math.round(((idx+1)/tabs.length)*100);
+  document.getElementById('progress-bar').style.width=pct+'%';
+}
+
 document.querySelectorAll('.chapter-nav a').forEach(a=>{
   a.addEventListener('click',e=>{
     e.preventDefault();
     goTab(a.dataset.tab);
   });
 });
+
+// Keyboard navigation
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA') return;
+  const idx=tabs.indexOf(currentTab);
+  if((e.key==='ArrowRight'||e.key==='PageDown') && idx<tabs.length-1) goTab(tabs[idx+1]);
+  if((e.key==='ArrowLeft'||e.key==='PageUp') && idx>0) goTab(tabs[idx-1]);
+});
+
+updateProgress();
 </script>
 </body>
 </html>
