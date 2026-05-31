@@ -305,113 +305,130 @@ tr:hover td{background:#fafafa}
       <p>Η απόφαση τύπου <strong>ΚΑΤΑΚΥΡΩΣΗ</strong> — η επίσημη ανάδειξη αναδόχου μετά από ανοικτό διαγωνισμό — είναι η πιο αξιόπιστη μέτρηση. Δεν επηρεάζεται από κωδικολογικές ασάφειες. Για κάθε ΚΑΤΑΚΥΡΩΣΗ υπήρξε διαγωνισμός, υπήρξαν προσφορές, και επελέγη νικητής με αντικειμενικά κριτήρια.</p>
       <p>Το ΓΝ Τρικάλων — νοσοκομείο ίδιας κλίμακας, ίδιας γεωγραφικής κατηγορίας — ολοκληρώνει ανταγωνιστικές κατακυρώσεις <strong>4,9 φορές πιο συχνά</strong> από το ΓΝ Λαμίας. Δεν είναι λεπτή διαφορά.</p>
     </div>
-    <div class="tbl-wrap">
+    <!-- ΝΟΣΟΚΟΜΕΙΑ -->
+    <p style="font-size:.72rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin:4px 0 6px">Νοσοκομεία — μέτρο: πόσες φορές ολοκληρώθηκε ανταγωνιστικός διαγωνισμός</p>
+    <div class="tbl-wrap" style="margin-bottom:22px">
       <table>
         <thead><tr>
-          <th>Φορέας</th><th>Τύπος</th>
-          <th class="td-r">Αναθέσεις (πλήθος)</th>
-          <th class="td-r">% πλήθους</th>
-          <th class="td-r">Αξία ΑΝΑΘΕΣΗ</th>
-          <th class="td-r">Μ.Ο./απόφαση</th>
-          <th class="td-r">Κατακυρώσεις</th>
-          <th class="td-r">Σήμα</th>
+          <th>Φορέας</th>
+          <th class="td-r">Άμεσες αναθέσεις</th>
+          <th class="td-r">% αποφάσεων</th>
+          <th class="td-r">Κατακυρώσεις μετά διαγ.</th>
+          <th class="td-r">Αναλογία αναθ. : κατακ.</th>
         </tr></thead>
         <tbody>
-          <!-- ΝΟΣΟΚΟΜΕΙΑ -->
           <tr style="background:#fef9f9">
-            <td><strong>ΓΝ Λαμίας</strong></td><td>Νοσοκομείο</td>
-            <td class="td-r"><strong>5.887</strong></td><td class="td-r">11,6%</td>
-            <td class="td-r">~€82,3Μ <span style="font-size:.75em;color:var(--ink3)">(καθαρό)</span></td>
-            <td class="td-r">~€13k</td>
+            <td><strong>ΓΝ Λαμίας</strong> <span style="font-size:.75rem;color:var(--ink3)">~€82,3Μ αξία αναθέσεων</span></td>
+            <td class="td-r"><strong>5.887</strong></td>
+            <td class="td-r">11,6%</td>
             <td class="td-r"><strong>407</strong></td>
-            <td class="td-r red-cell"><strong>14,5:1</strong></td></tr>
+            <td class="td-r red-cell"><strong>14,5 : 1 🔴</strong></td>
+          </tr>
           <tr style="color:var(--ink3);font-size:.9em">
-            <td>ΓΝ Τρικάλων</td><td>σύγκριση</td>
+            <td>ΓΝ Τρικάλων <em>(σύγκριση)</em></td>
             <td class="td-r">187</td><td class="td-r">0,3%</td>
-            <td class="td-r">—</td><td class="td-r">—</td>
-            <td class="td-r">1.991</td><td class="td-r green-cell">0,1:1</td></tr>
+            <td class="td-r">1.991</td>
+            <td class="td-r green-cell">0,1 : 1 ✓</td>
+          </tr>
           <tr style="color:var(--ink3);font-size:.9em">
-            <td>ΓΝ Σερρών</td><td>σύγκριση</td>
+            <td>ΓΝ Σερρών <em>(σύγκριση)</em></td>
             <td class="td-r">184</td><td class="td-r">0,7%</td>
-            <td class="td-r">—</td><td class="td-r">—</td>
-            <td class="td-r">82</td><td class="td-r">2,2:1</td></tr>
-          <!-- ΔΗΜΟΙ -->
-          <tr style="border-top:2px solid var(--border);background:#fef9f9">
-            <td><strong>Δήμος Λαμίας</strong></td><td>ΟΤΑ Α΄</td>
-            <td class="td-r"><strong>10.388</strong></td><td class="td-r red-cell"><strong>16,1%</strong></td>
-            <td class="td-r">~€25,6Μ <span style="font-size:.75em;color:var(--ink3)">(39% κάλυψη)</span></td>
-            <td class="td-r">~€11k</td>
-            <td class="td-r">—</td>
-            <td class="td-r red-cell"><strong>#1 από 5</strong></td></tr>
-          <tr style="color:var(--ink3);font-size:.9em">
-            <td>Δήμος Τρικάλων</td><td>σύγκριση</td>
-            <td class="td-r">6.991</td><td class="td-r">11,5%</td>
-            <td class="td-r">€24,1Μ <span style="font-size:.75em">(97%)</span></td><td class="td-r">€3.560</td>
-            <td class="td-r">—</td><td class="td-r"></td></tr>
-          <tr style="color:var(--ink3);font-size:.9em">
-            <td>Δήμος Κοζάνης</td><td>σύγκριση</td>
-            <td class="td-r">4.380</td><td class="td-r">9,6%</td>
-            <td class="td-r"><em>μη συγκρίσιμο †</em></td><td class="td-r"><em>€302k †</em></td>
-            <td class="td-r">—</td><td class="td-r"></td></tr>
-          <tr style="color:var(--ink3);font-size:.9em">
-            <td>Δήμος Καρδίτσας</td><td>σύγκριση</td>
-            <td class="td-r">2.709</td><td class="td-r">4,6%</td>
-            <td class="td-r">—</td><td class="td-r">—</td>
-            <td class="td-r">—</td><td class="td-r"></td></tr>
-          <tr style="color:var(--ink3);font-size:.9em">
-            <td>Δήμος Σερρών</td><td>σύγκριση</td>
-            <td class="td-r">1.586</td><td class="td-r">2,6%</td>
-            <td class="td-r">€23,1Μ <span style="font-size:.75em">(83%)</span></td><td class="td-r">€17.635</td>
-            <td class="td-r">—</td><td class="td-r"></td></tr>
-          <!-- ΔΕΥΑ -->
-          <tr style="border-top:2px solid var(--border);background:#fef9f9">
-            <td><strong>ΔΕΥΑ Λαμίας</strong></td><td>Νομικό Πρόσωπο</td>
-            <td class="td-r"><strong>2.840</strong></td><td class="td-r red-cell"><strong>11,6%</strong></td>
-            <td class="td-r red-cell"><strong>€10,1Μ</strong> <span style="font-size:.75em">(69%)</span></td>
-            <td class="td-r">€5.105</td>
-            <td class="td-r">—</td>
-            <td class="td-r red-cell"><strong>93% αξίας ‡</strong></td></tr>
-          <tr style="color:var(--ink3);font-size:.9em">
-            <td>ΔΕΥΑ Τρικάλων</td><td>σύγκριση</td>
-            <td class="td-r">262</td><td class="td-r">1,8%</td>
-            <td class="td-r">—</td><td class="td-r">—</td>
-            <td class="td-r">—</td><td class="td-r"></td></tr>
-          <tr style="color:var(--ink3);font-size:.9em">
-            <td>ΔΕΥΑ Κοζάνης</td><td>σύγκριση</td>
-            <td class="td-r">196</td><td class="td-r">1,4%</td>
-            <td class="td-r">—</td><td class="td-r">—</td>
-            <td class="td-r">—</td><td class="td-r"></td></tr>
-          <tr style="color:var(--ink3);font-size:.9em">
-            <td>ΔΕΥΑ Καρδίτσας</td><td>σύγκριση</td>
-            <td class="td-r">148</td><td class="td-r">1,0%</td>
-            <td class="td-r">€0,96Μ <span style="font-size:.75em">(99%)</span></td><td class="td-r">€9.507</td>
-            <td class="td-r">—</td><td class="td-r"></td></tr>
-          <!-- ΠΕΡΙΦΕΡΕΙΑ -->
-          <tr style="border-top:2px solid var(--border);background:#fef9f9">
-            <td><strong>Περιφέρεια Στ. Ελλάδας</strong></td><td>ΟΤΑ Β΄</td>
-            <td class="td-r"><strong>7.361</strong></td><td class="td-r amber-cell"><strong>5,2%</strong></td>
-            <td class="td-r">—</td><td class="td-r">—</td>
-            <td class="td-r">70</td>
-            <td class="td-r amber-cell"><strong>#1 από 7</strong></td></tr>
-          <tr style="color:var(--ink3);font-size:.9em">
-            <td>Περιφ. Θεσσαλίας</td><td>σύγκριση</td>
-            <td class="td-r">7.630</td><td class="td-r">4,6%</td>
-            <td class="td-r">—</td><td class="td-r">—</td>
-            <td class="td-r">337</td><td class="td-r"></td></tr>
-          <tr style="color:var(--ink3);font-size:.9em">
-            <td>Περιφ. Ηπείρου</td><td>σύγκριση</td>
-            <td class="td-r">5.744</td><td class="td-r">4,3%</td>
-            <td class="td-r">—</td><td class="td-r">—</td>
-            <td class="td-r">36</td><td class="td-r"></td></tr>
+            <td class="td-r">82</td>
+            <td class="td-r">2,2 : 1</td>
+          </tr>
         </tbody>
       </table>
     </div>
-    <p style="font-size:.78rem;color:var(--ink3);margin-top:10px;line-height:1.7">
-      <strong>Νοσοκομεία:</strong> Σήμα = ΑΝΑΘΕΣΗ / ΚΑΤΑΚΥΡΩΣΗ. ΓΝ Λαμίας αξία «καθαρό» = €82,3Μ αφού εξαιρεθούν 739 διαδικαστικές καταχωρήσεις ανταγωνιστικών διαδικασιών που φέρουν τεχνητά μεγάλα ποσά (€132,8Μ). Η αναλογία παραμένει ~27:1 μετά διόρθωση.
-      <strong>†</strong> Δήμος Κοζάνης: μ.ο. €302k επειδή ανταγωνιστικά έργα καταχωρούνται ως ΑΝΑΘΕΣΗ — η αξία δεν είναι συγκρίσιμη.
-      <strong>‡</strong> ΔΕΥΑ Λαμίας: €10,1Μ ΑΝΑΘΕΣΗ vs €0,74Μ ανταγωνιστικές αναθέσεις = 93% αξίας διοχετεύεται χωρίς διαγωνισμό. Μ.Ο. €5.105 — εντός ορίου — αλλά ο συνολικός όγκος είναι 14,1× ο μ.ο. ομοτίμων.
-      <strong>Δήμοι:</strong> Ο λόγος ΑΝΑΘΕΣΗ/ΚΑΤΑΚΥΡΩΣΗ δεν χρησιμοποιείται — ομότιμοι κωδικολογούν διαφορετικά. Σήμα = % πλήθους. Αξία Τρικάλων/Σερρών υψηλή επίσης, αλλά με χαμηλότερο ποσοστό απόφάσεων και μικρότερο μ.ο.
-    </p>
+
+    <!-- ΔΗΜΟΙ -->
+    <p style="font-size:.72rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin:4px 0 6px">Δήμοι — μέτρο: % άμεσων αναθέσεων στο σύνολο αποφάσεων</p>
+    <div class="tbl-wrap" style="margin-bottom:22px">
+      <table>
+        <thead><tr>
+          <th>Φορέας</th>
+          <th class="td-r">Άμεσες αναθέσεις</th>
+          <th class="td-r">% αποφάσεων</th>
+          <th class="td-r">Κατάταξη (από 5)</th>
+        </tr></thead>
+        <tbody>
+          <tr style="background:#fef9f9">
+            <td><strong>Δήμος Λαμίας</strong></td>
+            <td class="td-r"><strong>10.388</strong></td>
+            <td class="td-r red-cell"><strong>16,1%</strong></td>
+            <td class="td-r red-cell"><strong>#1 🔴</strong></td>
+          </tr>
+          <tr style="color:var(--ink3);font-size:.9em">
+            <td>Δήμος Τρικάλων</td><td class="td-r">6.991</td><td class="td-r">11,5%</td><td class="td-r">#2</td>
+          </tr>
+          <tr style="color:var(--ink3);font-size:.9em">
+            <td>Δήμος Κοζάνης</td><td class="td-r">4.380</td><td class="td-r">9,6%</td><td class="td-r">#3</td>
+          </tr>
+          <tr style="color:var(--ink3);font-size:.9em">
+            <td>Δήμος Καρδίτσας</td><td class="td-r">2.709</td><td class="td-r">4,6%</td><td class="td-r">#4</td>
+          </tr>
+          <tr style="color:var(--ink3);font-size:.9em">
+            <td>Δήμος Σερρών</td><td class="td-r">1.586</td><td class="td-r">2,6%</td><td class="td-r">#5</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ΔΕΥΑ -->
+    <p style="font-size:.72rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin:4px 0 6px">ΔΕΥΑ — μέτρο: αριθμός αναθέσεων vs ομοτίμων (14× πάνω από μέσο όρο)</p>
+    <div class="tbl-wrap" style="margin-bottom:22px">
+      <table>
+        <thead><tr>
+          <th>Φορέας</th>
+          <th class="td-r">Άμεσες αναθέσεις</th>
+          <th class="td-r">% αποφάσεων</th>
+          <th class="td-r">Μ.Ο. αξίας/ανάθεση</th>
+        </tr></thead>
+        <tbody>
+          <tr style="background:#fef9f9">
+            <td><strong>ΔΕΥΑ Λαμίας</strong> <span style="font-size:.75rem;color:var(--ink3)">€10,1Μ αξία (93% χωρίς διαγ.)</span></td>
+            <td class="td-r red-cell"><strong>2.840</strong></td>
+            <td class="td-r red-cell"><strong>11,6%</strong></td>
+            <td class="td-r">€5.105</td>
+          </tr>
+          <tr style="color:var(--ink3);font-size:.9em">
+            <td>ΔΕΥΑ Τρικάλων</td><td class="td-r">262</td><td class="td-r">1,8%</td><td class="td-r">—</td>
+          </tr>
+          <tr style="color:var(--ink3);font-size:.9em">
+            <td>ΔΕΥΑ Κοζάνης</td><td class="td-r">196</td><td class="td-r">1,4%</td><td class="td-r">—</td>
+          </tr>
+          <tr style="color:var(--ink3);font-size:.9em">
+            <td>ΔΕΥΑ Καρδίτσας</td><td class="td-r">148</td><td class="td-r">1,0%</td><td class="td-r">—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ΠΕΡΙΦΕΡΕΙΑ -->
+    <p style="font-size:.72rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin:4px 0 6px">Περιφέρεια — μέτρο: % άμεσων αναθέσεων vs 7 ομότιμες (αναλυτικά στο Κεφ. 7)</p>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>Φορέας</th>
+          <th class="td-r">Άμεσες αναθέσεις</th>
+          <th class="td-r">% αποφάσεων</th>
+          <th class="td-r">Κατάταξη (από 7)</th>
+        </tr></thead>
+        <tbody>
+          <tr style="background:#fef9f9">
+            <td><strong>Περιφέρεια Στ. Ελλάδας</strong></td>
+            <td class="td-r"><strong>7.361</strong></td>
+            <td class="td-r amber-cell"><strong>5,2%</strong></td>
+            <td class="td-r amber-cell"><strong>#1 🟡</strong></td>
+          </tr>
+          <tr style="color:var(--ink3);font-size:.9em">
+            <td>Εύρος 6 ομοτίμων</td>
+            <td class="td-r">5.744–7.630</td>
+            <td class="td-r">4,3–4,9%</td>
+            <td class="td-r">#2–#7</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <div class="section">
