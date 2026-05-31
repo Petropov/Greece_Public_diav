@@ -7,7 +7,7 @@
 
 ## Executive Summary
 
-This analysis covers six years of public procurement records (2020–2026) for three public entities in Lamia — the General Hospital (ΓΝ Λαμίας), the municipality (Δήμος Λαμίας), and the water utility (ΔΕΥΑ Λαμίας) — cross-validated against peer institutions of comparable size in Trikala, Karditsa, Kozani, and Serres.
+This analysis covers six years of public procurement records (2020–2026) for four public entities in the Lamia area — the General Hospital (ΓΝ Λαμίας), the municipality (Δήμος Λαμίας), the water utility (ΔΕΥΑ Λαμίας), and the Regional Authority (Περιφέρεια Στερεάς Ελλάδας, headquartered in Lamia) — cross-validated against peer institutions of comparable size in Trikala, Karditsa, Kozani, Serres, and all 12 other Greek regional authorities.
 
 **The core finding is not a single anomaly but a structural pattern:** all three Lamia entities independently show elevated direct-award frequency. The most analytically clean signal is the hospital's **competitive award (ΚΑΤΑΚΥΡΩΣΗ) count: 407 at ΓΝ Λαμίας versus 1,991 at the comparable ΓΝ Τρικάλων** — a **4.9×** inversion (local data 2020–May 2026; prior API figure: 1,841), robust to any classification ambiguity. The root cause at the hospital is identified: a labour model that outsources cleaning, catering, security, and H/M maintenance to external contractors (€7.34M = 44.9% of the 2024 budget). ΓΝ Τρικάλων also outsources cleaning and security to external contractors — but through competitive tenders that reach a winner (cleaning: ΓΕΝ ΚΑ ΑΕ via open tender; security: bridge contracts while competitive tender 26/2024 is under appeal). Only H/M maintenance is handled with internal staff at peer hospitals (no CPV 50710000-5 contracts found in peer data 2020–2026). The two hospitals spend almost identically per capita (€244 vs €246), but repeated tender failures at Lamia mean incumbents persist without competition — generating the 4.9× ΚΑΤΑΚΥΡΩΣΗ gap.
 
@@ -111,6 +111,32 @@ Direct analysis of all 2,840 "ΑΝΑΘΕΣΗ ΕΡΓΩΝ / ΠΡΟΜΗΘΕΙΩΝ /
 
 The outsourcing model that creates the UNISON-type dynamic — a €1.3–4M/year service contract requiring competitive tendering, with associated risks of incumbency entrenchment and failed tenders — is **specific to ΓΝ Λαμίας hospital**. It is not a shared Lamia-wide procurement pattern. The three entities in this analysis each reflect a different operational model: the municipality uses dispersed small direct awards; ΔΕΥΑ uses in-house staff plus small operational procurement; only ΓΝ Λαμίας concentrates 40% of its budget into large outsourced service contracts where competitive pressure is structurally difficult to maintain.
 
+### 1.4 The Regional Authority (Περιφέρεια Στερεάς Ελλάδας)
+
+Περιφέρεια Στερεάς Ελλάδας (org=5013, headquartered in Lamia) is the fourth major public entity in the area with independent procurement decision-making. It covers all of Στερεά Ελλάδα (five regional units: Φθιώτιδα, Φωκίδα, Βοιωτία, Εύβοια, Ευρυτανία) and published approximately 142,835 decisions on Diavgeia between 2020–2026.
+
+**Regional peer comparison — 7 comparable Greek regions (2020–2026):**
+
+| Region | ΑΝΑΘΕΣΗ (Δ.1) | ΚΑΤΑΚΥΡΩΣΗ (Δ.2.2) | Total decisions | ΑΝΑΘΕΣΗ rate | Ratio |
+|--------|--------------|-------------------|-----------------|-------------|-------|
+| **ΣΤΕΡΕΑ ΕΛΛΑΔΑ** | **7,361** | **70** | **142,835** | **5.2%** | **105×** |
+| ΔΥΤΙΚΗ ΜΑΚΕΔΟΝΙΑ | 6,524 | 1,710 | 134,024 | 4.9% | 3.8× |
+| ΑΝ. ΜΑΚΕΔ.-ΘΡΑΚΗ | 6,933 | 654 | 143,264 | 4.8% | 10.6× |
+| ΔΥΤΙΚΗ ΕΛΛΑΔΑ | 7,133 | 701 | 151,345 | 4.7% | 10.2× |
+| ΘΕΣΣΑΛΙΑ | 7,630 | 337 | 167,379 | 4.6% | 22.6× |
+| ΠΕΛΟΠΟΝΝΗΣΟΣ | 6,017 | 850 | 134,297 | 4.5% | 7.1× |
+| ΗΠΕΙΡΟΣ | 5,744 | 36 | 132,364 | 4.3% | 159.6× |
+
+*Comparison set: 7 medium-sized Greek regional authorities (excluding ΑΤΤΙΚΗ and ΚΕΝΤΡΙΚΗ ΜΑΚΕΔΟΝΙΑ — substantially larger administrative scale). Data via Diavgeia /api/search `info.total`, single API call per metric, May 2026.*
+
+**ΣΤΕΡΕΑ ΕΛΛΑΔΑ ranks first on ΑΝΑΘΕΣΗ rate** (5.2% vs 4.3–4.9% for all peers). The gap is real but modest — approximately 0.3–0.9 percentage points above the peer range. This contrasts with the municipality finding, where Lamia's 16.1% is 1.4–6.2× above peers.
+
+**The ΚΑΤΑΚΥΡΩΣΗ/ΑΝΑΘΕΣΗ ratio (105×)** places ΣΤΕΡΕΑ ΕΛΛΑΔΑ second among peers (ΗΠΕΙΡΟΣ has 160×, but with a lower ΑΝΑΘΕΣΗ rate). High variance on this metric across regions (3.8× to 160×) reflects different administrative practices for recording competitive award outcomes rather than systematic measurement of direct-award avoidance. The ratio is noted but not treated as the primary signal for regional comparisons, for the same reason it is not used for municipality comparisons (§2.1).
+
+**Methodological limitation:** The regional authority covers five provincial units, not just Fthiotida/Lamia. Its procurement profile is aggregated across a 600k-population area. Any Lamia-specific concentration within the regional entity's decisions would require a further breakdown by project location — beyond the scope of this analysis.
+
+**Assessment:** ΣΤΕΡΕΑ ΕΛΛΑΔΑ shows the weakest of the four signals identified in this analysis. It ranks first among regional peers on ΑΝΑΘΕΣΗ rate, but the margin is smaller than for any of the three core entities. The finding is supplementary: it extends the "higher-than-peers" pattern to a fourth entity, but does not independently constitute a regulatory referral-level finding in the way the hospital ΚΑΤΑΚΥΡΩΣΗ inversion or the municipality above-threshold security awards do.
+
 ---
 
 ## Part 2 — What It Means
@@ -121,9 +147,18 @@ The ΑΝΑΘΕΣΗ count anomaly at ΓΝ Λαμίας (5,887 vs 187) partially r
 
 The ΚΑΤΑΚΥΡΩΣΗ inversion (407 Lamia vs 1,991 Trikala) uses a more precise decision type and tells the same story unambiguously: ΓΝ Τρικάλων overwhelmingly chooses to run competitive processes to formal award; ΓΝ Λαμίας does not.
 
-### 2.2 Three Entities, One Pattern
+### 2.2 Four Entities, One Pattern
 
-The same signal — elevated direct award frequency — appears independently in three separate organisations sharing only a common location. Each has its own legal personality, governing board, management. That all three independently display elevated direct award rates suggests the pattern reflects something about the local procurement culture or oversight environment rather than any particular operational constraint.
+The same signal — elevated direct award frequency — appears independently in four separate organisations sharing only a common location. Each has its own legal personality, governing board, management. The signal strength varies across entities:
+
+| Entity | Metric | Lamia | Peer range | Signal |
+|--------|--------|-------|------------|--------|
+| ΓΝ Λαμίας | ΚΑΤΑΚΥΡΩΣΗ count | 407 | 1,991 (ΓΝ Τρικάλων) | **4.9× deficit — strongest** |
+| Δήμος Λαμίας | ΑΝΑΘΕΣΗ rate | 16.1% | 2.6–11.5% | **1.4–6.2× above peers** |
+| ΔΕΥΑ Λαμίας | ΑΝΑΘΕΣΗ count | 2,840 | avg 202 | **14.1× above peer avg** |
+| Περιφέρεια Στ. Ελλάδας | ΑΝΑΘΕΣΗ rate | 5.2% | 4.3–4.9% | 0.3–0.9pp above peers (weakest) |
+
+That all four independently display elevated direct-award metrics suggests the pattern reflects something about the local procurement culture or oversight environment rather than any particular operational constraint. However, the regional authority result is the weakest signal and could fall within normal variation; the three core entities are the basis for any referral finding.
 
 ### 2.3 Possible Explanations
 
@@ -189,7 +224,7 @@ The hospital's 2024 budget execution report (published on Diavgeia as ADA `9ΤΥ
 
 3. ΔΕΥΑ Λαμίας issues 4.9× more direct award transactions than the comparable peer average (ΔΕΥΑ Τρικάλων, Καρδίτσας, Κοζάνης — excluding ΔΕΥΑ Σερρών whose ΑΝΑΘΕΣΗ count reflects board resolutions, not procurement awards), with 93% of identifiable spend going through this channel. The average transaction value (€3,500) is within the legal threshold — the concern is volume and the near-total absence of competitive procurement.
 
-4. All three Lamia entities independently show elevated direct award frequency, suggesting systemic pattern rather than institution-specific circumstance.
+4. All three core Lamia entities independently show elevated direct award frequency, suggesting a systemic pattern rather than institution-specific circumstance. A fourth entity — Περιφέρεια Στερεάς Ελλάδας — also ranks highest among 7 peer Greek regional authorities on ΑΝΑΘΕΣΗ rate (5.2% vs 4.3–4.9% range), though the gap is smaller and the signal weaker than for the three core entities.
 
 **What requires revision from earlier drafts:**
 
