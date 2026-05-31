@@ -743,6 +743,77 @@ A rolling 60-day window analysis of all municipality ΑΝΑΘΕΣΗ decisions wi
 
 ---
 
+## Part 4 — Additional Analytical Checks (May 2026)
+
+*Four systematic data patterns were checked against the full CSV dataset (148,089 rows across ΓΝ Λαμίας, Δήμος Λαμίας, ΔΕΥΑ Λαμίας). Summary of results:*
+
+### 4.1 Signer Concentration
+
+**ΓΝ Λαμίας:** One authorising official — signer ID 100062447 — signed **4,221 of 5,887 ΑΝΑΘΕΣΗ decisions (71.7%)**, representing 74.9% of identifiable ΑΝΑΘΕΣΗ spend (€161M). A second official (100035866, active only in 2020) and two others account for the remainder. This extreme concentration reflects the hospital's institutional practice of routing all procurement-related board decisions through the same authorising signature (the President of the Board of Directors or Διοικητής) — not unusual for a Greek hospital structure, where a single governing body approves all disbursements. It does, however, mean that a very large volume of procurement decisions carried minimal counter-signature review.
+
+The unit IDs associated with signer 100062447 (74617, 75250) are consistent with the hospital's central administration (Διοικητικό Συμβούλιο), confirming this is a structural characteristic rather than an individual irregularity.
+
+**ΔΕΥΑ Λαμίας:** Signer 125420 handles 52.9% of decisions but only 4.0% of spend — these are the small operational purchases (average €270/decision). Signer 100052471 controls only 10.5% of decisions but 66.1% of spend (€6.65M). Inspection of the subjects confirms: 100052471's awards are competitive tender approvals ("Έγκριση μελέτης και όρων ηλεκτρονικού διαγωνισμού") — large values representing future competitive procurement, classified as Δ.1 ΑΝΑΘΕΣΗ (another misclassification instance, separate from the hospital's H2 finding). The signer distribution at ΔΕΥΑ reflects its internal hierarchy, not a concentration risk.
+
+---
+
+### 4.2 Year-End Acceleration
+
+**Result: Negative for all three entities.**
+
+Monthly distribution of ΑΝΑΘΕΣΗ decisions was checked for November-December concentration (expected: 16.7% of annual; flag threshold: >25%).
+
+- **ΓΝ Λαμίας:** Nov-Dec overall = 19.1% (count) / 21.6% (spend). An apparent spike in 2023 (47.9% of annual ΑΝΑΘΕΣΗ spend in Nov-Dec) was investigated and found to be entirely composed of board decisions **without supplier identifiers** — formal hospital board approvals of competitive tender evaluation reports, each carrying the full estimated contract value. These are procedural decisions, not direct-award acceleration. The Nov-Dec 2023 supplier-linked direct awards total only €51,878. **No year-end acceleration signal.**
+
+- **ΔΕΥΑ Λαμίας:** Nov-Dec = 16.8% of annual count — essentially exactly the expected 16.7%. **Flat distribution; no signal.**
+
+- **Δήμος Λαμίας:** Insufficient amount data for meaningful analysis (only 10 ΑΝΑΘΕΣΗ decisions with populated amounts in the CSV).
+
+---
+
+### 4.3 Threshold Clustering and Benford's Law
+
+**Benford's Law** (leading digit distribution) was applied to all ΑΝΑΘΕΣΗ amounts with supplier identifiers.
+
+- **ΓΝ Λαμίας** (937 supplier-linked awards with amounts): Benford's Law respected across all digits. Leading digit '9': observed 4.6% vs expected 4.6%. **No anomaly.**
+- **ΔΕΥΑ Λαμίας** (1,970 awards with amounts): Benford's Law fits closely across all digits. **No anomaly.**
+
+**Threshold clustering** (awards in the 10% window below legal direct-award ceilings):
+
+- **ΔΕΥΑ Λαμίας:** Completely clean. Zero clustering at any threshold. The most common amounts are €37.20, €62.00, €24.80, €186.00 — these are ΔΕΥΑ operational service units at fixed tariff rates. No threshold gaming.
+
+- **ΓΝ Λαμίας:** Elevated cluster at €30,000 — **77 board decisions (no supplier)** and **2 supplier-linked awards** fall in the €27,000–30,000 window (3.1% of decisions with amounts). This is marginally above the 3% flag threshold. Detailed review of all 77 board decisions shows these are predominantly board-approved direct procurement authorisations for medical supplies, lab reagents, and surgical materials. The pattern is structured around the €30,000 legal ceiling for direct award (Art. 118 Law 4412/2016).
+
+  **Notable sub-pattern — bridge procurement cycling:** The hospital repeatedly procured the same item in consecutive monthly contracts just below €30k while a competitive tender for that item was pending. The clearest example: liquid medical oxygen from ΛΙΝΤΕ ΕΛΛΑΣ ΕΠΕ (AFM 095167018) purchased in three consecutive monthly contracts at exactly €29,475.42 (June, July, September 2021) while the open competitive tender ΕΣΗΔΗΣ 20PROC007729941 was under evaluation. A follow-on 2-month contract at €29,016.00 (October 2021) continued the bridge until the competitive award concluded. This is a documented operational gap — the hospital was legally obliged to maintain oxygen supply during the tender period — but the repeated near-threshold pricing reflects a practice of structuring each bridge tranche just below the competitive requirement. The same pattern appears for immunological reagents (€29,XXX recurring, 2021–2024).
+
+  **Context:** Most of the €30k-cluster decisions are not fraudulent in isolation — they represent genuine hospital operational needs during tender gaps. The analytical concern is whether the same recurring needs were systematically structured as rolling sub-threshold tranches rather than being incorporated into competitive annual tenders from the outset.
+
+---
+
+### 4.4 Subject-Line Recycling
+
+Detected for the same supplier receiving the same normalized subject string 3+ times across 2+ years.
+
+- **ΓΝ Λαμίας:** 8 patterns found. All are hospital-standard repetitive purchases: immunological reagents (AFM 94499248, 6 entries), microbiology reagents (94499248, 5 entries), generic "αντιδραστήρια" (94027257, 4+4 entries). These are expected for a hospital procuring consumables from established suppliers across multiple years. None involve above-threshold totals; none represent a single supplier capture pattern.
+
+- **ΔΕΥΑ Λαμίας:** 123 patterns found, but all share the same subject: "ΑΠΟΦΑΣΗ ΑΝΑΘΕΣΗΣ" — ΔΕΥΑ's default subject for all direct award decisions. The recycling is a data-entry practice (using the same boilerplate text), not a meaningful signal. The suppliers span 123 distinct entities.
+
+---
+
+### 4.5 Summary of Additional Checks
+
+| Check | ΓΝ Λαμίας | Δήμος Λαμίας | ΔΕΥΑ Λαμίας |
+|-------|-----------|-------------|-------------|
+| Signer concentration | Structural (71.7% → single ΔΣ authority) | Insufficient data | Normal hierarchy |
+| Year-end acceleration | **Negative** | Insufficient data | **Negative** |
+| Benford's Law | **Clean** | Insufficient data | **Clean** |
+| €30k threshold cluster | **Marginal signal** (3.1% — bridge procurement) | Insufficient data | **Clean** |
+| Subject recycling | Routine (hospital consumables) | Insufficient data | Boilerplate text |
+
+**Overall assessment:** The additional checks confirm existing findings rather than surface new fraud-level signals. The most analytically important result is that **ΔΕΥΑ Λαμίας's volume anomaly is confirmed as genuine dispersed procurement** — Benford's Law is respected, threshold gaming is absent, and no signer or supplier concentration is found. This strengthens the interpretation that ΔΕΥΑ's issue is procurement culture (defaulting to direct awards rather than framework agreements) rather than directed spending. The hospital's marginal €30k cluster is contextualised by legitimate bridge-procurement operations rather than structured fraud.
+
+---
+
 ## Open Questions & Verification Notes
 
 *These items are not required for regulatory referral but would strengthen the record further.*

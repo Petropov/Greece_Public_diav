@@ -178,6 +178,10 @@ Each finding below is rated by **evidence quality**:
 | Cross-entity supplier network | **Negative** — 21 shared AFMs, all routine; no coordinated supplier capture |
 | Hospital catering ΓΙΑΝΝΙΤΣΗΣ | **Cleared** — small distributor 2020–2023, main contract competitively awarded to ΠΙΕΤΡΗΣ |
 | ΙΝΤΕΡΚΑΤ criminal basis | **Insufficient** — sole bidder is suspicious but legally possible; requires ΕΑΑΔΗΣΥ specification review before criminal referral |
+| Year-end acceleration (all 3 entities) | **Negative** — checked May 2026; no entity shows Nov-Dec surge above 25%; hospital apparent 2023 spike is board procedural decisions (no supplier), not direct-award acceleration |
+| Benford's Law / threshold gaming (hospital + ΔΕΥΑ) | **Negative on Benford** — leading digits match expected distribution at both entities. Hospital has marginal €30k cluster (77 board-approved near-threshold awards) explainable by bridge procurement during competitive tender gaps (e.g., monthly LINDE oxygen at €29,475 while tender pending). ΔΕΥΑ completely clean. |
+| Signer concentration as individual irregularity | **Structural only** — hospital signer 100062447 signed 71.7% of ΑΝΑΘΕΣΗ; this reflects Board of Directors institutional practice, not individual misconduct. ΔΕΥΑ signer distribution normal. |
+| Subject-line recycling (hospital + ΔΕΥΑ) | **Routine** — hospital: standard repetitive medical consumable purchases from established suppliers. ΔΕΥΑ: boilerplate text ("ΑΠΟΦΑΣΗ ΑΝΑΘΕΣΗΣ") used uniformly — not informative. |
 
 ---
 
