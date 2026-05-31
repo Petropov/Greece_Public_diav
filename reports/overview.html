@@ -959,46 +959,101 @@ tr:hover td{background:#fafafa}
   </div>
 
   <div class="section">
-    <h3>Σύγκριση 7 ομότιμων Περιφερειών — ΑΝΑΘΕΣΗ rate &amp; ratio (2020–2026)</h3>
+    <h3>Πόσο συχνά αποφεύγεται ο διαγωνισμός — σε 7 συγκρίσιμες Περιφέρειες (2020–2026)</h3>
+
+    <!-- LEGEND -->
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;font-size:.8rem;color:var(--ink2)">
+      <div style="background:#f3f4f6;border:1px solid var(--border);border-radius:6px;padding:8px 14px">
+        <strong>% αποφάσεων χωρίς διαγωνισμό</strong><br>
+        <span style="color:var(--ink3)">ΑΝΑΘΕΣΗ ÷ σύνολο αποφάσεων · χαμηλότερο = καλύτερο</span>
+      </div>
+      <div style="background:#f3f4f6;border:1px solid var(--border);border-radius:6px;padding:8px 14px">
+        <strong>Αναλογία χωρίς/με διαγωνισμό</strong><br>
+        <span style="color:var(--ink3)">ΑΝΑΘΕΣΗ ÷ ΚΑΤΑΚΥΡΩΣΗ · 1× = ισορροπία · χαμηλότερο = καλύτερο</span>
+      </div>
+      <div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:6px;padding:8px 14px">
+        <span style="color:var(--red)">🔴 #1 στο ποσοστό</span> &nbsp;
+        <span style="color:var(--amber)">🟡 υψηλή αναλογία</span> &nbsp;
+        <span style="color:var(--green)">🟢 χαμηλή αναλογία</span>
+      </div>
+    </div>
+
     <div class="tbl-wrap">
       <table>
-        <thead><tr>
-          <th>Περιφέρεια</th>
-          <th class="td-r">ΑΝΑΘΕΣΗ</th>
-          <th class="td-r">ΚΑΤΑΚΥΡΩΣΗ</th>
-          <th class="td-r">Σύνολο αποφ.</th>
-          <th class="td-r">Ποσοστό ΑΝΑΘΕΣΗ</th>
-          <th class="td-r">Λόγος</th>
-        </tr></thead>
+        <thead>
+          <tr>
+            <th rowspan="2">Περιφέρεια</th>
+            <th class="td-r" colspan="3" style="border-bottom:1px solid var(--border);color:var(--ink3);font-weight:500;font-size:.75rem">Πλήθος αποφάσεων Διαύγεια</th>
+            <th class="td-r" style="border-left:2px solid var(--border)">% χωρίς διαγ.</th>
+            <th class="td-r">Αναλογία χωρίς/με</th>
+          </tr>
+          <tr>
+            <th class="td-r" style="font-size:.75rem;font-weight:500;color:var(--ink3)">Άμεσες αναθέσεις</th>
+            <th class="td-r" style="font-size:.75rem;font-weight:500;color:var(--ink3)">Κατακυρώσεις μετά διαγ.</th>
+            <th class="td-r" style="font-size:.75rem;font-weight:500;color:var(--ink3)">Σύνολο αποφάσεων</th>
+            <th class="td-r" style="border-left:2px solid var(--border);font-size:.75rem;font-weight:500;color:var(--ink3)">(ΑΝΑΘΕΣΗ ÷ σύνολο)</th>
+            <th class="td-r" style="font-size:.75rem;font-weight:500;color:var(--ink3)">(ΑΝΑΘΕΣΗ ÷ ΚΑΤΑΚΥΡΩΣΗ)</th>
+          </tr>
+        </thead>
         <tbody>
           <tr style="background:#fef2f2">
-            <td><strong>ΣΤΕΡΕΑ ΕΛΛΑΔΑ</strong></td>
-            <td class="td-r">7.361</td><td class="td-r">70</td><td class="td-r">142.835</td>
-            <td class="td-r red-cell"><strong>5,2%</strong></td>
-            <td class="td-r amber-cell">105×</td>
+            <td><strong>ΣΤΕΡΕΑ ΕΛΛΑΔΑ</strong> <span class="tag red">#1</span></td>
+            <td class="td-r">7.361</td>
+            <td class="td-r">70</td>
+            <td class="td-r">142.835</td>
+            <td class="td-r red-cell" style="border-left:2px solid var(--border)"><strong>5,2%</strong></td>
+            <td class="td-r amber-cell"><strong>105×</strong></td>
           </tr>
-          <tr><td>ΔΥΤΙΚΗ ΜΑΚΕΔΟΝΙΑ</td>
+          <tr>
+            <td>ΔΥΤΙΚΗ ΜΑΚΕΔΟΝΙΑ</td>
             <td class="td-r">6.524</td><td class="td-r">1.710</td><td class="td-r">134.024</td>
-            <td class="td-r">4,9%</td><td class="td-r green-cell">3,8×</td></tr>
-          <tr><td>ΑΝ. ΜΑΚΕΔ.-ΘΡΑΚΗ</td>
+            <td class="td-r" style="border-left:2px solid var(--border)">4,9%</td>
+            <td class="td-r green-cell">3,8× ✓</td>
+          </tr>
+          <tr>
+            <td>ΑΝ. ΜΑΚΕΔ.-ΘΡΑΚΗ</td>
             <td class="td-r">6.933</td><td class="td-r">654</td><td class="td-r">143.264</td>
-            <td class="td-r">4,8%</td><td class="td-r">10,6×</td></tr>
-          <tr><td>ΔΥΤΙΚΗ ΕΛΛΑΔΑ</td>
+            <td class="td-r" style="border-left:2px solid var(--border)">4,8%</td>
+            <td class="td-r">10,6×</td>
+          </tr>
+          <tr>
+            <td>ΔΥΤΙΚΗ ΕΛΛΑΔΑ</td>
             <td class="td-r">7.133</td><td class="td-r">701</td><td class="td-r">151.345</td>
-            <td class="td-r">4,7%</td><td class="td-r">10,2×</td></tr>
-          <tr><td>ΘΕΣΣΑΛΙΑ</td>
+            <td class="td-r" style="border-left:2px solid var(--border)">4,7%</td>
+            <td class="td-r">10,2×</td>
+          </tr>
+          <tr>
+            <td>ΘΕΣΣΑΛΙΑ</td>
             <td class="td-r">7.630</td><td class="td-r">337</td><td class="td-r">167.379</td>
-            <td class="td-r">4,6%</td><td class="td-r">22,6×</td></tr>
-          <tr><td>ΠΕΛΟΠΟΝΝΗΣΟΣ</td>
+            <td class="td-r" style="border-left:2px solid var(--border)">4,6%</td>
+            <td class="td-r">22,6×</td>
+          </tr>
+          <tr>
+            <td>ΠΕΛΟΠΟΝΝΗΣΟΣ</td>
             <td class="td-r">6.017</td><td class="td-r">850</td><td class="td-r">134.297</td>
-            <td class="td-r">4,5%</td><td class="td-r">7,1×</td></tr>
-          <tr><td>ΗΠΕΙΡΟΣ</td>
+            <td class="td-r" style="border-left:2px solid var(--border)">4,5%</td>
+            <td class="td-r">7,1×</td>
+          </tr>
+          <tr>
+            <td>ΗΠΕΙΡΟΣ <span class="tag amber" title="Μόνο 36 κατακυρώσεις — η κωδικολόγηση μπορεί να εξηγεί μέρος">⚠</span></td>
             <td class="td-r">5.744</td><td class="td-r">36</td><td class="td-r">132.364</td>
-            <td class="td-r">4,3%</td><td class="td-r">159,6×</td></tr>
+            <td class="td-r" style="border-left:2px solid var(--border)">4,3%</td>
+            <td class="td-r amber-cell">159,6×</td>
+          </tr>
         </tbody>
       </table>
     </div>
-    <p style="font-size:.8rem;color:var(--ink3);margin-top:10px">Πηγή: Diavgeia /api/search <code>info.total</code>, Μάιος 2026. Ομάδα σύγκρισης: 7 μεσαίες Περιφέρειες (εξαιρούνται Αττική και Κεντρ. Μακεδονία — ουσιωδώς μεγαλύτερης κλίμακας). Ο λόγος ΑΝΑΘΕΣΗ/ΚΑΤΑΚΥΡΩΣΗ έχει μεγάλη διακύμανση (3,8× έως 160×) λόγω διαφορών κωδικολογίας — ενδεικτικός αλλά όχι καθοριστικός.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px">
+      <div style="background:#fff8e1;border:1px solid #fcd34d;border-radius:6px;padding:10px 14px;font-size:.79rem;color:var(--ink2)">
+        <strong>⚠ Ηπειρος 159,6×:</strong> Έχει <em>χαμηλότερο</em> ποσοστό (4,3%) από τη Στερεά αλλά <em>χειρότερη</em> αναλογία. Αυτό σημαίνει ότι πολύ λίγες αποφάσεις της φτάνουν σε κατακύρωση — πιθανώς λόγω διαφορετικής κωδικολόγησης.
+      </div>
+      <div style="background:#eff6ff;border:1px solid #93c5fd;border-radius:6px;padding:10px 14px;font-size:.79rem;color:var(--ink2)">
+        <strong>Πρωτεύον σήμα: το ποσοστό (%).</strong> Η αναλογία (×) εξαρτάται από πόσες κατακυρώσεις κωδικοποιεί κάθε Περιφέρεια — δεν είναι συγκρίσιμη απόλυτα. Το ποσοστό επηρεάζεται λιγότερο από αυτή την ασυνέπεια.
+      </div>
+    </div>
+
+    <p style="font-size:.78rem;color:var(--ink3);margin-top:10px">Πηγή: Diavgeia /api/search <code>info.total</code>, Μάιος 2026. Εξαιρούνται Αττική και Κεντρ. Μακεδονία (ουσιωδώς μεγαλύτερης κλίμακας).</p>
   </div>
 
   <div class="section">
