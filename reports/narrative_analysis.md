@@ -256,9 +256,24 @@ All 53 are legitimate medical device, pharmaceutical, diagnostic, or equipment c
 
 *Sources: ΚΑΤΑΚΥΡΩΣΗ PDFs fetched May 2026 for all 5 identified service contract ADAs. Cross-referenced against ΑΝΑΘΕΣΗ decisions identifying option exercises and contract modifications.*
 
-**Cross-entity supplier overlap (ΓΝ Λαμίας ↔ Δήμος Λαμίας):**
-- **ΠΙΕΤΡΗΣ ΕΣΤΙΑΣΗ ΑΕ (AFM 999404941)** holds the hospital catering contract (€2.24M, 2023) AND won a Δήμος Λαμίας school meals tender in 2025 (€0.20M, ΚΑΤΑΚΥΡΩΣΗ ADA in org=6166). Both contracts are competitively awarded; no improper concentration is implied — ΠΙΕΤΡΗΣ is a national catering company with operations across multiple public entities. This is noted for transparency.
-- No hospital service contractors (ΙΝΤΕΡΚΑΤ, ΗΦΑΙΣΤΟΣ, UNISON, 3G FACILITIES) appear in the Δήμος or ΔΕΥΑ procurement records.
+**Cross-entity supplier overlap — full analysis (May 2026, all three entities):**
+
+A systematic AFM-level comparison across all three core entities (ΓΝ Λαμίας 277 unique AFMs, Δήμος 243, ΔΕΥΑ 147; 148,089 total decision rows) found **21 AFMs appearing in 2+ entities**. All are explainable by operational necessity:
+
+| AFM | Supplier | Entities | Amounts | Nature |
+|-----|---------|---------|---------|--------|
+| 999691753 | ΚΤΕΟ (vehicle inspection) | All 3 | Tiny (€15–1,858/tx) | Mandatory legal requirement for all vehicle fleets |
+| 095167018 | LINDE (medical/industrial gases) | Hospital + ΔΕΥΑ | Hospital €495k, ΔΕΥΑ €3.7k | Different products: medical O₂ vs industrial gas; competitive contract at hospital |
+| 094026421 | ΕΛΤΑ (postal service) | Hospital + Municipality | €2.5–9.4k/tx | Monopoly Universal Service Obligation — direct award legally required |
+| 082785679 | ΜΑΝΤΕΣ-ΤΣΑΜΗΣ ΟΕ (IT) | Hospital + Municipality | Hospital €13k (WiFi maintenance); Municipality €73k competitive award (2019, pre-period) | Different services, small hospital amount |
+| 094275308 | Unknown | Municipality + ΔΕΥΑ | Municipality: 2019 competitive ratification (pre-period); ΔΕΥΑ: €8.6k asphalt 2025 | Temporal separation, different services |
+| 16 others | Various | 2 entities each | All small amounts | Different service categories |
+
+**Key negative finding:** None of the documented direct-award problem contractors — UNISON, ΙΝΤΕΡΚΑΤ, ΗΦΑΙΣΤΟΣ, ΚΟΥΤΚΙΑΣ (security), ΚΑΝΑΒΕΤΑΣ-ΚΑΡΑΔΗΜΑΣ (electrical materials), ΜΑΝΤΕΣ-ΤΣΑΜΗΣ (threshold-ceiling IT) — appear in more than one entity's procurement records at meaningful scale.
+
+**ΠΙΕΤΡΗΣ ΕΣΤΙΑΣΗ ΑΕ (AFM 999404941)** holds the hospital catering contract (€2.24M, 2023) AND won a Δήμος Λαμίας school meals tender in 2025 (€0.20M). Both competitively awarded. ΠΙΕΤΡΗΣ is a national catering company. Noted for transparency; not an anomaly.
+
+**Implication:** The elevated direct-award pattern across the three entities does not reflect a common supplier network or external intermediary directing contracts to shared beneficiaries. Each entity has its own procurement problem, independently structured. This points toward institutional culture or local oversight failure as the explanation, rather than organised corruption of the "single orchestrator" type.
 
 *ΑΝΑΘΕΣΗ classification — additional categories identified:*
 Beyond the 739 competitive-tender procedural steps identified earlier, two further categories inflate the ΑΝΑΘΕΣΗ figures:
