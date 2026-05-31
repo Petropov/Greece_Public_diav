@@ -231,34 +231,74 @@ tr:hover td{background:#fafafa}
         <thead><tr>
           <th>Φορέας</th><th>Τύπος</th>
           <th class="td-r">Άμεσες αναθέσεις</th>
-          <th class="td-r">Ανταγωνιστικές κατακυρώσεις</th>
+          <th class="td-r">% επί συνόλου</th>
+          <th class="td-r">Κατακυρώσεις</th>
           <th class="td-r">Σήμα</th>
         </tr></thead>
         <tbody>
-          <tr><td><strong>ΓΝ Λαμίας</strong></td><td>Νοσοκομείο</td>
-              <td class="td-r">5.887</td><td class="td-r">407</td>
-              <td class="td-r red-cell">14,5 : 1</td></tr>
-          <tr><td>ΓΝ Τρικάλων</td><td>Νοσοκομείο (σύγκριση)</td>
-              <td class="td-r">187</td><td class="td-r">1.991</td>
-              <td class="td-r green-cell">0,1 : 1</td></tr>
-          <tr><td>ΓΝ Σερρών</td><td>Νοσοκομείο (σύγκριση)</td>
-              <td class="td-r">184</td><td class="td-r">82</td>
-              <td class="td-r">2,2 : 1</td></tr>
-          <tr style="border-top:2px solid var(--border)">
-              <td><strong>Δήμος Λαμίας</strong></td><td>ΟΤΑ</td>
-              <td class="td-r">10.388</td><td class="td-r">—</td>
-              <td class="td-r amber-cell">υψηλότερος από ομοτίμους</td></tr>
-          <tr><td><strong>ΔΕΥΑ Λαμίας</strong></td><td>Νομικό Πρόσωπο</td>
-              <td class="td-r">2.840</td><td class="td-r">—</td>
-              <td class="td-r amber-cell">14,1× πάνω από μ.ο. ομοτίμων</td></tr>
-          <tr style="border-top:2px solid var(--border)">
-              <td><strong>Περιφέρεια Στ. Ελλάδας</strong></td><td>ΟΤΑ Β΄ Βαθμού</td>
-              <td class="td-r">7.361</td><td class="td-r">70</td>
-              <td class="td-r amber-cell">5,2% — #1 σε 7 ομότιμες Περιφέρειες</td></tr>
+          <!-- ΝΟΣΟΚΟΜΕΙΑ -->
+          <tr style="background:#fef9f9">
+            <td><strong>ΓΝ Λαμίας</strong></td><td>Νοσοκομείο</td>
+            <td class="td-r"><strong>5.887</strong></td><td class="td-r">11,6%</td><td class="td-r"><strong>407</strong></td>
+            <td class="td-r red-cell"><strong>λόγος 14,5:1</strong></td></tr>
+          <tr style="color:var(--ink3);font-size:.9em">
+            <td>ΓΝ Τρικάλων</td><td>σύγκριση</td>
+            <td class="td-r">187</td><td class="td-r">0,3%</td><td class="td-r">1.991</td>
+            <td class="td-r green-cell">0,1:1</td></tr>
+          <tr style="color:var(--ink3);font-size:.9em">
+            <td>ΓΝ Σερρών</td><td>σύγκριση</td>
+            <td class="td-r">184</td><td class="td-r">0,7%</td><td class="td-r">82</td>
+            <td class="td-r">2,2:1</td></tr>
+          <!-- ΔΗΜΟΙ -->
+          <tr style="border-top:2px solid var(--border);background:#fef9f9">
+            <td><strong>Δήμος Λαμίας</strong></td><td>ΟΤΑ Α΄</td>
+            <td class="td-r"><strong>10.388</strong></td><td class="td-r red-cell"><strong>16,1%</strong></td><td class="td-r">—</td>
+            <td class="td-r red-cell"><strong>#1 από 5 ομοτίμους</strong></td></tr>
+          <tr style="color:var(--ink3);font-size:.9em">
+            <td>Δήμος Τρικάλων</td><td>σύγκριση</td>
+            <td class="td-r">6.991</td><td class="td-r">11,5%</td><td class="td-r">—</td><td class="td-r"></td></tr>
+          <tr style="color:var(--ink3);font-size:.9em">
+            <td>Δήμος Κοζάνης</td><td>σύγκριση</td>
+            <td class="td-r">4.380</td><td class="td-r">9,6%</td><td class="td-r">—</td><td class="td-r"></td></tr>
+          <tr style="color:var(--ink3);font-size:.9em">
+            <td>Δήμος Καρδίτσας</td><td>σύγκριση</td>
+            <td class="td-r">2.709</td><td class="td-r">4,6%</td><td class="td-r">—</td><td class="td-r"></td></tr>
+          <tr style="color:var(--ink3);font-size:.9em">
+            <td>Δήμος Σερρών</td><td>σύγκριση</td>
+            <td class="td-r">1.586</td><td class="td-r">2,6%</td><td class="td-r">—</td><td class="td-r"></td></tr>
+          <!-- ΔΕΥΑ -->
+          <tr style="border-top:2px solid var(--border);background:#fef9f9">
+            <td><strong>ΔΕΥΑ Λαμίας</strong></td><td>Νομικό Πρόσωπο</td>
+            <td class="td-r"><strong>2.840</strong></td><td class="td-r red-cell"><strong>11,6%</strong></td><td class="td-r">—</td>
+            <td class="td-r red-cell"><strong>14,1× μ.ο. ομοτίμων</strong></td></tr>
+          <tr style="color:var(--ink3);font-size:.9em">
+            <td>ΔΕΥΑ Τρικάλων</td><td>σύγκριση</td>
+            <td class="td-r">262</td><td class="td-r">1,8%</td><td class="td-r">—</td><td class="td-r"></td></tr>
+          <tr style="color:var(--ink3);font-size:.9em">
+            <td>ΔΕΥΑ Κοζάνης</td><td>σύγκριση</td>
+            <td class="td-r">196</td><td class="td-r">1,4%</td><td class="td-r">—</td><td class="td-r"></td></tr>
+          <tr style="color:var(--ink3);font-size:.9em">
+            <td>ΔΕΥΑ Καρδίτσας</td><td>σύγκριση</td>
+            <td class="td-r">148</td><td class="td-r">1,0%</td><td class="td-r">—</td><td class="td-r"></td></tr>
+          <!-- ΠΕΡΙΦΕΡΕΙΑ -->
+          <tr style="border-top:2px solid var(--border);background:#fef9f9">
+            <td><strong>Περιφέρεια Στ. Ελλάδας</strong></td><td>ΟΤΑ Β΄</td>
+            <td class="td-r"><strong>7.361</strong></td><td class="td-r amber-cell"><strong>5,2%</strong></td><td class="td-r">70</td>
+            <td class="td-r amber-cell"><strong>#1 από 7 ομοτίμους</strong></td></tr>
+          <tr style="color:var(--ink3);font-size:.9em">
+            <td>Περιφ. Θεσσαλίας</td><td>σύγκριση</td>
+            <td class="td-r">7.630</td><td class="td-r">4,6%</td><td class="td-r">337</td><td class="td-r"></td></tr>
+          <tr style="color:var(--ink3);font-size:.9em">
+            <td>Περιφ. Ηπείρου</td><td>σύγκριση</td>
+            <td class="td-r">5.744</td><td class="td-r">4,3%</td><td class="td-r">36</td><td class="td-r"></td></tr>
         </tbody>
       </table>
     </div>
-    <p style="font-size:.8rem;color:var(--ink3);margin-top:10px">Σημ.: 739 από τις 5.887 ΑΝΑΘΕΣΗ του ΓΝ Λαμίας αφορούν αποφάσεις επιτροπών εντός ανταγωνιστικών διαδικασιών — κωδικολογικό artifact. Η καθαρή αναλογία παραμένει ~27:1 ακόμα και μετά τη διόρθωση. Για Δήμο Λαμίας: το σήμα «υψηλότερος από ομοτίμους» βασίζεται στο <em>ποσοστό</em> ΑΝΑΘΕΣΗ επί συνόλου αποφάσεων (16,1% Λαμία vs 11,5% Τρίκαλα, 9,6% Κοζάνη, 4,6% Καρδίτσα, 2,6% Σέρρες). Ο λόγος ΑΝΑΘΕΣΗ/ΚΑΤΑΚΥΡΩΣΗ δεν χρησιμοποιείται για δήμους: ομότιμοι εμφανίζουν υψηλότερους λόγους λόγω διαφορών κωδικολογίας (π.χ. Καρδίτσα 387×, Τρίκαλα 194×), όχι χαλαρότερης εποπτείας. Για Περιφέρεια: το σήμα είναι ασθενέστερο — η διαφορά 5,2% vs 4,3–4,9% για τις 6 ομότιμες είναι υπαρκτή αλλά μικρή. Αναλύεται ξεχωριστά στο Κεφ. 9.</p>
+    <p style="font-size:.78rem;color:var(--ink3);margin-top:10px;line-height:1.6">
+      <strong>Νοσοκομεία:</strong> Σήμα = ΑΝΑΘΕΣΗ / ΚΑΤΑΚΥΡΩΣΗ. 739 από τις 5.887 ΑΝΑΘΕΣΗ του ΓΝ Λαμίας είναι διαδικαστικές καταχωρήσεις εντός ανταγωνιστικών διαδικασιών — η καθαρή αναλογία παραμένει ~27:1 μετά διόρθωση.
+      <strong>Δήμοι &amp; ΔΕΥΑ:</strong> Ο λόγος ΑΝΑΘΕΣΗ/ΚΑΤΑΚΥΡΩΣΗ <em>δεν</em> χρησιμοποιείται — ομότιμοι κωδικολογούν ανταγωνιστικές κατακυρώσεις διαφορετικά (ΣΥΜΒΑΣΗ, ΕΓΚΡΙΣΗ κ.ά.), παράγοντας τεχνητά υψηλούς λόγους. Σήμα = ποσοστό ΑΝΑΘΕΣΗ επί συνόλου αποφάσεων.
+      <strong>Περιφέρεια:</strong> Ασθενέστερο σήμα — διαφορά 0,3–0,9 μονάδες έναντι ομοτίμων. Κεφ. 9 για ανάλυση.
+    </p>
   </div>
 
   <div class="section">
@@ -266,7 +306,7 @@ tr:hover td{background:#fafafa}
     <div class="prose">
       <p>Η πρώτη εξήγηση είναι δομική: το ΓΝ Λαμίας έχει αναθέσει σε εξωτερικούς αναδόχους καθαριότητα, εστίαση, φύλαξη και Η/Μ συντήρηση. Τα ομότιμα νοσοκομεία επίσης αναθέτουν καθαριότητα και φύλαξη εξωτερικά — αλλά <em>μέσω ανταγωνιστικών διαγωνισμών που ολοκληρώνονται</em>. Για Η/Μ συντήρηση, τα ομότιμα χρησιμοποιούν ίδιο προσωπικό (κανένας εξωτερικός ανάδοχος για CPV 50710000-5 στα δεδομένα Διαύγεια 2020–2026). Κάθε λήξη σύμβασης σημαίνει νέο διαγωνισμό. Κάθε ναυαγισμένος διαγωνισμός σημαίνει παράταση. Αυτή η τριβή — και ο υψηλός ρυθμός αποτυχίας ανταγωνιστικών κύκλων — εξηγεί μαθηματικά το 4,9×.</p>
       <p>Αλλά η δομή δεν εξηγεί τα πάντα. Γιατί οι μεγάλοι διαγωνισμοί ναυάγησαν επανειλημμένα; Γιατί η εταιρεία συντήρησης Η/Μ παραμένει μοναδικός προσφέρων επί 9 χρόνια; Γιατί το κόστος φύλαξης είναι τετραπλάσιο από τα ομότιμα; Γιατί ο Δήμος αναθέτει άνω ορίου χωρίς διαγωνισμό; Αυτές δεν είναι δομικές αναγκαιότητες — είναι επιλογές.</p>
-      <p>Αυτή η ανάλυση δεν αποδεικνύει πρόθεση. Τεκμηριώνει αποτελέσματα: <strong>σε τρεις ανεξάρτητους φορείς, με διαφορετικές διοικήσεις, ο ανταγωνισμός καταλήγει να απουσιάζει πιο συχνά απ' ό,τι θα δικαιολογούσε η τύχη ή η αναγκαιότητα.</strong></p>
+      <p>Αυτή η ανάλυση δεν αποδεικνύει πρόθεση. Τεκμηριώνει αποτελέσματα: <strong>σε τέσσερις ανεξάρτητους φορείς, με διαφορετικές διοικήσεις, ο ανταγωνισμός καταλήγει να απουσιάζει πιο συχνά απ' ό,τι θα δικαιολογούσε η τύχη ή η αναγκαιότητα.</strong></p>
     </div>
   </div>
 
