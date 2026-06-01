@@ -8,6 +8,7 @@ by the digest/backfill workflows and never calls the Diavgeia API.
 from __future__ import annotations
 
 import argparse
+import functools
 import hashlib
 import importlib.util
 import json
@@ -308,6 +309,7 @@ def normalize_text(value: Any) -> str | None:
     return text or None
 
 
+@functools.lru_cache(maxsize=8192)
 def normalize_label(value: Any) -> str:
     text = str(value).strip().lower()
     decomposed = unicodedata.normalize("NFD", text)
@@ -315,6 +317,7 @@ def normalize_label(value: Any) -> str:
     return re.sub(r"[\s_\-]+", "", without_accents)
 
 
+@functools.lru_cache(maxsize=8192)
 def canonical_text(value: Any) -> str:
     if value in (None, "", []):
         return ""
