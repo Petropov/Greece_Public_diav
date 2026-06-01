@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Risk Ranking — Procurement Signal Sweep</title>
+<style>
+  :root {
+    --red: #dc2626; --orange: #ea580c; --yellow: #ca8a04;
+    --green: #16a34a; --bg: #0f172a; --surface: #1e293b;
+    --border: #334155; --text: #e2e8f0; --muted: #94a3b8;
+    --accent: #38bdf8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+
+  .hero { background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%); padding: 48px 32px 36px; border-bottom: 1px solid var(--border); }
+  .hero h1 { font-size: 2rem; font-weight: 700; color: #fff; margin-bottom: 8px; }
+  .hero p { color: var(--muted); font-size: 0.95rem; max-width: 700px; }
+  .hero .meta { display: flex; gap: 24px; margin-top: 20px; }
+  .hero .meta span { background: #1e293b; border: 1px solid var(--border); border-radius: 6px; padding: 6px 14px; font-size: 0.82rem; color: var(--muted); }
+  .hero .meta span strong { color: var(--text); }
+
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+  /* Stats bar */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 28px 0; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; }
+  .stat .val { font-size: 2rem; font-weight: 700; color: var(--accent); }
+  .stat .lbl { font-size: 0.8rem; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--border); margin-bottom: 28px; }
+  .tab { padding: 10px 20px; font-size: 0.88rem; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; transition: all .2s; background: none; border-top: none; border-left: none; border-right: none; }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .pane { display: none; }
+  .pane.active { display: block; }
+
+  /* Risk table */
+  .risk-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  .risk-table th { background: var(--surface); color: var(--muted); font-weight: 600; text-align: left; padding: 10px 14px; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border); }
+  .risk-table td { padding: 11px 14px; border-bottom: 1px solid rgba(51,65,85,0.5); vertical-align: top; }
+  .risk-table tr:hover td { background: rgba(30,41,59,0.5); }
+
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+  .badge-red { background: rgba(220,38,38,.15); color: #f87171; border: 1px solid rgba(220,38,38,.3); }
+  .badge-orange { background: rgba(234,88,12,.15); color: #fb923c; border: 1px solid rgba(234,88,12,.3); }
+  .badge-yellow { background: rgba(202,138,4,.15); color: #facc15; border: 1px solid rgba(202,138,4,.3); }
+  .badge-green { background: rgba(22,163,74,.15); color: #4ade80; border: 1px solid rgba(22,163,74,.3); }
+
+  .tenet-pill { display: inline-block; padding: 1px 7px; border-radius: 10px; font-size: 0.72rem; font-weight: 700; margin: 1px; background: rgba(56,189,248,.12); color: var(--accent); border: 1px solid rgba(56,189,248,.25); }
+  .tenet-pill.t5 { background: rgba(220,38,38,.12); color: #f87171; border-color: rgba(220,38,38,.25); }
+  .tenet-pill.t8 { background: rgba(234,88,12,.12); color: #fb923c; border-color: rgba(234,88,12,.25); }
+  .tenet-pill.t9a { background: rgba(168,85,247,.12); color: #c084fc; border-color: rgba(168,85,247,.25); }
+
+  /* Signal freq table */
+  .freq-bar { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .freq-bar-fill { height: 100%; border-radius: 4px; background: var(--accent); }
+
+  /* Findings */
+  .finding-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 22px 24px; margin-bottom: 16px; }
+  .finding-card.critical { border-left: 3px solid var(--red); }
+  .finding-card.high { border-left: 3px solid #ea580c; }
+  .finding-card h3 { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .finding-card .org-tag { color: var(--muted); font-size: 0.82rem; margin-bottom: 10px; }
+  .finding-card .amount { font-size: 1.4rem; font-weight: 700; color: #f87171; margin: 8px 0; }
+  .finding-card .detail { font-size: 0.84rem; color: var(--muted); line-height: 1.6; }
+  .finding-card .detail strong { color: var(--text); }
+  .finding-card .ada { font-family: monospace; font-size: 0.78rem; color: var(--accent); margin-top: 8px; }
+
+  .cross-link { display: inline-block; margin-top: 8px; padding: 3px 10px; background: rgba(168,85,247,.12); color: #c084fc; border: 1px solid rgba(168,85,247,.3); border-radius: 4px; font-size: 0.78rem; }
+
+  /* Network */
+  .network-note { background: rgba(168,85,247,.07); border: 1px solid rgba(168,85,247,.25); border-radius: 8px; padding: 16px 20px; margin: 16px 0; font-size: 0.86rem; }
+  .network-note strong { color: #c084fc; }
+
+  footer { border-top: 1px solid var(--border); padding: 24px; text-align: center; color: var(--muted); font-size: 0.8rem; margin-top: 48px; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="container">
+    <h1>🔍 Procurement Risk Ranking</h1>
+    <p>Multi-signal sweep across 23 public bodies. Seven detectors covering emergency procurement abuse, temporal clustering, single-source monopoly, copy-paste awards, burst windows, price standardisation, and committee capture.</p>
+    <div class="meta">
+      <span><strong>23</strong> organisations</span>
+      <span><strong>7</strong> signal detectors</span>
+      <span><strong>T5·T6·T8·T9A·T9B·T9C·T9D</strong> tenets</span>
+      <span>Data: Diavgeia 2018–2026</span>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="stats">
+    <div class="stat">
+      <div class="val">22/23</div>
+      <div class="lbl">Orgs with ≥1 signal</div>
+    </div>
+    <div class="stat">
+      <div class="val">10</div>
+      <div class="lbl">🔴 High-risk orgs (≥5 signals)</div>
+    </div>
+    <div class="stat">
+      <div class="val">€4.96M</div>
+      <div class="lbl">Largest single anomalous direct award</div>
+    </div>
+    <div class="stat">
+      <div class="val">87%</div>
+      <div class="lbl">Orgs with T6 temporal clustering</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="show('ranking')">Risk Ranking</button>
+    <button class="tab" onclick="show('findings')">Top Findings</button>
+    <button class="tab" onclick="show('signals')">Signal Frequency</button>
+    <button class="tab" onclick="show('network')">Cross-Org Network</button>
+  </div>
+
+  <!-- RANKING TAB -->
+  <div id="ranking" class="pane active">
+    <table class="risk-table">
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Org ID</th>
+          <th>Organisation</th>
+          <th>Signals</th>
+          <th>Tenets fired</th>
+          <th>Top finding</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>🔴 #1</td><td>6166</td><td><strong>ΔΗΜΟΣ ΛΑΜΙΑΙΩΝ</strong></td>
+          <td><span class="badge badge-red">7 / 7</span></td>
+          <td>
+            <span class="tenet-pill t5">T5</span><span class="tenet-pill t8">T6</span>
+            <span class="tenet-pill t8">T8</span><span class="tenet-pill t9a">T9A</span>
+            <span class="tenet-pill">T9B</span><span class="tenet-pill">T9C</span><span class="tenet-pill">T9D</span>
+          </td>
+          <td style="color:var(--muted);font-size:.82rem">All 7 detectors fired · T9A committee capture 50% · ΘΕΜΗΣ ΧΕΙΜΑΡΑΣ ΚΑΙ ΣΙΑ EE monopoly</td>
+        </tr>
+        <tr>
+          <td>🔴 #2</td><td>50200</td><td><strong>ΑΠΟΚΕΝΤΡΩΜΕΝΗ ΔΙΟ/ΣΗ ΘΕΣΣΑΛΙΑΣ-ΣΤ.ΕΛ.</strong></td>
+          <td><span class="badge badge-red">6</span></td>
+          <td>
+            <span class="tenet-pill t5">T5</span><span class="tenet-pill t8">T6</span>
+            <span class="tenet-pill t8">T8</span>
+            <span class="tenet-pill">T9B</span><span class="tenet-pill">T9C</span><span class="tenet-pill">T9D</span>
+          </td>
+          <td style="color:var(--muted);font-size:.82rem">€4.96M direct award (ΜΑΝΑΡΙΤΣΑΣ ΕΚ) · 78% of 2021 spend · €348k emergency fuel</td>
+        </tr>
+        <tr>
+          <td>🔴 #2</td><td>99221923</td><td><strong>ΓΝ ΛΑΜΙΑΣ</strong></td>
+          <td><span class="badge badge-red">6</span></td>
+          <td>
+            <span class="tenet-pill t5">T5</span><span class="tenet-pill t8">T6</span>
+            <span class="tenet-pill t8">T8</span>
+            <span class="tenet-pill">T9B</span><span class="tenet-pill">T9C</span><span class="tenet-pill">T9D</span>
+          </td>
+          <td style="color:var(--muted);font-size:.82rem">ISS/UNISON FACILITY SERVICES 71.5% of 2026 spend · €773k + €681k emergency cleaning</td>
+        </tr>
+        <tr>
+          <td>🔴 #4</td><td>50226</td><td>ΛΙΜΕΝΙΚΟ ΤΑΜΕΙΟ ΦΘΙΩΤΙΔΑΣ</td>
+          <td><span class="badge badge-red">5</span></td>
+          <td>
+            <span class="tenet-pill t8">T6</span><span class="tenet-pill t8">T8</span>
+            <span class="tenet-pill">T9B</span><span class="tenet-pill">T9C</span><span class="tenet-pill">T9D</span>
+          </td>
+          <td style="color:var(--muted);font-size:.82rem">ΑΡΙΣΤΟΤΕΛΗΣ ΠΑΠΑΒΑΣΙΛΕΙΟΥ ΚΑΙ ΣΙΑ ΕΕ security monopoly</td>
+        </tr>
+        <tr>
+          <td>🔴 #4</td><td>6030</td><td>ΔΗΜΟΣ ΑΜΦΙΚΛΕΙΑΣ-ΕΛΑΤΕΙΑΣ</td>
+          <td><span class="badge badge-red">5</span></td>
+          <td>
+            <span class="tenet-pill t8">T6</span><span class="tenet-pill t8">T8</span>
+            <span class="tenet-pill">T9B</span><span class="tenet-pill">T9C</span><span class="tenet-pill">T9D</span>
+          </td>
+          <td style="color:var(--muted);font-size:.82rem">ΣΚΥΡΟΔΕΜΑ ΣΤΕΡΕΑΣ 54% of 2020 spend · ΚΩΝ ΜΑΝΤΕΣ ΔΗΜ ΤΣΑΜΗΣ also present</td>
+        </tr>
+        <tr>
+          <td>🔴 #4</td><td>6154</td><td>ΔΗΜΟΣ ΚΟΖΑΝΗΣ</td>
+          <td><span class="badge badge-red">5</span></td>
+          <td>
+            <span class="tenet-pill t5">T5</span><span class="tenet-pill t8">T6</span>
+            <span class="tenet-pill">T9B</span><span class="tenet-pill">T9C</span><span class="tenet-pill">T9D</span>
+          </td>
+          <td style="color:var(--muted);font-size:.82rem">€348k + €345k emergency negotiated awards</td>
+        </tr>
+        <tr>
+          <td>🔴 #4</td><td>6176</td><td>ΔΗΜΟΣ ΛΟΚΡΩΝ</td>
+          <td><span class="badge badge-red">5</span></td>
+          <td>
+            <span class="tenet-pill t8">T6</span><span class="tenet-pill t8">T8</span>
+            <span class="tenet-pill">T9B</span><span class="tenet-pill">T9C</span><span class="tenet-pill">T9D</span>
+          </td>
+          <td style="color:var(--muted);font-size:.82rem">ΛΟΥΙΖΟΣ ΕΦΡΑΙΜ (natural person) capturing maintenance spend</td>
+        </tr>
+        <tr>
+          <td>🔴 #4</td><td>6179</td><td>ΔΗΜΟΣ ΜΑΚΡΑΚΩΜΗΣ</td>
+          <td><span class="badge badge-red">5</span></td>
+          <td>
+            <span class="tenet-pill t8">T6</span><span class="tenet-pill t8">T8</span>
+            <span class="tenet-pill">T9B</span><span class="tenet-pill">T9C</span><span class="tenet-pill">T9D</span>
+          </td>
+          <td style="color:var(--muted);font-size:.82rem">ΜΕΣΟΓΕΙΟΣ DIGITAL software monopoly</td>
+        </tr>
+        <tr>
+          <td>🔴 #4</td><td>6202</td><td>ΔΗΜΟΣ ΜΩΛΟΥ-ΑΓΙΟΥ ΚΩΝΣΤΑΝΤΙΝΟΥ</td>
+          <td><span class="badge badge-red">5</span></td>
+          <td>
+            <span class="tenet-pill t8">T6</span><span class="tenet-pill t8">T8</span>
+            <span class="tenet-pill">T9B</span><span class="tenet-pill">T9C</span><span class="tenet-pill">T9D</span>
+          </td>
+          <td style="color:var(--muted);font-size:.82rem">T8 top supplier is another municipality — inter-municipal service anomaly</td>
+        </tr>
+        <tr>
+          <td>🔴 #4</td><td>6289</td><td>ΔΗΜΟΣ ΣΤΥΛΙΔΑΣ</td>
+          <td><span class="badge badge-red">5</span></td>
+          <td>
+            <span class="tenet-pill t5">T5</span><span class="tenet-pill t8">T6</span>
+            <span class="tenet-pill">T9B</span><span class="tenet-pill">T9C</span><span class="tenet-pill">T9D</span>
+          </td>
+          <td style="color:var(--muted);font-size:.82rem">€278k + €221k emergency awards — very high for municipality scale</td>
+        </tr>
+        <tr>
+          <td>🟠 #11</td><td>50449</td><td>ΤΕΧΝΙΚΟ ΕΠΙΜΕΛΗΤΗΡΙΟ</td>
+          <td><span class="badge badge-orange">4</span></td>
+          <td>
+            <span class="tenet-pill t8">T6</span><span class="tenet-pill t8">T8</span>
+            <span class="tenet-pill">T9B</span><span class="tenet-pill">T9C</span>
+          </td>
+          <td style="color:var(--muted);font-size:.82rem"></td>
+        </tr>
+        <tr>
+          <td>🟠 #11</td><td>6298</td><td>ΔΗΜΟΣ ΤΡΙΛΟΦΟΥ</td>
+          <td><span class="badge badge-orange">4</span></td>
+          <td>
+            <span class="tenet-pill t8">T6</span>
+            <span class="tenet-pill">T9B</span><span class="tenet-pill">T9C</span><span class="tenet-pill">T9D</span>
+          </td>
+          <td style="color:var(--muted);font-size:.82rem">T6 weekend award €5.74M · year-end bursts</td>
+        </tr>
+        <tr>
+          <td>🟠 #11</td><td>99221946</td><td>ΓΝ ΤΡΙΚΑΛΩΝ</td>
+          <td><span class="badge badge-orange">4</span></td>
+          <td>
+            <span class="tenet-pill t8">T6</span>
+            <span class="tenet-pill">T9B</span><span class="tenet-pill">T9C</span><span class="tenet-pill">T9D</span>
+          </td>
+          <td style="color:var(--muted);font-size:.82rem"></td>
+        </tr>
+        <tr>
+          <td>🟠 #14</td><td>50304</td><td>ΔΕΥΑ ΛΑΜΙΑΣ</td>
+          <td><span class="badge badge-orange">3</span></td>
+          <td>
+            <span class="tenet-pill">T9B</span><span class="tenet-pill">T9C</span><span class="tenet-pill">T9D</span>
+          </td>
+          <td style="color:var(--muted);font-size:.82rem">Copy-paste micro-awards</td>
+        </tr>
+        <tr>
+          <td>🟠 #14</td><td>6079</td><td>ΔΗΜΟΣ ΔΕΛΦΩΝ</td>
+          <td><span class="badge badge-orange">3</span></td>
+          <td>
+            <span class="tenet-pill t5">T5</span><span class="tenet-pill t8">T6</span><span class="tenet-pill t8">T8</span>
+          </td>
+          <td style="color:var(--muted);font-size:.82rem">€1.4M emergency · T8 supplier monopoly</td>
+        </tr>
+        <tr>
+          <td>🟠 #14</td><td>6272</td><td>ΔΗΜΟΣ ΣΕΡΡΩΝ</td>
+          <td><span class="badge badge-orange">3</span></td>
+          <td>
+            <span class="tenet-pill t8">T6</span><span class="tenet-pill t8">T8</span>
+            <span class="tenet-pill">T9C</span>
+          </td>
+          <td style="color:var(--muted);font-size:.82rem">Monopoly supplier + burst</td>
+        </tr>
+        <tr>
+          <td>🟡 #17</td><td>50432</td><td>ΠΥΡΟΣΒΕΣΤΙΚΗ ΥΠ. ΛΑΜΙΑΣ</td>
+          <td><span class="badge badge-yellow">2</span></td>
+          <td>
+            <span class="tenet-pill t5">T5</span><span class="tenet-pill t8">T6</span>
+          </td>
+          <td style="color:var(--muted);font-size:.82rem">€395k emergency award</td>
+        </tr>
+        <tr>
+          <td>🟡 #17</td><td>51546</td><td>ΔΕΥΑ ΔΕΛΦΩΝ</td>
+          <td><span class="badge badge-yellow">2</span></td>
+          <td>
+            <span class="tenet-pill t8">T6</span><span class="tenet-pill t8">T8</span>
+          </td>
+          <td style="color:var(--muted);font-size:.82rem"></td>
+        </tr>
+        <tr>
+          <td>🟡 #17</td><td>99221920</td><td>ΓΝ ΛΑΡΙΣΑΣ</td>
+          <td><span class="badge badge-yellow">2</span></td>
+          <td>
+            <span class="tenet-pill t8">T6</span><span class="tenet-pill t8">T8</span>
+          </td>
+          <td style="color:var(--muted);font-size:.82rem">Year-end reversals €1.1M, €646k</td>
+        </tr>
+        <tr>
+          <td>🟡 #20</td><td>6135</td><td>ΔΗΜΟΣ ΘΗΒΑΙΩΝ</td>
+          <td><span class="badge badge-yellow">1</span></td>
+          <td><span class="tenet-pill t8">T6</span></td>
+          <td style="color:var(--muted);font-size:.82rem">Year-end burst only</td>
+        </tr>
+        <tr>
+          <td>🟡 #20</td><td>99221913</td><td>ΓΝ ΚΑΡΔΙΤΣΑΣ</td>
+          <td><span class="badge badge-yellow">1</span></td>
+          <td><span class="tenet-pill t8">T6</span></td>
+          <td style="color:var(--muted);font-size:.82rem">Year-end reversals €5.2M, €4.7M</td>
+        </tr>
+        <tr>
+          <td>🟡 #20</td><td>99221942</td><td>ΓΝ ΑΜΦΙΣΣΑΣ</td>
+          <td><span class="badge badge-yellow">1</span></td>
+          <td><span class="tenet-pill t8">T6</span></td>
+          <td style="color:var(--muted);font-size:.82rem">Year-end burst only</td>
+        </tr>
+        <tr style="opacity:.6">
+          <td>🟢 #23</td><td>50621</td><td>ΔΕΥΑ ΣΕΡΡΩΝ</td>
+          <td><span class="badge badge-green">0 CLEAN</span></td>
+          <td>—</td>
+          <td style="color:var(--muted);font-size:.82rem">No signals detected — benchmark baseline</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- FINDINGS TAB -->
+  <div id="findings" class="pane">
+
+    <div class="finding-card critical">
+      <h3>🚨 T8 — €4.96M direct award: pine cone collection, no tender</h3>
+      <div class="org-tag">ORG 50200 · ΑΠΟΚΕΝΤΡΩΜΕΝΗ ΔΙΟΙΚΗΣΗ ΘΕΣΣΑΛΙΑΣ-ΣΤΕΡΕΑΣ ΕΛΛΑΔΑΣ · 2021</div>
+      <div class="amount">€4,960,000</div>
+      <div class="detail">
+        <strong>Supplier:</strong> ΜΑΝΑΡΙΤΣΑΣ ΕΥΑΓΓΕΛΟΣ-ΚΩΝΣΤΑΝΤΙΝΟΣ (AFM 054537472)<br>
+        <strong>Subject:</strong> "ΣΥΜΒΑΣΗ ΣΥΛΛΟΓΗ ΚΩΝΩΝ ΧΑΛΕΠΙΟΥ ΠΕΥΚΗΣ ΑΠΟ ΤΗ ΣΥΣΤΑΔΑ 15α ΤΟΥ ΙΔΙΩΤΙΚΟΥ ΔΑΣΟΥΣ ΠΡΟΚΟΠΙΟΥ-ΔΡΑΖΙΟΥ ΚΑΙ ΑΠΟ ΤΗ ΣΥΣΤΑΔΑ 2β ΤΟΥ ΔΙΑΚΑΤΕΧΟΜΕΝΟΥ ΔΑΣΟΥΣ ΚΕΧΡΙΩΝ-ΛΟΓΓΟΥ"<br><br>
+        A €4.96M direct award (Δ.1) for pine cone harvesting from two specific privately-owned forest stands in Central Greece, signed without competitive tender under Law 4412/2016 Art. 118 — a provision capped at €30,000. This single contract represents <strong>77.6% of all direct-award spend by this decentralised administration in 2021</strong>. The same supplier appears again in 2020 (€51k contract, same forestry context) and 2021 (€4k award same day), suggesting an ongoing relationship. A second supplier (AFM 082453034 · ΑΘΑΝΑΣΙΟΣ ΚΑΙ ΚΩΝΣΤΑΝΤΙΝΟΣ ΝΙΚΟΠΟΥΛΟΣ ΟΕ) captures 86% of 2026 direct-award spend (€679k).
+      </div>
+      <div class="ada">ADA: 6696ΟΡ10-ΚΙΗ</div>
+    </div>
+
+    <div class="finding-card critical">
+      <h3>🚨 T8 + T5 — Cleaning services monopoly at Lamia General Hospital</h3>
+      <div class="org-tag">ORG 99221923 · ΓΕΝΙΚΟ ΝΟΣΟΚΟΜΕΙΟ ΛΑΜΙΑΣ · 2025–2026</div>
+      <div class="amount">€1,454,000 in emergency awards</div>
+      <div class="detail">
+        <strong>Supplier:</strong> ISS / UNISON FACILITY SERVICES (AFM 094081864)<br>
+        <strong>T8:</strong> 71.5% of 2026 direct-award spend (€1.74M, 3 contracts) — single-source monopoly<br>
+        <strong>T5 — Emergency awards:</strong><br>
+        &nbsp;• 2025: €680,859 — ΕΑΔΗΣΥ consent for negotiated procedure without publication<br>
+        &nbsp;• 2026: €772,767 — Cleaning services extended 5 additional months via negotiated procedure<br>
+        &nbsp;• 2021: €60,663 + €88,672 + €72,054 — ICU consumables and medical gas emergency awards<br><br>
+        The 5-month cleaning extension (2026) is the clearest red flag: this is a recurring service that should have been subject to an open tender. Resorting to the emergency procedure for a routine operational need — cleaning hospital premises — is a direct misuse of Art. 32 of Dir. 2014/24/EU. A €4.386M Sunday decision (17/12/2023) in the same org further triggers T6 temporal clustering.
+      </div>
+      <div class="ada">Key ADAs: 9Π3Γ4690ΒΜ-ΡΗΠ · ΨΜΧΥ4690ΒΜ-75Β · ΩΧΑ64690ΒΜ-8Ι2</div>
+    </div>
+
+    <div class="finding-card high">
+      <h3>⚠️ T9A — Committee capture: 50% of Lamia direct awards through one body</h3>
+      <div class="org-tag">ORG 6166 · ΔΗΜΟΣ ΛΑΜΙΑΙΩΝ · 2019–2024</div>
+      <div class="detail">
+        <strong>Body:</strong> ΕΠΙΤΡΟΠΗ ΣΥΝΤΗΡΗΣΗΣ ΚΑΙ ΕΠΙΣΚΕΥΗΣ ΟΧΗΜΑΤΩΝ (Vehicle Maintenance Committee)<br>
+        This single committee is responsible for <strong>50% of all direct awards</strong> in the municipality — over 5,600 decisions. If this body is captured (through personal relationships, rotation manipulation, or external pressure), half of all non-competitive spending is controlled by a single chokepoint. The T9C burst detector confirms that suppliers like ΚΩΝ ΜΑΝΤΕΣ and ΑΓΑΜ ΤΣΑΚΩΝΙΤΗΣ receive multiple awards within narrow 30-day windows — consistent with contract-splitting against the same underlying need.
+      </div>
+    </div>
+
+    <div class="finding-card high">
+      <h3>⚠️ T5 — Emergency procurement of fuel: €348k direct award</h3>
+      <div class="org-tag">ORG 50200 · ΑΠΟΚΕΝΤΡΩΜΕΝΗ ΔΙΟΙΚΗΣΗ ΘΕΣΣΑΛΙΑΣ-ΣΤΕΡΕΑΣ ΕΛΛΑΔΑΣ · 2022</div>
+      <div class="amount">€348,792</div>
+      <div class="detail">
+        <strong>Subject:</strong> "Απευθείας ανάθεση προμήθεια καυσίμων κίνησης και θέρμανσης για το έτος 2022"<br>
+        Annual fuel supply awarded as a direct award via negotiated procedure — fuel procurement is a fully foreseeable annual need with mature market competition. Use of the emergency bypass for an annual operational supply is a clear misuse of the negotiated-without-publication procedure. The total budgeted value (€348k) far exceeds the €30k Art. 118 cap for direct awards and the €140k threshold for EU publication.
+      </div>
+      <div class="ada">ADA: 6ΦΕ7ΟΡ10-Φ67</div>
+    </div>
+
+    <div class="finding-card high">
+      <h3>⚠️ T5 — Large emergency awards in ΔΗΜΟΣ ΚΟΖΑΝΗΣ and ΔΗΜΟΣ ΣΤΥΛΙΔΑΣ</h3>
+      <div class="org-tag">ORG 6154 + ORG 6289</div>
+      <div class="detail">
+        <strong>ΚΟΖΑΝΗ:</strong> Two awards of €348,336 and €345,476 via negotiated procedure — near-identical amounts in the same category, suggesting a split of a single need or the same contract repeated through an emergency mechanism.<br>
+        <strong>ΣΤΥΛΙΔΑ:</strong> €278,169 and €220,720 in emergency awards — disproportionate scale for a small municipality (population ~5,000). The €278k award alone exceeds the EU publication threshold.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SIGNALS TAB -->
+  <div id="signals" class="pane">
+    <table class="risk-table">
+      <thead>
+        <tr>
+          <th>Tenet</th>
+          <th>Description</th>
+          <th>Fires in</th>
+          <th>Coverage</th>
+          <th>Legal basis</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="badge badge-red">T6</span></td>
+          <td>Temporal clustering (year-end burst, weekend/holiday awards)</td>
+          <td>20 / 23</td>
+          <td>
+            <div class="freq-bar"><div class="freq-bar-fill" style="width:87%"></div></div>
+            <span style="font-size:.8rem;color:var(--muted)">87%</span>
+          </td>
+          <td style="font-size:.78rem;color:var(--muted)">Art. 56 N. 4412/2016 · budget rules</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-orange">T9B</span></td>
+          <td>Copy-paste structured award (same non-round amount, same supplier)</td>
+          <td>18 / 23</td>
+          <td>
+            <div class="freq-bar"><div class="freq-bar-fill" style="width:78%"></div></div>
+            <span style="font-size:.8rem;color:var(--muted)">78%</span>
+          </td>
+          <td style="font-size:.78rem;color:var(--muted)">Art. 6 N. 4412/2016 (anti-splitting)</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-orange">T9C</span></td>
+          <td>30-day award burst (3+ awards same supplier within rolling month)</td>
+          <td>18 / 23</td>
+          <td>
+            <div class="freq-bar"><div class="freq-bar-fill" style="width:78%"></div></div>
+            <span style="font-size:.8rem;color:var(--muted)">78%</span>
+          </td>
+          <td style="font-size:.78rem;color:var(--muted)">Art. 6 N. 4412/2016 · Dir. 2014/24/EU Art. 6</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-yellow">T9D</span></td>
+          <td>Price standardisation (same non-round amount to 3+ different suppliers)</td>
+          <td>15 / 23</td>
+          <td>
+            <div class="freq-bar"><div class="freq-bar-fill" style="width:65%"></div></div>
+            <span style="font-size:.8rem;color:var(--muted)">65%</span>
+          </td>
+          <td style="font-size:.78rem;color:var(--muted)">Competition law · Art. 101 TFEU</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-orange">T8</span></td>
+          <td>Single-source monopoly (one supplier >50–70% of annual category spend)</td>
+          <td>13 / 23</td>
+          <td>
+            <div class="freq-bar"><div class="freq-bar-fill" style="width:57%"></div></div>
+            <span style="font-size:.8rem;color:var(--muted)">57%</span>
+          </td>
+          <td style="font-size:.78rem;color:var(--muted)">Art. 118 N. 4412/2016 · OLAF indicators</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-red">T5</span></td>
+          <td>Emergency procurement overuse (negotiated without publication)</td>
+          <td>8 / 23</td>
+          <td>
+            <div class="freq-bar"><div class="freq-bar-fill" style="width:35%"></div></div>
+            <span style="font-size:.8rem;color:var(--muted)">35%</span>
+          </td>
+          <td style="font-size:.78rem;color:var(--muted)">Art. 32 Dir. 2014/24/EU · Art. 32 N. 4412/2016</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-red">T9A</span></td>
+          <td>Committee capture (single body controls >40% of direct awards)</td>
+          <td>1 / 23</td>
+          <td>
+            <div class="freq-bar"><div class="freq-bar-fill" style="width:4%"></div></div>
+            <span style="font-size:.8rem;color:var(--muted)">4%</span>
+          </td>
+          <td style="font-size:.78rem;color:var(--muted)">Governance / anti-corruption</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="margin-top:28px;padding:20px;background:var(--surface);border:1px solid var(--border);border-radius:10px;font-size:.86rem;color:var(--muted)">
+      <strong style="color:var(--text)">Methodology note:</strong> T6 fires in 87% of organisations because year-end budget absorption and some weekend contract signings are structurally common in Greek public administration. T6 alone is a weak signal; it gains evidentiary weight when co-occurring with T5, T8, or T9A. The high co-occurrence rate of T9B + T9C + T9D (all three in 13/23 orgs) suggests that copy-paste procurement templates are endemic — this may reflect administrative convenience as much as fraud, but the pattern is a reliable discriminator for further manual review.
+    </div>
+  </div>
+
+  <!-- NETWORK TAB -->
+  <div id="network" class="pane">
+
+    <div class="network-note">
+      <strong>⚠️ Cross-organisation supplier links detected.</strong> The following suppliers appear in direct awards from <em>multiple</em> organisations in this dataset. This does not imply wrongdoing — a company can legitimately supply multiple municipalities — but when the same supplier appears as a T8 monopolist in more than one organisation, the combined risk profile warrants cross-org investigation.
+    </div>
+
+    <div class="finding-card" style="border-left:3px solid #c084fc">
+      <h3>🔗 ΚΩΝ ΜΑΝΤΕΣ ΔΗΜ ΤΣΑΜΗΣ ΟΕ — appears in 2 organisations</h3>
+      <div class="detail">
+        <strong>ORG 6166 (ΔΗΜΟΣ ΛΑΜΙΑΙΩΝ):</strong> T9B copy-paste awards + T9C burst window + T8 monopoly candidate in vehicle maintenance<br>
+        <strong>ORG 6030 (ΔΗΜΟΣ ΑΜΦΙΚΛΕΙΑΣ-ΕΛΑΤΕΙΑΣ):</strong> T8 finding (AFM 82785679), 67.6% of 2026 direct-award spend (€446k)<br><br>
+        The same supplier (or individual) winning concentrated vehicle maintenance contracts in two geographically linked municipalities in Central Greece — without open tenders — is a pattern consistent with a captured regional supply network.
+        <span class="cross-link">🔗 Cross-org link</span>
+      </div>
+    </div>
+
+    <div class="finding-card" style="border-left:3px solid #c084fc">
+      <h3>🏥 ISS / UNISON FACILITY SERVICES — hospital cleaning monopoly</h3>
+      <div class="detail">
+        <strong>ORG 99221923 (ΓΝ ΛΑΜΙΑΣ):</strong> AFM 094081864 · 71.5% of 2026 direct-award spend · €773k + €681k emergency awards<br><br>
+        ISS Facility Services is a large multinational — presence in a single hospital is not anomalous per se. However, the continued use of the <em>emergency</em> negotiated procedure for a recurring operational service (cleaning) rather than running an open tender, sustained over multiple years (2021–2026), is the red flag. The company's name appears as both "ISS FACILITY SERVICES" and "UNISON FACILITY SERVICES" in different Diavgeia records under the same AFM — a possible rebranding or data entry inconsistency that warrants verification.
+      </div>
+    </div>
+
+    <div class="finding-card" style="border-left:3px solid #c084fc">
+      <h3>🌲 ΜΑΝΑΡΙΤΣΑΣ ΕΥΑΓΓΕΛΟΣ-ΚΩΝΣΤΑΝΤΙΝΟΣ — forestry direct award</h3>
+      <div class="detail">
+        <strong>ORG 50200 (ΑΠΟΚΕΝΤΡΩΜΕΝΗ ΔΙΟ/ΣΗ):</strong> AFM 054537472 · €4,960,000 single contract 2021 · multiple smaller awards 2020<br><br>
+        A natural person receiving a nearly €5M direct award for pine cone harvesting from specific, named private forest stands. The specificity of the parcel references (Συστάδα 15α, Συστάδα 2β) suggests this contract was written around a particular supplier. The €4,960,000 figure is 77.6% of the Decentralised Administration's entire 2021 direct-award spend — achieved through a mechanism capped at €30,000.
+        <span class="cross-link">🔴 Highest-value anomaly in dataset</span>
+      </div>
+    </div>
+
+    <table class="risk-table" style="margin-top:20px">
+      <thead>
+        <tr>
+          <th>Supplier</th>
+          <th>AFM</th>
+          <th>Orgs</th>
+          <th>Total known value</th>
+          <th>Risk</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>ΜΑΝΑΡΙΤΣΑΣ ΕΥΑΓΓΕΛΟΣ-ΚΩΝΣΤΑΝΤΙΝΟΣ</td>
+          <td style="font-family:monospace">054537472</td>
+          <td>50200</td>
+          <td style="color:#f87171">€5,037,268</td>
+          <td><span class="badge badge-red">Critical</span></td>
+        </tr>
+        <tr>
+          <td>ISS / UNISON FACILITY SERVICES</td>
+          <td style="font-family:monospace">094081864</td>
+          <td>99221923</td>
+          <td style="color:#f87171">€1,740,000+</td>
+          <td><span class="badge badge-red">Critical</span></td>
+        </tr>
+        <tr>
+          <td>ΚΩΝ ΜΑΝΤΕΣ ΔΗΜ ΤΣΑΜΗΣ ΟΕ</td>
+          <td style="font-family:monospace">082785679</td>
+          <td>6166, 6030</td>
+          <td style="color:#fb923c">€446,000+</td>
+          <td><span class="badge badge-orange">High</span></td>
+        </tr>
+        <tr>
+          <td>ΑΘΑΝΑΣΙΟΣ ΚΑΙ ΚΩΝΣΤΑΝΤΙΝΟΣ ΝΙΚΟΠΟΥΛΟΣ ΟΕ</td>
+          <td style="font-family:monospace">082453034</td>
+          <td>50200</td>
+          <td style="color:#fb923c">€683,364</td>
+          <td><span class="badge badge-orange">High</span></td>
+        </tr>
+        <tr>
+          <td>ΘΕΜΗΣ ΧΕΙΜΑΡΑΣ ΚΑΙ ΣΙΑ EE</td>
+          <td style="font-family:monospace">—</td>
+          <td>6166</td>
+          <td style="color:#fb923c">T8 + T9C</td>
+          <td><span class="badge badge-orange">High</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div><!-- /container -->
+
+<footer>
+  <div class="container">
+    All signals derived from open government data (Diavgeia). No legal findings — patterns warranting scrutiny by competent authorities. Detectors: T5·T6·T8·T9A·T9B·T9C·T9D per <a href="TENETS.md" style="color:var(--accent)">TENETS.md</a>.
+  </div>
+</footer>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
