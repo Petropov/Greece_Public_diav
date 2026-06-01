@@ -1,5 +1,33 @@
 # Greece_Public_diav
 
+> **A citizen-built AI pipeline for cross-referencing Greek public procurement data.**  
+> Built by a Greek engineer living abroad, out of personal curiosity, using only open government databases.  
+> ~80 hours of work. Fully open source. Replicable for any Greek city.
+
+## 📊 Live Report
+
+**[→ View the Lamia findings report](https://petropov.github.io/Greece_Public_diav/reports/overview.html)**
+
+## What this found (Lamia pilot)
+
+Using only public data — Diavgeia, ΚΗΜΔΗΣ, ΓΕΜΗ — the pipeline identified three patterns in Lamia's public spending:
+
+| # | Finding | Amount |
+|---|---------|--------|
+| 1 | **ΙΝΤΕΡΚΑΤ ΑΕ**: 10 years of H/M maintenance contracts at Lamia Hospital, zero competitive tenders, no matching business activity code in ΓΕΜΗ | >€5M |
+| 2 | **ΚΟΥΤΚΙΑΣ**: same individual operating under two legal identities (personal AFM + ΕΕ), receiving simultaneous security contracts from the Municipality — including 2 identical contracts on the same day | ~€345k |
+| 3 | **ΚΑΝΑΒΕΤΑΣ-ΚΑΡΑΔΗΜΑΣ ΟΕ**: 5 confirmed contract-splitting bundles (2019–2023), identical supplies split by neighbourhood to stay under the €30k threshold | €587k |
+
+All findings are verifiable from the linked sources. Nothing here is an accusation — it is a pattern that warrants scrutiny.
+
+## Why this matters
+
+This is a proof of concept: **one person + AI tools + open data = procurement audit in weeks, not months.**
+
+The pipeline is designed to run on any Greek public entity. If you want to check what's happening in your city, region, or hospital — the code is here.
+
+---
+
 This repository builds a **procurement intelligence pipeline** for Greek municipalities using open government data. It fetches, normalises, and analyses decisions published on [Diavgeia](https://diavgeia.gov.gr) — Greece's mandatory transparency platform — and enriches supplier data via the [ΓΕΜΗ](https://opendata.businessportal.gr) commercial registry.
 
 The pipeline was developed as a pilot study on **Lamia Municipality** (Δήμος Λαμιέων, Diavgeia org `6166`). It is designed to be reusable for any Greek public body. Key findings from the Lamia study are summarised below; full methodology is in [`reports/STUDY_RECAP.md`](reports/STUDY_RECAP.md).
