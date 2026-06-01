@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Benchmark Νοσοκομείων — 10 Μεγαλύτερα Νοσοκομεία Ελλάδας</title>
+<style>
+:root{
+  --ink:#1a1a2e; --ink2:#3d4560; --ink3:#6b7280;
+  --red:#c0392b; --red-lt:#fdf3f2;
+  --amber:#b7791f; --amber-lt:#fffbeb;
+  --blue:#1d4ed8; --blue-lt:#eff6ff;
+  --green:#15803d; --green-lt:#f0fdf4;
+  --border:#e5e7eb; --bg:#f8f9fb;
+  --card:#fff;
+  --r:10px; --shadow:0 1px 6px rgba(0,0,0,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;
+     background:var(--bg);color:var(--ink);line-height:1.65;font-size:15px}
+header{
+  background:linear-gradient(135deg,#0f1b35 0%,#1a2f5a 60%,#243b6e 100%);
+  color:#fff;padding:52px 40px 40px;
+}
+.kicker{font-size:.7rem;letter-spacing:3px;text-transform:uppercase;color:#7fa3d0;margin-bottom:12px}
+header h1{font-size:2.4rem;font-weight:800;line-height:1.15;margin-bottom:12px}
+header h1 span{color:#7fa3d0}
+.sub{color:#a8bfd6;font-size:.98rem;max-width:700px;margin-bottom:22px;line-height:1.8}
+.meta-row{display:flex;flex-wrap:wrap;gap:8px}
+.badge{font-size:.7rem;color:#8fb3d0;background:rgba(255,255,255,.09);
+       padding:4px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.14)}
+.back-link{display:inline-block;margin-top:16px;font-size:.78rem;color:#7fa3d0;
+           text-decoration:none;border:1px solid rgba(255,255,255,.2);
+           padding:5px 14px;border-radius:20px}
+.back-link:hover{color:#fff;border-color:rgba(255,255,255,.4)}
+
+/* ── CHAPTER NAV ── */
+.chapter-nav{
+  background:#fff;border-bottom:2px solid var(--border);
+  padding:0 32px;position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 10px rgba(0,0,0,.06);
+}
+.chapter-nav ul{display:flex;list-style:none;overflow-x:auto}
+.chapter-nav a{
+  display:block;padding:16px 20px;font-size:.82rem;font-weight:600;
+  color:var(--ink3);text-decoration:none;
+  border-bottom:3px solid transparent;margin-bottom:-2px;
+  white-space:nowrap;transition:color .15s,border-color .15s;
+}
+.chapter-nav a:hover{color:var(--ink)}
+.chapter-nav a.active{color:var(--red);border-bottom-color:var(--red)}
+.ch-num{font-size:.65rem;letter-spacing:1px;text-transform:uppercase;
+        color:var(--ink3);display:block;margin-bottom:2px}
+
+/* ── PANES ── */
+.pane{display:none;max-width:1040px;margin:0 auto;padding:40px 24px 80px}
+.pane.active{display:block}
+.ch-title{margin-bottom:36px}
+.ch-label{font-size:.7rem;letter-spacing:2.5px;text-transform:uppercase;
+          color:var(--ink3);margin-bottom:6px}
+.ch-title h2{font-size:1.85rem;font-weight:800;line-height:1.2;margin-bottom:14px}
+.ch-title .lede{font-size:1.05rem;color:var(--ink2);max-width:720px;line-height:1.8}
+
+/* ── SECTION ── */
+.section{background:var(--card);border:1px solid var(--border);border-radius:var(--r);
+         padding:28px 30px;margin-bottom:24px;box-shadow:var(--shadow)}
+.section h3{font-size:1.05rem;font-weight:700;margin-bottom:14px;color:var(--ink)}
+.section h4{font-size:.9rem;font-weight:600;margin-bottom:8px;color:var(--ink2)}
+
+/* ── STATS ── */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin:28px 0}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:var(--r);
+      padding:20px 22px;box-shadow:var(--shadow)}
+.stat .n{font-size:2.2rem;font-weight:800;line-height:1;margin-bottom:6px}
+.stat .n.red{color:var(--red)} .stat .n.amber{color:var(--amber)}
+.stat .n.blue{color:var(--blue)} .stat .n.green{color:var(--green)}
+.stat .label{font-size:.78rem;color:var(--ink3);line-height:1.4}
+
+/* ── PROSE ── */
+.prose{max-width:720px}
+.prose p{margin-bottom:1.1em;color:var(--ink2);line-height:1.8}
+.prose p:last-child{margin-bottom:0}
+.prose strong{color:var(--ink)}
+.prose ul{padding-left:20px;margin-bottom:1em}
+.prose li{color:var(--ink2);margin-bottom:.4em;font-size:.93rem}
+
+/* ── TABLE ── */
+.tbl-wrap{overflow-x:auto;margin:14px 0}
+table{border-collapse:collapse;width:100%;font-size:.83rem}
+th{background:#f3f4f6;padding:9px 12px;text-align:left;font-weight:600;
+   border-bottom:2px solid var(--border);color:var(--ink2)}
+td{padding:8px 12px;border-bottom:1px solid #f0f0f0;color:var(--ink2)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafafa}
+.td-r{text-align:right} .td-c{text-align:center}
+code{font-size:.78rem;background:#f3f4f6;padding:2px 6px;border-radius:4px;
+     border:1px solid var(--border);font-family:monospace}
+
+/* ── STATUS BADGES ── */
+.status-pending{color:var(--ink3);font-size:.78rem}
+.status-running{color:#d97706;font-weight:600;font-size:.78rem}
+.status-done{color:var(--green);font-weight:600;font-size:.78rem}
+.status-flagged{color:var(--red);font-weight:700;font-size:.78rem}
+
+/* ── TAG ── */
+.tag{display:inline-block;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:12px;
+     vertical-align:middle;margin-left:6px}
+.tag.red{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}
+.tag.amber{background:#fef3c7;color:#92400e;border:1px solid #fcd34d}
+.tag.green{background:#dcfce7;color:#166534;border:1px solid #86efac}
+.tag.blue{background:#dbeafe;color:#1e40af;border:1px solid #93c5fd}
+
+/* ── FINDING ── */
+.finding{display:flex;gap:16px;align-items:flex-start;
+         padding:18px 20px;border-radius:var(--r);margin-bottom:12px;
+         border:1px solid var(--border);background:var(--card)}
+.finding.red{border-color:#fca5a5;background:#fef2f2}
+.finding.amber{border-color:#fcd34d;background:#fffbeb}
+.finding.blue{border-color:#93c5fd;background:#eff6ff}
+.finding .icon{font-size:1.4rem;flex-shrink:0;margin-top:2px}
+.finding h4{font-size:.9rem;font-weight:700;margin-bottom:4px;color:var(--ink)}
+.finding p{font-size:.84rem;color:var(--ink2);margin:0;line-height:1.6}
+
+/* ── BRIDGE ── */
+.bridge{
+  background:linear-gradient(135deg,#0f1b35,#1a2f5a);color:#fff;
+  border-radius:var(--r);padding:22px 26px;margin-top:32px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+}
+.bridge p{font-size:.9rem;color:#a8bfd6;max-width:500px}
+.bridge strong{color:#fff}
+.bridge .nxt{
+  flex-shrink:0;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);
+  color:#fff;padding:10px 18px;border-radius:6px;font-size:.82rem;font-weight:600;
+  cursor:pointer;transition:background .15s;white-space:nowrap;text-decoration:none;
+}
+.bridge .nxt:hover{background:rgba(255,255,255,.2)}
+
+/* ── PENDING OVERLAY ── */
+.pending-notice{
+  background:linear-gradient(135deg,#fffbeb,#fef3c7);
+  border:2px dashed #fcd34d;border-radius:var(--r);
+  padding:24px 28px;text-align:center;color:var(--amber);
+  margin:20px 0;
+}
+.pending-notice .big{font-size:1.8rem;margin-bottom:8px}
+.pending-notice p{font-size:.88rem;color:var(--ink2);max-width:500px;margin:0 auto;line-height:1.6}
+
+#progress-bar{position:fixed;top:0;left:0;height:3px;background:var(--red);
+              width:0%;transition:width .1s;z-index:999;pointer-events:none}
+
+@media(max-width:600px){
+  header{padding:32px 20px 28px}
+  header h1{font-size:1.7rem}
+  .pane{padding:24px 16px 60px}
+  .bridge{flex-direction:column}
+}
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<header>
+  <div class="kicker">Ερευνητική Ανάλυση · Διαύγεια OpenData · Ελλάδα 2019–2026</div>
+  <h1>Benchmark <span>Νοσοκομείων</span></h1>
+  <p class="sub">Τα 10 μεγαλύτερα δημόσια νοσοκομεία της Ελλάδας υπό το ίδιο πρίσμα: ποσοστό άμεσων αναθέσεων, συγκέντρωση αναδόχων, κόστος ανά κλίνη. Σκοπός: να φανεί ποιο νοσοκομείο αποκλίνει — και γιατί.</p>
+  <div class="meta-row">
+    <span class="badge">Πηγή: Διαύγεια OpenData API</span>
+    <span class="badge">95 νοσοκομεία αντιστοιχισμένα</span>
+    <span class="badge">Ανάλυση σε εξέλιξη — Ιούνιος 2026</span>
+  </div>
+  <a class="back-link" href="overview.html">← Πίσω στην ανάλυση Λαμίας</a>
+</header>
+
+<nav class="chapter-nav">
+  <ul>
+    <li><a href="#" class="active" data-tab="tab1"><span class="ch-num">Εισαγωγή</span>Σκοπός & Μέθοδος</a></li>
+    <li><a href="#" data-tab="tab2"><span class="ch-num">Δεδομένα</span>Τα 10 Νοσοκομεία</a></li>
+    <li><a href="#" data-tab="tab3"><span class="ch-num">Βάση</span>Τι Μάθαμε στη Λαμία</a></li>
+    <li><a href="#" data-tab="tab4"><span class="ch-num">Επόμενο</span>Υπουργείο Άμυνας</a></li>
+  </ul>
+</nav>
+
+<!-- ══════════════════════════════════════════
+     TAB 1 — ΣΚΟΠΟΣ & ΜΕΘΟΔΟΣ
+══════════════════════════════════════════ -->
+<div class="pane active" id="tab1">
+
+  <div class="ch-title">
+    <div class="ch-label">Εισαγωγή · Σκοπός & Μέθοδος</div>
+    <h2>Ένα νοσοκομείο δεν είναι αρκετό</h2>
+    <p class="lede">Η ανάλυση του ΓΝ Λαμίας αποκάλυψε πρότυπα που δεν μπορούν να εξηγηθούν από τυχαία διοικητική αδυναμία. Αλλά για να πει κανείς «αυτό είναι παθολογικό», χρειάζεται σύγκριση. Τι κάνουν τα άλλα νοσοκομεία;</p>
+  </div>
+
+  <div class="section">
+    <h3>Το ερώτημα</h3>
+    <div class="prose">
+      <p>Το ΓΝ Λαμίας έχει 4,9× λιγότερες κατακυρώσεις ανταγωνιστικών διαγωνισμών από το ΓΝ Τρικάλων. Η ίδια εταιρεία (ΙΝΤΕΡΚΑΤ) λαμβάνει συμβάσεις Η/Μ συντήρησης για 10 χρόνια χωρίς ανταγωνιστική διαδικασία — παρόλο που δεν έχει σχετικό ΚΑΔ.</p>
+      <p>Η κρίσιμη ερώτηση: <strong>είναι αυτό μοναδικό στη Λαμία — ή επαναλαμβάνεται αλλού;</strong> Αν η ΙΝΤΕΡΚΑΤ ή παρόμοιο πρότυπο εμφανίζεται σε πολλά νοσοκομεία, η ιστορία δεν είναι τοπική. Είναι συστημική.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Τι μετράμε</h3>
+    <div class="prose">
+      <ul>
+        <li><strong>Ποσοστό άμεσων αναθέσεων (Δ.2.2)</strong> vs ανταγωνιστικών κατακυρώσεων — το κύριο σήμα</li>
+        <li><strong>Συγκέντρωση αναδόχων</strong> — ποιοί 5 ανάδοχοι παίρνουν το μεγαλύτερο μερίδιο</li>
+        <li><strong>Κόστος ανά κλίνη ανά έτος</strong> — για Η/Μ συντήρηση, φύλαξη, καθαριότητα</li>
+        <li><strong>Ανάδοχοι χωρίς σχετικό ΚΑΔ</strong> — η διαπίστωση που έκανε τη διαφορά στη Λαμία</li>
+        <li><strong>Διάρκεια αποκλειστικότητας</strong> — πόσα χρόνια ο ίδιος ανάδοχος χωρίς ανταγωνισμό</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Πώς λειτουργεί η pipeline</h3>
+    <div class="prose">
+      <p>Για κάθε νοσοκομείο: (1) κατεβαίνουν όλες οι αποφάσεις Διαύγεια 2019–2026, (2) κανονικοποιούνται και αποσυμφορίζονται οι διπλές εγγραφές lifecycle, (3) εμπλουτίζονται οι ανάδοχοι από ΓΕΜΗ, (4) παράγεται αυτόματη έκθεση.</p>
+      <p>Το κώδικας είναι ανοιχτός: <a href="https://github.com/Petropov/Greece_Public_diav" target="_blank" style="color:var(--blue)">github.com/Petropov/Greece_Public_diav</a>. Οποιοσδήποτε μπορεί να τρέξει την ίδια ανάλυση για οποιοδήποτε νοσοκομείο αλλάζοντας μόνο το org ID.</p>
+    </div>
+  </div>
+
+  <div class="bridge">
+    <div><p><strong>Επόμενο:</strong> Η κατάσταση για καθένα από τα 10 νοσοκομεία — τι έχει φετωθεί, τι αναμένεται.</p></div>
+    <button class="nxt" onclick="goTab('tab2')">Τα 10 Νοσοκομεία →</button>
+  </div>
+
+</div><!-- /tab1 -->
+
+
+<!-- ══════════════════════════════════════════
+     TAB 2 — ΤΑ 10 ΝΟΣΟΚΟΜΕΙΑ
+══════════════════════════════════════════ -->
+<div class="pane" id="tab2">
+
+  <div class="ch-title">
+    <div class="ch-label">Δεδομένα · Τα 10 Νοσοκομεία</div>
+    <h2>Το δείγμα: 10 νοσοκομεία, ~5.000 κλίνες, ~€1Β δαπάνη</h2>
+    <p class="lede">Τα δέκα μεγαλύτερα δημόσια νοσοκομεία της Ελλάδας κατά εκτιμώμενο αριθμό κλινών. Η ανάλυση τρέχει σε εξέλιξη — αποτελέσματα θα εμφανιστούν εδώ καθώς ολοκληρώνεται κάθε νοσοκομείο.</p>
+  </div>
+
+  <div class="section">
+    <h3>Κατάσταση ανάλυσης</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Νοσοκομείο</th>
+            <th>Πόλη</th>
+            <th class="td-c">Εκτιμ. Κλίνες</th>
+            <th>Diavgeia org</th>
+            <th>Κατάσταση</th>
+            <th>Κύριο εύρημα</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td><strong>Ευαγγελισμός</strong></td>
+            <td>Αθήνα</td>
+            <td class="td-c">~700</td>
+            <td><code>99221993</code></td>
+            <td><span class="status-running">⏳ Σε εξέλιξη</span></td>
+            <td style="color:var(--ink3);font-style:italic">—</td>
+          </tr>
+          <tr style="background:var(--bg)">
+            <td>2</td>
+            <td><strong>ΑΧΕΠΑ</strong></td>
+            <td>Θεσσαλονίκη</td>
+            <td class="td-c">~700</td>
+            <td><code>99221998</code></td>
+            <td><span class="status-pending">◦ Αναμένει</span></td>
+            <td style="color:var(--ink3);font-style:italic">—</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td><strong>Σισμανόγλειο</strong></td>
+            <td>Αθήνα</td>
+            <td class="td-c">~600</td>
+            <td><code>99221990</code></td>
+            <td><span class="status-pending">◦ Αναμένει</span></td>
+            <td style="color:var(--ink3);font-style:italic">—</td>
+          </tr>
+          <tr style="background:var(--bg)">
+            <td>4</td>
+            <td><strong>Ιπποκράτειο Θεσσαλονίκης</strong></td>
+            <td>Θεσσαλονίκη</td>
+            <td class="td-c">~600</td>
+            <td><code>99222000</code></td>
+            <td><span class="status-pending">◦ Αναμένει</span></td>
+            <td style="color:var(--ink3);font-style:italic">—</td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td><strong>Λαϊκό</strong></td>
+            <td>Αθήνα</td>
+            <td class="td-c">~500</td>
+            <td><code>99221994</code></td>
+            <td><span class="status-pending">◦ Αναμένει</span></td>
+            <td style="color:var(--ink3);font-style:italic">—</td>
+          </tr>
+          <tr style="background:var(--bg)">
+            <td>6</td>
+            <td><strong>Γ. Παπανικόλαου</strong></td>
+            <td>Θεσσαλονίκη</td>
+            <td class="td-c">~600</td>
+            <td><code>99221999</code></td>
+            <td><span class="status-pending">◦ Αναμένει</span></td>
+            <td style="color:var(--ink3);font-style:italic">—</td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td><strong>Βενιζέλειο-Πανάνειο</strong></td>
+            <td>Ηράκλειο</td>
+            <td class="td-c">~500</td>
+            <td><code>99221997</code></td>
+            <td><span class="status-pending">◦ Αναμένει</span></td>
+            <td style="color:var(--ink3);font-style:italic">—</td>
+          </tr>
+          <tr style="background:var(--bg)">
+            <td>8</td>
+            <td><strong>Γ. Γεννηματάς</strong></td>
+            <td>Αθήνα</td>
+            <td class="td-c">~400</td>
+            <td><code>99221992</code></td>
+            <td><span class="status-pending">◦ Αναμένει</span></td>
+            <td style="color:var(--ink3);font-style:italic">—</td>
+          </tr>
+          <tr>
+            <td>9</td>
+            <td><strong>Άγιος Ανδρέας</strong></td>
+            <td>Πάτρα</td>
+            <td class="td-c">~400</td>
+            <td><code>99222007</code></td>
+            <td><span class="status-pending">◦ Αναμένει</span></td>
+            <td style="color:var(--ink3);font-style:italic">—</td>
+          </tr>
+          <tr style="background:var(--bg)">
+            <td>10</td>
+            <td><strong>Νικαία-Πειραιάς</strong></td>
+            <td>Πειραιάς</td>
+            <td class="td-c">~400</td>
+            <td><code>99222003</code></td>
+            <td><span class="status-pending">◦ Αναμένει</span></td>
+            <td style="color:var(--ink3);font-style:italic">—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pending-notice" style="margin-top:20px">
+      <div class="big">⏳</div>
+      <p>Η ανάλυση τρέχει αυτή τη στιγμή. Τα αποτελέσματα θα συμπληρωθούν εδώ καθώς ολοκληρώνεται κάθε νοσοκομείο. Το κρίσιμο ερώτημα: <strong>εμφανίζεται η ΙΝΤΕΡΚΑΤ ή παρόμοιο πρότυπο αλλού;</strong></p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Τι θα συγκριθεί — τα benchmark metrics</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Μετρική</th>
+            <th>ΓΝ Λαμίας (baseline)</th>
+            <th>ΓΝ Τρικάλων (καλύτερο benchmark)</th>
+            <th>Στόχος σύγκρισης</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Κατακυρώσεις 2020–2026</td>
+            <td class="red-cell">407</td>
+            <td style="color:var(--green);font-weight:600">1.991</td>
+            <td>Ποιο νοσοκομείο είναι πιο κοντά στη Λαμία;</td>
+          </tr>
+          <tr style="background:var(--bg)">
+            <td>Κόστος φύλαξης / κλίνη / έτος</td>
+            <td class="red-cell">€2.136</td>
+            <td style="color:var(--green);font-weight:600">€486</td>
+            <td>Ποιο νοσοκομείο έχει παρόμοια απόκλιση;</td>
+          </tr>
+          <tr>
+            <td>Η/Μ συντήρηση — εξωτερικός ανάδοχος</td>
+            <td class="red-cell">ΙΝΤΕΡΚΑΤ (10 χρόνια)</td>
+            <td style="color:var(--green);font-weight:600">Εσωτερικό προσωπικό</td>
+            <td>Ποιος άλλος έχει εξωτερικό ανάδοχο Η/Μ;</td>
+          </tr>
+          <tr style="background:var(--bg)">
+            <td>Ανάδοχοι χωρίς σχετικό ΚΑΔ</td>
+            <td class="red-cell">ΙΝΤΕΡΚΑΤ — 0 Η/Μ ΚΑΔ</td>
+            <td style="color:var(--green);font-weight:600">—</td>
+            <td>Εμφανίζεται η ΙΝΤΕΡΚΑΤ αλλού;</td>
+          </tr>
+          <tr>
+            <td>Συνολική δαπάνη / κλίνη / έτος</td>
+            <td>~€336k</td>
+            <td>Εκκρεμεί</td>
+            <td>Συγκριτική αποδοτικότητα</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:.8rem;color:var(--ink3);margin-top:10px">Στοιχεία ΓΝ Λαμίας και ΓΝ Τρικάλων από <a href="overview.html" style="color:var(--blue)">την ανάλυση Λαμίας</a>.</p>
+  </div>
+
+  <div class="bridge">
+    <div><p><strong>Επόμενο:</strong> Τι ακριβώς βρέθηκε στη Λαμία και γιατί αποτελεί τη βάση σύγκρισης.</p></div>
+    <button class="nxt" onclick="goTab('tab3')">Η Βάση: Λαμία →</button>
+  </div>
+
+</div><!-- /tab2 -->
+
+
+<!-- ══════════════════════════════════════════
+     TAB 3 — ΤΙ ΜΑΘΑΜΕ ΣΤΗ ΛΑΜΙΑ
+══════════════════════════════════════════ -->
+<div class="pane" id="tab3">
+
+  <div class="ch-title">
+    <div class="ch-label">Βάση Σύγκρισης · Λαμία</div>
+    <h2>Τι αποκαλύφθηκε στη Λαμία — και τι ψάχνουμε αλλού</h2>
+    <p class="lede">Τα ευρήματα από το ΓΝ Λαμίας δεν είναι συμπεράσματα — είναι υποθέσεις προς επαλήθευση σε εθνική κλίμακα.</p>
+  </div>
+
+  <div class="section">
+    <h3>Τα τρία πρότυπα που αναζητάμε</h3>
+
+    <div class="finding red">
+      <div class="icon">🔴</div>
+      <div>
+        <h4>Πρότυπο Α — Αποκλειστικός ανάδοχος χωρίς σχετικό αντικείμενο</h4>
+        <p>ΙΝΤΕΡΚΑΤ ΑΕ (ΑΦΜ 094440530): λαμβάνει Η/Μ συμβάσεις από το 2015, αλλά έχει <strong>μηδέν ΚΑΔ</strong> που αντιστοιχούν σε ηλεκτρομηχανολογικές εργασίες (43.21 / 43.22 / 71.12). Κύρια δραστηριότητα: εξόρυξη λιγνίτη, λατομεία. Το ίδιο πρότυπο σε άλλο νοσοκομείο θα ήταν εθνική είδηση.</p>
+      </div>
+    </div>
+
+    <div class="finding red">
+      <div class="icon">🔴</div>
+      <div>
+        <h4>Πρότυπο Β — Κόστος ανά κλίνη 4× πάνω από ομότιμα</h4>
+        <p>Φύλαξη: €2.136/κλίνη/έτος vs €486 στο ΓΝ Τρικάλων. Η/Μ: χωρίς ανάλογο σε ομότιμα νοσοκομεία. Η απόκλιση δεν εξηγείται από γεωγραφία, μέγεθος ή τύπο νοσοκομείου.</p>
+      </div>
+    </div>
+
+    <div class="finding amber">
+      <div class="icon">🟡</div>
+      <div>
+        <h4>Πρότυπο Γ — Δεκαετής σχέση αποκλειστικότητας χωρίς TED</h4>
+        <p>Από το 2015 ως σήμερα, >€5M σε ΙΝΤΕΡΚΑΤ — αλλά <strong>κανένα αποτέλεσμα στο TED</strong> (το ευρωπαϊκό μητρώο συμβάσεων άνω €140k). Αν επιβεβαιωθεί η απουσία, ανοίγει αρμοδιότητα Ευρωπαϊκής Εισαγγελίας (EPPO).</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Πλήρης ανάλυση Λαμίας</h3>
+    <div class="prose">
+      <p>Η αναλυτική έκθεση για το ΓΝ Λαμίας, το Δήμο και τη ΔΕΥΑ Λαμίας περιλαμβάνει 9 κεφάλαια με πρωτογενή δεδομένα, πίνακες σύγκρισης, ADAs και αποδεικτικά έγγραφα PDF.</p>
+    </div>
+    <div style="margin-top:16px">
+      <a href="overview.html" style="display:inline-block;background:var(--red);color:#fff;padding:10px 20px;border-radius:6px;text-decoration:none;font-size:.85rem;font-weight:600">→ Άνοιγμα ανάλυσης Λαμίας</a>
+    </div>
+  </div>
+
+  <div class="bridge">
+    <div><p><strong>Επόμενο:</strong> Πέρα από τα νοσοκομεία — τι κρύβεται στις αμυντικές δαπάνες.</p></div>
+    <button class="nxt" onclick="goTab('tab4')">Υπουργείο Άμυνας →</button>
+  </div>
+
+</div><!-- /tab3 -->
+
+
+<!-- ══════════════════════════════════════════
+     TAB 4 — ΥΠΟΥΡΓΕΙΟ ΑΜΥΝΑΣ
+══════════════════════════════════════════ -->
+<div class="pane" id="tab4">
+
+  <div class="ch-title">
+    <div class="ch-label">Επόμενο · Υπουργείο Εθνικής Άμυνας</div>
+    <h2>Ο Στρατός: η μεγαλύτερη ανεξερεύνητη δεξαμενή</h2>
+    <p class="lede">Η Ελλάδα δαπανά ~2,5% ΑΕΠ για άμυνα — από τα υψηλότερα στο ΝΑΤΟ. Μεγάλο μέρος δεν αφορά όπλα αλλά καθημερινή λειτουργία: φαγητό, καύσιμα, καθαριότητα, συντήρηση. Και είναι όλο στη Διαύγεια.</p>
+  </div>
+
+  <div class="section">
+    <h3>Τι δημοσιεύεται — και τι όχι</h3>
+    <div class="prose">
+      <p>Το <strong>Υπουργείο Εθνικής Άμυνας (ΥΠΕΘΑ)</strong> έχει Diavgeia org ID = <code>6</code> και δεκάδες υποφορείς (μονάδες, σχηματισμοί, νοσοκομεία). Δημοσιεύεται:</p>
+      <ul>
+        <li><strong>Σίτιση</strong> — συμβάσεις εστίασης για εκατοντάδες βάσεις σε ολόκληρη την Ελλάδα</li>
+        <li><strong>Καύσιμα</strong> — τεράστιοι όγκοι, συχνά μέσω πλαισίων-συμφωνιών</li>
+        <li><strong>Καθαριότητα & συντήρηση</strong> — κτίρια, οχήματα, εξοπλισμός βάσεων</li>
+        <li><strong>Διαχείριση προσφύγων 2015–2018</strong> — σίτιση σε ΚΥΤ, κάποιες από τις μεγαλύτερες άμεσες αναθέσεις της δεκαετίας</li>
+      </ul>
+      <p>Δεν δημοσιεύεται: οπλικά συστήματα, πυρομαχικά, στρατηγικές προμήθειες — εθνικό απόρρητο.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Γιατί είναι ενδιαφέρον</h3>
+
+    <div class="finding blue">
+      <div class="icon">🍽️</div>
+      <div>
+        <h4>Σίτιση — κλασικό πεδίο πελατειακών σχέσεων</h4>
+        <p>Εκατοντάδες βάσεις σε όλη την Ελλάδα, κάθε μία με επαναλαμβανόμενες συμβάσεις σίτισης. Ίδια λογική με τη Λαμία: ο ίδιος ανάδοχος χρόνο με τον χρόνο, χωρίς ανταγωνιστική διαδικασία;</p>
+      </div>
+    </div>
+
+    <div class="finding blue">
+      <div class="icon">🚨</div>
+      <div>
+        <h4>Προσφυγικές συμβάσεις 2015–2018 — ο μεγάλος αδιερεύνητος όγκος</h4>
+        <p>Κατά τη διαχείριση της προσφυγικής κρίσης, ο στρατός ανέλαβε τη διαχείριση πολλών ΚΥΤ. Οι συμβάσεις σίτισης εκείνης της περιόδου ήταν τεράστιες και βιαστικές — ιδανικές συνθήκες για παράκαμψη διαγωνισμών.</p>
+      </div>
+    </div>
+
+    <div class="finding blue">
+      <div class="icon">⛽</div>
+      <div>
+        <h4>Καύσιμα — ο αόρατος κίνδυνος</h4>
+        <p>Τα πλαίσια-συμφωνίες καυσίμων για τις ένοπλες δυνάμεις αφορούν εκατομμύρια λίτρα. Ακόμα και μικρή απόκλιση τιμής από την αγορά σημαίνει εκατοντάδες χιλιάδες ευρώ. Η σύγκριση με EU Oil Bulletin (που έγινε για τη Λαμία) είναι άμεσα εφαρμόσιμη.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Τεχνική σημείωση</h3>
+    <div class="prose">
+      <p>Η ίδια pipeline που χρησιμοποιήθηκε για τα νοσοκομεία εκτελείται αυτούσια για το ΥΠΕΘΑ με <code>--org 6</code>. Η διαφορά: ο αριθμός των υποφορέων (μονάδων) είναι πολύ μεγαλύτερος, οπότε η ανάλυση χρειάζεται να συγκεντρωθεί σε συγκεκριμένες κατηγορίες δαπάνης (σίτιση, καύσιμα) αντί για συνολικό corpus.</p>
+      <p>Δεν έχει εκτελεστεί ακόμα. Ανάλυση σε σχεδιασμό.</p>
+    </div>
+  </div>
+
+</div><!-- /tab4 -->
+
+
+<script>
+const tabs=['tab1','tab2','tab3','tab4'];
+function goTab(id){
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.chapter-nav a').forEach(a=>a.classList.remove('active'));
+  const pane=document.getElementById(id);
+  if(pane) pane.classList.add('active');
+  const link=document.querySelector(`.chapter-nav a[data-tab="${id}"]`);
+  if(link) link.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  updateProgress();
+}
+document.querySelectorAll('.chapter-nav a').forEach(a=>{
+  a.addEventListener('click',e=>{e.preventDefault();goTab(a.dataset.tab)});
+});
+function updateProgress(){
+  const idx=tabs.indexOf(document.querySelector('.pane.active')?.id||'tab1');
+  document.getElementById('progress-bar').style.width=((idx+1)/tabs.length*100)+'%';
+}
+updateProgress();
+</script>
+</body>
+</html>
