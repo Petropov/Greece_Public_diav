@@ -1,4 +1,4 @@
-# Δήμος Λαμιέων (org=50304) — Procurement Intelligence Report
+# ΔΕΥΑ Λαμίας (org=50304) — Procurement Intelligence Report
 
 > Data range: **2020–2026** · Decisions: **24,433** · Procurements: **9,509** · Known suppliers: **0** · Clean spend (deduplicated): **€18.27M** · Raw (with multi-stage): **€25.39M**
 

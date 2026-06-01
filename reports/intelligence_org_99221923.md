@@ -1,4 +1,4 @@
-# Δήμος Λαμιέων (org=99221923) — Procurement Intelligence Report
+# ΓΝ Λαμίας (org=99221923) — Procurement Intelligence Report
 
 > Data range: **2020–2026** · Decisions: **50,729** · Procurements: **18,185** · Known suppliers: **0** · Clean spend (deduplicated): **€99.80M** · Raw (with multi-stage): **€290.76M**
 

@@ -1,4 +1,4 @@
-# Δήμος Λαμιέων (org=6272) — Procurement Intelligence Report
+# Δήμος Σερρών (org=6272) — Procurement Intelligence Report
 
 > Data range: **2020–2026** · Decisions: **61,688** · Procurements: **30,156** · Known suppliers: **0** · Clean spend (deduplicated): **€135.68M** · Raw (with multi-stage): **€444.37M**
 

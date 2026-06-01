@@ -1,4 +1,4 @@
-# Δήμος Λαμιέων (org=6079) — Procurement Intelligence Report
+# Δήμος Δομοκού (org=6079) — Procurement Intelligence Report
 
 > Data range: **2020–2026** · Decisions: **25,453** · Procurements: **3,071** · Known suppliers: **0** · Clean spend (deduplicated): **€47.46M** · Raw (with multi-stage): **€51.04M**
 

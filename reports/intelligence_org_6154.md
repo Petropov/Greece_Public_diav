@@ -1,4 +1,4 @@
-# Δήμος Λαμιέων (org=6154) — Procurement Intelligence Report
+# Δήμος Κοζάνης (org=6154) — Procurement Intelligence Report
 
 > Data range: **2020–2026** · Decisions: **45,584** · Procurements: **29,086** · Known suppliers: **0** · Clean spend (deduplicated): **€386.23M** · Raw (with multi-stage): **€1095.03M**
 

@@ -1,4 +1,4 @@
-# Δήμος Λαμιέων (org=50200) — Procurement Intelligence Report
+# Αποκεντρωμένη Διοίκηση Θεσσαλίας-Στερεάς Ελλάδας (org=50200) — Procurement Intelligence Report
 
 > Data range: **2020–2026** · Decisions: **78,839** · Procurements: **7,031** · Known suppliers: **0** · Clean spend (deduplicated): **€162.44M** · Raw (with multi-stage): **€236.63M**
 

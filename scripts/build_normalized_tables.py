@@ -471,6 +471,11 @@ def _extract_structured_amount(source: Any, path: str = "") -> tuple[float | Non
                 amount = normalize_amount(value)
                 if amount is not None:
                     return amount, child_path
+                # Value may be a nested dict like awardAmount: {amount: X, currency: Y}
+                if isinstance(value, (dict, list)):
+                    amount, amount_source = _extract_structured_amount(value, child_path)
+                    if amount is not None:
+                        return amount, amount_source
             elif isinstance(value, (dict, list)):
                 amount, amount_source = _extract_structured_amount(value, child_path)
                 if amount is not None:
