@@ -57,10 +57,14 @@ A single natural person performing hydraulic construction, fire infrastructure m
 |----------|------|--------|----------|---------|
 | Small pine cone collection | 2021-05-12 | €4,000 | ΜΑΝΑΡΙΤΣΑΣ | Direct (Art. 118) |
 | **Large pine cone collection** | **2021-05-14** | **€4,960,000** | **ΜΑΝΑΡΙΤΣΑΣ** | **Direct (Art. 118 — void)** |
+| Heating oil 2026-2027 | 2026-03-03 | €679,272 | ΝΙΚΟΠΟΥΛΟΣ ΟΕ (082453034) | Direct — justification unclear |
+| Fuel supply 2022 (άγονα τμήματα) | 2022-01-10 | €348,792 | — | Direct — failed-tender parts |
+| Cleaning services | 2024-12-18 | €200,007 | — | **Direct (year-end, T6)** |
+| Drone purchase | 2020-11-25 | €147,560 | — | **Direct (Art. 118 — ×4.9 over cap)** |
 | Similar forestry services (CPV 77) in ORG 50200 | Various | €1k–€49k | Multiple | Direct |
 | Flood restoration construction | 2021 | €5,200,000 | ΧΑΤΖΗΓΑΚΗΣ ΤΕΧ. ΑΕ | **Open tender** ✓ |
 
-The €5.2M flood restoration project with ΧΑΤΖΗΓΑΚΗΣ was properly tendered. The €4.96M pine cone collection was not.
+The €5.2M flood restoration project with ΧΑΤΖΗΓΑΚΗΣ was properly tendered. The €4.96M pine cone collection, the €679k heating oil, and the €200k cleaning award were not.
 
 ---
 
