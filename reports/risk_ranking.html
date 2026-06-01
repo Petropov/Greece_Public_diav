@@ -85,7 +85,7 @@
     <h1>🔍 Procurement Risk Ranking</h1>
     <p>Multi-signal sweep across 23 public bodies. Seven detectors covering emergency procurement abuse, temporal clustering, single-source monopoly, copy-paste awards, burst windows, price standardisation, and committee capture.</p>
     <div class="meta">
-      <span><strong>23</strong> organisations</span>
+      <span><strong>24</strong> organisations</span>
       <span><strong>7</strong> signal detectors</span>
       <span><strong>T5·T6·T8·T9A·T9B·T9C·T9D</strong> tenets</span>
       <span>Data: Diavgeia 2018–2026</span>
@@ -323,8 +323,14 @@
           <td><span class="tenet-pill t8">T6</span></td>
           <td style="color:var(--muted);font-size:.82rem">Year-end burst only</td>
         </tr>
+        <tr>
+          <td>🟡 #20</td><td>99221993</td><td>ΓΝΑ ΕΥΑΓΓΕΛΙΣΜΟΣ</td>
+          <td><span class="badge badge-yellow">1†</span></td>
+          <td><span class="tenet-pill t8">T6</span></td>
+          <td style="color:var(--muted);font-size:.82rem">T6: year-end batch commits (ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ) — 3,372 direct awards with no supplier data; deeper analysis pending hydration</td>
+        </tr>
         <tr style="opacity:.6">
-          <td>🟢 #23</td><td>50621</td><td>ΔΕΥΑ ΣΕΡΡΩΝ</td>
+          <td>🟢 #24</td><td>50621</td><td>ΔΕΥΑ ΣΕΡΡΩΝ</td>
           <td><span class="badge badge-green">0 CLEAN</span></td>
           <td>—</td>
           <td style="color:var(--muted);font-size:.82rem">No signals detected — benchmark baseline</td>
@@ -492,7 +498,7 @@
     </table>
 
     <div style="margin-top:28px;padding:20px;background:var(--surface);border:1px solid var(--border);border-radius:10px;font-size:.86rem;color:var(--muted)">
-      <strong style="color:var(--text)">Methodology note:</strong> T6 fires in 87% of organisations because year-end budget absorption and some weekend contract signings are structurally common in Greek public administration. T6 alone is a weak signal; it gains evidentiary weight when co-occurring with T5, T8, or T9A. The high co-occurrence rate of T9B + T9C + T9D (all three in 13/23 orgs) suggests that copy-paste procurement templates are endemic — this may reflect administrative convenience as much as fraud, but the pattern is a reliable discriminator for further manual review.
+      <strong style="color:var(--text)">Methodology note:</strong> T6 fires in 87% of organisations because year-end budget absorption and some weekend contract signings are structurally common in Greek public administration. T6 alone is a weak signal; it gains evidentiary weight when co-occurring with T5, T8, or T9A. The high co-occurrence rate of T9B + T9C + T9D (all three in 13/24 orgs) suggests that copy-paste procurement templates are endemic — this may reflect administrative convenience as much as fraud, but the pattern is a reliable discriminator for further manual review. † = signal fired on non-award decisions (ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ); treated as weak pending supplier-level hydration.
     </div>
   </div>
 
@@ -532,6 +538,18 @@
         &nbsp;• 2025-03-30 — Contract 10/2025: €755,857 (ADA: ΨΕΗΠ46907Φ-Ψ6Φ)<br>
         &nbsp;• 2025-04-29 — Amendment to contract 10/2025: +€800,382 (ADA: ΨΥΖΚ46907Φ-4ΣΓ)<br>
         &nbsp;• 2026-05-30 — Contract 49/2026: €800,382 — same amount as amendment (ADA: 9ΨΛΖ46907Φ-Σ0Τ)
+      </div>
+    </div>
+
+    <div class="finding-card" style="border-left:3px solid var(--border);opacity:.85">
+      <h3>ΓΝΑ ΕΥΑΓΓΕΛΙΣΜΟΣ — Data pending hydration (ORG 99221993)</h3>
+      <div class="org-tag">ORG 99221993 · T6 (weak) · 1 tenet — signals limited by supplier data gaps</div>
+      <div class="amount">3,372 direct award decisions · 0 with supplier data (search-only coverage)</div>
+      <div class="detail">
+        Athens' Evangelismos Hospital is the largest hospital in the dataset: 43,255 normalised decisions (2019–2026), including 3,372 ΑΝΑΘΕΣΗ direct award decisions — none with supplier identity in the current dataset.<br><br>
+        <strong>What we can say:</strong> The hospital runs large-scale competitive tenders for high-value procurement (open electronic tenders for angiography materials €8.4M, immunology exams €4.1M, cleaning services €4.6M via ΑΕΠΠ/ΕΑΔΗΣΥ arbitration). Budget commitments to AFM 999336270 (ΕΠΥ / central health purchasing body) total €40.6M across 4,955 batch entries — this is centralised procurement, not direct award concentration.<br><br>
+        <strong>What we cannot yet say:</strong> The 3,372 individual direct award decisions have no supplier data (not hydrated). T1/T8/T9B/T9C/T9D signals cannot be assessed. T6 fired on ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ batch commits (not actual awards) — treated as a false positive in this context.<br><br>
+        <strong>Recommended next step:</strong> Hydrate ΑΝΑΘΕΣΗ decision JSONs for this org to extract supplier AFMs. With supplier data, T1 and T8 analysis becomes possible for Greece's largest hospital.
       </div>
     </div>
 
