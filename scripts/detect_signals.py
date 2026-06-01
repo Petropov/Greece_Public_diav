@@ -88,6 +88,10 @@ T6_MIN_YEAR_DECISIONS = 3000  # skip years with sparse data (incomplete fetch)
 T6_WEEKEND_AMOUNT = 5_000  # €5k minimum for a weekend award to be flagged
 T6_MONTHLY_MULTIPLIER = 2.5
 
+T1_COUNT_THRESHOLD = 0.30   # supplier with >30% of org's 3-year direct-award count
+T1_AMOUNT_THRESHOLD = 0.25  # or >25% of 3-year direct-award spend
+T1_MIN_AWARDS = 2           # minimum awards to be considered
+
 T8_SHARE_THRESHOLD = 0.50  # 50% of annual direct-award spend
 T8_SHARE_CRITICAL = 0.70   # 70% — fire regardless of persistence
 T8_MIN_YEARS = 2           # consecutive years above threshold
@@ -401,6 +405,117 @@ def detect_t8(df: pd.DataFrame) -> dict:
     }
 
 
+# ── T1 · Direct award concentration (rolling 3-year) ─────────────────────────
+
+def detect_t1(df: pd.DataFrame) -> dict:
+    """T1: Supplier capturing >40% of org's direct awards (count) or >35% of spend
+    over the most recent 3 full years of data.  Uses rolling window so a captured
+    relationship that spans years isn't diluted by T8's per-year view.
+    """
+    # T1 is specifically about DIRECT awards — exclude competitive tender awards
+    awards = df[
+        df["decision_type"].isin(DIRECT_AWARD_TYPES) &
+        df["supplier_tax_id"].notna() &
+        df["issue_date"].notna()
+    ].copy()
+
+    # Remove known data-quality artefact: some records have the supplier AFM
+    # entered in the amount field (awardAmount == AFM numerically).
+    # Filter: exclude amounts > €30M (unrealistic for direct awards at this org scale)
+    # and amounts numerically within 1% of the supplier_tax_id value (AFM-as-amount).
+    if "amount" in awards.columns:
+        awards["amount"] = pd.to_numeric(awards["amount"], errors="coerce")
+        afm_numeric = pd.to_numeric(awards["supplier_tax_id"], errors="coerce")
+        afm_as_amount = (
+            awards["amount"].notna() &
+            afm_numeric.notna() &
+            (awards["amount"] > 1_000_000) &
+            (((awards["amount"] - afm_numeric).abs() / afm_numeric.clip(lower=1)) < 0.01)
+        )
+        awards = awards[~afm_as_amount]
+
+    # Exclude self-referential tax IDs: when the "supplier" tax_id appears in
+    # >50% of ALL procurement decisions (not just filtered), it is almost certainly
+    # the contracting authority's own VAT being mis-recorded as the supplier.
+    all_procurement = df[df["decision_type"].isin(DIRECT_AWARD_TYPES)]["supplier_tax_id"].dropna()
+    if len(all_procurement) > 0:
+        all_counts = all_procurement.value_counts()
+        self_ids = all_counts[all_counts / len(all_procurement) > 0.50].index
+        awards = awards[~awards["supplier_tax_id"].isin(self_ids)]
+
+    if awards.empty:
+        return {"tenet": "T1", "name": "Direct award concentration", "fired": False,
+                "note": "No direct award decisions with supplier_tax_id", "findings": []}
+
+    # Determine the 3-year window — use all available data (full history gives
+    # the clearest picture of sustained concentration). Rolling 3-year is
+    # applied by using all years that have data, giving up to 7 years.
+    # For orgs with only sparse years, use everything.
+    year_counts = awards["year"].dropna().astype(int).value_counts()
+    if year_counts.empty:
+        return {"tenet": "T1", "name": "Direct award concentration", "fired": False,
+                "note": "No year data", "findings": []}
+
+    # Use ALL years that have at least 5 decisions with supplier_tax_id
+    # (a 3-year rolling window is unreliable when coverage is patchy)
+    window_years = sorted(year_counts[year_counts >= 5].index.tolist())
+    if not window_years:
+        window_years = sorted(year_counts.index.tolist())
+    window = awards[awards["year"].isin(window_years)].copy()
+
+    if window.empty:
+        return {"tenet": "T1", "name": "Direct award concentration", "fired": False,
+                "note": f"No data in window {window_years}", "findings": []}
+
+    total_count = len(window)
+    total_spend = window["amount"].dropna()[window["amount"] > 0].sum() if "amount" in window.columns else 0
+
+    by_sup = (
+        window.groupby("supplier_tax_id")
+        .agg(
+            count=("ada", "count"),
+            spend=("amount", lambda x: pd.to_numeric(x, errors="coerce").clip(lower=0).sum()),
+            name=("supplier_name", "first"),
+            years=("year", lambda x: sorted(x.dropna().astype(int).unique().tolist())),
+        )
+        .reset_index()
+    )
+
+    findings = []
+    for _, row in by_sup.iterrows():
+        count_share = row["count"] / total_count if total_count else 0
+        spend_share = row["spend"] / total_spend if total_spend > 0 else 0
+
+        if row["count"] < T1_MIN_AWARDS:
+            continue
+
+        rule_fired = count_share >= T1_COUNT_THRESHOLD or spend_share >= T1_AMOUNT_THRESHOLD
+        if rule_fired:
+            findings.append({
+                "rule": "direct_award_concentration",
+                "supplier_tax_id": str(row["supplier_tax_id"]),
+                "supplier_name": str(row["name"]) if pd.notna(row["name"]) else None,
+                "window_years": window_years,
+                "award_count": int(row["count"]),
+                "award_count_share": round(float(count_share), 3),
+                "spend": float(row["spend"]),
+                "spend_share": round(float(spend_share), 3),
+                "years_active": row["years"],
+            })
+
+    findings.sort(key=lambda x: -x["award_count_share"])
+
+    return {
+        "tenet": "T1",
+        "name": "Direct award concentration",
+        "window_years": window_years,
+        "total_window_awards": int(total_count),
+        "total_window_spend": float(total_spend),
+        "fired": len(findings) > 0,
+        "findings": clean(findings),
+    }
+
+
 # ── T9A · Committee capture ───────────────────────────────────────────────────
 
 def detect_t9a(df: pd.DataFrame) -> dict:
@@ -584,6 +699,7 @@ def detect_t9d(df: pd.DataFrame) -> dict:
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 DETECTORS = {
+    "T1": detect_t1,
     "T5": detect_t5,
     "T6": detect_t6,
     "T8": detect_t8,
@@ -614,7 +730,13 @@ def print_report(results: list[dict]) -> None:
         print(f"\n  Findings ({len(findings)}):")
         for f in findings:
             rule = f.get("rule", "")
-            if rule == "annual_rate":
+            if rule == "direct_award_concentration":
+                name = f.get("supplier_name") or f"AFM {f['supplier_tax_id']}"
+                print(f"    {name} — {f['award_count']} awards "
+                      f"({f['award_count_share']*100:.0f}% of count, "
+                      f"{f['spend_share']*100:.0f}% of spend) "
+                      f"in {f['window_years']}")
+            elif rule == "annual_rate":
                 print(f"    [{f['year']}] Emergency rate {f['rate']*100:.1f}% "
                       f"({f['emergency_decisions']}/{f['total_procurement_decisions']} decisions) "
                       f"— threshold {f['threshold']*100:.0f}%")
@@ -661,7 +783,7 @@ def print_report(results: list[dict]) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Procurement signal detector")
     parser.add_argument("--org", required=True, help="Organisation UID")
-    parser.add_argument("--tenets", default="T5,T6,T8,T9A,T9B,T9C,T9D",
+    parser.add_argument("--tenets", default="T1,T5,T6,T8,T9A,T9B,T9C,T9D",
                         help="Comma-separated list of tenets to run (default: all)")
     parser.add_argument("--json", action="store_true", dest="output_json",
                         help="Output machine-readable JSON")
