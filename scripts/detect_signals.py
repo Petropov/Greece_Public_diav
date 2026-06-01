@@ -2,41 +2,50 @@
 """Signal detectors for procurement intelligence tenets.
 
 Implements:
-  T5 · Emergency procurement overuse
-  T6 · Temporal clustering (year-end burst, weekend/holiday awards)
-  T8 · Single-source monopoly
+  T5  · Emergency procurement overuse
+  T6  · Temporal clustering (year-end burst, weekend/holiday awards)
+  T8  · Single-source monopoly
+  T9A · Committee capture (single body dominates direct awards)
+  T9B · Copy-paste structured award (same non-round amount, same supplier)
+  T9C · 30-day award burst (same supplier, multiple awards in a month)
+  T9D · Price standardisation across suppliers (fixed-rate manipulation)
 
 Usage:
     python scripts/detect_signals.py --org 6166
-    python scripts/detect_signals.py --org 6166 --json          # machine-readable output
-    python scripts/detect_signals.py --org 6166 --tenets T5,T8  # run specific tenets
+    python scripts/detect_signals.py --org 6166 --json
+    python scripts/detect_signals.py --org 6166 --tenets T5,T9B,T9C
 
 Rules of the game
 -----------------
-T5  A procurement decision is "emergency" if its subject contains any of the
-    emergency keywords (see T5_KEYWORDS). An org FIRES T5 if emergency decisions
-    exceed T5_THRESHOLD (15%) of all procurement-type decisions in any calendar year,
-    OR if any single emergency award exceeds T5_HIGH_VALUE (€60k — double the
-    direct-award ceiling, indicating the emergency bypass was used to avoid tendering
-    a contract that clearly required it).
+T5  Emergency if subject contains negotiated-without-publication keywords.
+    Fires at >15% annual rate OR single award >€60k.
 
-T6a Year-end burst. For each calendar year, compute the daily award rate in
-    Dec 22–31 vs the daily rate for Jan 1–Dec 21. FIRES if the year-end rate
-    exceeds T6_YEAREND_MULTIPLIER (3×) the baseline rate. (Dec already runs 2× —
-    3× is the anomaly threshold.)
+T6a Year-end burst: Dec 22–31 daily rate vs baseline. Fires at 3×.
+T6b Weekend awards ≥ €5k.
+T6c Greek public holiday awards ≥ €5k.
+T6d Monthly spike ≥ 2.5× annual mean.
 
-T6b Weekend awards. Flag awards issued on Saturday or Sunday where the amount
-    exceeds T6_WEEKEND_AMOUNT (€5k). Low volume but high signal — legitimate
-    emergency awards on weekends exist but are rare.
+T8  Single supplier >70% of annual direct-award spend (critical) or
+    >50% for 2+ consecutive years (sustained monopoly).
 
-T6c Monthly spike. Flag any calendar month where the decision count exceeds
-    T6_MONTHLY_MULTIPLIER (2.5×) the 12-month rolling average for that org.
+T9A Committee capture. One named decision-making body (identified from
+    subject text) responsible for >T9A_THRESHOLD (40%) of all direct
+    awards. Structural control point: if the committee is captured, all
+    maintenance spend is captured.
 
-T8  For each (org, year), compute each supplier's share of total direct-award
-    spend. FIRES if a single supplier exceeds T8_SHARE_THRESHOLD (50%) of the
-    year's direct-award spend AND the relationship persists for at least
-    T8_MIN_YEARS (2) consecutive years. Secondary flag: any supplier >70% in
-    any single year regardless of persistence.
+T9B Copy-paste structured award. Same non-round amount (not divisible
+    by T9B_ROUND_DIVISOR=100) paid to the same supplier T9B_MIN_COUNT
+    (2+) times. Non-round identical amounts indicate a template decision
+    used repeatedly rather than independently evaluated procurements.
+
+T9C 30-day award burst. Same supplier receives T9C_MIN_AWARDS (3+)
+    separate awards within any rolling T9C_WINDOW_DAYS (30) day window.
+    A genuine single need split across multiple small direct awards.
+
+T9D Price standardisation. Same non-round amount paid to T9D_MIN_SUPPLIERS
+    (3+) different suppliers. Suggests either a fixed rate applied
+    mechanically (copy-paste decisions) or coordination between awards
+    that should be independent.
 """
 
 from __future__ import annotations
@@ -80,6 +89,13 @@ T6_MONTHLY_MULTIPLIER = 2.5
 T8_SHARE_THRESHOLD = 0.50  # 50% of annual direct-award spend
 T8_SHARE_CRITICAL = 0.70   # 70% — fire regardless of persistence
 T8_MIN_YEARS = 2           # consecutive years above threshold
+
+T9A_THRESHOLD = 0.40       # 40% of direct awards from one committee/body
+T9B_ROUND_DIVISOR = 100    # amounts divisible by this are considered "round"
+T9B_MIN_COUNT = 2          # same non-round amount to same supplier
+T9C_MIN_AWARDS = 3         # minimum awards in burst window
+T9C_WINDOW_DAYS = 30       # rolling window in days
+T9D_MIN_SUPPLIERS = 3      # same non-round amount across this many suppliers
 
 PROCUREMENT_TYPES = {
     "ΑΝΑΘΕΣΗ ΕΡΓΩΝ / ΠΡΟΜΗΘΕΙΩΝ / ΥΠΗΡΕΣΙΩΝ / ΜΕΛΕΤΩΝ",
@@ -383,12 +399,191 @@ def detect_t8(df: pd.DataFrame) -> dict:
     }
 
 
+# ── T9A · Committee capture ───────────────────────────────────────────────────
+
+def detect_t9a(df: pd.DataFrame) -> dict:
+    awards = df[is_procurement(df)].copy()
+    total = len(awards)
+    if total == 0:
+        return {"tenet": "T9A", "name": "Committee capture", "fired": False, "findings": []}
+
+    # Extract committee/body name from subject — look for "ΕΠΙΤΡΟΠΗ" or "ΕΠΙΤΡΟΠ"
+    awards = awards.copy()
+    awards["_body"] = awards["subject"].str.extract(
+        r"(ΕΠΙΤΡΟΠ[ΗΣ\w\s]{0,40}?(?:ΣΥΝΤΗΡ|ΑΝΑΘΕΣ|ΕΚΤΕΛ|ΔΙΑΧΕΙΡ|ΑΞΙΟΛΟΓ)[Α-Ωα-ω\s]{0,30})",
+        expand=False
+    ).str.strip().str[:60]
+
+    body_counts = awards["_body"].value_counts()
+    findings = []
+    for body, count in body_counts.items():
+        if not body or pd.isna(body):
+            continue
+        share = count / total
+        if share >= T9A_THRESHOLD:
+            findings.append({
+                "rule": "committee_capture",
+                "body": body,
+                "direct_awards": int(count),
+                "total_awards": int(total),
+                "share": round(share, 3),
+                "threshold": T9A_THRESHOLD,
+            })
+
+    return {
+        "tenet": "T9A",
+        "name": "Committee capture",
+        "total_direct_awards": int(total),
+        "fired": len(findings) > 0,
+        "findings": clean(findings),
+    }
+
+
+# ── T9B · Copy-paste structured award ────────────────────────────────────────
+
+def detect_t9b(df: pd.DataFrame) -> dict:
+    awards = df[
+        is_procurement(df) &
+        df["amount"].notna() &
+        (df["amount"] > 0) &
+        df["supplier_tax_id"].notna()
+    ].copy()
+
+    # Non-round amounts only
+    awards["_non_round"] = awards["amount"] % T9B_ROUND_DIVISOR != 0
+    awards = awards[awards["_non_round"]]
+
+    grouped = (
+        awards.groupby(["supplier_tax_id", "amount"])
+        .agg(count=("ada", "count"), name=("supplier_name", "first"),
+             dates=("issue_date", lambda x: sorted(str(v)[:10] for v in x if pd.notna(v))))
+        .reset_index()
+    )
+    hits = grouped[grouped["count"] >= T9B_MIN_COUNT].sort_values("count", ascending=False)
+
+    findings = []
+    for _, row in hits.iterrows():
+        findings.append({
+            "rule": "copy_paste_amount",
+            "supplier_tax_id": str(row["supplier_tax_id"]),
+            "supplier_name": str(row["name"]) if pd.notna(row["name"]) else None,
+            "amount": float(row["amount"]),
+            "occurrences": int(row["count"]),
+            "dates": row["dates"][:5],
+        })
+
+    return {
+        "tenet": "T9B",
+        "name": "Copy-paste structured award",
+        "fired": len(findings) > 0,
+        "findings": clean(findings),
+    }
+
+
+# ── T9C · 30-day award burst ──────────────────────────────────────────────────
+
+def detect_t9c(df: pd.DataFrame) -> dict:
+    awards = df[
+        is_procurement(df) &
+        df["supplier_tax_id"].notna() &
+        df["issue_date"].notna()
+    ].copy()
+    awards = awards.sort_values(["supplier_tax_id", "issue_date"])
+
+    findings = []
+    for supplier_id, grp in awards.groupby("supplier_tax_id"):
+        grp = grp.sort_values("issue_date").reset_index(drop=True)
+        if len(grp) < T9C_MIN_AWARDS:
+            continue
+        # Sliding window
+        dates = grp["issue_date"].tolist()
+        for i in range(len(dates)):
+            window = [j for j in range(i, len(dates))
+                      if (dates[j] - dates[i]).days <= T9C_WINDOW_DAYS]
+            if len(window) >= T9C_MIN_AWARDS:
+                window_rows = grp.iloc[window]
+                total_amt = pd.to_numeric(window_rows["amount"], errors="coerce").sum()
+                findings.append({
+                    "rule": "burst_window",
+                    "supplier_tax_id": str(supplier_id),
+                    "supplier_name": str(grp["supplier_name"].iloc[0]) if pd.notna(grp["supplier_name"].iloc[0]) else None,
+                    "awards_in_window": len(window),
+                    "window_start": str(dates[i])[:10],
+                    "window_end": str(dates[window[-1]])[:10],
+                    "total_amount": float(total_amt) if total_amt == total_amt else None,
+                    "subjects": window_rows["subject"].dropna().str[:60].tolist()[:3],
+                })
+                break  # one finding per supplier (the biggest burst)
+
+    # Deduplicate by supplier
+    seen = set()
+    deduped = []
+    for f in sorted(findings, key=lambda x: -x["awards_in_window"]):
+        if f["supplier_tax_id"] not in seen:
+            seen.add(f["supplier_tax_id"])
+            deduped.append(f)
+
+    return {
+        "tenet": "T9C",
+        "name": "30-day award burst",
+        "fired": len(deduped) > 0,
+        "findings": clean(deduped),
+    }
+
+
+# ── T9D · Price standardisation across suppliers ──────────────────────────────
+
+def detect_t9d(df: pd.DataFrame) -> dict:
+    awards = df[
+        is_procurement(df) &
+        df["amount"].notna() &
+        (df["amount"] > 0) &
+        df["supplier_tax_id"].notna()
+    ].copy()
+
+    awards["_non_round"] = awards["amount"] % T9B_ROUND_DIVISOR != 0
+    awards = awards[awards["_non_round"]]
+
+    grouped = (
+        awards.groupby("amount")
+        .agg(supplier_count=("supplier_tax_id", "nunique"),
+             total_count=("ada", "count"),
+             suppliers=("supplier_name", lambda x: list(x.dropna().unique())[:5]))
+        .reset_index()
+    )
+    hits = grouped[grouped["supplier_count"] >= T9D_MIN_SUPPLIERS].sort_values(
+        "supplier_count", ascending=False
+    )
+
+    findings = []
+    for _, row in hits.iterrows():
+        findings.append({
+            "rule": "price_standardisation",
+            "amount": float(row["amount"]),
+            "distinct_suppliers": int(row["supplier_count"]),
+            "total_occurrences": int(row["total_count"]),
+            "suppliers": row["suppliers"],
+            "threshold": T9D_MIN_SUPPLIERS,
+        })
+
+    return {
+        "tenet": "T9D",
+        "name": "Price standardisation across suppliers",
+        "fired": len(findings) > 0,
+        "findings": clean(findings),
+    }
+
+
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 DETECTORS = {
     "T5": detect_t5,
     "T6": detect_t6,
     "T8": detect_t8,
+    "T9A": detect_t9a,
+    "T9B": detect_t9b,
+    "T9C": detect_t9c,
+    "T9D": detect_t9d,
 }
 
 
@@ -437,6 +632,21 @@ def print_report(results: list[dict]) -> None:
                 print(f"    {f['supplier_name']} (AFM {f['supplier_tax_id']}) "
                       f"years {f['years']} avg {f['avg_share']*100:.0f}% "
                       f"total {fmt_eur(f['total_over_period'])}")
+            elif rule == "committee_capture":
+                print(f"    {f['body'][:55]}")
+                print(f"      → {f['direct_awards']}/{f['total_awards']} awards ({f['share']*100:.0f}%)")
+            elif rule == "copy_paste_amount":
+                print(f"    {f['supplier_name']} (AFM {f['supplier_tax_id']}) "
+                      f"— €{f['amount']:,.2f} × {f['occurrences']} times  dates: {f['dates']}")
+            elif rule == "burst_window":
+                print(f"    {f['supplier_name']} (AFM {f['supplier_tax_id']}) "
+                      f"— {f['awards_in_window']} awards {f['window_start']}→{f['window_end']} "
+                      f"total {fmt_eur(f['total_amount']) if f['total_amount'] else '?'}")
+            elif rule == "price_standardisation":
+                print(f"    €{f['amount']:,.2f} paid to {f['distinct_suppliers']} different suppliers "
+                      f"({f['total_occurrences']} total occurrences)")
+                for s in f['suppliers'][:3]:
+                    print(f"      · {s}")
             else:
                 print(f"    {f}")
 
@@ -444,8 +654,8 @@ def print_report(results: list[dict]) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Procurement signal detector")
     parser.add_argument("--org", required=True, help="Organisation UID")
-    parser.add_argument("--tenets", default="T5,T6,T8",
-                        help="Comma-separated list of tenets to run (default: T5,T6,T8)")
+    parser.add_argument("--tenets", default="T5,T6,T8,T9A,T9B,T9C,T9D",
+                        help="Comma-separated list of tenets to run (default: all)")
     parser.add_argument("--json", action="store_true", dest="output_json",
                         help="Output machine-readable JSON")
     args = parser.parse_args()
