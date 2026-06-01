@@ -337,6 +337,33 @@ def detect_t8(df: pd.DataFrame) -> dict:
             "findings": [],
         }
 
+    # Remove known data-quality artefact: some records have the supplier AFM
+    # entered in the amount field (awardAmount == AFM numerically).
+    # Exclude amounts numerically within 1% of supplier_tax_id when amount > €1M.
+    afm_numeric = pd.to_numeric(awards["supplier_tax_id"], errors="coerce")
+    afm_as_amount = (
+        awards["amount"].notna() &
+        afm_numeric.notna() &
+        (awards["amount"] > 1_000_000) &
+        (((awards["amount"] - afm_numeric).abs() / afm_numeric.clip(lower=1)) < 0.01)
+    )
+    if afm_as_amount.any():
+        n_excluded = int(afm_as_amount.sum())
+        awards = awards[~afm_as_amount]
+        # Store for reporting
+        _t8_afm_excluded = n_excluded
+    else:
+        _t8_afm_excluded = 0
+
+    if awards.empty:
+        return {
+            "tenet": "T8",
+            "name": "Single-source monopoly",
+            "fired": False,
+            "note": "No valid direct awards after data-quality filtering",
+            "findings": [],
+        }
+
     yearly = (
         awards.groupby(["year", "supplier_tax_id"])
         .agg(total=("amount", "sum"), count=("amount", "count"), name=("supplier_name", "first"))
@@ -395,7 +422,7 @@ def detect_t8(df: pd.DataFrame) -> dict:
                     ],
                 })
 
-    return {
+    result = {
         "tenet": "T8",
         "name": "Single-source monopoly",
         "years_analysed": sorted(awards["year"].dropna().astype(int).unique().tolist()),
@@ -403,6 +430,9 @@ def detect_t8(df: pd.DataFrame) -> dict:
         "fired": len(findings) > 0,
         "findings": clean(findings),
     }
+    if _t8_afm_excluded:
+        result["data_quality_note"] = f"{_t8_afm_excluded} record(s) excluded: amount == supplier AFM (data entry error)"
+    return result
 
 
 # ── T1 · Direct award concentration (rolling 3-year) ─────────────────────────
