@@ -62,13 +62,14 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 
 # ── Rule parameters ──────────────────────────────────────────────────────────
 
+# Use accented stems — pandas case=False does NOT strip Greek accent marks,
+# so "διαπραγματ" will NOT match "διαπραγμάτευσης". Use the accented stem.
 T5_KEYWORDS = (
-    "διαπραγμάτευση χωρίς προηγούμενη δημοσίευση",
-    "διαπραγματευση χωρις προηγουμενη δημοσιευση",
-    "αδυναμία ανταγωνισμού",
-    "αδυναμια ανταγωνισμου",
-    "μοναδικός προμηθευτής",
-    "μοναδικος προμηθευτης",
+    "διαπραγμάτευσ",       # covers all inflections: -η, -ης, -ησης, -ήσει
+    "αδυναμία ανταγωνισμ",
+    "αδυναμια ανταγωνισμ",
+    "μοναδικός προμηθευτ",
+    "μοναδικος προμηθευτ",
 )
 # Subjects containing these phrases are council procedural decisions
 # (urgent agenda items), NOT emergency procurement — exclude them
@@ -83,6 +84,7 @@ T5_HIGH_VALUE = 60_000    # €60k — double the direct-award ceiling
 
 T6_YEAREND_START_DAY = 22  # Dec 22–31
 T6_YEAREND_MULTIPLIER = 3.0
+T6_MIN_YEAR_DECISIONS = 3000  # skip years with sparse data (incomplete fetch)
 T6_WEEKEND_AMOUNT = 5_000  # €5k minimum for a weekend award to be flagged
 T6_MONTHLY_MULTIPLIER = 2.5
 
@@ -235,8 +237,8 @@ def detect_t6(df: pd.DataFrame) -> dict:
     # ── T6a: year-end burst ──
     for year, grp in df.groupby("year"):
         grp = grp[grp["issue_date"].notna()].copy()
-        if len(grp) < 30:
-            continue
+        if len(grp) < T6_MIN_YEAR_DECISIONS:
+            continue  # sparse year — data incomplete, baseline unreliable
 
         yearend = grp[(grp["month"] == 12) & (grp["day"] >= T6_YEAREND_START_DAY)]
         baseline = grp[~((grp["month"] == 12) & (grp["day"] >= T6_YEAREND_START_DAY))]
@@ -412,7 +414,7 @@ def detect_t9a(df: pd.DataFrame) -> dict:
     awards["_body"] = awards["subject"].str.extract(
         r"(ΕΠΙΤΡΟΠ[ΗΣ\w\s]{0,40}?(?:ΣΥΝΤΗΡ|ΑΝΑΘΕΣ|ΕΚΤΕΛ|ΔΙΑΧΕΙΡ|ΑΞΙΟΛΟΓ)[Α-Ωα-ω\s]{0,30})",
         expand=False
-    ).str.strip().str[:60]
+    ).str.strip().str.replace(r"\s+", " ", regex=True).str[:60]  # collapse newlines/spaces
 
     body_counts = awards["_body"].value_counts()
     findings = []
@@ -482,9 +484,14 @@ def detect_t9b(df: pd.DataFrame) -> dict:
 
 # ── T9C · 30-day award burst ──────────────────────────────────────────────────
 
+DIRECT_AWARD_TYPES = {"ΑΝΑΘΕΣΗ ΕΡΓΩΝ / ΠΡΟΜΗΘΕΙΩΝ / ΥΠΗΡΕΣΙΩΝ / ΜΕΛΕΤΩΝ", "Procurement assignment"}
+
+
 def detect_t9c(df: pd.DataFrame) -> dict:
+    # Only direct awards — ΚΑΤΑΚΥΡΩΣΗ (competitive tender finalization) is
+    # legitimate and should NOT be flagged as a burst.
     awards = df[
-        is_procurement(df) &
+        df["decision_type"].isin(DIRECT_AWARD_TYPES) &
         df["supplier_tax_id"].notna() &
         df["issue_date"].notna()
     ].copy()
