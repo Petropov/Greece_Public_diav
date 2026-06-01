@@ -109,8 +109,8 @@
       <div class="lbl">Largest single anomalous direct award</div>
     </div>
     <div class="stat">
-      <div class="val">87%</div>
-      <div class="lbl">Orgs with T6 temporal clustering</div>
+      <div class="val">8 detectors</div>
+      <div class="lbl">T1·T5·T6·T8·T9A·T9B·T9C·T9D</div>
     </div>
   </div>
 
@@ -119,6 +119,7 @@
     <button class="tab" onclick="show('findings')">Top Findings</button>
     <button class="tab" onclick="show('signals')">Signal Frequency</button>
     <button class="tab" onclick="show('network')">Cross-Org Network</button>
+    <button class="tab" onclick="show('hospitals')">Hospital Pattern</button>
   </div>
 
   <!-- RANKING TAB -->
@@ -408,6 +409,16 @@
       </thead>
       <tbody>
         <tr>
+          <td><span class="badge badge-orange">T1</span></td>
+          <td>Direct award concentration (>25% of spend to one supplier over full history)</td>
+          <td>3 / 23</td>
+          <td>
+            <div class="freq-bar"><div class="freq-bar-fill" style="width:13%"></div></div>
+            <span style="font-size:.8rem;color:var(--muted)">13%</span>
+          </td>
+          <td style="font-size:.78rem;color:var(--muted)">Art. 118 N. 4412/2016 · OLAF Red Flag</td>
+        </tr>
+        <tr>
           <td><span class="badge badge-red">T6</span></td>
           <td>Temporal clustering (year-end burst, weekend/holiday awards)</td>
           <td>20 / 23</td>
@@ -483,6 +494,59 @@
     <div style="margin-top:28px;padding:20px;background:var(--surface);border:1px solid var(--border);border-radius:10px;font-size:.86rem;color:var(--muted)">
       <strong style="color:var(--text)">Methodology note:</strong> T6 fires in 87% of organisations because year-end budget absorption and some weekend contract signings are structurally common in Greek public administration. T6 alone is a weak signal; it gains evidentiary weight when co-occurring with T5, T8, or T9A. The high co-occurrence rate of T9B + T9C + T9D (all three in 13/23 orgs) suggests that copy-paste procurement templates are endemic — this may reflect administrative convenience as much as fraud, but the pattern is a reliable discriminator for further manual review.
     </div>
+  </div>
+
+  <!-- HOSPITALS TAB -->
+  <div id="hospitals" class="pane">
+
+    <div class="network-note" style="background:rgba(220,38,38,.07);border-color:rgba(220,38,38,.3)">
+      <strong style="color:#f87171">🏥 Recurring pattern: Hospital cleaning monopoly via emergency procedure.</strong>
+      Two Greek general hospitals in our dataset share the same structural anomaly — a single cleaning company captures the majority of direct-award spend through repeated use of the negotiated-without-publication emergency bypass, rather than open competitive tenders.
+    </div>
+
+    <div class="finding-card critical">
+      <h3>ΓΝ ΛΑΜΙΑΣ — ISS / UNISON FACILITY SERVICES (AFM 094081864)</h3>
+      <div class="org-tag">ORG 99221923 · T1 + T8 + T5 fired · 6 tenets total</div>
+      <div class="amount">€3,259,050 via direct award (2020–2026)</div>
+      <div class="detail">
+        <strong>27% of all direct-award spend</strong> over the full 7-year period, concentrated in large single contracts.<br>
+        <strong>T8 (2026):</strong> 71.5% of 2026 direct-award spend (€1.74M, 3 contracts)<br>
+        <strong>T5 emergency awards:</strong> €680,859 (2025) + €772,767 (2026) via negotiated-without-publication<br>
+        The 2026 €773k award subject: <em>"Cleaning services extended 5 additional months via negotiated procedure"</em> — a recurring operational service bypassing the open tender obligation.<br>
+        <strong>Note on name:</strong> AFM 094081864 appears as "ISS FACILITY SERVICES" in some ADAs and "UNISON FACILITY SERVICES" in others — may reflect a corporate rebranding or data inconsistency. Requires verification.
+      </div>
+      <div class="ada">Key ADAs: 9Π3Γ4690ΒΜ-ΡΗΠ (€773k) · ΨΜΧΥ4690ΒΜ-75Β (€681k)</div>
+    </div>
+
+    <div class="finding-card high">
+      <h3>ΓΝ ΤΡΙΚΑΛΩΝ — ΓΕΝ ΚΑ ΑΕ (AFM 094510036)</h3>
+      <div class="org-tag">ORG 99221946 · T1 fired · 4 tenets total</div>
+      <div class="amount">€2,356,620 via direct award (2025–2026)</div>
+      <div class="detail">
+        <strong>ΓΕΝ ΚΑ ΕΤΑΙΡΕΙΑ ΟΛΟΚΛΗΡΩΜΕΝΗΣ ΔΙΑΧΕΙΡΙΣΗΣ ΚΤΗΡΙΑΚΩΝ ΕΓΚΑΤΑΣΤΑΣΕΩΝ ΑΕ</strong><br>
+        <strong>34% of all direct-award spend</strong> across 3 contracts.<br>
+        <strong>T4 pattern visible:</strong> Contract 10/2025 (€755,857) → Amendment upward to €800,382 → Next contract 49/2026 at exactly €800,382 (same amount copied from amendment). This is the textbook amendment-inflation lifecycle: original contract below threshold → amendment crosses threshold → next contract priced off inflated base.<br><br>
+        <strong>Timeline:</strong><br>
+        &nbsp;• 2025-03-30 — Contract 10/2025: €755,857 (ADA: ΨΕΗΠ46907Φ-Ψ6Φ)<br>
+        &nbsp;• 2025-04-29 — Amendment to contract 10/2025: +€800,382 (ADA: ΨΥΖΚ46907Φ-4ΣΓ)<br>
+        &nbsp;• 2026-05-30 — Contract 49/2026: €800,382 — same amount as amendment (ADA: 9ΨΛΖ46907Φ-Σ0Τ)
+      </div>
+    </div>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px 24px;margin-top:20px">
+      <h3 style="margin-bottom:12px;font-size:.95rem">Common pattern: why this matters</h3>
+      <div style="font-size:.86rem;color:var(--muted);line-height:1.7">
+        Hospital cleaning is a <strong style="color:var(--text)">predictable, recurring need</strong> with well-established market competition in Greece (multiple companies compete at scale). There is no legitimate basis for invoking the emergency negotiated procedure (Art. 32 Dir. 2014/24/EU) for a routine annual service contract. When the same company is continuously renewed via emergency extension rather than open tender:
+        <ul style="margin:10px 0 10px 20px">
+          <li>The hospital avoids the competition that would force pricing downward</li>
+          <li>The incumbent company faces no competitive pressure to improve service or price</li>
+          <li>Each extension resets the clock and prevents any challenger from participating</li>
+          <li>The cumulative value (€3.26M + €2.36M across just 2 hospitals) far exceeds the EU publication threshold</li>
+        </ul>
+        This pattern should be referred to <strong style="color:var(--text)">ΕΑΔΗΣΥ</strong> (procurement oversight authority) and the relevant hospital boards.
+      </div>
+    </div>
+
   </div>
 
   <!-- NETWORK TAB -->
