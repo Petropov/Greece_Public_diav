@@ -111,6 +111,15 @@ PROCUREMENT_TYPES = {
     "Contract award",
 }
 
+# Subset of PROCUREMENT_TYPES that represents genuine direct awards (no tender).
+# ΚΑΤΑΚΥΡΩΣΗ (competitive tender finalisation) and ΣΥΜΒΑΣΗ (signed contract, may
+# follow a tender) are excluded — they represent competitive procedures and should
+# NOT be flagged as single-source monopolies.
+DIRECT_AWARD_TYPES = {
+    "ΑΝΑΘΕΣΗ ΕΡΓΩΝ / ΠΡΟΜΗΘΕΙΩΝ / ΥΠΗΡΕΣΙΩΝ / ΜΕΛΕΤΩΝ",
+    "Procurement assignment",
+}
+
 # Greek public holidays (recurring dates, MM-DD)
 GREEK_HOLIDAYS = {
     "01-01", "01-06", "03-25", "05-01", "08-15",
@@ -321,8 +330,11 @@ def detect_t6(df: pd.DataFrame) -> dict:
 # ── T8 · Single-source monopoly ──────────────────────────────────────────────
 
 def detect_t8(df: pd.DataFrame) -> dict:
+    # T8 targets single-source DIRECT award monopoly — use DIRECT_AWARD_TYPES,
+    # not PROCUREMENT_TYPES, so that competitive tender finalisations (ΚΑΤΑΚΥΡΩΣΗ)
+    # and signed contracts (ΣΥΜΒΑΣΗ) do not trigger false-positive monopoly signals.
     awards = df[
-        is_procurement(df) &
+        df["decision_type"].isin(DIRECT_AWARD_TYPES) &
         df["supplier_tax_id"].notna() &
         df["amount"].notna() &
         (df["amount"] > 0)
@@ -628,9 +640,6 @@ def detect_t9b(df: pd.DataFrame) -> dict:
 
 
 # ── T9C · 30-day award burst ──────────────────────────────────────────────────
-
-DIRECT_AWARD_TYPES = {"ΑΝΑΘΕΣΗ ΕΡΓΩΝ / ΠΡΟΜΗΘΕΙΩΝ / ΥΠΗΡΕΣΙΩΝ / ΜΕΛΕΤΩΝ", "Procurement assignment"}
-
 
 def detect_t9c(df: pd.DataFrame) -> dict:
     # Only direct awards — ΚΑΤΑΚΥΡΩΣΗ (competitive tender finalization) is
