@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ΓΝΑ ΑΧΕΠΑ — Procurement Intelligence Brief</title>
+<style>
+  :root{--bg:#0f1117;--card:#1a1d27;--card2:#1e2133;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--red:#ef4444;--orange:#f97316;--amber:#f59e0b;--green:#22c55e;--teal:#14b8a6;--blue:#3b82f6}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;font-size:14px;line-height:1.6}
+  .header{background:var(--card);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+  .header-title{font-size:1.05rem;font-weight:700;color:#fff}
+  .header-sub{color:var(--muted);font-size:.8rem;margin-top:2px}
+  .badge{background:rgba(99,102,241,.15);color:var(--accent);border:1px solid rgba(99,102,241,.3);border-radius:9999px;padding:3px 10px;font-size:.75rem;font-weight:600}
+  .tabs{background:var(--card);border-bottom:1px solid var(--border);display:flex;padding:0 24px;overflow-x:auto}
+  .tab{background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);cursor:pointer;font-size:.83rem;font-weight:500;padding:11px 14px;white-space:nowrap;transition:color .15s,border-color .15s}
+  .tab:hover{color:var(--text)}
+  .tab.active{border-bottom-color:var(--accent);color:#fff;font-weight:600}
+  .tab .cnt{display:inline-block;background:rgba(99,102,241,.2);color:var(--accent);border-radius:9999px;padding:1px 6px;font-size:.68rem;margin-left:4px}
+  .tab .cnt-red{background:rgba(239,68,68,.2);color:#fca5a5}
+  .tab .cnt-amber{background:rgba(245,158,11,.2);color:#fcd34d}
+  .pane{display:none;padding:24px;max-width:1300px;margin:0 auto}
+  .pane.active{display:block}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .grid-5{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+  @media(max-width:900px){.grid-3{grid-template-columns:1fr 1fr}.grid-5{grid-template-columns:repeat(3,1fr)}}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 18px}
+  .kv-label{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
+  .kv-val{font-size:1.3rem;font-weight:700;line-height:1.2}
+  .kv-sub{font-size:.7rem;color:var(--muted);margin-top:2px}
+  .notice{border-radius:8px;padding:12px 16px;font-size:.82rem;line-height:1.7;margin-bottom:16px}
+  .notice-amber{background:rgba(245,158,11,.08);border-left:3px solid var(--amber)}
+  .notice-red{background:rgba(239,68,68,.08);border-left:3px solid var(--red)}
+  .notice-blue{background:rgba(59,130,246,.08);border-left:3px solid var(--blue)}
+  .notice-indigo{background:rgba(99,102,241,.08);border-left:3px solid var(--accent)}
+  .notice b{color:#fff}
+  table{width:100%;border-collapse:collapse;font-size:.78rem}
+  th{background:#111320;color:var(--muted);font-weight:600;padding:7px 10px;text-align:left;border-bottom:1px solid var(--border);font-size:.7rem;text-transform:uppercase;letter-spacing:.04em}
+  td{padding:7px 10px;border-bottom:1px solid rgba(42,45,62,.5);vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  tr:hover td{background:rgba(99,102,241,.04)}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .ada{font-family:monospace;font-size:.73rem;color:#93c5fd}
+  .badge-red{background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.3);border-radius:4px;padding:2px 7px;font-size:.7rem;font-weight:600}
+  .badge-amber{background:rgba(245,158,11,.15);color:#fcd34d;border:1px solid rgba(245,158,11,.3);border-radius:4px;padding:2px 7px;font-size:.7rem;font-weight:600}
+  .badge-green{background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.3);border-radius:4px;padding:2px 7px;font-size:.7rem;font-weight:600}
+  .section-title{font-size:.88rem;font-weight:700;color:#fff;margin:18px 0 10px}
+  .pill{display:inline-block;border-radius:9999px;padding:2px 8px;font-size:.7rem;font-weight:600;margin:1px}
+  .pill-red{background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.3)}
+  .pill-amber{background:rgba(245,158,11,.15);color:#fcd34d;border:1px solid rgba(245,158,11,.3)}
+  .pill-indigo{background:rgba(99,102,241,.15);color:#a5b4fc;border:1px solid rgba(99,102,241,.3)}
+  .timeline{position:relative;padding-left:20px}
+  .timeline::before{content:'';position:absolute;left:6px;top:0;bottom:0;width:2px;background:var(--border)}
+  .tl-item{position:relative;padding-bottom:14px}
+  .tl-dot{position:absolute;left:-17px;top:4px;width:10px;height:10px;border-radius:50%;border:2px solid var(--border)}
+  .tl-dot-red{background:rgba(239,68,68,.5);border-color:var(--red)}
+  .tl-dot-amber{background:rgba(245,158,11,.5);border-color:var(--amber)}
+  .tl-dot-green{background:rgba(34,197,94,.5);border-color:var(--green)}
+  .tl-year{font-size:.68rem;color:var(--muted);font-weight:600}
+  .tl-amount{font-weight:700;font-size:.88rem}
+  .tl-detail{font-size:.75rem;color:var(--muted)}
+  .bar-bg{background:var(--border);border-radius:3px;height:6px;width:100%;margin-top:4px}
+  .bar-fill{height:6px;border-radius:3px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-title">ΓΝΑ ΑΧΕΠΑ · Πανεπιστημιακό Γενικό Νοσοκομείο Θεσσαλονίκης</div>
+    <div class="header-sub">Org 99221998 · 700 beds · 43,994 decisions (2019–2026) · €169.3M cumulative ΑΝΑΘΕΣΗ</div>
+  </div>
+  <span class="badge">4 signals fired · rank #10</span>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="show('ov',this)">Overview</button>
+  <button class="tab" onclick="show('t5',this)">T5 — Emergency <span class="cnt cnt-red">30</span></button>
+  <button class="tab" onclick="show('t6',this)">T6 — Timing <span class="cnt cnt-amber">2</span></button>
+  <button class="tab" onclick="show('t18',this)">T1+T8 — Concentration <span class="cnt cnt-amber">5</span></button>
+</div>
+
+<!-- ═══════════════ OVERVIEW ═══════════════ -->
+<div class="pane active" id="pane-ov">
+  <div class="grid-5" style="margin-bottom:20px">
+    <div class="card"><div class="kv-label">Signals fired</div><div class="kv-val" style="color:#fca5a5">4 / 9</div><div class="kv-sub">T1 T5 T6 T8</div></div>
+    <div class="card"><div class="kv-label">ΑΝΑΘΕΣΗ decisions</div><div class="kv-val">1,249</div><div class="kv-sub">€169.3M total amount</div></div>
+    <div class="card"><div class="kv-label">Emergency (T5)</div><div class="kv-val" style="color:#fcd34d">49</div><div class="kv-sub">3.4% of procurement decisions</div></div>
+    <div class="card"><div class="kv-label">Art.32§2γ span</div><div class="kv-val">2019–2026</div><div class="kv-sub">7 consecutive years</div></div>
+    <div class="card"><div class="kv-label">Cleaning via emergency</div><div class="kv-val" style="color:#f97316">€8.16M+</div><div class="kv-sub">Continuously renewed contract</div></div>
+  </div>
+
+  <div class="notice notice-red">
+    <b>Core narrative: 7-year routine cleaning contract disguised as perpetual "emergency."</b> ΠΓΝΘ ΑΧΕΠΑ has been renewing cleaning services (καθαριότητα, απολύμανση, συντήρηση πρασίνου, απεντόμωση) under Art.32§2γ emergency without tender every 6 months since at least 2019. The justification — "κατεπείγουσα ανάγκη οφειλόμενη σε απρόβλεπτη περίσταση" — becomes legally void when applied to a routine, predictable, annually recurring service. Total cleaning spend identified through emergency procedures: &gt;€8M (2019–2026).
+  </div>
+
+  <div class="section-title">Cleaning emergency timeline</div>
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-dot tl-dot-red"></div>
+      <div class="tl-year">2019 · 6 decisions · ~€968k</div>
+      <div class="tl-amount">ΑΧΟΥΤΟΣ + IPIROTIKI (multiple contractors)</div>
+      <div class="tl-detail">Monthly cleaning approvals Jul–Nov; amounts €153–170k per 2-month contract. Contractor: Έγκριση Πρακτικού Διαπραγμάτευσης per cycle.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot tl-dot-red"></div>
+      <div class="tl-year">2020 · 4 decisions · €2.05M</div>
+      <div class="tl-amount">IPIROTIKI FACILITY SERVICES (AFM 998309282)</div>
+      <div class="tl-detail">€1,925,770 (Feb-Dec 2020 cleaning, κλειστή ηλεκτρονική διαπραγμάτευση). ADA 61ΞΠ469064-ΒΕΒ. T8: 99.7% of annual direct-award spend.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot tl-dot-amber"></div>
+      <div class="tl-year">2021 · 3 decisions · €351k</div>
+      <div class="tl-amount">Ongoing cleaning, smaller monthly cycles</div>
+      <div class="tl-detail">€204k (Προσφυγή Feb), €73k + €74k (Επικύρωση Apr 2021). T6 fires: Dec 22-31 burst 3× baseline.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot tl-dot-red"></div>
+      <div class="tl-year">2022 · 4 decisions · €1.86M</div>
+      <div class="tl-amount" style="color:#fca5a5">ΑΧΟΥΤΟΣ (named in Έγκριση decision)</div>
+      <div class="tl-detail">€1,143,948 (Έγκριση προσφυγής "στην εταιρεία Α ΧΟΥΤΟ..."). ADA 6Φ4Σ469064-ΟΧ8. Plus €310k + €228k cleaning confirmations. T6 fires: Dec 22-31 burst 3.1× baseline.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot tl-dot-amber"></div>
+      <div class="tl-year">2023 · 4 decisions · €650k</div>
+      <div class="tl-amount">Continuing emergency renewals</div>
+      <div class="tl-detail">€200k + €100k + €124k + €226k across 4 quarterly award confirmations.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot tl-dot-red"></div>
+      <div class="tl-year">2024 · 1 decision · €847k</div>
+      <div class="tl-amount">Έγκριση προσφυγής — single large award</div>
+      <div class="tl-detail">ADA ΨΖΔ7469064-5Ρ2. €847,425 emergency cleaning contract via Art.32§2γ.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot tl-dot-red"></div>
+      <div class="tl-year">2025–2026 · 5 decisions · €2.19M</div>
+      <div class="tl-amount" style="color:#fca5a5">€1,316,327 — 6 months Dec 2025–May 2026</div>
+      <div class="tl-detail">ADA ΨΒΛΛ469064-ΥΡΖ (€1.32M Προσφυγή Oct 2025) + 3× €218,897 monthly approvals (Jan, Feb, Mar 2026). Full service: καθαριότητα, απολύμανση, συντήρηση πρασίνου, απεντόμωση-μυοκτονία. Justification: Art.32§2γ "κατεπείγουσα ανάγκη".</div>
+    </div>
+  </div>
+
+  <div class="section-title" style="margin-top:24px">Signal coverage</div>
+  <table>
+    <thead><tr><th>Tenet</th><th>Status</th><th>Findings</th><th>Key evidence</th></tr></thead>
+    <tbody>
+      <tr><td>T1 · Concentration</td><td><span class="badge-amber">FIRED</span></td><td class="num">2</td><td>AFM 998309282 = 92.6% of 2020 ΑΝΑΘΕΣΗ (€983k); AFM 94510036 = 100% of 2019</td></tr>
+      <tr><td>T4 · Amendment inflation</td><td><span class="badge-green">CLEAN</span></td><td class="num">0</td><td>No consecutive same-supplier ΑΝΑΘΕΣΗ with ≤5% price change</td></tr>
+      <tr><td>T5 · Emergency overuse</td><td><span class="badge-red">FIRED</span></td><td class="num">30</td><td>49 emergency decisions, 3.4% overall rate, 2019–2026 continuous cleaning</td></tr>
+      <tr><td>T6 · Timing</td><td><span class="badge-amber">FIRED</span></td><td class="num">2</td><td>2021 Dec burst 3.0×; 2022 Dec burst 3.1× baseline daily rate</td></tr>
+      <tr><td>T8 · Monopoly</td><td><span class="badge-amber">FIRED</span></td><td class="num">3</td><td>2019 AFM 94510036 100%; 2020 IPIROTIKI 99.7%; 2021 AFM 999723663 100%</td></tr>
+      <tr><td>T9B · Copy-paste</td><td><span class="badge-green">CLEAN</span></td><td class="num">0</td><td>—</td></tr>
+      <tr><td>T9C · Lot-splitting</td><td><span class="badge-green">CLEAN</span></td><td class="num">0</td><td>—</td></tr>
+      <tr><td>T9D · Price standardisation</td><td><span class="badge-green">CLEAN</span></td><td class="num">0</td><td>—</td></tr>
+    </tbody>
+  </table>
+
+  <div class="notice notice-amber" style="margin-top:16px">
+    <b>Cross-hospital alert — IPIROTIKI FACILITY SERVICES (AFM 998309282):</b> The dominant 2020 cleaning contractor at ΓΝΑ ΑΧΕΠΑ also appears as the emergency catering/food supplier at ΓΝ ΙΠΠΟΚΡΑΤΕΙΟ Θεσσαλονίκης (same city). Both hospitals use Art.32§2γ emergency procedures for routine facility services. Cross-institutional monopoly pattern warrants joint investigation.
+  </div>
+
+  <div class="notice notice-amber" style="margin-top:12px">
+    <b>ΓΕΝ ΚΑ ΑΕ (AFM 94510036):</b> T8 fires 2019 (100% of that year's direct-award spend, €55,800). Same AFM is the dominant cleaning supplier at ΓΝ ΤΡΙΚΑΛΑ (T8 + T4 findings). Cross-hospital supplier in two different cities (Θεσσαλονίκη + Τρίκαλα) active in emergency cleaning procurement.
+  </div>
+</div>
+
+<!-- ═══════════════ T5 EMERGENCY ═══════════════ -->
+<div class="pane" id="pane-t5">
+  <div class="notice notice-indigo">
+    <b>T5 — Emergency procurement overuse (Art.32§2γ):</b> Detects organisations that repeatedly classify routine, recurring procurement as "emergency" to bypass competitive tender requirements. Fires when annual rate ≥15% of procurement decisions are emergency-classified, or when any single award exceeds €60k under emergency procedure. At ΓΝΑ ΑΧΕΠΑ: 49 emergency decisions over 1,427 procurement decisions (3.4% overall rate). The issue is not the rate alone but the 7-year continuous recurrence for an identical service category (cleaning) — legally incompatible with "unforeseeable emergency" justification.
+  </div>
+  <div class="notice notice-amber">
+    <b>Note on finding count:</b> T5 finds 30 "high-value emergency" decisions here (filtered to &gt;€60k threshold). The full 49 emergency decisions include some below-threshold awards. Many entries are board "Επικύρωση" (ratification) decisions confirming a prior "Προσφυγή" initiation — so ~20 unique emergency contracts underlie the 30 findings.
+  </div>
+
+  <div class="section-title">Top T5 findings — sorted by amount desc</div>
+  <table>
+    <thead><tr><th>#</th><th>Year</th><th>ADA</th><th>Amount</th><th>×Art.118 cap (€60k)</th><th>Subject (truncated)</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>2025</td><td><a class="ada" href="https://diavgeia.gov.gr/doc/ΨΒΛΛ469064-ΥΡΖ" target="_blank">ΨΒΛΛ469064-ΥΡΖ</a></td><td class="num">€1,316,327</td><td class="num" style="color:#fca5a5">22×</td><td>Προσφυγή για καθαριότητα-απολύμανση-πράσινο-απεντόμωση ΑΧΕΠΑ, 6 μήνες Dec'25-May'26</td></tr>
+      <tr><td>2</td><td>2020</td><td><a class="ada" href="https://diavgeia.gov.gr/doc/61ΞΠ469064-ΒΕΒ" target="_blank">61ΞΠ469064-ΒΕΒ</a></td><td class="num">€1,925,770</td><td class="num" style="color:#fca5a5">32×</td><td>Κατακύρωση κλειστής διαπραγμάτευσης (85538), υπηρεσίες καθαριότητας — IPIROTIKI</td></tr>
+      <tr><td>3</td><td>2024</td><td><a class="ada" href="https://diavgeia.gov.gr/doc/ΨΖΔ7469064-5Ρ2" target="_blank">ΨΖΔ7469064-5Ρ2</a></td><td class="num">€847,425</td><td class="num" style="color:#fca5a5">14×</td><td>Έγκριση προσφυγής χωρίς δημοσίευση για καθαριότητα</td></tr>
+      <tr><td>4</td><td>2022</td><td><a class="ada" href="https://diavgeia.gov.gr/doc/6Φ4Σ469064-ΟΧ8" target="_blank">6Φ4Σ469064-ΟΧ8</a></td><td class="num">€1,143,948</td><td class="num" style="color:#fca5a5">19×</td><td>Έγκριση προσφυγής στην εταιρεία ΑΧΟΥΤΟΣ για καθαριότητα (Art.32§2γ)</td></tr>
+      <tr><td>5</td><td>2020</td><td><a class="ada" href="https://diavgeia.gov.gr/doc/99Μ4469064-6ΔΝ" target="_blank">99Μ4469064-6ΔΝ</a></td><td class="num">€481,442</td><td class="num" style="color:#fca5a5">8×</td><td>Επικύρωση Πρακτικού (emergency award confirmation)</td></tr>
+      <tr><td>6</td><td>2022</td><td><a class="ada" href="https://diavgeia.gov.gr/doc/ΨΩΓ8469064-ΓΩΖ" target="_blank">ΨΩΓ8469064-ΓΩΖ</a></td><td class="num">€182,372</td><td class="num" style="color:#fcd34d">3×</td><td>Επικύρωση Πρακτικού Αποσφράγισης και Διαπραγμάτευσης (Mar 2022)</td></tr>
+      <tr><td>7</td><td>2019</td><td><a class="ada" href="https://diavgeia.gov.gr/doc/637Σ469064-Β5Δ" target="_blank">637Σ469064-Β5Δ</a></td><td class="num">€170,119</td><td class="num" style="color:#fcd34d">3×</td><td>Κατακύρωση ηλεκτρονικής (80073) διαπραγμάτευσης — ΥΠΗΡΕΣΙΕΣ ΚΑΘΑΡΙΟΤΗΤΑΣ</td></tr>
+      <tr><td>8</td><td>2019</td><td><a class="ada" href="https://diavgeia.gov.gr/doc/63ΘΩ469064-ΧΕΔ" target="_blank">63ΘΩ469064-ΧΕΔ</a></td><td class="num">€170,500</td><td class="num" style="color:#fcd34d">3×</td><td>Έγκριση Πρακτικού Διαπραγμάτευσης Oct 2019</td></tr>
+      <tr><td>9</td><td>2019</td><td><a class="ada" href="https://diavgeia.gov.gr/doc/ΩΘ1Ε469064-Β9Ξ" target="_blank">ΩΘ1Ε469064-Β9Ξ</a></td><td class="num">€170,500</td><td class="num" style="color:#fcd34d">3×</td><td>Έγκριση Πρακτικού Διαπραγμάτευσης Nov 2019</td></tr>
+      <tr><td>10</td><td>2026</td><td><a class="ada" href="https://diavgeia.gov.gr/doc/ΨΒΖ3469064-ΚΣΥ" target="_blank">ΨΒΖ3469064-ΚΣΥ</a></td><td class="num">€218,897</td><td class="num" style="color:#fcd34d">4×</td><td>Προσφυγή καθαριότητα-απολύμανση-πράσινο Jan 2026</td></tr>
+      <tr><td>11</td><td>2026</td><td><a class="ada" href="https://diavgeia.gov.gr/doc/9ΤΚΘ469064-8Μ9" target="_blank">9ΤΚΘ469064-8Μ9</a></td><td class="num">€218,897</td><td class="num" style="color:#fcd34d">4×</td><td>Έγκριση Πρακτικού Διαπραγμάτευσης Jan 2026</td></tr>
+      <tr><td>12</td><td>2026</td><td><a class="ada" href="https://diavgeia.gov.gr/doc/ΨΕ1Υ469064-5ΨΕ" target="_blank">ΨΕ1Υ469064-5ΨΕ</a></td><td class="num">€218,897</td><td class="num" style="color:#fcd34d">4×</td><td>Έγκριση Πρακτικού Διαπραγμάτευσης Feb 2026</td></tr>
+      <tr><td>13</td><td>2023</td><td><a class="ada" href="https://diavgeia.gov.gr/doc/ΡΠΥ3469064-Ζ6Β" target="_blank">ΡΠΥ3469064-Ζ6Β</a></td><td class="num">€225,887</td><td class="num" style="color:#fcd34d">4×</td><td>Επικύρωση Πρακτικού Διαπραγμάτευσης Nov 2023</td></tr>
+      <tr><td>14</td><td>2020</td><td><a class="ada" href="https://diavgeia.gov.gr/doc/9Ι6Β469064-2ΜΡ" target="_blank">9Ι6Β469064-2ΜΡ</a></td><td class="num">€214,892</td><td class="num" style="color:#fcd34d">4×</td><td>Προσφυγή χωρίς δημοσίευση — καθαριότητα</td></tr>
+      <tr><td>15</td><td>2021</td><td><a class="ada" href="https://diavgeia.gov.gr/doc/6ΧΜΓ469064-ΨΙ9" target="_blank">6ΧΜΓ469064-ΨΙ9</a></td><td class="num">€204,227</td><td class="num" style="color:#fcd34d">3×</td><td>Προσφυγή χωρίς δημοσίευση — καθαριότητα (Προσφυγή Feb 2021)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="notice notice-red" style="margin-top:16px">
+    <b>Legal analysis:</b> Art.32§2γ of Law 4412/2016 allows emergency without tender for "κατεπείγουσα ανάγκη οφειλόμενη σε απρόβλεπτη περίσταση" (urgent need caused by unforeseeable circumstances). A cleaning contract renewed every 6 months for 7 consecutive years is neither "urgent" (it is predictable months in advance) nor "unforeseeable" (it is the termination of the previous contract — a perfectly foreseeable event). The applicable Directive 2014/24/EU Art.32(2)(c) requires the circumstances to be "not attributable to the contracting authority" — repeated failure to tender in advance is attributable to the administration. ΑΧΕΠΑ's use of this procedure is structurally unlawful.
+  </div>
+</div>
+
+<!-- ═══════════════ T6 TIMING ═══════════════ -->
+<div class="pane" id="pane-t6">
+  <div class="notice notice-indigo">
+    <b>T6 — Temporal clustering:</b> Detects abnormal concentrations of procurement decisions in year-end windows (Dec 22-31), weekends, or public holidays — patterns suggesting deadline pressure, retroactive documentation, or irregular posting schedules. At ΓΝΑ ΑΧΕΠΑ: T6 fires in 2021 and 2022 at the minimum 3× threshold, suggesting year-end pressure is consistent but not extreme.
+  </div>
+
+  <div class="section-title">Year-end procurement bursts</div>
+  <table>
+    <thead><tr><th>Year</th><th>Dec 22-31 decisions</th><th>Baseline daily rate</th><th>Burst daily rate</th><th>Multiplier</th><th>Assessment</th></tr></thead>
+    <tbody>
+      <tr><td>2021</td><td class="num">16</td><td class="num">0.5/day</td><td class="num">1.6/day</td><td class="num" style="color:#fcd34d">3.0×</td><td>Marginal — exactly at threshold. Consistent with year-end contract signing pressure.</td></tr>
+      <tr><td>2022</td><td class="num">21</td><td class="num">0.7/day</td><td class="num">2.1/day</td><td class="num" style="color:#fcd34d">3.1×</td><td>Marginal — same pattern as 2021. Note: T6 also fires in 2022 at ΓΝ ΛΑΜΙΑ and ΓΝ ΤΡΙΚΑΛΑ — may reflect system-wide year-end administrative pressure.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="notice notice-blue" style="margin-top:16px">
+    <b>Context:</b> The T6 bursts at ΑΧΕΠΑ are marginal (at threshold). They likely reflect the year-end administrative cycle for confirming pending procurement decisions before the fiscal year closes. Compare: ΓΝ ΚΑΡΔΙΤΣΑ T6 is 46–66× (structurally anomalous); ΓΝ ΛΑΜΙΑ T6 is 5–8× (elevated). ΑΧΕΠΑ's 3× is the minimum threshold and not a standalone red flag without the T5 context.
+  </div>
+</div>
+
+<!-- ═══════════════ T1 + T8 CONCENTRATION ═══════════════ -->
+<div class="pane" id="pane-t18">
+  <div class="notice notice-indigo">
+    <b>T1 — Direct award concentration:</b> Fires when a single supplier accounts for ≥50% of direct-award spend over a 3-year window. T8 — Single-source monopoly: Fires when a single supplier accounts for ≥70% of annual direct-award spend (critical threshold: ≥70% in any year). At ΓΝΑ ΑΧΕΠΑ, both fire on supplier concentration — but supplier_tax_id is only available for 5 of 1,249 ΑΝΑΘΕΣΗ decisions, meaning most of the €169M is opaque to AFM-based detectors.
+  </div>
+
+  <div class="notice notice-amber">
+    <b>Data limitation:</b> 1,244 of 1,249 ΑΝΑΘΕΣΗ decisions have no supplier_tax_id in the normalized data. T1 and T8 can only analyse the 5 decisions (out of €169.3M) where the supplier AFM was captured. The findings below represent a small visible slice, not the full picture.
+  </div>
+
+  <div class="section-title">T8 — Single-source monopoly findings</div>
+  <table>
+    <thead><tr><th>Year</th><th>Supplier AFM</th><th>Supplier name</th><th>Total ΑΝΑΘΕΣΗ</th><th>Share</th><th>Contracts</th><th>Rule</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>2019</td>
+        <td class="ada">94510036</td>
+        <td>ΓΕΝ ΚΑ ΑΕ <span style="color:var(--muted);">(cross-hospital: also at ΓΝ ΤΡΙΚΑΛΑ)</span></td>
+        <td class="num">€55,800</td>
+        <td class="num" style="color:#fca5a5">100%</td>
+        <td class="num">2</td>
+        <td><span class="badge-red">T8 critical</span></td>
+      </tr>
+      <tr>
+        <td>2020</td>
+        <td class="ada">998309282</td>
+        <td>IPIROTIKI FACILITY SERVICES <span style="color:var(--muted);">(καθαριότητα; cross-hospital: also at ΓΝ ΙΠΠΟΚΡΑΤΕΙΟ)</span></td>
+        <td class="num">€982,685</td>
+        <td class="num" style="color:#fca5a5">99.7%</td>
+        <td class="num">2</td>
+        <td><span class="badge-red">T8 critical</span></td>
+      </tr>
+      <tr>
+        <td>2021</td>
+        <td class="ada">999723663</td>
+        <td>AFM 999723663 (identity unverified)</td>
+        <td class="num">€20,000</td>
+        <td class="num" style="color:#fca5a5">100%</td>
+        <td class="num">1</td>
+        <td><span class="badge-amber">T8 elevated</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="section-title" style="margin-top:20px">T1 — Concentration findings (2019–2021 window)</div>
+  <table>
+    <thead><tr><th>Supplier AFM</th><th>Supplier name</th><th>3-yr spend</th><th>3-yr spend share</th><th>Award count</th><th>Years active</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="ada">998309282</td>
+        <td>IPIROTIKI FACILITY SERVICES</td>
+        <td class="num">€982,685</td>
+        <td class="num" style="color:#fca5a5">92.6%</td>
+        <td class="num">2</td>
+        <td>2020 only</td>
+      </tr>
+      <tr>
+        <td class="ada">94510036</td>
+        <td>ΓΕΝ ΚΑ ΑΕ</td>
+        <td class="num">€55,800</td>
+        <td class="num" style="color:#fcd34d">5.3%</td>
+        <td class="num">2</td>
+        <td>2019 only</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="notice notice-amber" style="margin-top:16px">
+    <b>Cross-hospital supplier network:</b>
+    <ul style="margin-top:6px;padding-left:20px;font-size:.82rem">
+      <li><b>IPIROTIKI FACILITY SERVICES (AFM 998309282)</b>: Emergency cleaning at ΓΝΑ ΑΧΕΠΑ (2020, €1.93M) + emergency catering/food at ΓΝ ΙΠΠΟΚΡΑΤΕΙΟ (2019–2026, multiple contracts). Both Θεσσαλονίκη hospitals, both using Art.32§2γ.</li>
+      <li><b>ΓΕΝ ΚΑ ΑΕ (AFM 94510036)</b>: Direct awards at ΓΝΑ ΑΧΕΠΑ (2019) + dominant cleaning supplier at ΓΝ ΤΡΙΚΑΛΑ (T4 amendment inflation + T8 monopoly, 34% of cleaning spend). Cross-regional supplier in two cities.</li>
+    </ul>
+  </div>
+
+  <div class="notice notice-amber" style="margin-top:12px">
+    <b>2022 anomaly (€45.3M):</b> Direct-award spend in 2022 (€45.3M) is 2.5–4× surrounding years. Not explained by the 4 emergency cleaning decisions (~€1.9M combined). The remaining €43.4M is in 129 ΑΝΑΘΕΣΗ decisions without supplier_tax_id. Possible bulk procurement reclassification or data migration event during COVID recovery period. Requires ADA-level verification.
+  </div>
+</div>
+
+<script>
+function show(id,btn){
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('pane-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>
