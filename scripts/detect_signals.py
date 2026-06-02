@@ -2,6 +2,7 @@
 """Signal detectors for procurement intelligence tenets.
 
 Implements:
+  T4  · Amendment inflation (contract amended up; next contract uses inflated base)
   T5  · Emergency procurement overuse
   T6  · Temporal clustering (year-end burst, weekend/holiday awards)
   T8  · Single-source monopoly
@@ -84,9 +85,22 @@ T5_HIGH_VALUE = 60_000    # €60k — double the direct-award ceiling
 
 T6_YEAREND_START_DAY = 22  # Dec 22–31
 T6_YEAREND_MULTIPLIER = 3.0
-T6_MIN_YEAR_DECISIONS = 3000  # skip years with sparse data (incomplete fetch)
+T6_MIN_YEAR_DECISIONS = 20   # min procurement decisions in a year for T6a to fire
+                              # (was 3000 all-decisions; now scoped to procurement types)
 T6_WEEKEND_AMOUNT = 5_000  # €5k minimum for a weekend award to be flagged
 T6_MONTHLY_MULTIPLIER = 2.5
+
+T4_AMOUNT_TOLERANCE = 0.05   # consecutive awards within 5% considered price carry-forward
+T4_MIN_AMOUNT = 50_000        # ignore carry-forwards below €50k
+T4_MAX_GAP_DAYS = 548         # max gap between consecutive contracts (~18 months)
+T4_AMENDMENT_KEYWORDS = (
+    "τροποποίηση",
+    "τροποποιητικ",
+    "τροποπ.",
+    "τροπ. συμβ",
+    "αύξηση αντικειμένου",
+    "αυξηση αντικειμενου",
+)
 
 T1_COUNT_THRESHOLD = 0.30   # supplier with >30% of org's 3-year direct-award count
 T1_AMOUNT_THRESHOLD = 0.25  # or >25% of 3-year direct-award spend
@@ -191,6 +205,130 @@ def clean_row(d: dict) -> dict:
     return out
 
 
+# ── T4 · Amendment inflation ─────────────────────────────────────────────────
+
+def detect_t4(df: pd.DataFrame) -> dict:
+    """T4: Amendment inflation — contract amended upward; next contract starts at
+    the inflated value rather than the original.
+
+    Pattern (confirmed at ΓΝ ΤΡΙΚΑΛΑ and ΓΝ ΛΑΜΙΑ):
+      1. ΑΝΑΘΕΣΗ(N): supplier receives direct award at €X
+      2. ΣΥΜΒΑΣΗ amendment raises it to €X+δ
+      3. ΑΝΑΘΕΣΗ(N+1): same supplier, same service, starts at €X+δ (not €X)
+
+    Detection: for each supplier with 2+ direct awards, flag consecutive pairs
+    where amount[N+1] is within T4_AMOUNT_TOLERANCE of amount[N] and both
+    exceed T4_MIN_AMOUNT.  If an intervening ΣΥΜΒΑΣΗ amendment is found
+    the rule fires as "amendment_inflation"; otherwise as "price_carry".
+    """
+    awards = df[
+        df["decision_type"].isin(DIRECT_AWARD_TYPES) &
+        df["amount"].notna() &
+        (df["amount"] >= T4_MIN_AMOUNT) &
+        df["supplier_tax_id"].notna() &
+        df["issue_date"].notna()
+    ].copy()
+    awards = awards.sort_values(["supplier_tax_id", "issue_date"])
+
+    # Find ΣΥΜΒΑΣΗ records that look like amendments
+    symbasi = df[df["decision_type"] == "ΣΥΜΒΑΣΗ"].copy()
+    if not symbasi.empty and "subject" in symbasi.columns:
+        amend_mask = subject_contains(symbasi, T4_AMENDMENT_KEYWORDS)
+        amendments = symbasi[amend_mask & symbasi["supplier_tax_id"].notna() & symbasi["issue_date"].notna()]
+    else:
+        amendments = pd.DataFrame()
+
+    findings = []
+
+    for supplier_id, grp in awards.groupby("supplier_tax_id"):
+        grp = grp.sort_values("issue_date").reset_index(drop=True)
+        if len(grp) < 2:
+            continue
+
+        sup_amendments = (
+            amendments[amendments["supplier_tax_id"] == supplier_id]
+            if not amendments.empty else pd.DataFrame()
+        )
+
+        for i in range(len(grp) - 1):
+            row_n  = grp.iloc[i]
+            row_n1 = grp.iloc[i + 1]
+
+            amt_n  = float(row_n["amount"])
+            amt_n1 = float(row_n1["amount"])
+            if amt_n <= 0 or amt_n1 <= 0:
+                continue
+
+            gap_days = (row_n1["issue_date"] - row_n["issue_date"]).days
+            if gap_days < 1 or gap_days > T4_MAX_GAP_DAYS:
+                continue
+
+            pct_diff = abs(amt_n1 - amt_n) / amt_n
+            if pct_diff > T4_AMOUNT_TOLERANCE:
+                continue
+
+            # Look for an intervening amendment between the two contracts
+            has_amendment = False
+            amendment_ada = None
+            amendment_amount = None
+            if not sup_amendments.empty:
+                between = sup_amendments[
+                    (sup_amendments["issue_date"] >= row_n["issue_date"]) &
+                    (sup_amendments["issue_date"] <= row_n1["issue_date"])
+                ]
+                if not between.empty:
+                    has_amendment = True
+                    with_amt = between[between["amount"].notna()]
+                    if not with_amt.empty:
+                        best = with_amt.loc[with_amt["amount"].idxmax()]
+                        amendment_ada = str(best.get("ada", "")) or None
+                        amendment_amount = float(best["amount"])
+
+            findings.append({
+                "rule": "amendment_inflation" if has_amendment else "price_carry",
+                "supplier_tax_id": str(supplier_id),
+                "supplier_name": (
+                    str(row_n["supplier_name"])
+                    if pd.notna(row_n.get("supplier_name")) else None
+                ),
+                "contract_n": {
+                    "ada": str(row_n.get("ada", "")) or None,
+                    "date": str(row_n["issue_date"])[:10],
+                    "amount": amt_n,
+                    "subject": str(row_n.get("subject", ""))[:80],
+                },
+                "contract_n1": {
+                    "ada": str(row_n1.get("ada", "")) or None,
+                    "date": str(row_n1["issue_date"])[:10],
+                    "amount": amt_n1,
+                    "subject": str(row_n1.get("subject", ""))[:80],
+                },
+                "gap_days": int(gap_days),
+                "pct_diff": round(pct_diff * 100, 2),
+                "has_amendment": has_amendment,
+                "amendment_ada": amendment_ada,
+                "amendment_amount": amendment_amount,
+            })
+
+    # One finding per supplier — prefer amendment_inflation over price_carry,
+    # then largest amount
+    seen: set = set()
+    deduped = []
+    findings.sort(key=lambda x: (0 if x["rule"] == "amendment_inflation" else 1,
+                                  -x["contract_n"]["amount"]))
+    for f in findings:
+        if f["supplier_tax_id"] not in seen:
+            seen.add(f["supplier_tax_id"])
+            deduped.append(f)
+
+    return {
+        "tenet": "T4",
+        "name": "Amendment inflation",
+        "fired": len(deduped) > 0,
+        "findings": clean(deduped),
+    }
+
+
 # ── T5 · Emergency procurement overuse ───────────────────────────────────────
 
 def detect_t5(df: pd.DataFrame) -> dict:
@@ -245,10 +383,16 @@ def detect_t5(df: pd.DataFrame) -> dict:
 # ── T6 · Temporal clustering ─────────────────────────────────────────────────
 
 def detect_t6(df: pd.DataFrame) -> dict:
+    # Scope T6 to procurement decision types only.
+    # ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ (budget commitments) and ΑΝΑΤΡΟΠΗ (reversals) are posted
+    # in large batches at year-end and on public holidays as routine accounting
+    # operations — NOT procurement anomalies.  Including them produces false positives
+    # for every hospital and municipality that batches financial entries at Dec 31.
+    proc = df[is_procurement(df)].copy()
     findings = []
 
     # ── T6a: year-end burst ──
-    for year, grp in df.groupby("year"):
+    for year, grp in proc.groupby("year"):
         grp = grp[grp["issue_date"].notna()].copy()
         if len(grp) < T6_MIN_YEAR_DECISIONS:
             continue  # sparse year — data incomplete, baseline unreliable
@@ -276,10 +420,10 @@ def detect_t6(df: pd.DataFrame) -> dict:
             })
 
     # ── T6b: weekend high-value awards ──
-    weekend = df[
-        (df["weekday"] >= 5) &
-        df["amount"].notna() &
-        (df["amount"] >= T6_WEEKEND_AMOUNT)
+    weekend = proc[
+        (proc["weekday"] >= 5) &
+        proc["amount"].notna() &
+        (proc["amount"] >= T6_WEEKEND_AMOUNT)
     ]
     for _, row in weekend.sort_values("amount", ascending=False).head(20).iterrows():
         findings.append({
@@ -290,10 +434,11 @@ def detect_t6(df: pd.DataFrame) -> dict:
             "amount": float(row["amount"]),
             "supplier": str(row.get("supplier_name", "")) or None,
             "subject": str(row.get("subject", ""))[:100],
+            "decision_type": str(row.get("decision_type", "")) or None,
         })
 
     # ── T6c: public holiday awards ──
-    holiday_df = df[df["mmdd"].isin(GREEK_HOLIDAYS) & df["amount"].notna() & (df["amount"] >= T6_WEEKEND_AMOUNT)]
+    holiday_df = proc[proc["mmdd"].isin(GREEK_HOLIDAYS) & proc["amount"].notna() & (proc["amount"] >= T6_WEEKEND_AMOUNT)]
     for _, row in holiday_df.sort_values("amount", ascending=False).head(10).iterrows():
         findings.append({
             "rule": "holiday_award",
@@ -301,10 +446,11 @@ def detect_t6(df: pd.DataFrame) -> dict:
             "date": str(row["issue_date"])[:10] if pd.notna(row["issue_date"]) else None,
             "amount": float(row["amount"]),
             "subject": str(row.get("subject", ""))[:100],
+            "decision_type": str(row.get("decision_type", "")) or None,
         })
 
     # ── T6d: monthly spike ──
-    monthly = df.groupby(["year", "month"]).size().reset_index(name="count")
+    monthly = proc.groupby(["year", "month"]).size().reset_index(name="count")
     monthly["rolling_mean"] = monthly.groupby("year")["count"].transform("mean")
     monthly["spike_ratio"] = monthly["count"] / monthly["rolling_mean"]
     spikes = monthly[monthly["spike_ratio"] >= T6_MONTHLY_MULTIPLIER]
@@ -739,6 +885,7 @@ def detect_t9d(df: pd.DataFrame) -> dict:
 
 DETECTORS = {
     "T1": detect_t1,
+    "T4": detect_t4,
     "T5": detect_t5,
     "T6": detect_t6,
     "T8": detect_t8,
@@ -815,6 +962,18 @@ def print_report(results: list[dict]) -> None:
                       f"({f['total_occurrences']} total occurrences)")
                 for s in f['suppliers'][:3]:
                     print(f"      · {s}")
+            elif rule in ("amendment_inflation", "price_carry"):
+                sup = f.get("supplier_name") or f"AFM {f['supplier_tax_id']}"
+                label = "AMENDMENT INFLATION" if rule == "amendment_inflation" else "price carry"
+                print(f"    [{label}] {sup}")
+                n  = f["contract_n"]
+                n1 = f["contract_n1"]
+                print(f"      Contract N  {n['date']}  {fmt_eur(n['amount'])}  {n['subject']}")
+                if f.get("amendment_ada"):
+                    print(f"      Amendment   {f['amendment_ada']}  "
+                          f"{fmt_eur(f['amendment_amount']) if f.get('amendment_amount') else '?'}")
+                print(f"      Contract N+1 {n1['date']}  {fmt_eur(n1['amount'])}  {n1['subject']}")
+                print(f"      gap {f['gap_days']}d  Δ {f['pct_diff']:.1f}%")
             else:
                 print(f"    {f}")
 
@@ -822,7 +981,7 @@ def print_report(results: list[dict]) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Procurement signal detector")
     parser.add_argument("--org", required=True, help="Organisation UID")
-    parser.add_argument("--tenets", default="T1,T5,T6,T8,T9A,T9B,T9C,T9D",
+    parser.add_argument("--tenets", default="T1,T4,T5,T6,T8,T9A,T9B,T9C,T9D",
                         help="Comma-separated list of tenets to run (default: all)")
     parser.add_argument("--json", action="store_true", dest="output_json",
                         help="Output machine-readable JSON")
