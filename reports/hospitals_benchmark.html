@@ -506,6 +506,34 @@ const HOSPITALS = [
       {r:"med",t:"T8 — 2020 single-source concentration",b:"AFM 998309282 = 92.6% of 2020 direct-award spend. This AFM may correspond to ΕΠΥ — verification needed to distinguish ΕΠΥ-routed procurement from genuine single-source monopoly."},
       {r:"med",t:"T1 — 2022 direct-award spike",b:"€45.3M ΑΝΑΘΕΣΗ in 2022 = 2.5–4× surrounding years. Not explained by emergency records alone. Possible bulk procurement reclassification during COVID recovery period."}],
     notes:"€266.8M ΟΡΙΣΤΙΚΟΠΟΙΗΣΗ (payment) confirms major procurement entity. 2022 amount spike is the primary unexplained anomaly. Cross-supplier alert: ΓΕΝ ΚΑ ΑΕ (AFM 094510036) = top cleaning supplier also at ΓΝ ΤΡΙΚΑΛΑ."
+  },
+  { id:"99221990", name:"ΓΝΑ ΣΙΣΜΑΝΟΓΛΕΙΟ", city:"Αθήνα", beds:480, total:41625,
+    direct_count:10, direct_amount:783475, comp_count:0, comp_amount:0,
+    emerg_count:0, emerg_amount:0, emerg_rate:0,
+    rank:"#20", signals:1, pills:["T8"],
+    type_counts:{"ΑΝΑΘΕΣΗ":10,"ΚΑΤΑΚΥΡΩΣΗ":0,"ΣΥΜΒΑΣΗ":50,"ΠΕΡΙΛΗΨΗ":65,"ΑΝΑΛΗΨΗ":31386,"ΟΡΙΣΤΙΚΟΠΟΙΗΣΗ":870,"ΕΠΙΤΡΟΠΙΚΟ":0,"ΚΑΝΟΝΙΣΤΙΚΗ":8414,"ΛΟΙΠΕΣ":830},
+    yd:{}, yc:{}, ye:{},
+    suppliers:[{afm:"997516863",label:"AFM 997516863 (φύλαξη 2020)",total:0.241,count:1}],
+    findings:[
+      {r:"low",t:"T8 — Single-source 2020 (COVID-period security services)",b:"AFM 997516863 = 100% of direct-award spend in 2020 (€241,474 — only year with direct awards visible). Single ΑΝΑΘΕΣΗ for security guarding services (φύλαξη) through September 2020. Marginal T8: single year, small total, likely COVID-period emergency staffing. Not indicative of structural monopoly."},
+      {r:"low",t:"T6 — False positive (ΙΔΟΧ employment contracts, not procurement)",b:"T6 fires at 994× baseline for Dec 22-31 2020 — but the 28 ΣΥΜΒΑΣΗ decisions are ΙΔΟΧ (Ιδιωτικό Δίκαιο Ορισμένου Χρόνου) fixed-term employment contracts for auxiliary medical staff (ΕΠΙΚΟΥΡΙΚΟΥ ΙΑΤΡΟΥ/ΠΡΟΣΩΠΙΚΟΥ), all posted together in December 2020. ΣΥΜΒΑΣΗ type covers both procurement contracts and employment contracts — this batch is entirely HR, not procurement. Known detector limitation: T6 should exclude employment-subject ΣΥΜΒΑΣΗ."}
+    ],
+    notes:"Near-total ΕΠΥ routing — only 10 ΑΝΑΘΕΣΗ decisions visible 2019–2026. 31,386 ΑΝΑΛΗΨΗ (75% of all decisions) + 8,414 ΚΑΝΟΝΙΣΤΙΚΗ ΠΡΑΞΗ (20%). T6 false positive confirmed: Dec 2020 burst = ΙΔΟΧ employment contracts, not procurement. T8 is marginal COVID-period context. Actual procurement spend completely invisible from this Diavgeia feed."
+  },
+  { id:"99222000", name:"ΓΝ ΙΠΠΟΚΡΑΤΕΙΟ", city:"Θεσσαλονίκη", beds:835, total:44500,
+    direct_count:4431, direct_amount:304130917, comp_count:12, comp_amount:135440,
+    emerg_count:103, emerg_amount:8136018, emerg_rate:0.077,
+    rank:"#17", signals:2, pills:["T5","T6"],
+    type_counts:{"ΑΝΑΘΕΣΗ":4431,"ΚΑΤΑΚΥΡΩΣΗ":12,"ΣΥΜΒΑΣΗ":118,"ΠΕΡΙΛΗΨΗ":131,"ΑΝΑΛΗΨΗ":21944,"ΟΡΙΣΤΙΚΟΠΟΙΗΣΗ":5498,"ΕΠΙΤΡΟΠΙΚΟ":8915,"ΚΑΝΟΝΙΣΤΙΚΗ":2,"ΛΟΙΠΕΣ":3449},
+    yd:{"2019":29.17,"2020":35.07,"2021":38.38,"2022":47.65,"2023":30.27,"2024":51.42,"2025":35.28,"2026":36.89},
+    yc:{},
+    ye:{"2019":0.32,"2020":0.33,"2021":0.68,"2022":0.59,"2023":1.23,"2024":0.25,"2025":3.95,"2026":0.79},
+    suppliers:[],
+    findings:[
+      {r:"med",t:"T5 — Art.32§2γ emergency overuse, escalating 2023–2026",b:"T5 fires with 103 high-value emergency findings across 2019–2026 (7.7% of procurement decisions). Director Αντωνάκης Νικόλαος repeatedly initiates emergency negotiations (Προσφυγή) for routine procurement. Amounts cluster near €240-250k. Each emergency contract generates 2-3 Diavgeia entries (Προσφυγή + Επικύρωση board approval), so ~35-50 unique emergency contracts underlie the 103 findings. Sharp escalation: 14 initial Προσφυγή decisions in 2025 (3.5× prior years average). Recurring emergency suppliers: SOL HELLAS ΑΕ (oxygen), catering (IPPIROTIKI), cleaning. A 7-year continuous emergency procurement programme cannot lawfully qualify as 'emergency'."},
+      {r:"low",t:"T6 — Temporal clustering (Dec 2020 + Jan 2025 + Mar 2026 bursts)",b:"Three T6 findings: Dec 2020 (41 decisions at 5.8× baseline); Jan 2025 (87 decisions at 2.6× monthly mean); Mar 2026 (343 decisions at 3.8× monthly mean). The 2025-2026 spikes temporally follow the escalating emergency negotiation cycle — administrative board decisions bunching after emergency contract cycles."}
+    ],
+    notes:"835-bed major teaching hospital Θεσσαλονίκης. €304M cumulative ΑΝΑΘΕΣΗ (2019–2026). No supplier_tax_id in direct-award records — T1/T8/T9B/T9C/T9D detectors blind. 8,915 ΕΠΙΤΡΟΠΙΚΟ ΕΝΤΑΛΜΑ (20% of decisions). Emergency procurement rate (7.7%) exceeds ΓΝΑ ΑΧΕΠΑ (3.7%). ye values = initial Προσφυγή amounts only (conservative lower bound; full contract values in Επικύρωση ratifications)."
   }
 ];
 
