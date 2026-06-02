@@ -409,24 +409,24 @@ const HOSPITALS = [
     yd:{}, yc:{}, ye:{},
     suppliers:[],
     findings:[
-      {r:"low",t:"T6 — Year-end invoice reversals (false positive)",b:"37 ΑΝΑΤΡΟΠΗ ΑΝΕΞΟΦΛΗΤΩΝ ΤΙΜΟΛΟΓΙΩΝ posted Dec 31. Standard year-end accounting, not procurement. T6 filter fix pending."}],
-    notes:"0 ΑΝΑΘΕΣΗ — procurement routed through ΕΠΥ. 11,837 ΚΑΝΟΝΙΣΤΙΚΗ ΠΡΑΞΗ (32% of decisions) is unusually high. Procurement exposure completely invisible from this feed."
+      {r:"med",t:"T6 — Year-end ΣΥΜΒΑΣΗ burst (46–66× baseline)",b:"After filtering out ΑΝΑΛΗΨΗ false positives, T6 still fires on ΣΥΜΒΑΣΗ (contract) decisions: 51–80 contracts posted in Dec 22–31 at 46–66× the baseline daily rate (2021–2025 every year). Consistent pattern of contracts signed at year-end deadline pressure. Not accounting noise — these are actual procurement contracts."}],
+    notes:"0 ΑΝΑΘΕΣΗ — procurement routed through ΕΠΥ. 11,837 ΚΑΝΟΝΙΣΤΙΚΗ ΠΡΑΞΗ (32% of decisions) is unusually high. Procurement exposure completely invisible from this feed. Year-end contract surge confirmed genuine signal."
   },
   { id:"99221920", name:"ΓΝ ΛΑΡΙΣΑ", city:"Λάρισα", beds:350, total:35381,
     direct_count:0, direct_amount:0, comp_count:15, comp_amount:236519,
     emerg_count:0, emerg_amount:0, emerg_rate:0,
-    rank:"#20", signals:1, pills:["T6"],
+    rank:"clean", signals:0, pills:[],
     type_counts:{"ΑΝΑΘΕΣΗ":0,"ΚΑΤΑΚΥΡΩΣΗ":15,"ΣΥΜΒΑΣΗ":0,"ΠΕΡΙΛΗΨΗ":28,"ΑΝΑΛΗΨΗ":15705,"ΟΡΙΣΤΙΚΟΠΟΙΗΣΗ":14106,"ΕΠΙΤΡΟΠΙΚΟ":964,"ΚΑΝΟΝΙΣΤΙΚΗ":2443,"ΛΟΙΠΕΣ":2120},
     yd:{}, yc:{"2020":0,"2021":0,"2023":0,"2024":0.06,"2025":0.03,"2026":0.14}, ye:{},
     suppliers:[],
     findings:[
-      {r:"low",t:"T6 — ΑΝΑΛΗΨΗ batch commitments on weekends",b:"Budget commitments posted on weekends/public holidays trigger T6. Routine financial workflow, not suspicious procurement. Filter fix pending."}],
-    notes:"350-bed major regional hospital with 0 ΑΝΑΘΕΣΗ. Only 15 ΚΑΤΑΚΥΡΩΣΗ records (€236k) visible — confirms near-total ΕΠΥ routing. Actual procurement unknowable from this feed."
+      {r:"low",t:"No signals — ΕΠΥ-routed, limited visibility",b:"After T6 fix removing ΑΝΑΛΗΨΗ/ΑΝΑΤΡΟΠΗ false positives, no genuine procurement signals detected. 0 ΑΝΑΘΕΣΗ confirms near-total ΕΠΥ routing. Only 15 ΚΑΤΑΚΥΡΩΣΗ records (€236k) visible — procurement exposure is structurally invisible from this feed."}],
+    notes:"350-bed major regional hospital. Clean signal profile reflects ΕΠΥ routing rather than clean procurement — actual spend is unobservable from Diavgeia alone."
   },
   { id:"99221923", name:"ΓΝ ΛΑΜΙΑ", city:"Λαμία", beds:307, total:50729,
     direct_count:5887, direct_amount:215487627, comp_count:407, comp_amount:45258126,
     emerg_count:163, emerg_amount:2777045, emerg_rate:2.8,
-    rank:"#1", signals:7, pills:["T1","T5","T6","T8","T9B","T9C","T9D"],
+    rank:"#1", signals:8, pills:["T1","T4","T5","T6","T8","T9B","T9C","T9D"],
     type_counts:{"ΑΝΑΘΕΣΗ":5887,"ΚΑΤΑΚΥΡΩΣΗ":407,"ΣΥΜΒΑΣΗ":896,"ΠΕΡΙΛΗΨΗ":500,"ΑΝΑΛΗΨΗ":20286,"ΟΡΙΣΤΙΚΟΠΟΙΗΣΗ":14208,"ΕΠΙΤΡΟΠΙΚΟ":3179,"ΚΑΝΟΝΙΣΤΙΚΗ":2,"ΛΟΙΠΕΣ":5764},
     yd:{"2020":33.15,"2021":51.68,"2022":30.28,"2023":39.29,"2024":34.03,"2025":22.83,"2026":4.22},
     yc:{"2020":3.79,"2021":1.24,"2022":7.03,"2023":11.69,"2024":13.44,"2025":7.05,"2026":1.01},
@@ -436,11 +436,12 @@ const HOSPITALS = [
       {afm:"997645083",label:"AFM 997645083",total:1.632,count:1},
       {afm:"999436428",label:"AFM 999436428",total:0.765,count:2}],
     findings:[
+      {r:"high",t:"T4 — Amendment inflation (ISS/UNISON price carry-forward)",b:"T4 confirmed: AFM 094081864 (ISS HELLAS/UNISON) price carry-forward between consecutive ΑΝΑΘΕΣΗ awards. Same cleaning price carried forward across contract cycles (0% price diff, 155-day gap). Consistent with T5 pattern — the inflated base price is set once via emergency extension, then locked in as the 'market rate' for subsequent awards."},
       {r:"high",t:"T5 — ISS/UNISON cleaning monopoly via Art.32§2γ emergency",b:"ISS HELLAS/UNISON (AFM 094081864) = 71.5% of 2026 direct-award spend (€1.74M). Emergency justification used repeatedly for routine cleaning: €773k Apr 2026 + €681k Jul 2025. Same supplier, same service, renewed as 'emergency' every cycle."},
       {r:"high",t:"T8 — Single-source dominance (2020–2021)",b:"Dominant supplier concentration in 2020 (€33.2M direct total for the year). Direct-award volume 2020–2021 (€84.8M) anomalously high for a 307-bed provincial hospital."},
       {r:"med",t:"T9B/T9C/T9D — Lot-splitting pattern",b:"Multiple same-supplier awards below Art.118 €30k threshold for what appears to be a single continuous service. Consistent with deliberate lot-splitting to avoid tender."},
       {r:"med",t:"T1 — Anomalous amount outlier",b:"Single ΑΝΑΘΕΣΗ decision with amount significantly above peer average for the same CPV category, after filtering AFM-as-amount data-entry errors."}],
-    notes:"Highest-ranked hospital (7/8 signals). €215.5M cumulative ΑΝΑΘΕΣΗ exceeds larger Athens hospitals in absolute count. ΑΝΑΛΗΨΗ amounts = 0 in normalized data (submitted without amounts)."
+    notes:"Highest-ranked hospital (8/9 signals). €215.5M cumulative ΑΝΑΘΕΣΗ exceeds larger Athens hospitals in absolute count. ΑΝΑΛΗΨΗ amounts = 0 in normalized data (submitted without amounts). T4 now confirmed: ISS/UNISON price carry-forward and ΕΑΔΗΣΥ-linked award pattern detected."
   },
   { id:"99221942", name:"ΓΝ ΑΜΦΙΣΣΑ", city:"Άμφισσα", beds:120, total:25764,
     direct_count:184, direct_amount:815277, comp_count:82, comp_amount:448296,
@@ -452,13 +453,13 @@ const HOSPITALS = [
     ye:{"2020":0.04,"2021":0.04,"2022":0},
     suppliers:[],
     findings:[
-      {r:"low",t:"T6 — Year-end ΑΝΑΛΗΨΗ bursts",b:"Large batches of budget commitments on Dec 31 trigger T6. Standard year-end accounting. Filter fix pending."}],
+      {r:"low",t:"T6 — Marginal year-end procurement burst",b:"After ΑΝΑΛΗΨΗ/ΑΝΑΤΡΟΠΗ filter applied, T6 still fires with 3 findings: Dec 22-31 procurement decisions 3.2× baseline in 2021 and 2022, and a Nov 2023 monthly spike (2.8×). Marginal signals exactly at threshold — borderline genuine vs. seasonal procurement patterns."}],
     notes:"ΑΝΑΛΗΨΗ amount (€369M) corrupt — impossible for 120-bed hospital. Direct award average (€4.4k/decision) is plausible for small items. 2025 direct spike to €0.34M warrants monitoring."
   },
   { id:"99221946", name:"ΓΝ ΤΡΙΚΑΛΑ", city:"Τρίκαλα", beds:300, total:69379,
     direct_count:220, direct_amount:9619335, comp_count:1991, comp_amount:35082368,
     emerg_count:0, emerg_amount:0, emerg_rate:0,
-    rank:"#4", signals:5, pills:["T1","T6","T9B","T9C","T9D"],
+    rank:"#4", signals:7, pills:["T1","T4","T6","T8","T9B","T9C","T9D"],
     type_counts:{"ΑΝΑΘΕΣΗ":220,"ΚΑΤΑΚΥΡΩΣΗ":1991,"ΣΥΜΒΑΣΗ":987,"ΠΕΡΙΛΗΨΗ":821,"ΑΝΑΛΗΨΗ":24574,"ΟΡΙΣΤΙΚΟΠΟΙΗΣΗ":1773,"ΕΠΙΤΡΟΠΙΚΟ":19482,"ΚΑΝΟΝΙΣΤΙΚΗ":5188,"ΛΟΙΠΕΣ":14343},
     yd:{"2020":1.73,"2021":0.86,"2022":1.48,"2023":0.68,"2024":0.69,"2025":3.11,"2026":1.07},
     yc:{"2020":4.02,"2021":11.35,"2022":3.52,"2023":4.62,"2024":4.84,"2025":5.85,"2026":0.88},
@@ -468,22 +469,23 @@ const HOSPITALS = [
       {afm:"070419338",label:"AFM 070419338",total:1.163,count:3},
       {afm:"998283526",label:"AFM 998283526",total:0.514,count:13}],
     findings:[
-      {r:"high",t:"T4 (pending) — Amendment-inflation pattern",b:"Contract 10/2025 for cleaning: original €755k → amended to €800k → Contract 49/2026 issued at exactly €800k starting price, using the inflated amended value as the new base. ΓΕΝ ΚΑ ΑΕ (AFM 094510036) = 34% of cleaning spend. T4 detector not yet implemented in platform."},
+      {r:"high",t:"T4 — Amendment inflation confirmed (ΓΕΝ ΚΑ ΑΕ cleaning)",b:"T4 fires with 5 findings. Confirmed pattern: Contract 10/2025 for cleaning €755k → ΣΥΜΒΑΣΗ amendment to €800k → Contract 49/2026 starts at exactly €800k (inflated base). ΓΕΝ ΚΑ ΑΕ (AFM 094510036) = 34% of cleaning spend. Same supplier, upward-only price ratchet across contract cycles."},
+      {r:"high",t:"T8 — Single-source monopoly (4 findings)",b:"T8 fires with 4 findings across multiple years. ΓΕΝ ΚΑ ΑΕ dominates annual direct-award spend in multiple years. Cross-hospital: same AFM appears as top supplier at ΓΝΑ ΑΧΕΠΑ."},
       {r:"med",t:"T9B/T9C/T9D — Lot splitting in direct awards",b:"Despite the strong competitive-tender record, the 220 direct awards show a pattern of repeated small-value same-supplier awards that together would exceed Art.118 threshold."},
       {r:"med",t:"T1 — Anomalous amount in direct awards",b:"One or more direct awards with amounts significantly above the peer average for the same service category."}],
-    notes:"Best D:C ratio in cohort (0.11). 19,482 ΕΠΙΤΡΟΠΙΚΟ ΕΝΤΑΛΜΑ (older payment format) accounts for 28% of decisions — may inflate total count. Note: ΓΕΝ ΚΑ ΑΕ (AFM 094510036) also appears as top supplier at ΓΝΑ ΑΧΕΠΑ — cross-hospital supplier alert."
+    notes:"Best D:C ratio in cohort (0.11 — most competitive). Now 7/9 signals after T4 and T8 confirmed. 19,482 ΕΠΙΤΡΟΠΙΚΟ ΕΝΤΑΛΜΑ (older payment format) accounts for 28% of decisions. ΓΕΝ ΚΑ ΑΕ (AFM 094510036) is a cross-hospital supplier alert: top cleaning supplier also at ΓΝΑ ΑΧΕΠΑ."
   },
   { id:"99221993", name:"ΓΝΑ ΕΥΑΓΓΕΛΙΣΜΟΣ", city:"Αθήνα", beds:650, total:43255,
     direct_count:3372, direct_amount:60659502, comp_count:1, comp_amount:0,
     emerg_count:0, emerg_amount:0, emerg_rate:0,
-    rank:"#20", signals:1, pills:["T6"],
+    rank:"clean", signals:0, pills:[],
     type_counts:{"ΑΝΑΘΕΣΗ":3372,"ΚΑΤΑΚΥΡΩΣΗ":1,"ΣΥΜΒΑΣΗ":0,"ΠΕΡΙΛΗΨΗ":234,"ΑΝΑΛΗΨΗ":10704,"ΟΡΙΣΤΙΚΟΠΟΙΗΣΗ":18290,"ΕΠΙΤΡΟΠΙΚΟ":0,"ΚΑΝΟΝΙΣΤΙΚΗ":8422,"ΛΟΙΠΕΣ":2232},
     yd:{"2019":0,"2020":0,"2021":0,"2022":0,"2023":0.06,"2024":60.6,"2025":0,"2026":0},
     yc:{"2021":0},
     ye:{},
     suppliers:[],
     findings:[
-      {r:"low",t:"T6 — ΑΝΑΛΗΨΗ false positive",b:"T6 fires on ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ posted on public holidays. ΕΠΥ-routed budget commitments, not direct procurement. Filter fix pending."},
+      {r:"low",t:"T6 false positive resolved — now clean",b:"T6 was firing on ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ posted on public holidays (ΕΠΥ-routed budget commitments). After fix scoping T6 to procurement decisions only, no genuine signals remain."},
       {r:"med",t:"⚠ 2024 ΑΝΑΘΕΣΗ amount spike — investigation needed",b:"€60.6M of €60.7M total ΑΝΑΘΕΣΗ amount is in 2024 alone (zero all other years). Almost certainly a bulk reclassification or data migration event. Requires manual ADA-level verification before using the amount in analysis."}],
     notes:"Payment record (€2.06B ΟΡΙΣΤΙΚΟΠΟΙΗΣΗ total) confirms very high actual procurement volume, but routed through ΕΠΥ. The 3,372 ΑΝΑΘΕΣΗ count is real (avg €18k/decision). 2024 amount anomaly makes cumulative ΑΝΑΘΕΣΗ value unreliable."
   },
@@ -748,8 +750,8 @@ function renderTrends() {
 function renderHospitals() {
   const c = document.getElementById('deepdive-container');
   HOSPITALS.forEach(h=>{
-    const rc = h.signals>=5?'#fca5a5':h.signals>=3?'#fdba74':'#fcd34d';
-    const tag = h.signals>=5?'<span class="risk-tag">HIGH RISK</span>':h.signals>=3?'<span class="warn-tag">ELEVATED</span>':'<span class="info-tag">WATCH</span>';
+    const rc = h.signals>=5?'#fca5a5':h.signals>=3?'#fdba74':h.signals>=1?'#fcd34d':'#86efac';
+    const tag = h.signals>=5?'<span class="risk-tag">HIGH RISK</span>':h.signals>=3?'<span class="warn-tag">ELEVATED</span>':h.signals>=1?'<span class="info-tag">WATCH</span>':'<span style="background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.3);border-radius:4px;padding:2px 8px;font-size:.72rem;font-weight:700">CLEAN</span>';
     const pills = h.pills.map(p=>`<span class="pill pill-${p.startsWith('T5')||p.startsWith('T8')?'red':p.startsWith('T9')?'amber':'blue'}">${p}</span>`).join('');
 
     const typeRows = Object.entries(h.type_counts).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([k,v])=>`
