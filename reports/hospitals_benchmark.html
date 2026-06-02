@@ -3,558 +3,796 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Benchmark Νοσοκομείων — 10 Μεγαλύτερα Νοσοκομεία Ελλάδας</title>
+<title>Hospital Diavgeia Benchmark · Greece Procurement Intelligence</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
 <style>
-:root{
-  --ink:#1a1a2e; --ink2:#3d4560; --ink3:#6b7280;
-  --red:#c0392b; --red-lt:#fdf3f2;
-  --amber:#b7791f; --amber-lt:#fffbeb;
-  --blue:#1d4ed8; --blue-lt:#eff6ff;
-  --green:#15803d; --green-lt:#f0fdf4;
-  --border:#e5e7eb; --bg:#f8f9fb;
-  --card:#fff;
-  --r:10px; --shadow:0 1px 6px rgba(0,0,0,.08);
-}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;
-     background:var(--bg);color:var(--ink);line-height:1.65;font-size:15px}
-header{
-  background:linear-gradient(135deg,#0f1b35 0%,#1a2f5a 60%,#243b6e 100%);
-  color:#fff;padding:52px 40px 40px;
-}
-.kicker{font-size:.7rem;letter-spacing:3px;text-transform:uppercase;color:#7fa3d0;margin-bottom:12px}
-header h1{font-size:2.4rem;font-weight:800;line-height:1.15;margin-bottom:12px}
-header h1 span{color:#7fa3d0}
-.sub{color:#a8bfd6;font-size:.98rem;max-width:700px;margin-bottom:22px;line-height:1.8}
-.meta-row{display:flex;flex-wrap:wrap;gap:8px}
-.badge{font-size:.7rem;color:#8fb3d0;background:rgba(255,255,255,.09);
-       padding:4px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.14)}
-.back-link{display:inline-block;margin-top:16px;font-size:.78rem;color:#7fa3d0;
-           text-decoration:none;border:1px solid rgba(255,255,255,.2);
-           padding:5px 14px;border-radius:20px}
-.back-link:hover{color:#fff;border-color:rgba(255,255,255,.4)}
+  :root {
+    --bg: #0f1117;
+    --card: #1a1d27;
+    --card2: #1e2133;
+    --border: #2a2d3e;
+    --text: #e2e8f0;
+    --muted: #8892a4;
+    --accent: #6366f1;
+    --red: #ef4444;
+    --orange: #f97316;
+    --amber: #f59e0b;
+    --green: #22c55e;
+    --teal: #14b8a6;
+    --blue: #3b82f6;
+    --sky: #0ea5e9;
+    --purple: #a855f7;
+    --slate: #64748b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif; font-size: 14px; line-height: 1.6; }
 
-/* ── CHAPTER NAV ── */
-.chapter-nav{
-  background:#fff;border-bottom:2px solid var(--border);
-  padding:0 32px;position:sticky;top:0;z-index:100;
-  box-shadow:0 2px 10px rgba(0,0,0,.06);
-}
-.chapter-nav ul{display:flex;list-style:none;overflow-x:auto}
-.chapter-nav a{
-  display:block;padding:16px 20px;font-size:.82rem;font-weight:600;
-  color:var(--ink3);text-decoration:none;
-  border-bottom:3px solid transparent;margin-bottom:-2px;
-  white-space:nowrap;transition:color .15s,border-color .15s;
-}
-.chapter-nav a:hover{color:var(--ink)}
-.chapter-nav a.active{color:var(--red);border-bottom-color:var(--red)}
-.ch-num{font-size:.65rem;letter-spacing:1px;text-transform:uppercase;
-        color:var(--ink3);display:block;margin-bottom:2px}
+  .header { background: var(--card); border-bottom: 1px solid var(--border); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+  .header-logo { font-size: 1.1rem; font-weight: 700; color: #fff; }
+  .header-sub { color: var(--muted); font-size: 0.82rem; }
+  .header-badge { background: rgba(99,102,241,.18); color: var(--accent); border: 1px solid rgba(99,102,241,.3); border-radius: 9999px; padding: 3px 10px; font-size: .78rem; font-weight: 600; }
 
-/* ── PANES ── */
-.pane{display:none;max-width:1040px;margin:0 auto;padding:40px 24px 80px}
-.pane.active{display:block}
-.ch-title{margin-bottom:36px}
-.ch-label{font-size:.7rem;letter-spacing:2.5px;text-transform:uppercase;
-          color:var(--ink3);margin-bottom:6px}
-.ch-title h2{font-size:1.85rem;font-weight:800;line-height:1.2;margin-bottom:14px}
-.ch-title .lede{font-size:1.05rem;color:var(--ink2);max-width:720px;line-height:1.8}
+  .tabs { background: var(--card); border-bottom: 1px solid var(--border); display: flex; padding: 0 24px; overflow-x: auto; }
+  .tab-btn { background: none; border: none; border-bottom: 2px solid transparent; color: var(--muted); cursor: pointer; font-size: .85rem; font-weight: 500; padding: 12px 16px; white-space: nowrap; transition: color .15s, border-color .15s; }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { border-bottom-color: var(--accent); color: #fff; font-weight: 600; }
+  .tab-pane { display: none; padding: 24px; max-width: 1400px; margin: 0 auto; }
+  .tab-pane.active { display: block; }
 
-/* ── SECTION ── */
-.section{background:var(--card);border:1px solid var(--border);border-radius:var(--r);
-         padding:28px 30px;margin-bottom:24px;box-shadow:var(--shadow)}
-.section h3{font-size:1.05rem;font-weight:700;margin-bottom:14px;color:var(--ink)}
-.section h4{font-size:.9rem;font-weight:600;margin-bottom:8px;color:var(--ink2)}
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; }
+  .card-title { font-size: .9rem; font-weight: 600; color: #fff; margin-bottom: 6px; }
+  .card-sub { font-size: .78rem; color: var(--muted); margin-bottom: 14px; }
 
-/* ── STATS ── */
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin:28px 0}
-.stat{background:var(--card);border:1px solid var(--border);border-radius:var(--r);
-      padding:20px 22px;box-shadow:var(--shadow)}
-.stat .n{font-size:2.2rem;font-weight:800;line-height:1;margin-bottom:6px}
-.stat .n.red{color:var(--red)} .stat .n.amber{color:var(--amber)}
-.stat .n.blue{color:var(--blue)} .stat .n.green{color:var(--green)}
-.stat .label{font-size:.78rem;color:var(--ink3);line-height:1.4}
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .grid-7 { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; }
+  @media (max-width: 1100px) { .grid-7 { grid-template-columns: repeat(4,1fr); } }
+  @media (max-width: 800px) { .grid-7 { grid-template-columns: repeat(2,1fr); } .grid-2,.grid-3 { grid-template-columns: 1fr; } }
 
-/* ── PROSE ── */
-.prose{max-width:720px}
-.prose p{margin-bottom:1.1em;color:var(--ink2);line-height:1.8}
-.prose p:last-child{margin-bottom:0}
-.prose strong{color:var(--ink)}
-.prose ul{padding-left:20px;margin-bottom:1em}
-.prose li{color:var(--ink2);margin-bottom:.4em;font-size:.93rem}
+  .notice { border-radius: 8px; padding: 12px 16px; font-size: .83rem; line-height: 1.7; }
+  .notice-amber { background: rgba(245,158,11,.1); border-left: 3px solid var(--amber); }
+  .notice-blue  { background: rgba(59,130,246,.1);  border-left: 3px solid var(--blue); }
+  .notice-red   { background: rgba(239,68,68,.1);   border-left: 3px solid var(--red); }
+  .notice-green { background: rgba(34,197,94,.1);   border-left: 3px solid var(--green); }
+  .notice b { color: #fff; }
 
-/* ── TABLE ── */
-.tbl-wrap{overflow-x:auto;margin:14px 0}
-table{border-collapse:collapse;width:100%;font-size:.83rem}
-th{background:#f3f4f6;padding:9px 12px;text-align:left;font-weight:600;
-   border-bottom:2px solid var(--border);color:var(--ink2)}
-td{padding:8px 12px;border-bottom:1px solid #f0f0f0;color:var(--ink2)}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:#fafafa}
-.td-r{text-align:right} .td-c{text-align:center}
-code{font-size:.78rem;background:#f3f4f6;padding:2px 6px;border-radius:4px;
-     border:1px solid var(--border);font-family:monospace}
+  .hosp-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; position: relative; }
+  .hosp-name { font-size: .82rem; font-weight: 700; color: #fff; margin-bottom: 2px; }
+  .hosp-city { font-size: .72rem; color: var(--muted); margin-bottom: 8px; }
+  .hosp-beds { position: absolute; top: 12px; right: 12px; font-size: .7rem; color: var(--muted); }
+  .hm-label { font-size: .68rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  .hm-value { font-size: 1.0rem; font-weight: 700; line-height: 1.2; }
+  .hm-sub { font-size: .68rem; color: var(--muted); }
+  .profile-stripe { height: 5px; border-radius: 3px; margin-top: 10px; overflow: hidden; display: flex; }
 
-/* ── STATUS BADGES ── */
-.status-pending{color:var(--ink3);font-size:.78rem}
-.status-running{color:#d97706;font-weight:600;font-size:.78rem}
-.status-done{color:var(--green);font-weight:600;font-size:.78rem}
-.status-flagged{color:var(--red);font-weight:700;font-size:.78rem}
+  .pill { display: inline-block; border-radius: 9999px; padding: 2px 7px; font-size: .7rem; font-weight: 600; margin: 1px; }
+  .pill-red    { background: rgba(239,68,68,.18);  color: #fca5a5; border: 1px solid rgba(239,68,68,.3); }
+  .pill-blue   { background: rgba(59,130,246,.18); color: #93c5fd; border: 1px solid rgba(59,130,246,.3); }
+  .pill-amber  { background: rgba(245,158,11,.18); color: #fcd34d; border: 1px solid rgba(245,158,11,.3); }
+  .pill-slate  { background: rgba(100,116,139,.18);color: #94a3b8; border: 1px solid rgba(100,116,139,.3); }
+  .pill-green  { background: rgba(34,197,94,.18);  color: #86efac; border: 1px solid rgba(34,197,94,.3); }
 
-/* ── TAG ── */
-.tag{display:inline-block;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:12px;
-     vertical-align:middle;margin-left:6px}
-.tag.red{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}
-.tag.amber{background:#fef3c7;color:#92400e;border:1px solid #fcd34d}
-.tag.green{background:#dcfce7;color:#166534;border:1px solid #86efac}
-.tag.blue{background:#dbeafe;color:#1e40af;border:1px solid #93c5fd}
+  table { width: 100%; border-collapse: collapse; font-size: .8rem; }
+  th { background: #111320; color: var(--muted); font-weight: 600; padding: 7px 10px; text-align: left; border-bottom: 1px solid var(--border); font-size: .72rem; text-transform: uppercase; letter-spacing: .04em; }
+  td { padding: 7px 10px; border-bottom: 1px solid rgba(42,45,62,.5); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(99,102,241,.04); }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
 
-/* ── FINDING ── */
-.finding{display:flex;gap:16px;align-items:flex-start;
-         padding:18px 20px;border-radius:var(--r);margin-bottom:12px;
-         border:1px solid var(--border);background:var(--card)}
-.finding.red{border-color:#fca5a5;background:#fef2f2}
-.finding.amber{border-color:#fcd34d;background:#fffbeb}
-.finding.blue{border-color:#93c5fd;background:#eff6ff}
-.finding .icon{font-size:1.4rem;flex-shrink:0;margin-top:2px}
-.finding h4{font-size:.9rem;font-weight:700;margin-bottom:4px;color:var(--ink)}
-.finding p{font-size:.84rem;color:var(--ink2);margin:0;line-height:1.6}
+  .chart-wrap { position: relative; }
+  .ratio-bar { height: 20px; border-radius: 4px; overflow: hidden; display: flex; margin: 3px 0; background: #111320; }
 
-/* ── BRIDGE ── */
-.bridge{
-  background:linear-gradient(135deg,#0f1b35,#1a2f5a);color:#fff;
-  border-radius:var(--r);padding:22px 26px;margin-top:32px;
-  display:flex;align-items:center;justify-content:space-between;gap:16px;
-}
-.bridge p{font-size:.9rem;color:#a8bfd6;max-width:500px}
-.bridge strong{color:#fff}
-.bridge .nxt{
-  flex-shrink:0;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);
-  color:#fff;padding:10px 18px;border-radius:6px;font-size:.82rem;font-weight:600;
-  cursor:pointer;transition:background .15s;white-space:nowrap;text-decoration:none;
-}
-.bridge .nxt:hover{background:rgba(255,255,255,.2)}
+  .legend-row { display: flex; align-items: center; gap: 6px; font-size: .74rem; color: var(--muted); margin: 3px 0; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
 
-/* ── PENDING OVERLAY ── */
-.pending-notice{
-  background:linear-gradient(135deg,#fffbeb,#fef3c7);
-  border:2px dashed #fcd34d;border-radius:var(--r);
-  padding:24px 28px;text-align:center;color:var(--amber);
-  margin:20px 0;
-}
-.pending-notice .big{font-size:1.8rem;margin-bottom:8px}
-.pending-notice p{font-size:.88rem;color:var(--ink2);max-width:500px;margin:0 auto;line-height:1.6}
+  .section-head { margin: 24px 0 14px; }
+  .section-head h2 { font-size: 1.05rem; font-weight: 700; color: #fff; }
+  .section-head p { font-size: .8rem; color: var(--muted); margin-top: 3px; }
+  hr.sep { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
 
-#progress-bar{position:fixed;top:0;left:0;height:3px;background:var(--red);
-              width:0%;transition:width .1s;z-index:999;pointer-events:none}
+  .deepdive { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 18px; }
+  .deepdive-name { font-size: 1.0rem; font-weight: 700; color: #fff; }
+  .deepdive-meta { font-size: .77rem; color: var(--muted); margin-top: 2px; }
+  .stat-row { display: flex; gap: 18px; flex-wrap: wrap; margin: 10px 0; }
+  .s-label { font-size: .68rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  .s-value { font-size: .95rem; font-weight: 700; color: #fff; }
+  .s-sub { font-size: .7rem; color: var(--muted); }
+  .finding-item { background: var(--card2); border-radius: 6px; padding: 9px 12px; margin: 5px 0; font-size: .79rem; border-left: 3px solid var(--slate); }
+  .finding-item.risk-high { border-left-color: var(--red); }
+  .finding-item.risk-med  { border-left-color: var(--amber); }
+  .finding-item.risk-low  { border-left-color: var(--slate); }
+  .f-title { font-weight: 600; color: #fff; margin-bottom: 3px; }
+  .f-body { color: var(--muted); line-height: 1.6; }
+  .risk-tag  { background: rgba(239,68,68,.12); color: #fca5a5; border: 1px solid rgba(239,68,68,.25); border-radius: 4px; padding: 2px 8px; font-size: .72rem; font-weight: 600; }
+  .warn-tag  { background: rgba(245,158,11,.12); color: #fcd34d; border: 1px solid rgba(245,158,11,.25); border-radius: 4px; padding: 2px 8px; font-size: .72rem; font-weight: 600; }
+  .info-tag  { background: rgba(100,116,139,.12);color: #94a3b8; border: 1px solid rgba(100,116,139,.25); border-radius: 4px; padding: 2px 8px; font-size: .72rem; font-weight: 600; }
 
-@media(max-width:600px){
-  header{padding:32px 20px 28px}
-  header h1{font-size:1.7rem}
-  .pane{padding:24px 16px 60px}
-  .bridge{flex-direction:column}
-}
+  .mt8 { margin-top: 8px; }
+  .mt16 { margin-top: 16px; }
+  .mt20 { margin-top: 20px; }
+  .gap-y > * + * { margin-top: 10px; }
 </style>
 </head>
 <body>
 
-<div id="progress-bar"></div>
-
-<header>
-  <div class="kicker">Ερευνητική Ανάλυση · Διαύγεια OpenData · Ελλάδα 2019–2026</div>
-  <h1>Benchmark <span>Νοσοκομείων</span></h1>
-  <p class="sub">Τα 10 μεγαλύτερα δημόσια νοσοκομεία της Ελλάδας υπό το ίδιο πρίσμα: ποσοστό άμεσων αναθέσεων, συγκέντρωση αναδόχων, κόστος ανά κλίνη. Σκοπός: να φανεί ποιο νοσοκομείο αποκλίνει — και γιατί.</p>
-  <div class="meta-row">
-    <span class="badge">Πηγή: Διαύγεια OpenData API</span>
-    <span class="badge">95 νοσοκομεία αντιστοιχισμένα</span>
-    <span class="badge">Ανάλυση σε εξέλιξη — Ιούνιος 2026</span>
+<div class="header">
+  <div>
+    <div class="header-logo">🏥 Hospital Diavgeia Benchmark</div>
+    <div class="header-sub">Greece Procurement Intelligence · 7 NHS Hospitals · 2019–2026</div>
   </div>
-  <a class="back-link" href="overview.html">← Πίσω στην ανάλυση Λαμίας</a>
-</header>
+  <span class="header-badge">Generated 2026-06-02</span>
+</div>
 
-<nav class="chapter-nav">
-  <ul>
-    <li><a href="#" class="active" data-tab="tab1"><span class="ch-num">Εισαγωγή</span>Σκοπός & Μέθοδος</a></li>
-    <li><a href="#" data-tab="tab2"><span class="ch-num">Δεδομένα</span>Τα 10 Νοσοκομεία</a></li>
-    <li><a href="#" data-tab="tab3"><span class="ch-num">Βάση</span>Τι Μάθαμε στη Λαμία</a></li>
-    <li><a href="#" data-tab="tab4"><span class="ch-num">Επόμενο</span>Υπουργείο Άμυνας</a></li>
-  </ul>
-</nav>
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab('overview',this)">Overview</button>
+  <button class="tab-btn" onclick="showTab('profile',this)">Decision Profile</button>
+  <button class="tab-btn" onclick="showTab('procurement',this)">Procurement Comparison</button>
+  <button class="tab-btn" onclick="showTab('trends',this)">Year Trends</button>
+  <button class="tab-btn" onclick="showTab('hospitals',this)">Per Hospital</button>
+</div>
 
-<!-- ══════════════════════════════════════════
-     TAB 1 — ΣΚΟΠΟΣ & ΜΕΘΟΔΟΣ
-══════════════════════════════════════════ -->
-<div class="pane active" id="tab1">
+<!-- ══════════════ OVERVIEW ══════════════ -->
+<div id="tab-overview" class="tab-pane active">
 
-  <div class="ch-title">
-    <div class="ch-label">Εισαγωγή · Σκοπός & Μέθοδος</div>
-    <h2>Ένα νοσοκομείο δεν είναι αρκετό</h2>
-    <p class="lede">Η ανάλυση του ΓΝ Λαμίας αποκάλυψε πρότυπα που δεν μπορούν να εξηγηθούν από τυχαία διοικητική αδυναμία. Αλλά για να πει κανείς «αυτό είναι παθολογικό», χρειάζεται σύγκριση. Τι κάνουν τα άλλα νοσοκομεία;</p>
+  <div class="notice notice-blue mt8" style="margin-bottom:18px">
+    <b>What this report shows:</b> Each Greek public hospital must publish all administrative decisions on <em>Diavgeia</em>. This benchmark compares the <b>composition of those publications</b> across 7 NHS hospitals. Because hospitals use different internal workflows — and some route large-volume procurement through the central purchasing body ΕΠΥ — the same economic activity may appear under different decision types, or not appear at all.
+    <b>Direct comparison requires understanding publication practice, not just record counts.</b>
   </div>
 
-  <div class="section">
-    <h3>Το ερώτημα</h3>
-    <div class="prose">
-      <p>Το ΓΝ Λαμίας έχει 4,9× λιγότερες κατακυρώσεις ανταγωνιστικών διαγωνισμών από το ΓΝ Τρικάλων. Η ίδια εταιρεία (ΙΝΤΕΡΚΑΤ) λαμβάνει συμβάσεις Η/Μ συντήρησης για 10 χρόνια χωρίς ανταγωνιστική διαδικασία — παρόλο που δεν έχει σχετικό ΚΑΔ.</p>
-      <p>Η κρίσιμη ερώτηση: <strong>είναι αυτό μοναδικό στη Λαμία — ή επαναλαμβάνεται αλλού;</strong> Αν η ΙΝΤΕΡΚΑΤ ή παρόμοιο πρότυπο εμφανίζεται σε πολλά νοσοκομεία, η ιστορία δεν είναι τοπική. Είναι συστημική.</p>
-    </div>
-  </div>
+  <div class="grid-7" id="summary-grid"></div>
 
-  <div class="section">
-    <h3>Τι μετράμε</h3>
-    <div class="prose">
-      <ul>
-        <li><strong>Ποσοστό άμεσων αναθέσεων (Δ.2.2)</strong> vs ανταγωνιστικών κατακυρώσεων — το κύριο σήμα</li>
-        <li><strong>Συγκέντρωση αναδόχων</strong> — ποιοί 5 ανάδοχοι παίρνουν το μεγαλύτερο μερίδιο</li>
-        <li><strong>Κόστος ανά κλίνη ανά έτος</strong> — για Η/Μ συντήρηση, φύλαξη, καθαριότητα</li>
-        <li><strong>Ανάδοχοι χωρίς σχετικό ΚΑΔ</strong> — η διαπίστωση που έκανε τη διαφορά στη Λαμία</li>
-        <li><strong>Διάρκεια αποκλειστικότητας</strong> — πόσα χρόνια ο ίδιος ανάδοχος χωρίς ανταγωνισμό</li>
-      </ul>
-    </div>
-  </div>
+  <hr class="sep">
 
-  <div class="section">
-    <h3>Πώς λειτουργεί η pipeline</h3>
-    <div class="prose">
-      <p>Για κάθε νοσοκομείο: (1) κατεβαίνουν όλες οι αποφάσεις Διαύγεια 2019–2026, (2) κανονικοποιούνται και αποσυμφορίζονται οι διπλές εγγραφές lifecycle, (3) εμπλουτίζονται οι ανάδοχοι από ΓΕΜΗ, (4) παράγεται αυτόματη έκθεση.</p>
-      <p>Το κώδικας είναι ανοιχτός: <a href="https://github.com/Petropov/Greece_Public_diav" target="_blank" style="color:var(--blue)">github.com/Petropov/Greece_Public_diav</a>. Οποιοσδήποτε μπορεί να τρέξει την ίδια ανάλυση για οποιοδήποτε νοσοκομείο αλλάζοντας μόνο το org ID.</p>
-    </div>
-  </div>
-
-  <div class="bridge">
-    <div><p><strong>Επόμενο:</strong> Η κατάσταση για καθένα από τα 10 νοσοκομεία — τι έχει φετωθεί, τι αναμένεται.</p></div>
-    <button class="nxt" onclick="goTab('tab2')">Τα 10 Νοσοκομεία →</button>
-  </div>
-
-</div><!-- /tab1 -->
-
-
-<!-- ══════════════════════════════════════════
-     TAB 2 — ΤΑ 10 ΝΟΣΟΚΟΜΕΙΑ
-══════════════════════════════════════════ -->
-<div class="pane" id="tab2">
-
-  <div class="ch-title">
-    <div class="ch-label">Δεδομένα · Τα 10 Νοσοκομεία</div>
-    <h2>Το δείγμα: 10 νοσοκομεία, ~5.000 κλίνες, ~€1Β δαπάνη</h2>
-    <p class="lede">Τα δέκα μεγαλύτερα δημόσια νοσοκομεία της Ελλάδας κατά εκτιμώμενο αριθμό κλινών. Η ανάλυση τρέχει σε εξέλιξη — αποτελέσματα θα εμφανιστούν εδώ καθώς ολοκληρώνεται κάθε νοσοκομείο.</p>
-  </div>
-
-  <div class="section">
-    <h3>Κατάσταση ανάλυσης</h3>
-    <div class="tbl-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Νοσοκομείο</th>
-            <th>Πόλη</th>
-            <th class="td-c">Εκτιμ. Κλίνες</th>
-            <th>Diavgeia org</th>
-            <th>Κατάσταση</th>
-            <th>Κύριο εύρημα</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>1</td>
-            <td><strong>Ευαγγελισμός</strong></td>
-            <td>Αθήνα</td>
-            <td class="td-c">~700</td>
-            <td><code>99221993</code></td>
-            <td><span class="status-running">⏳ Σε εξέλιξη</span></td>
-            <td style="color:var(--ink3);font-style:italic">—</td>
-          </tr>
-          <tr style="background:var(--bg)">
-            <td>2</td>
-            <td><strong>ΑΧΕΠΑ</strong></td>
-            <td>Θεσσαλονίκη</td>
-            <td class="td-c">~700</td>
-            <td><code>99221998</code></td>
-            <td><span class="status-pending">◦ Αναμένει</span></td>
-            <td style="color:var(--ink3);font-style:italic">—</td>
-          </tr>
-          <tr>
-            <td>3</td>
-            <td><strong>Σισμανόγλειο</strong></td>
-            <td>Αθήνα</td>
-            <td class="td-c">~600</td>
-            <td><code>99221990</code></td>
-            <td><span class="status-pending">◦ Αναμένει</span></td>
-            <td style="color:var(--ink3);font-style:italic">—</td>
-          </tr>
-          <tr style="background:var(--bg)">
-            <td>4</td>
-            <td><strong>Ιπποκράτειο Θεσσαλονίκης</strong></td>
-            <td>Θεσσαλονίκη</td>
-            <td class="td-c">~600</td>
-            <td><code>99222000</code></td>
-            <td><span class="status-pending">◦ Αναμένει</span></td>
-            <td style="color:var(--ink3);font-style:italic">—</td>
-          </tr>
-          <tr>
-            <td>5</td>
-            <td><strong>Λαϊκό</strong></td>
-            <td>Αθήνα</td>
-            <td class="td-c">~500</td>
-            <td><code>99221994</code></td>
-            <td><span class="status-pending">◦ Αναμένει</span></td>
-            <td style="color:var(--ink3);font-style:italic">—</td>
-          </tr>
-          <tr style="background:var(--bg)">
-            <td>6</td>
-            <td><strong>Γ. Παπανικόλαου</strong></td>
-            <td>Θεσσαλονίκη</td>
-            <td class="td-c">~600</td>
-            <td><code>99221999</code></td>
-            <td><span class="status-pending">◦ Αναμένει</span></td>
-            <td style="color:var(--ink3);font-style:italic">—</td>
-          </tr>
-          <tr>
-            <td>7</td>
-            <td><strong>Βενιζέλειο-Πανάνειο</strong></td>
-            <td>Ηράκλειο</td>
-            <td class="td-c">~500</td>
-            <td><code>99221997</code></td>
-            <td><span class="status-pending">◦ Αναμένει</span></td>
-            <td style="color:var(--ink3);font-style:italic">—</td>
-          </tr>
-          <tr style="background:var(--bg)">
-            <td>8</td>
-            <td><strong>Γ. Γεννηματάς</strong></td>
-            <td>Αθήνα</td>
-            <td class="td-c">~400</td>
-            <td><code>99221992</code></td>
-            <td><span class="status-pending">◦ Αναμένει</span></td>
-            <td style="color:var(--ink3);font-style:italic">—</td>
-          </tr>
-          <tr>
-            <td>9</td>
-            <td><strong>Άγιος Ανδρέας</strong></td>
-            <td>Πάτρα</td>
-            <td class="td-c">~400</td>
-            <td><code>99222007</code></td>
-            <td><span class="status-pending">◦ Αναμένει</span></td>
-            <td style="color:var(--ink3);font-style:italic">—</td>
-          </tr>
-          <tr style="background:var(--bg)">
-            <td>10</td>
-            <td><strong>Νικαία-Πειραιάς</strong></td>
-            <td>Πειραιάς</td>
-            <td class="td-c">~400</td>
-            <td><code>99222003</code></td>
-            <td><span class="status-pending">◦ Αναμένει</span></td>
-            <td style="color:var(--ink3);font-style:italic">—</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="pending-notice" style="margin-top:20px">
-      <div class="big">⏳</div>
-      <p>Η ανάλυση τρέχει αυτή τη στιγμή. Τα αποτελέσματα θα συμπληρωθούν εδώ καθώς ολοκληρώνεται κάθε νοσοκομείο. Το κρίσιμο ερώτημα: <strong>εμφανίζεται η ΙΝΤΕΡΚΑΤ ή παρόμοιο πρότυπο αλλού;</strong></p>
-    </div>
-  </div>
-
-  <div class="section">
-    <h3>Τι θα συγκριθεί — τα benchmark metrics</h3>
-    <div class="tbl-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Μετρική</th>
-            <th>ΓΝ Λαμίας (baseline)</th>
-            <th>ΓΝ Τρικάλων (καλύτερο benchmark)</th>
-            <th>Στόχος σύγκρισης</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Κατακυρώσεις 2020–2026</td>
-            <td class="red-cell">407</td>
-            <td style="color:var(--green);font-weight:600">1.991</td>
-            <td>Ποιο νοσοκομείο είναι πιο κοντά στη Λαμία;</td>
-          </tr>
-          <tr style="background:var(--bg)">
-            <td>Κόστος φύλαξης / κλίνη / έτος</td>
-            <td class="red-cell">€2.136</td>
-            <td style="color:var(--green);font-weight:600">€486</td>
-            <td>Ποιο νοσοκομείο έχει παρόμοια απόκλιση;</td>
-          </tr>
-          <tr>
-            <td>Η/Μ συντήρηση — εξωτερικός ανάδοχος</td>
-            <td class="red-cell">ΙΝΤΕΡΚΑΤ (10 χρόνια)</td>
-            <td style="color:var(--green);font-weight:600">Εσωτερικό προσωπικό</td>
-            <td>Ποιος άλλος έχει εξωτερικό ανάδοχο Η/Μ;</td>
-          </tr>
-          <tr style="background:var(--bg)">
-            <td>Ανάδοχοι χωρίς σχετικό ΚΑΔ</td>
-            <td class="red-cell">ΙΝΤΕΡΚΑΤ — 0 Η/Μ ΚΑΔ</td>
-            <td style="color:var(--green);font-weight:600">—</td>
-            <td>Εμφανίζεται η ΙΝΤΕΡΚΑΤ αλλού;</td>
-          </tr>
-          <tr>
-            <td>Συνολική δαπάνη / κλίνη / έτος</td>
-            <td>~€336k</td>
-            <td>Εκκρεμεί</td>
-            <td>Συγκριτική αποδοτικότητα</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <p style="font-size:.8rem;color:var(--ink3);margin-top:10px">Στοιχεία ΓΝ Λαμίας και ΓΝ Τρικάλων από <a href="overview.html" style="color:var(--blue)">την ανάλυση Λαμίας</a>.</p>
-  </div>
-
-  <div class="bridge">
-    <div><p><strong>Επόμενο:</strong> Τι ακριβώς βρέθηκε στη Λαμία και γιατί αποτελεί τη βάση σύγκρισης.</p></div>
-    <button class="nxt" onclick="goTab('tab3')">Η Βάση: Λαμία →</button>
-  </div>
-
-</div><!-- /tab2 -->
-
-
-<!-- ══════════════════════════════════════════
-     TAB 3 — ΤΙ ΜΑΘΑΜΕ ΣΤΗ ΛΑΜΙΑ
-══════════════════════════════════════════ -->
-<div class="pane" id="tab3">
-
-  <div class="ch-title">
-    <div class="ch-label">Βάση Σύγκρισης · Λαμία</div>
-    <h2>Τι αποκαλύφθηκε στη Λαμία — και τι ψάχνουμε αλλού</h2>
-    <p class="lede">Τα ευρήματα από το ΓΝ Λαμίας δεν είναι συμπεράσματα — είναι υποθέσεις προς επαλήθευση σε εθνική κλίμακα.</p>
-  </div>
-
-  <div class="section">
-    <h3>Τα τρία πρότυπα που αναζητάμε</h3>
-
-    <div class="finding red">
-      <div class="icon">🔴</div>
-      <div>
-        <h4>Πρότυπο Α — Αποκλειστικός ανάδοχος χωρίς σχετικό αντικείμενο</h4>
-        <p>ΙΝΤΕΡΚΑΤ ΑΕ (ΑΦΜ 094440530): λαμβάνει Η/Μ συμβάσεις από το 2015, αλλά έχει <strong>μηδέν ΚΑΔ</strong> που αντιστοιχούν σε ηλεκτρομηχανολογικές εργασίες (43.21 / 43.22 / 71.12). Κύρια δραστηριότητα: εξόρυξη λιγνίτη, λατομεία. Το ίδιο πρότυπο σε άλλο νοσοκομείο θα ήταν εθνική είδηση.</p>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">📋 Decision Type Glossary</div>
+      <div class="gap-y mt8">
+        <div style="font-size:.8rem"><span class="pill pill-red">ΑΝΑΘΕΣΗ</span> <span style="color:var(--muted)">Direct award — procurement without competitive tender. Cap: €30k (Art.118) or Art.32 emergency exception. <b style="color:#fff">Primary fraud-risk indicator.</b></span></div>
+        <div style="font-size:.8rem"><span class="pill pill-blue">ΚΑΤΑΚΥΡΩΣΗ</span> <span style="color:var(--muted)">Competitive tender finalization — winner selected after open/restricted procedure. Compliant procurement path.</span></div>
+        <div style="font-size:.8rem"><span class="pill pill-slate">ΣΥΜΒΑΣΗ</span> <span style="color:var(--muted)">Contract signing — may follow a tender or a direct award.</span></div>
+        <div style="font-size:.8rem"><span class="pill pill-slate">ΠΕΡΙΛΗΨΗ ΔΙΑΚΗΡΥΞΗΣ</span> <span style="color:var(--muted)">Tender notice — competitive call publication.</span></div>
+        <div style="font-size:.8rem"><span class="pill pill-slate" style="background:rgba(20,184,166,.15);color:#5eead4;border-color:rgba(20,184,166,.3)">ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ</span> <span style="color:var(--muted)">Budget commitment. <b style="color:var(--amber)">Amounts unreliable</b> (year-end batch entries, encoding errors).</span></div>
+        <div style="font-size:.8rem"><span class="pill pill-green">ΟΡΙΣΤΙΚΟΠΟΙΗΣΗ ΠΛΗΡΩΜΗΣ</span> <span style="color:var(--muted)">Payment finalization — actual invoice payment. Amount reflects real expenditure.</span></div>
+        <div style="font-size:.8rem"><span class="pill pill-amber">ΕΠΙΤΡΟΠΙΚΟ ΕΝΤΑΛΜΑ</span> <span style="color:var(--muted)">Older payment-order format, used heavily by ΓΝ ΤΡΙΚΑΛΑ.</span></div>
+        <div style="font-size:.8rem"><span class="pill pill-slate" style="background:rgba(168,85,247,.15);color:#d8b4fe;border-color:rgba(168,85,247,.3)">ΚΑΝΟΝΙΣΤΙΚΗ ΠΡΑΞΗ</span> <span style="color:var(--muted)">Regulatory/governance decision — not procurement. Dominant in ΓΝ ΚΑΡΔΙΤΣΑ.</span></div>
       </div>
     </div>
 
-    <div class="finding red">
-      <div class="icon">🔴</div>
-      <div>
-        <h4>Πρότυπο Β — Κόστος ανά κλίνη 4× πάνω από ομότιμα</h4>
-        <p>Φύλαξη: €2.136/κλίνη/έτος vs €486 στο ΓΝ Τρικάλων. Η/Μ: χωρίς ανάλογο σε ομότιμα νοσοκομεία. Η απόκλιση δεν εξηγείται από γεωγραφία, μέγεθος ή τύπο νοσοκομείου.</p>
-      </div>
-    </div>
-
-    <div class="finding amber">
-      <div class="icon">🟡</div>
-      <div>
-        <h4>Πρότυπο Γ — Δεκαετής σχέση αποκλειστικότητας χωρίς TED</h4>
-        <p>Από το 2015 ως σήμερα, >€5M σε ΙΝΤΕΡΚΑΤ — αλλά <strong>κανένα αποτέλεσμα στο TED</strong> (το ευρωπαϊκό μητρώο συμβάσεων άνω €140k). Αν επιβεβαιωθεί η απουσία, ανοίγει αρμοδιότητα Ευρωπαϊκής Εισαγγελίας (EPPO).</p>
+    <div class="card">
+      <div class="card-title">⚠️ Data Quality &amp; Comparability Notes</div>
+      <div class="gap-y mt8">
+        <div class="notice notice-amber"><b>ΕΠΥ Routing (ΓΝ ΚΑΡΔΙΤΣΑ, ΓΝ ΛΑΡΙΣΑ):</b> 0 ΑΝΑΘΕΣΗ records. Procurement routed through ΕΠΥ (Επιτροπή Προμηθειών Υγείας, AFM 999336270) and published under that org-ID. These hospitals' own feeds reveal nothing about their procurement.</div>
+        <div class="notice notice-amber"><b>ΑΝΑΛΗΨΗ amounts corrupted:</b> ΓΝΑ ΕΥΑΓΓΕΛΙΣΜΟΣ = €10B+ (capped), ΓΝ ΑΜΦΙΣΣΑ = €369M for a 120-bed hospital. All ΑΝΑΛΗΨΗ amounts are excluded from monetary comparisons.</div>
+        <div class="notice notice-amber"><b>ΓΝΑ ΕΥΑΓΓΕΛΙΣΜΟΣ 2024 spike:</b> €60.6M of the €60.7M total ΑΝΑΘΕΣΗ appears in 2024 only (zero in all other years). Almost certainly a data reclassification event, not actual procurement. Excluded from amount comparisons.</div>
+        <div class="notice notice-blue"><b>Coverage:</b> ΓΝΑ ΑΧΕΠΑ and ΓΝΑ ΕΥΑΓΓΕΛΙΣΜΟΣ data starts 2019; all others start 2020.</div>
       </div>
     </div>
   </div>
 
-  <div class="section">
-    <h3>Πλήρης ανάλυση Λαμίας</h3>
-    <div class="prose">
-      <p>Η αναλυτική έκθεση για το ΓΝ Λαμίας, το Δήμο και τη ΔΕΥΑ Λαμίας περιλαμβάνει 9 κεφάλαια με πρωτογενή δεδομένα, πίνακες σύγκρισης, ADAs και αποδεικτικά έγγραφα PDF.</p>
+  <hr class="sep">
+
+  <div class="card">
+    <div class="card-title">Procurement Activity at a Glance</div>
+    <div class="card-sub">ΑΝΑΘΕΣΗ (direct award) and ΚΑΤΑΚΥΡΩΣΗ (competitive) counts and amounts. ΑΝΑΛΗΨΗ amounts excluded. D:C = direct÷competitive count ratio (lower = more competitive).</div>
+    <div style="overflow-x:auto">
+    <table>
+      <thead>
+        <tr>
+          <th>Hospital</th><th>Beds</th>
+          <th class="num">Records</th>
+          <th class="num" style="color:#fca5a5">ΑΝΑΘΕΣΗ N</th>
+          <th class="num" style="color:#fca5a5">ΑΝΑΘΕΣΗ €M</th>
+          <th class="num" style="color:#93c5fd">ΚΑΤΑΚΥΡΩΣΗ N</th>
+          <th class="num" style="color:#93c5fd">ΚΑΤΑΚΥΡΩΣΗ €M</th>
+          <th class="num">D:C Ratio</th>
+          <th class="num" style="color:#fdba74">Emergency %</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><b>ΓΝ ΚΑΡΔΙΤΣΑ</b></td><td class="num">266</td><td class="num">37,166</td>
+          <td class="num" style="color:var(--muted)">0</td><td class="num" style="color:var(--muted)">—</td>
+          <td class="num" style="color:var(--muted)">0</td><td class="num" style="color:var(--muted)">—</td>
+          <td class="num" style="color:var(--muted)">N/A</td><td class="num" style="color:var(--muted)">N/M</td></tr>
+        <tr><td><b>ΓΝ ΛΑΡΙΣΑ</b></td><td class="num">350</td><td class="num">35,381</td>
+          <td class="num" style="color:var(--muted)">0</td><td class="num" style="color:var(--muted)">—</td>
+          <td class="num">15</td><td class="num">€0.2M</td>
+          <td class="num" style="color:var(--muted)">N/A</td><td class="num" style="color:var(--muted)">N/M</td></tr>
+        <tr style="background:rgba(239,68,68,.04)">
+          <td><b>ΓΝ ΛΑΜΙΑ ⚑</b></td><td class="num">307</td><td class="num">50,729</td>
+          <td class="num" style="color:#fca5a5;font-weight:700">5,887</td><td class="num" style="color:#fca5a5;font-weight:700">€215.5M</td>
+          <td class="num">407</td><td class="num">€45.3M</td>
+          <td class="num" style="color:#fca5a5;font-weight:700">14.5:1</td>
+          <td class="num" style="color:var(--amber)">2.8%</td></tr>
+        <tr><td><b>ΓΝ ΑΜΦΙΣΣΑ</b></td><td class="num">120</td><td class="num">25,764</td>
+          <td class="num">184</td><td class="num">€0.8M</td>
+          <td class="num">82</td><td class="num">€0.4M</td>
+          <td class="num">2.2:1</td><td class="num" style="color:var(--muted)">1.6%</td></tr>
+        <tr style="background:rgba(34,197,94,.03)">
+          <td><b>ΓΝ ΤΡΙΚΑΛΑ ✓</b></td><td class="num">300</td><td class="num">69,379</td>
+          <td class="num">220</td><td class="num">€9.6M</td>
+          <td class="num" style="color:#86efac;font-weight:700">1,991</td><td class="num" style="color:#86efac;font-weight:700">€35.1M</td>
+          <td class="num" style="color:#86efac;font-weight:700">0.11:1</td>
+          <td class="num" style="color:var(--muted)">0% †</td></tr>
+        <tr><td><b>ΓΝΑ ΕΥΑΓΓΕΛΙΣΜΟΣ</b></td><td class="num">650</td><td class="num">43,255</td>
+          <td class="num">3,372</td><td class="num" style="color:var(--amber)">€60.7M ⚠</td>
+          <td class="num" style="color:var(--muted)">1</td><td class="num" style="color:var(--muted)">≈0</td>
+          <td class="num" style="color:var(--amber)">3372:1 ⚠</td>
+          <td class="num" style="color:var(--muted)">N/M</td></tr>
+        <tr style="background:rgba(239,68,68,.04)">
+          <td><b>ΓΝΑ ΑΧΕΠΑ ⚑</b></td><td class="num">700</td><td class="num">43,994</td>
+          <td class="num" style="color:#fca5a5;font-weight:700">1,249</td><td class="num" style="color:#fca5a5;font-weight:700">€169.3M</td>
+          <td class="num">158</td><td class="num">€13.7M</td>
+          <td class="num" style="color:var(--amber)">7.9:1</td>
+          <td class="num" style="color:#fca5a5;font-weight:700">3.7%</td></tr>
+      </tbody>
+    </table>
     </div>
-    <div style="margin-top:16px">
-      <a href="overview.html" style="display:inline-block;background:var(--red);color:#fff;padding:10px 20px;border-radius:6px;text-decoration:none;font-size:.85rem;font-weight:600">→ Άνοιγμα ανάλυσης Λαμίας</a>
+    <div style="font-size:.72rem;color:var(--muted);margin-top:8px">
+      ⚑ Flagged in main risk ranking. ✓ Best competitive ratio. † No Art.32 emergency records found but T4 amendment-inflation pattern suspected. N/M = not measurable (no ΑΝΑΘΕΣΗ records). ⚠ Amount anomaly — see data quality notes.
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ PROFILE ══════════════ -->
+<div id="tab-profile" class="tab-pane">
+  <div class="section-head">
+    <h2>Diavgeia Publication Profile</h2>
+    <p>Composition of each hospital's Diavgeia feed by decision type — as share of total records. Reveals fundamental differences in publication practice between hospitals.</p>
+  </div>
+
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-title">Decision Type Composition — 100% Stacked (count basis)</div>
+    <div class="card-sub">Each bar = one hospital. Stack shows what proportion of all decisions belong to each type. Note: ΛΑΜΙΑ is 11.6% ΑΝΑΘΕΣΗ; ΚΑΡΔΙΤΣΑ / ΛΑΡΙΣΑ are 0%.</div>
+    <div class="chart-wrap" style="height:380px">
+      <canvas id="chartProfile"></canvas>
     </div>
   </div>
 
-  <div class="bridge">
-    <div><p><strong>Επόμενο:</strong> Πέρα από τα νοσοκομεία — τι κρύβεται στις αμυντικές δαπάνες.</p></div>
-    <button class="nxt" onclick="goTab('tab4')">Υπουργείο Άμυνας →</button>
-  </div>
-
-</div><!-- /tab3 -->
-
-
-<!-- ══════════════════════════════════════════
-     TAB 4 — ΥΠΟΥΡΓΕΙΟ ΑΜΥΝΑΣ
-══════════════════════════════════════════ -->
-<div class="pane" id="tab4">
-
-  <div class="ch-title">
-    <div class="ch-label">Επόμενο · Υπουργείο Εθνικής Άμυνας</div>
-    <h2>Ο Στρατός: η μεγαλύτερη ανεξερεύνητη δεξαμενή</h2>
-    <p class="lede">Η Ελλάδα δαπανά ~2,5% ΑΕΠ για άμυνα — από τα υψηλότερα στο ΝΑΤΟ. Μεγάλο μέρος δεν αφορά όπλα αλλά καθημερινή λειτουργία: φαγητό, καύσιμα, καθαριότητα, συντήρηση. Και είναι όλο στη Διαύγεια.</p>
-  </div>
-
-  <div class="section">
-    <h3>Τι δημοσιεύεται — και τι όχι</h3>
-    <div class="prose">
-      <p>Το <strong>Υπουργείο Εθνικής Άμυνας (ΥΠΕΘΑ)</strong> έχει Diavgeia org ID = <code>6</code> και δεκάδες υποφορείς (μονάδες, σχηματισμοί, νοσοκομεία). Δημοσιεύεται:</p>
-      <ul>
-        <li><strong>Σίτιση</strong> — συμβάσεις εστίασης για εκατοντάδες βάσεις σε ολόκληρη την Ελλάδα</li>
-        <li><strong>Καύσιμα</strong> — τεράστιοι όγκοι, συχνά μέσω πλαισίων-συμφωνιών</li>
-        <li><strong>Καθαριότητα & συντήρηση</strong> — κτίρια, οχήματα, εξοπλισμός βάσεων</li>
-        <li><strong>Διαχείριση προσφύγων 2015–2018</strong> — σίτιση σε ΚΥΤ, κάποιες από τις μεγαλύτερες άμεσες αναθέσεις της δεκαετίας</li>
-      </ul>
-      <p>Δεν δημοσιεύεται: οπλικά συστήματα, πυρομαχικά, στρατηγικές προμήθειες — εθνικό απόρρητο.</p>
-    </div>
-  </div>
-
-  <div class="section">
-    <h3>Γιατί είναι ενδιαφέρον</h3>
-
-    <div class="finding blue">
-      <div class="icon">🍽️</div>
-      <div>
-        <h4>Σίτιση — κλασικό πεδίο πελατειακών σχέσεων</h4>
-        <p>Εκατοντάδες βάσεις σε όλη την Ελλάδα, κάθε μία με επαναλαμβανόμενες συμβάσεις σίτισης. Ίδια λογική με τη Λαμία: ο ίδιος ανάδοχος χρόνο με τον χρόνο, χωρίς ανταγωνιστική διαδικασία;</p>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Color Legend</div>
+      <div style="columns:2;column-gap:12px;margin-top:8px">
+        <div class="legend-row"><div class="legend-dot" style="background:#ef4444"></div>ΑΝΑΘΕΣΗ (direct award)</div>
+        <div class="legend-row"><div class="legend-dot" style="background:#3b82f6"></div>ΚΑΤΑΚΥΡΩΣΗ (competitive)</div>
+        <div class="legend-row"><div class="legend-dot" style="background:#60a5fa"></div>ΣΥΜΒΑΣΗ (contract)</div>
+        <div class="legend-row"><div class="legend-dot" style="background:#93c5fd"></div>ΠΕΡΙΛΗΨΗ (tender notice)</div>
+        <div class="legend-row"><div class="legend-dot" style="background:#14b8a6"></div>ΑΝΑΛΗΨΗ (budget commit)</div>
+        <div class="legend-row"><div class="legend-dot" style="background:#22c55e"></div>ΟΡΙΣΤΙΚΟΠΟΙΗΣΗ (payment)</div>
+        <div class="legend-row"><div class="legend-dot" style="background:#eab308"></div>ΕΠΙΤΡΟΠΙΚΟ ΕΝΤΑΛΜΑ</div>
+        <div class="legend-row"><div class="legend-dot" style="background:#8b5cf6"></div>ΚΑΝΟΝΙΣΤΙΚΗ ΠΡΑΞΗ</div>
+        <div class="legend-row"><div class="legend-dot" style="background:#475569"></div>Λοιπές (other)</div>
       </div>
     </div>
-
-    <div class="finding blue">
-      <div class="icon">🚨</div>
-      <div>
-        <h4>Προσφυγικές συμβάσεις 2015–2018 — ο μεγάλος αδιερεύνητος όγκος</h4>
-        <p>Κατά τη διαχείριση της προσφυγικής κρίσης, ο στρατός ανέλαβε τη διαχείριση πολλών ΚΥΤ. Οι συμβάσεις σίτισης εκείνης της περιόδου ήταν τεράστιες και βιαστικές — ιδανικές συνθήκες για παράκαμψη διαγωνισμών.</p>
-      </div>
-    </div>
-
-    <div class="finding blue">
-      <div class="icon">⛽</div>
-      <div>
-        <h4>Καύσιμα — ο αόρατος κίνδυνος</h4>
-        <p>Τα πλαίσια-συμφωνίες καυσίμων για τις ένοπλες δυνάμεις αφορούν εκατομμύρια λίτρα. Ακόμα και μικρή απόκλιση τιμής από την αγορά σημαίνει εκατοντάδες χιλιάδες ευρώ. Η σύγκριση με EU Oil Bulletin (που έγινε για τη Λαμία) είναι άμεσα εφαρμόσιμη.</p>
+    <div class="card">
+      <div class="card-title">Key Profile Observations</div>
+      <div class="gap-y mt8" style="font-size:.81rem">
+        <div class="notice notice-red"><b>ΓΝ ΛΑΜΙΑ:</b> 11.6% ΑΝΑΘΕΣΗ — highest direct-award share. 5,887 direct-award records visible in Diavgeia over 7 years. High transparency but also high risk exposure.</div>
+        <div class="notice notice-blue"><b>ΓΝ ΤΡΙΚΑΛΑ:</b> 2.9% ΚΑΤΑΚΥΡΩΣΗ + 28.1% ΕΠΙΤΡΟΠΙΚΟ ΕΝΤΑΛΜΑ (older payment format). Unique publication profile. Most active competitive-tender user in cohort.</div>
+        <div class="notice notice-amber"><b>ΓΝ ΚΑΡΔΙΤΣΑ:</b> 31.8% ΚΑΝΟΝΙΣΤΙΚΗ ΠΡΑΞΗ — unusually high regulatory-decision share. 0% procurement. Procurement completely hidden from their own feed.</div>
+        <div class="notice notice-blue"><b>ΓΝΑ ΑΧΕΠΑ:</b> 59% ΟΡΙΣΤΙΚΟΠΟΙΗΣΗ (25,941 payment records, €266.8M) — highest payment transparency. Confirms large actual procurement volume despite ΕΠΥ routing of some categories.</div>
       </div>
     </div>
   </div>
 
-  <div class="section">
-    <h3>Τεχνική σημείωση</h3>
-    <div class="prose">
-      <p>Η ίδια pipeline που χρησιμοποιήθηκε για τα νοσοκομεία εκτελείται αυτούσια για το ΥΠΕΘΑ με <code>--org 6</code>. Η διαφορά: ο αριθμός των υποφορέων (μονάδων) είναι πολύ μεγαλύτερος, οπότε η ανάλυση χρειάζεται να συγκεντρωθεί σε συγκεκριμένες κατηγορίες δαπάνης (σίτιση, καύσιμα) αντί για συνολικό corpus.</p>
-      <p>Δεν έχει εκτελεστεί ακόμα. Ανάλυση σε σχεδιασμό.</p>
+  <div class="card mt20">
+    <div class="card-title">Absolute Decision Counts by Type</div>
+    <div class="card-sub">Raw volume — ΓΝ ΤΡΙΚΑΛΑ publishes by far the most decisions (69,379) partly due to ΕΠΙΤΡΟΠΙΚΟ ΕΝΤΑΛΜΑ format.</div>
+    <div class="chart-wrap" style="height:320px">
+      <canvas id="chartAbsCount"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ PROCUREMENT ══════════════ -->
+<div id="tab-procurement" class="tab-pane">
+  <div class="section-head">
+    <h2>Procurement Comparison</h2>
+    <p>Direct awards (ΑΝΑΘΕΣΗ) vs competitive tenders (ΚΑΤΑΚΥΡΩΣΗ) — for the 5 hospitals where procurement records exist. ΓΝ ΚΑΡΔΙΤΣΑ and ΓΝ ΛΑΡΙΣΑ excluded (zero records in own feed).</p>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:18px">
+    <div class="card">
+      <div class="card-title">Direct-to-Competitive Ratio (count)</div>
+      <div class="card-sub">Lower = more competitive procedures. ΓΝ ΤΡΙΚΑΛΑ (0.11) is the reference benchmark.</div>
+      <div id="ratio-bars" style="margin-top:12px"></div>
+      <div style="font-size:.71rem;color:var(--muted);margin-top:10px;display:flex;gap:14px">
+        <span><span style="display:inline-block;width:9px;height:9px;background:#ef4444;border-radius:2px;margin-right:3px"></span>ΑΝΑΘΕΣΗ (direct)</span>
+        <span><span style="display:inline-block;width:9px;height:9px;background:#3b82f6;border-radius:2px;margin-right:3px"></span>ΚΑΤΑΚΥΡΩΣΗ (competitive)</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Average Direct-Award Size</div>
+      <div class="card-sub">Total ΑΝΑΘΕΣΗ amount ÷ count. ΓΝΑ ΑΧΕΠΑ avg (€135k) vs ΓΝ ΛΑΜΙΑ avg (€37k) — ΑΧΕΠΑ awards are larger per decision.</div>
+      <div class="chart-wrap" style="height:250px">
+        <canvas id="chartAvgSize"></canvas>
+      </div>
     </div>
   </div>
 
-</div><!-- /tab4 -->
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-title">Direct Award vs Competitive Award Amounts (€M, cumulative 2019/2020–2026)</div>
+    <div class="card-sub">ΓΝΑ ΕΥΑΓΓΕΛΙΣΜΟΣ ΑΝΑΘΕΣΗ amount includes 2024 data-anomaly spike of €60.6M and should be interpreted with caution.</div>
+    <div class="chart-wrap" style="height:300px">
+      <canvas id="chartAmounts"></canvas>
+    </div>
+  </div>
 
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Emergency Procurement Rate (% of direct awards)</div>
+      <div class="card-sub">Art.32§2γ emergency justification as share of all ΑΝΑΘΕΣΗ. Only measurable where hospitals publish ΑΝΑΘΕΣΗ records.</div>
+      <div class="chart-wrap" style="height:220px">
+        <canvas id="chartEmergRate"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Emergency Procurement Amount (€M cumulative)</div>
+      <div class="card-sub">ΓΝΑ ΑΧΕΠΑ €8.2M over 46 decisions (2019–2026) — dominated by ΑΧΟΥΤΟΣ ΕΠΙΣΙΤΙΣΜΟΣ cleaning renewed annually as "emergency" for 7+ years.</div>
+      <div class="chart-wrap" style="height:220px">
+        <canvas id="chartEmergAmount"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mt20 gap-y">
+    <div class="card-title">Interpretation: What the Ratios Mean</div>
+    <div class="notice notice-green mt8"><b>ΓΝ ΤΡΙΚΑΛΑ (ratio 0.11 — best):</b> For every 1 direct award, 9 competitive tenders are run. This is the legally expected model. However a T4 amendment-inflation pattern is suspected: Contract 10/2025 amended to €800k → Contract 49/2026 starts at exactly €800k.</div>
+    <div class="notice notice-red"><b>ΓΝ ΛΑΜΙΑ (ratio 14.5 — worst with valid data):</b> For every competitive tender finalization, 14.5 direct awards are issued. ISS HELLAS/UNISON (AFM 094081864) receives emergency Art.32§2γ cleaning awards repeatedly for a routine service — €3.26M across 8 decisions.</div>
+    <div class="notice notice-red"><b>ΓΝΑ ΑΧΕΠΑ (ratio 7.9):</b> ΑΧΟΥΤΟΣ ΕΠΙΣΙΤΙΣΜΟΣ has received emergency cleaning contracts every year since 2019 (€8.16M, 46 decisions). A service running continuously for 7 years cannot legitimately qualify as an "emergency".</div>
+    <div class="notice notice-amber"><b>ΓΝΑ ΕΥΑΓΓΕΛΙΣΜΟΣ (ratio 3,372:1 — unreliable):</b> Routes most procurement through ΕΠΥ. The ratio reflects publication practice. 2024 amount spike (€60.6M) requires investigation at ADA level.</div>
+  </div>
+</div>
+
+<!-- ══════════════ TRENDS ══════════════ -->
+<div id="tab-trends" class="tab-pane">
+  <div class="section-head">
+    <h2>Year-over-Year Procurement Trends</h2>
+    <p>Annual direct-award and competitive-award amounts for hospitals with usable yearly data. ΓΝ ΚΑΡΔΙΤΣΑ and ΓΝ ΛΑΡΙΣΑ omitted (no procurement records). 2026 = partial year.</p>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:18px">
+    <div class="card">
+      <div class="card-title">ΓΝ ΛΑΜΙΑ — Direct vs Competitive (€M/year)</div>
+      <div class="card-sub">Direct awards (red) dominate every year. 2021 peak (€51.7M direct). Emergency (orange dashes) rising in 2025–2026.</div>
+      <div class="chart-wrap" style="height:260px"><canvas id="chartLamia"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">ΓΝΑ ΑΧΕΠΑ — Direct vs Competitive (€M/year)</div>
+      <div class="card-sub">2022 direct-award spike €45.3M unexplained. Emergency (orange dashes) consistent at €0.4–2.0M every year since 2019.</div>
+      <div class="chart-wrap" style="height:260px"><canvas id="chartAchipa"></canvas></div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:18px">
+    <div class="card">
+      <div class="card-title">ΓΝ ΤΡΙΚΑΛΑ — Direct vs Competitive (€M/year)</div>
+      <div class="card-sub">Competitive (blue) exceeds direct (red) every single year. 2021 major competitive tender year (€11.4M). 2025 direct-award uptick (€3.1M) warrants monitoring.</div>
+      <div class="chart-wrap" style="height:260px"><canvas id="chartTrikala"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">ΓΝ ΑΜΦΙΣΣΑ — Direct vs Competitive (€M/year)</div>
+      <div class="card-sub">Very low volumes (120-bed hospital). 2025 direct spike to €0.34M. Emergency only 2020–2022 (€90k total). ΑΝΑΛΗΨΗ amount (€369M) is corrupt — excluded.</div>
+      <div class="chart-wrap" style="height:260px"><canvas id="chartAmfissa"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Emergency Procurement by Year — ΓΝ ΛΑΜΙΑ vs ΓΝΑ ΑΧΕΠΑ (€M)</div>
+    <div class="card-sub">Both hospitals use Art.32§2γ emergency justification for routine cleaning services. ΑΧΕΠΑ's pattern is continuous since 2019; ΛΑΜΙΑ's re-emerged in 2021 and is rising in 2025–2026.</div>
+    <div class="chart-wrap" style="height:260px"><canvas id="chartEmergYear"></canvas></div>
+  </div>
+</div>
+
+<!-- ══════════════ PER HOSPITAL ══════════════ -->
+<div id="tab-hospitals" class="tab-pane">
+  <div class="section-head">
+    <h2>Per-Hospital Deep Dive</h2>
+    <p>Individual procurement profiles, top suppliers, risk signal findings, and data notes for each of the 7 hospitals.</p>
+  </div>
+  <div id="deepdive-container"></div>
+</div>
 
 <script>
-const tabs=['tab1','tab2','tab3','tab4'];
-function goTab(id){
-  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.chapter-nav a').forEach(a=>a.classList.remove('active'));
-  const pane=document.getElementById(id);
-  if(pane) pane.classList.add('active');
-  const link=document.querySelector(`.chapter-nav a[data-tab="${id}"]`);
-  if(link) link.classList.add('active');
-  window.scrollTo({top:0,behavior:'smooth'});
-  updateProgress();
+// ─── DATA ─────────────────────────────────────────────────────────────
+const COLORS = {
+  "ΑΝΑΘΕΣΗ":"#ef4444","ΚΑΤΑΚΥΡΩΣΗ":"#3b82f6","ΣΥΜΒΑΣΗ":"#60a5fa",
+  "ΠΕΡΙΛΗΨΗ":"#93c5fd","ΑΝΑΛΗΨΗ":"#14b8a6","ΟΡΙΣΤΙΚΟΠΟΙΗΣΗ":"#22c55e",
+  "ΕΠΙΤΡΟΠΙΚΟ":"#eab308","ΚΑΝΟΝΙΣΤΙΚΗ":"#8b5cf6","ΛΟΙΠΕΣ":"#475569"
+};
+
+const HOSPITALS = [
+  { id:"99221913", name:"ΓΝ ΚΑΡΔΙΤΣΑ", city:"Καρδίτσα", beds:266, total:37166,
+    direct_count:0, direct_amount:0, comp_count:0, comp_amount:0,
+    emerg_count:0, emerg_amount:0, emerg_rate:0,
+    rank:"#20", signals:1, pills:["T6"],
+    type_counts:{"ΑΝΑΘΕΣΗ":0,"ΚΑΤΑΚΥΡΩΣΗ":0,"ΣΥΜΒΑΣΗ":759,"ΠΕΡΙΛΗΨΗ":2,"ΑΝΑΛΗΨΗ":6617,"ΟΡΙΣΤΙΚΟΠΟΙΗΣΗ":17035,"ΕΠΙΤΡΟΠΙΚΟ":0,"ΚΑΝΟΝΙΣΤΙΚΗ":11837,"ΛΟΙΠΕΣ":916},
+    yd:{}, yc:{}, ye:{},
+    suppliers:[],
+    findings:[
+      {r:"low",t:"T6 — Year-end invoice reversals (false positive)",b:"37 ΑΝΑΤΡΟΠΗ ΑΝΕΞΟΦΛΗΤΩΝ ΤΙΜΟΛΟΓΙΩΝ posted Dec 31. Standard year-end accounting, not procurement. T6 filter fix pending."}],
+    notes:"0 ΑΝΑΘΕΣΗ — procurement routed through ΕΠΥ. 11,837 ΚΑΝΟΝΙΣΤΙΚΗ ΠΡΑΞΗ (32% of decisions) is unusually high. Procurement exposure completely invisible from this feed."
+  },
+  { id:"99221920", name:"ΓΝ ΛΑΡΙΣΑ", city:"Λάρισα", beds:350, total:35381,
+    direct_count:0, direct_amount:0, comp_count:15, comp_amount:236519,
+    emerg_count:0, emerg_amount:0, emerg_rate:0,
+    rank:"#20", signals:1, pills:["T6"],
+    type_counts:{"ΑΝΑΘΕΣΗ":0,"ΚΑΤΑΚΥΡΩΣΗ":15,"ΣΥΜΒΑΣΗ":0,"ΠΕΡΙΛΗΨΗ":28,"ΑΝΑΛΗΨΗ":15705,"ΟΡΙΣΤΙΚΟΠΟΙΗΣΗ":14106,"ΕΠΙΤΡΟΠΙΚΟ":964,"ΚΑΝΟΝΙΣΤΙΚΗ":2443,"ΛΟΙΠΕΣ":2120},
+    yd:{}, yc:{"2020":0,"2021":0,"2023":0,"2024":0.06,"2025":0.03,"2026":0.14}, ye:{},
+    suppliers:[],
+    findings:[
+      {r:"low",t:"T6 — ΑΝΑΛΗΨΗ batch commitments on weekends",b:"Budget commitments posted on weekends/public holidays trigger T6. Routine financial workflow, not suspicious procurement. Filter fix pending."}],
+    notes:"350-bed major regional hospital with 0 ΑΝΑΘΕΣΗ. Only 15 ΚΑΤΑΚΥΡΩΣΗ records (€236k) visible — confirms near-total ΕΠΥ routing. Actual procurement unknowable from this feed."
+  },
+  { id:"99221923", name:"ΓΝ ΛΑΜΙΑ", city:"Λαμία", beds:307, total:50729,
+    direct_count:5887, direct_amount:215487627, comp_count:407, comp_amount:45258126,
+    emerg_count:163, emerg_amount:2777045, emerg_rate:2.8,
+    rank:"#1", signals:7, pills:["T1","T5","T6","T8","T9B","T9C","T9D"],
+    type_counts:{"ΑΝΑΘΕΣΗ":5887,"ΚΑΤΑΚΥΡΩΣΗ":407,"ΣΥΜΒΑΣΗ":896,"ΠΕΡΙΛΗΨΗ":500,"ΑΝΑΛΗΨΗ":20286,"ΟΡΙΣΤΙΚΟΠΟΙΗΣΗ":14208,"ΕΠΙΤΡΟΠΙΚΟ":3179,"ΚΑΝΟΝΙΣΤΙΚΗ":2,"ΛΟΙΠΕΣ":5764},
+    yd:{"2020":33.15,"2021":51.68,"2022":30.28,"2023":39.29,"2024":34.03,"2025":22.83,"2026":4.22},
+    yc:{"2020":3.79,"2021":1.24,"2022":7.03,"2023":11.69,"2024":13.44,"2025":7.05,"2026":1.01},
+    ye:{"2020":0,"2021":0.71,"2022":0.32,"2023":0.13,"2024":0.12,"2025":0.71,"2026":0.77},
+    suppliers:[
+      {afm:"094081864",label:"ISS HELLAS / UNISON (καθαρισμός)",total:3.259,count:8},
+      {afm:"997645083",label:"AFM 997645083",total:1.632,count:1},
+      {afm:"999436428",label:"AFM 999436428",total:0.765,count:2}],
+    findings:[
+      {r:"high",t:"T5 — ISS/UNISON cleaning monopoly via Art.32§2γ emergency",b:"ISS HELLAS/UNISON (AFM 094081864) = 71.5% of 2026 direct-award spend (€1.74M). Emergency justification used repeatedly for routine cleaning: €773k Apr 2026 + €681k Jul 2025. Same supplier, same service, renewed as 'emergency' every cycle."},
+      {r:"high",t:"T8 — Single-source dominance (2020–2021)",b:"Dominant supplier concentration in 2020 (€33.2M direct total for the year). Direct-award volume 2020–2021 (€84.8M) anomalously high for a 307-bed provincial hospital."},
+      {r:"med",t:"T9B/T9C/T9D — Lot-splitting pattern",b:"Multiple same-supplier awards below Art.118 €30k threshold for what appears to be a single continuous service. Consistent with deliberate lot-splitting to avoid tender."},
+      {r:"med",t:"T1 — Anomalous amount outlier",b:"Single ΑΝΑΘΕΣΗ decision with amount significantly above peer average for the same CPV category, after filtering AFM-as-amount data-entry errors."}],
+    notes:"Highest-ranked hospital (7/8 signals). €215.5M cumulative ΑΝΑΘΕΣΗ exceeds larger Athens hospitals in absolute count. ΑΝΑΛΗΨΗ amounts = 0 in normalized data (submitted without amounts)."
+  },
+  { id:"99221942", name:"ΓΝ ΑΜΦΙΣΣΑ", city:"Άμφισσα", beds:120, total:25764,
+    direct_count:184, direct_amount:815277, comp_count:82, comp_amount:448296,
+    emerg_count:3, emerg_amount:90000, emerg_rate:1.6,
+    rank:"#20", signals:1, pills:["T6"],
+    type_counts:{"ΑΝΑΘΕΣΗ":184,"ΚΑΤΑΚΥΡΩΣΗ":82,"ΣΥΜΒΑΣΗ":1,"ΠΕΡΙΛΗΨΗ":112,"ΑΝΑΛΗΨΗ":9044,"ΟΡΙΣΤΙΚΟΠΟΙΗΣΗ":13639,"ΕΠΙΤΡΟΠΙΚΟ":0,"ΚΑΝΟΝΙΣΤΙΚΗ":1442,"ΛΟΙΠΕΣ":1244},
+    yd:{"2020":0.04,"2021":0.12,"2022":0.09,"2023":0.15,"2024":0.08,"2025":0.34,"2026":0},
+    yc:{"2020":0,"2021":0.01,"2022":0.03,"2023":0.18,"2024":0.04,"2025":0.19,"2026":0.01},
+    ye:{"2020":0.04,"2021":0.04,"2022":0},
+    suppliers:[],
+    findings:[
+      {r:"low",t:"T6 — Year-end ΑΝΑΛΗΨΗ bursts",b:"Large batches of budget commitments on Dec 31 trigger T6. Standard year-end accounting. Filter fix pending."}],
+    notes:"ΑΝΑΛΗΨΗ amount (€369M) corrupt — impossible for 120-bed hospital. Direct award average (€4.4k/decision) is plausible for small items. 2025 direct spike to €0.34M warrants monitoring."
+  },
+  { id:"99221946", name:"ΓΝ ΤΡΙΚΑΛΑ", city:"Τρίκαλα", beds:300, total:69379,
+    direct_count:220, direct_amount:9619335, comp_count:1991, comp_amount:35082368,
+    emerg_count:0, emerg_amount:0, emerg_rate:0,
+    rank:"#4", signals:5, pills:["T1","T6","T9B","T9C","T9D"],
+    type_counts:{"ΑΝΑΘΕΣΗ":220,"ΚΑΤΑΚΥΡΩΣΗ":1991,"ΣΥΜΒΑΣΗ":987,"ΠΕΡΙΛΗΨΗ":821,"ΑΝΑΛΗΨΗ":24574,"ΟΡΙΣΤΙΚΟΠΟΙΗΣΗ":1773,"ΕΠΙΤΡΟΠΙΚΟ":19482,"ΚΑΝΟΝΙΣΤΙΚΗ":5188,"ΛΟΙΠΕΣ":14343},
+    yd:{"2020":1.73,"2021":0.86,"2022":1.48,"2023":0.68,"2024":0.69,"2025":3.11,"2026":1.07},
+    yc:{"2020":4.02,"2021":11.35,"2022":3.52,"2023":4.62,"2024":4.84,"2025":5.85,"2026":0.88},
+    ye:{},
+    suppliers:[
+      {afm:"094510036",label:"ΓΕΝ ΚΑ ΑΕ (καθαρισμός)",total:2.357,count:3},
+      {afm:"070419338",label:"AFM 070419338",total:1.163,count:3},
+      {afm:"998283526",label:"AFM 998283526",total:0.514,count:13}],
+    findings:[
+      {r:"high",t:"T4 (pending) — Amendment-inflation pattern",b:"Contract 10/2025 for cleaning: original €755k → amended to €800k → Contract 49/2026 issued at exactly €800k starting price, using the inflated amended value as the new base. ΓΕΝ ΚΑ ΑΕ (AFM 094510036) = 34% of cleaning spend. T4 detector not yet implemented in platform."},
+      {r:"med",t:"T9B/T9C/T9D — Lot splitting in direct awards",b:"Despite the strong competitive-tender record, the 220 direct awards show a pattern of repeated small-value same-supplier awards that together would exceed Art.118 threshold."},
+      {r:"med",t:"T1 — Anomalous amount in direct awards",b:"One or more direct awards with amounts significantly above the peer average for the same service category."}],
+    notes:"Best D:C ratio in cohort (0.11). 19,482 ΕΠΙΤΡΟΠΙΚΟ ΕΝΤΑΛΜΑ (older payment format) accounts for 28% of decisions — may inflate total count. Note: ΓΕΝ ΚΑ ΑΕ (AFM 094510036) also appears as top supplier at ΓΝΑ ΑΧΕΠΑ — cross-hospital supplier alert."
+  },
+  { id:"99221993", name:"ΓΝΑ ΕΥΑΓΓΕΛΙΣΜΟΣ", city:"Αθήνα", beds:650, total:43255,
+    direct_count:3372, direct_amount:60659502, comp_count:1, comp_amount:0,
+    emerg_count:0, emerg_amount:0, emerg_rate:0,
+    rank:"#20", signals:1, pills:["T6"],
+    type_counts:{"ΑΝΑΘΕΣΗ":3372,"ΚΑΤΑΚΥΡΩΣΗ":1,"ΣΥΜΒΑΣΗ":0,"ΠΕΡΙΛΗΨΗ":234,"ΑΝΑΛΗΨΗ":10704,"ΟΡΙΣΤΙΚΟΠΟΙΗΣΗ":18290,"ΕΠΙΤΡΟΠΙΚΟ":0,"ΚΑΝΟΝΙΣΤΙΚΗ":8422,"ΛΟΙΠΕΣ":2232},
+    yd:{"2019":0,"2020":0,"2021":0,"2022":0,"2023":0.06,"2024":60.6,"2025":0,"2026":0},
+    yc:{"2021":0},
+    ye:{},
+    suppliers:[],
+    findings:[
+      {r:"low",t:"T6 — ΑΝΑΛΗΨΗ false positive",b:"T6 fires on ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ posted on public holidays. ΕΠΥ-routed budget commitments, not direct procurement. Filter fix pending."},
+      {r:"med",t:"⚠ 2024 ΑΝΑΘΕΣΗ amount spike — investigation needed",b:"€60.6M of €60.7M total ΑΝΑΘΕΣΗ amount is in 2024 alone (zero all other years). Almost certainly a bulk reclassification or data migration event. Requires manual ADA-level verification before using the amount in analysis."}],
+    notes:"Payment record (€2.06B ΟΡΙΣΤΙΚΟΠΟΙΗΣΗ total) confirms very high actual procurement volume, but routed through ΕΠΥ. The 3,372 ΑΝΑΘΕΣΗ count is real (avg €18k/decision). 2024 amount anomaly makes cumulative ΑΝΑΘΕΣΗ value unreliable."
+  },
+  { id:"99221998", name:"ΓΝΑ ΑΧΕΠΑ", city:"Θεσσαλονίκη", beds:700, total:43994,
+    direct_count:1249, direct_amount:169292061, comp_count:158, comp_amount:13693498,
+    emerg_count:46, emerg_amount:8156558, emerg_rate:3.7,
+    rank:"#10", signals:4, pills:["T1","T5","T6","T8"],
+    type_counts:{"ΑΝΑΘΕΣΗ":1249,"ΚΑΤΑΚΥΡΩΣΗ":158,"ΣΥΜΒΑΣΗ":20,"ΠΕΡΙΛΗΨΗ":244,"ΑΝΑΛΗΨΗ":10767,"ΟΡΙΣΤΙΚΟΠΟΙΗΣΗ":25941,"ΕΠΙΤΡΟΠΙΚΟ":0,"ΚΑΝΟΝΙΣΤΙΚΗ":189,"ΛΟΙΠΕΣ":5426},
+    yd:{"2019":9.74,"2020":10.6,"2021":11.69,"2022":45.31,"2023":27.7,"2024":18.13,"2025":19.04,"2026":27.09},
+    yc:{"2019":0.18,"2020":4.34,"2021":0.33,"2022":0.53,"2023":0.4,"2024":5.79,"2025":1.33,"2026":0.78},
+    ye:{"2019":0.97,"2020":1.05,"2021":0.44,"2022":1.96,"2023":0.7,"2024":0.85,"2025":1.54,"2026":0.66},
+    suppliers:[
+      {afm:"998309282",label:"ΕΠΥ / AFM 998309282 (verify)",total:0.983,count:2},
+      {afm:"094510036",label:"ΓΕΝ ΚΑ ΑΕ (also top supplier at ΤΡΙΚΑΛΑ)",total:0.056,count:2},
+      {afm:"999723663",label:"AFM 999723663",total:0.02,count:1}],
+    findings:[
+      {r:"high",t:"T5 — ΑΧΟΥΤΟΣ ΕΠΙΣΙΤΙΣΜΟΣ emergency cleaning 2019–2026",b:"46 Art.32§2γ emergency decisions over 7 years. €8.16M total. Yearly: 2019 €0.97M, 2020 €1.05M, 2021 €0.44M, 2022 €1.96M, 2023 €0.70M, 2024 €0.85M, 2025 €1.54M (€1.32M single award), 2026 €0.66M (3×€218k Jan–Mar). A service running continuously for 7 years cannot lawfully qualify as 'emergency'."},
+      {r:"med",t:"T8 — 2020 single-source concentration",b:"AFM 998309282 = 92.6% of 2020 direct-award spend. This AFM may correspond to ΕΠΥ — verification needed to distinguish ΕΠΥ-routed procurement from genuine single-source monopoly."},
+      {r:"med",t:"T1 — 2022 direct-award spike",b:"€45.3M ΑΝΑΘΕΣΗ in 2022 = 2.5–4× surrounding years. Not explained by emergency records alone. Possible bulk procurement reclassification during COVID recovery period."}],
+    notes:"€266.8M ΟΡΙΣΤΙΚΟΠΟΙΗΣΗ (payment) confirms major procurement entity. 2022 amount spike is the primary unexplained anomaly. Cross-supplier alert: ΓΕΝ ΚΑ ΑΕ (AFM 094510036) = top cleaning supplier also at ΓΝ ΤΡΙΚΑΛΑ."
+  }
+];
+
+// ─── UTILS ────────────────────────────────────────────────────────────
+function fmtM(v) {
+  if (!v || v===0) return "0";
+  if (v>=1e9) return (v/1e9).toFixed(1)+"B";
+  if (v>=1e6) return (v/1e6).toFixed(1)+"M";
+  if (v>=1e3) return (v/1e3).toFixed(0)+"k";
+  return v.toFixed(0);
 }
-document.querySelectorAll('.chapter-nav a').forEach(a=>{
-  a.addEventListener('click',e=>{e.preventDefault();goTab(a.dataset.tab)});
-});
-function updateProgress(){
-  const idx=tabs.indexOf(document.querySelector('.pane.active')?.id||'tab1');
-  document.getElementById('progress-bar').style.width=((idx+1)/tabs.length*100)+'%';
+function fmtN(v) { return (v||0).toLocaleString('el-GR'); }
+
+const CHART_DEFAULTS = {
+  responsive: true, maintainAspectRatio: false,
+  plugins: { legend: { labels: { color:'#8892a4', boxWidth:12, font:{size:11} } } }
+};
+const AXIS_STYLE = { ticks:{color:'#8892a4',font:{size:11}}, grid:{color:'rgba(42,45,62,.8)'} };
+
+// ─── TABS ─────────────────────────────────────────────────────────────
+const _rendered = {};
+function showTab(id, btn) {
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+  if (!_rendered[id]) {
+    _rendered[id] = true;
+    if (id==='profile')     renderProfile();
+    if (id==='procurement') renderProcurement();
+    if (id==='trends')      renderTrends();
+    if (id==='hospitals')   renderHospitals();
+  }
 }
-updateProgress();
+
+// ─── OVERVIEW SUMMARY CARDS ──────────────────────────────────────────
+(function buildSummary() {
+  const g = document.getElementById('summary-grid');
+  HOSPITALS.forEach(h => {
+    const stripe = Object.entries(h.type_counts).map(([k,v])=>{
+      const p=(v/h.total*100).toFixed(2);
+      return `<div style="background:${COLORS[k]||'#475569'};width:${p}%;height:100%"></div>`;
+    }).join('');
+    const rc = h.signals>=5?'#fca5a5':h.signals>=3?'#fdba74':h.signals>=1?'#fcd34d':'#86efac';
+    g.innerHTML += `
+      <div class="hosp-card">
+        <div class="hosp-name">${h.name}</div>
+        <div class="hosp-city">${h.city}</div>
+        <div class="hosp-beds">${h.beds} beds</div>
+        <div style="margin-bottom:5px">
+          <div class="hm-label">Records</div>
+          <div class="hm-value">${fmtN(h.total)}</div>
+        </div>
+        <div style="margin-bottom:5px">
+          <div class="hm-label">ΑΝΑΘΕΣΗ</div>
+          <div class="hm-value" style="color:${h.direct_count?'#fca5a5':'var(--muted)'}">${fmtN(h.direct_count)||'0'}</div>
+          <div class="hm-sub">${h.direct_amount?'€'+fmtM(h.direct_amount):'none visible'}</div>
+        </div>
+        <div>
+          <div class="hm-label">Risk</div>
+          <div class="hm-value" style="color:${rc}">${h.rank} <span style="font-size:.72rem;font-weight:400">(${h.signals})</span></div>
+        </div>
+        <div class="profile-stripe">${stripe}</div>
+      </div>`;
+  });
+})();
+
+// ─── PROFILE CHARTS ───────────────────────────────────────────────────
+function renderProfile() {
+  const labels = HOSPITALS.map(h=>h.name.replace(/ΓΝΑ |ΓΝ /,''));
+  const types = ["ΑΝΑΘΕΣΗ","ΚΑΤΑΚΥΡΩΣΗ","ΣΥΜΒΑΣΗ","ΠΕΡΙΛΗΨΗ","ΑΝΑΛΗΨΗ","ΟΡΙΣΤΙΚΟΠΟΙΗΣΗ","ΕΠΙΤΡΟΠΙΚΟ","ΚΑΝΟΝΙΣΤΙΚΗ","ΛΟΙΠΕΣ"];
+  const typeLbl = {
+    "ΑΝΑΘΕΣΗ":"ΑΝΑΘΕΣΗ (direct award)","ΚΑΤΑΚΥΡΩΣΗ":"ΚΑΤΑΚΥΡΩΣΗ (competitive)",
+    "ΣΥΜΒΑΣΗ":"ΣΥΜΒΑΣΗ","ΠΕΡΙΛΗΨΗ":"ΠΕΡΙΛΗΨΗ ΔΙΑΚΗΡΥΞΗΣ",
+    "ΑΝΑΛΗΨΗ":"ΑΝΑΛΗΨΗ (budget commit)","ΟΡΙΣΤΙΚΟΠΟΙΗΣΗ":"ΟΡΙΣΤΙΚΟΠΟΙΗΣΗ (payment)",
+    "ΕΠΙΤΡΟΠΙΚΟ":"ΕΠΙΤΡΟΠΙΚΟ ΕΝΤΑΛΜΑ","ΚΑΝΟΝΙΣΤΙΚΗ":"ΚΑΝΟΝΙΣΤΙΚΗ ΠΡΑΞΗ","ΛΟΙΠΕΣ":"Λοιπές"
+  };
+  const ds = types.map(t=>({
+    label: typeLbl[t],
+    data: HOSPITALS.map(h=>parseFloat(((h.type_counts[t]||0)/h.total*100).toFixed(2))),
+    backgroundColor: COLORS[t], borderWidth:0,
+  }));
+  new Chart(document.getElementById('chartProfile'),{
+    type:'bar', data:{labels, datasets:ds},
+    options:{...CHART_DEFAULTS,
+      scales:{x:{stacked:true,...AXIS_STYLE},y:{stacked:true,max:100,...AXIS_STYLE,ticks:{...AXIS_STYLE.ticks,callback:v=>v+'%'}}},
+      plugins:{...CHART_DEFAULTS.plugins,legend:{display:false},tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${c.parsed.y}%`}}}
+    }
+  });
+  const dsAbs = types.map(t=>({
+    label: typeLbl[t],
+    data: HOSPITALS.map(h=>h.type_counts[t]||0),
+    backgroundColor: COLORS[t], borderWidth:0,
+  }));
+  new Chart(document.getElementById('chartAbsCount'),{
+    type:'bar', data:{labels, datasets:dsAbs},
+    options:{...CHART_DEFAULTS,
+      scales:{x:{stacked:true,...AXIS_STYLE},y:{stacked:true,...AXIS_STYLE,ticks:{...AXIS_STYLE.ticks,callback:v=>v>=1000?(v/1000)+'k':v}}},
+      plugins:{...CHART_DEFAULTS.plugins,legend:{display:false},tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${c.parsed.y.toLocaleString()}`}}}
+    }
+  });
+}
+
+// ─── PROCUREMENT CHARTS ───────────────────────────────────────────────
+function renderProcurement() {
+  // Ratio bars
+  const rc = document.getElementById('ratio-bars');
+  HOSPITALS.forEach(h=>{
+    const tot = h.direct_count+h.comp_count;
+    if (!tot) {
+      rc.innerHTML+=`<div style="margin-bottom:8px"><div style="font-size:.77rem;color:var(--muted);margin-bottom:2px">${h.name} — no procurement records in own feed</div><div class="ratio-bar"></div></div>`;
+      return;
+    }
+    const dp=h.direct_count/tot*100, cp=h.comp_count/tot*100;
+    const ratio=h.comp_count>0?(h.direct_count/h.comp_count).toFixed(1)+':1':'∞';
+    const rc2=h.direct_count/Math.max(h.comp_count,1)>5?'#fca5a5':h.direct_count/Math.max(h.comp_count,1)>2?'#fdba74':'#86efac';
+    rc.innerHTML+=`
+      <div style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;font-size:.77rem;margin-bottom:2px">
+          <span style="color:var(--text)">${h.name}</span>
+          <span style="color:${rc2};font-weight:700">${ratio} D:C</span>
+        </div>
+        <div class="ratio-bar">
+          <div style="background:#ef4444;width:${dp.toFixed(1)}%;height:100%"></div>
+          <div style="background:#3b82f6;width:${cp.toFixed(1)}%;height:100%"></div>
+        </div>
+        <div style="font-size:.69rem;color:var(--muted)">${fmtN(h.direct_count)} direct / ${fmtN(h.comp_count)} competitive</div>
+      </div>`;
+  });
+
+  // Avg award size
+  const withD = HOSPITALS.filter(h=>h.direct_count>0&&h.direct_amount>0);
+  new Chart(document.getElementById('chartAvgSize'),{
+    type:'bar',
+    data:{
+      labels: withD.map(h=>h.name.replace(/ΓΝΑ |ΓΝ /,'')),
+      datasets:[{
+        label:'Avg ΑΝΑΘΕΣΗ (€k)',
+        data: withD.map(h=>parseFloat((h.direct_amount/h.direct_count/1000).toFixed(1))),
+        backgroundColor: withD.map(h=>h.direct_amount/h.direct_count>80000?'#ef4444':h.direct_amount/h.direct_count>20000?'#f97316':'#22c55e'),
+        borderWidth:0, borderRadius:4,
+      }]
+    },
+    options:{...CHART_DEFAULTS, indexAxis:'y',
+      scales:{x:{...AXIS_STYLE,ticks:{...AXIS_STYLE.ticks,callback:v=>'€'+v+'k'}},y:{...AXIS_STYLE}},
+      plugins:{...CHART_DEFAULTS.plugins,legend:{display:false},tooltip:{callbacks:{label:c=>` Avg: €${(c.parsed.x*1000).toLocaleString()}`}}}
+    }
+  });
+
+  // Amounts grouped bar
+  const withA = HOSPITALS.filter(h=>h.direct_count>0);
+  new Chart(document.getElementById('chartAmounts'),{
+    type:'bar',
+    data:{
+      labels: withA.map(h=>h.name.replace(/ΓΝΑ |ΓΝ /,'')),
+      datasets:[
+        {label:'ΑΝΑΘΕΣΗ (direct) €M', data:withA.map(h=>parseFloat((h.direct_amount/1e6).toFixed(1))), backgroundColor:'#ef4444', borderWidth:0, borderRadius:3},
+        {label:'ΚΑΤΑΚΥΡΩΣΗ (competitive) €M', data:withA.map(h=>parseFloat((h.comp_amount/1e6).toFixed(1))), backgroundColor:'#3b82f6', borderWidth:0, borderRadius:3},
+      ]
+    },
+    options:{...CHART_DEFAULTS,
+      scales:{x:{...AXIS_STYLE},y:{...AXIS_STYLE,ticks:{...AXIS_STYLE.ticks,callback:v=>'€'+v+'M'}}},
+      plugins:{...CHART_DEFAULTS.plugins,tooltip:{callbacks:{label:c=>` ${c.dataset.label}: €${c.parsed.y}M`}}}
+    }
+  });
+
+  // Emergency rate
+  const withE = HOSPITALS.filter(h=>h.direct_count>0);
+  new Chart(document.getElementById('chartEmergRate'),{
+    type:'bar',
+    data:{
+      labels:withE.map(h=>h.name.replace(/ΓΝΑ |ΓΝ /,'')),
+      datasets:[{label:'Emergency %',
+        data:withE.map(h=>h.emerg_rate),
+        backgroundColor:withE.map(h=>h.emerg_rate>=3?'#ef4444':h.emerg_rate>0?'#f97316':'#475569'),
+        borderWidth:0, borderRadius:3,
+      }]
+    },
+    options:{...CHART_DEFAULTS, indexAxis:'y',
+      scales:{x:{...AXIS_STYLE,max:6,ticks:{...AXIS_STYLE.ticks,callback:v=>v+'%'}},y:{...AXIS_STYLE}},
+      plugins:{...CHART_DEFAULTS.plugins,legend:{display:false}}
+    }
+  });
+
+  // Emergency amount
+  const withEA = HOSPITALS.filter(h=>h.emerg_amount>0);
+  new Chart(document.getElementById('chartEmergAmount'),{
+    type:'bar',
+    data:{
+      labels:withEA.map(h=>h.name.replace(/ΓΝΑ |ΓΝ /,'')),
+      datasets:[{label:'Emergency €M',
+        data:withEA.map(h=>parseFloat((h.emerg_amount/1e6).toFixed(2))),
+        backgroundColor:withEA.map((_,i)=>i===withEA.length-1?'#ef4444':'#f97316'),
+        borderWidth:0, borderRadius:3,
+      }]
+    },
+    options:{...CHART_DEFAULTS,
+      scales:{x:{...AXIS_STYLE,ticks:{...AXIS_STYLE.ticks,callback:v=>'€'+v+'M'}},y:{...AXIS_STYLE}},
+      plugins:{...CHART_DEFAULTS.plugins,legend:{display:false}}
+    }
+  });
+}
+
+// ─── TRENDS CHARTS ────────────────────────────────────────────────────
+function renderTrends() {
+  function lineChart(id, h) {
+    const allYears = [...new Set([...Object.keys(h.yd),...Object.keys(h.yc),...Object.keys(h.ye)])].sort();
+    const ds = [
+      {label:'ΑΝΑΘΕΣΗ (direct) €M', data:allYears.map(y=>h.yd[y]??null), borderColor:'#ef4444', backgroundColor:'rgba(239,68,68,.08)', tension:0.3, fill:true, pointRadius:3},
+      {label:'ΚΑΤΑΚΥΡΩΣΗ (competitive) €M', data:allYears.map(y=>h.yc[y]??null), borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,.08)', tension:0.3, fill:true, pointRadius:3},
+    ];
+    if (Object.keys(h.ye).length)
+      ds.push({label:'Emergency Art.32 €M', data:allYears.map(y=>h.ye[y]??null), borderColor:'#f97316', backgroundColor:'transparent', tension:0.3, borderDash:[4,2], pointRadius:3, fill:false});
+    new Chart(document.getElementById(id),{
+      type:'line', data:{labels:allYears, datasets:ds},
+      options:{...CHART_DEFAULTS,
+        scales:{x:{...AXIS_STYLE},y:{...AXIS_STYLE,ticks:{...AXIS_STYLE.ticks,callback:v=>'€'+v+'M'}}},
+      }
+    });
+  }
+  lineChart('chartLamia',  HOSPITALS.find(h=>h.id==='99221923'));
+  lineChart('chartAchipa', HOSPITALS.find(h=>h.id==='99221998'));
+  lineChart('chartTrikala',HOSPITALS.find(h=>h.id==='99221946'));
+  lineChart('chartAmfissa',HOSPITALS.find(h=>h.id==='99221942'));
+
+  const lamia  = HOSPITALS.find(h=>h.id==='99221923');
+  const achipa = HOSPITALS.find(h=>h.id==='99221998');
+  const ey = ["2019","2020","2021","2022","2023","2024","2025","2026"];
+  new Chart(document.getElementById('chartEmergYear'),{
+    type:'line',
+    data:{labels:ey, datasets:[
+      {label:'ΓΝ ΛΑΜΙΑ emergency €M', data:ey.map(y=>lamia.ye[y]??null), borderColor:'#f97316', backgroundColor:'rgba(249,115,22,.08)', tension:0.3, fill:true, pointRadius:3},
+      {label:'ΓΝΑ ΑΧΕΠΑ emergency €M', data:ey.map(y=>achipa.ye[y]??null), borderColor:'#ef4444', backgroundColor:'rgba(239,68,68,.08)', tension:0.3, fill:true, pointRadius:3},
+    ]},
+    options:{...CHART_DEFAULTS,
+      scales:{x:{...AXIS_STYLE},y:{...AXIS_STYLE,ticks:{...AXIS_STYLE.ticks,callback:v=>'€'+v+'M'}}},
+    }
+  });
+}
+
+// ─── HOSPITAL DEEP DIVE CARDS ─────────────────────────────────────────
+function renderHospitals() {
+  const c = document.getElementById('deepdive-container');
+  HOSPITALS.forEach(h=>{
+    const rc = h.signals>=5?'#fca5a5':h.signals>=3?'#fdba74':'#fcd34d';
+    const tag = h.signals>=5?'<span class="risk-tag">HIGH RISK</span>':h.signals>=3?'<span class="warn-tag">ELEVATED</span>':'<span class="info-tag">WATCH</span>';
+    const pills = h.pills.map(p=>`<span class="pill pill-${p.startsWith('T5')||p.startsWith('T8')?'red':p.startsWith('T9')?'amber':'blue'}">${p}</span>`).join('');
+
+    const typeRows = Object.entries(h.type_counts).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([k,v])=>`
+      <tr><td><span style="display:inline-block;width:7px;height:7px;background:${COLORS[k]||'#475569'};border-radius:1px;margin-right:4px"></span>${k}</td>
+      <td class="num">${v.toLocaleString()}</td><td class="num">${(v/h.total*100).toFixed(1)}%</td></tr>`).join('');
+
+    const suppHtml = h.suppliers.length?`<div style="margin-top:12px">
+      <div style="font-size:.75rem;font-weight:600;color:#fff;margin-bottom:5px">Top Suppliers (ΑΝΑΘΕΣΗ)</div>
+      ${h.suppliers.map((s,i)=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);font-size:.76rem">
+        <div><b>#${i+1}</b> <span style="color:#fff">${s.label}</span> <span style="color:var(--muted);font-size:.68rem">AFM ${s.afm}</span></div>
+        <div style="text-align:right"><b style="color:#fca5a5">€${s.total.toFixed(2)}M</b> <span style="color:var(--muted)">(${s.count})</span></div>
+      </div>`).join('')}</div>`:'';
+
+    const findHtml = h.findings.map(f=>`<div class="finding-item risk-${f.r}"><div class="f-title">${f.t}</div><div class="f-body">${f.b}</div></div>`).join('');
+
+    c.innerHTML+=`
+      <div class="deepdive">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+          <div>
+            <div class="deepdive-name">${h.name}</div>
+            <div class="deepdive-meta">${h.city} · ${h.beds} beds · ${fmtN(h.total)} records · 2019/2020–2026</div>
+          </div>
+          <div style="text-align:right">${tag} <span style="font-size:.8rem;color:var(--muted)">${h.rank}</span><br>${pills}</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+          <div>
+            <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:10px">
+              <div><div class="s-label">ΑΝΑΘΕΣΗ</div><div class="s-value" style="color:${h.direct_count?'#fca5a5':'var(--muted)'}">${fmtN(h.direct_count)}</div><div class="s-sub">${h.direct_amount?'€'+fmtM(h.direct_amount):'ΕΠΥ-routed?'}</div></div>
+              <div><div class="s-label">ΚΑΤΑΚΥΡΩΣΗ</div><div class="s-value" style="color:${h.comp_count>100?'#86efac':h.comp_count>0?'#93c5fd':'var(--muted)'}">${fmtN(h.comp_count)}</div><div class="s-sub">${h.comp_amount?'€'+fmtM(h.comp_amount):'—'}</div></div>
+              <div><div class="s-label">Emergency</div><div class="s-value" style="color:${h.emerg_rate>=3?'#fca5a5':h.emerg_rate>0?'#fdba74':'var(--muted)'}">${h.emerg_rate>0?h.emerg_rate+'%':'—'}</div><div class="s-sub">${h.emerg_count?h.emerg_count+' dec, €'+fmtM(h.emerg_amount):'not measurable'}</div></div>
+            </div>
+            <table style="font-size:.73rem"><thead><tr><th>Type</th><th class="num">N</th><th class="num">%</th></tr></thead><tbody>${typeRows}</tbody></table>
+            ${suppHtml}
+          </div>
+          <div>
+            <div style="font-size:.77rem;font-weight:600;color:#fff;margin-bottom:7px">Risk Findings</div>
+            ${findHtml}
+            <div style="font-size:.73rem;color:var(--muted);margin-top:8px;padding:8px 10px;background:var(--card2);border-radius:5px;border:1px solid var(--border)"><b style="color:#8892a4">Data notes:</b> ${h.notes}</div>
+          </div>
+        </div>
+      </div>`;
+  });
+}
 </script>
 </body>
 </html>
