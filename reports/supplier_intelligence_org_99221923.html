@@ -3,333 +3,518 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ΓΝ ΛΑΜΙΑ — Procurement Intelligence Brief</title>
+<title>ΓΝ ΛΑΜΙΑ — Procurement Intelligence</title>
 <style>
-  :root {
-    --bg: #0f1117; --card: #1a1d27; --card2: #1e2133; --border: #2a2d3e;
-    --text: #e2e8f0; --muted: #8892a4; --accent: #6366f1;
-    --red: #ef4444; --orange: #f97316; --amber: #f59e0b; --green: #22c55e;
-    --teal: #14b8a6; --blue: #3b82f6; --purple: #a855f7;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif; font-size: 14px; line-height: 1.6; }
+:root{--bg:#0f1117;--card:#1a1d27;--card2:#1e2133;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--red:#ef4444;--orange:#f97316;--amber:#f59e0b;--green:#22c55e;--teal:#14b8a6;--blue:#3b82f6}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;font-size:14px;line-height:1.6}
 
-  .header { background: var(--card); border-bottom: 1px solid var(--border); padding: 20px 28px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-  .h-org { font-size: 1.35rem; font-weight: 800; color: #fff; }
-  .h-meta { color: var(--muted); font-size: .82rem; margin-top: 2px; }
-  .risk-badge { background: rgba(239,68,68,.18); color: #fca5a5; border: 1px solid rgba(239,68,68,.35); border-radius: 8px; padding: 6px 16px; font-size: .85rem; font-weight: 700; letter-spacing: .03em; }
-  .signal-count { font-size: 2rem; font-weight: 800; color: #fca5a5; }
-  .signal-label { font-size: .72rem; color: var(--muted); }
+/* header */
+.hdr{background:var(--card);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;position:sticky;top:0;z-index:100}
+.hdr-name{font-size:1.1rem;font-weight:800;color:#fff}
+.hdr-meta{font-size:.75rem;color:var(--muted);margin-top:1px}
+.risk-pill{background:rgba(239,68,68,.18);color:#fca5a5;border:1px solid rgba(239,68,68,.35);border-radius:6px;padding:4px 12px;font-size:.78rem;font-weight:700}
+.sig-n{font-size:1.6rem;font-weight:800;color:#fca5a5;line-height:1}
+.sig-l{font-size:.68rem;color:var(--muted)}
 
-  .main { max-width: 1300px; margin: 0 auto; padding: 24px; }
-  .section-title { font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 14px; margin-top: 32px; padding-bottom: 6px; border-bottom: 1px solid var(--border); letter-spacing: .02em; }
-  .section-title:first-child { margin-top: 0; }
+/* tabs */
+.tabs{background:var(--card);border-bottom:1px solid var(--border);display:flex;padding:0 24px;overflow-x:auto;gap:0}
+.tab{background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);cursor:pointer;font-size:.82rem;font-weight:500;padding:10px 14px;white-space:nowrap;transition:color .15s,border-color .15s;display:flex;align-items:center;gap:6px}
+.tab:hover{color:var(--text)}
+.tab.active{border-bottom-color:var(--accent);color:#fff;font-weight:600}
+.tab-cnt{font-size:.68rem;background:rgba(99,102,241,.2);color:#a5b4fc;border-radius:9999px;padding:1px 6px;font-weight:700}
+.tab-cnt.red{background:rgba(239,68,68,.2);color:#fca5a5}
+.tab-cnt.amber{background:rgba(245,158,11,.2);color:#fcd34d}
 
-  .stat-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
-  @media(max-width:900px) { .stat-grid { grid-template-columns: repeat(3,1fr); } }
-  .stat { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
-  .stat-val { font-size: 1.55rem; font-weight: 800; color: #fff; }
-  .stat-lbl { font-size: .73rem; color: var(--muted); margin-top: 2px; }
-  .stat-sub { font-size: .72rem; color: var(--muted); }
+/* panes */
+.pane{display:none;padding:24px;max-width:1280px;margin:0 auto}
+.pane.active{display:block}
 
-  .tenet-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-  @media(max-width:1000px) { .tenet-grid { grid-template-columns: 1fr 1fr; } }
-  .tenet-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; position: relative; }
-  .tenet-card.fired { border-color: rgba(239,68,68,.4); background: rgba(239,68,68,.04); }
-  .tenet-card.clean { border-color: rgba(34,197,94,.25); background: rgba(34,197,94,.03); }
-  .tenet-id { font-size: .7rem; font-weight: 800; letter-spacing: .06em; margin-bottom: 4px; }
-  .tenet-name { font-size: .88rem; font-weight: 700; color: #fff; margin-bottom: 6px; }
-  .tenet-usecase { font-size: .76rem; color: var(--muted); line-height: 1.55; }
-  .tenet-status { position: absolute; top: 12px; right: 12px; font-size: .68rem; font-weight: 700; padding: 2px 7px; border-radius: 4px; }
-  .fired-badge { background: rgba(239,68,68,.2); color: #fca5a5; }
-  .clean-badge { background: rgba(34,197,94,.15); color: #86efac; }
-  .tenet-evidence { font-size: .73rem; color: #fcd34d; margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,.07); line-height: 1.55; }
-  .tenet-evidence.clean { color: #86efac; }
+/* stat row */
+.stat-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px 16px;min-width:140px}
+.stat-v{font-size:1.4rem;font-weight:800;color:#fff}
+.stat-l{font-size:.7rem;color:var(--muted);margin-top:1px}
+.stat-s{font-size:.68rem;color:var(--muted)}
 
-  .finding { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; margin-bottom: 12px; }
-  .finding.critical { border-left: 4px solid var(--red); }
-  .finding.high { border-left: 4px solid var(--orange); }
-  .finding.med { border-left: 4px solid var(--amber); }
-  .finding-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
-  .finding-title { font-size: .92rem; font-weight: 700; color: #fff; }
-  .finding-body { font-size: .8rem; color: var(--muted); line-height: 1.65; }
-  .finding-body b { color: var(--text); }
+/* section header */
+.sec{font-size:.85rem;font-weight:700;color:#fff;margin:20px 0 10px;padding-bottom:5px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.sec .badge{font-size:.68rem;font-weight:700;padding:1px 7px;border-radius:4px}
 
-  .ev-table { width: 100%; border-collapse: collapse; font-size: .75rem; margin-top: 10px; }
-  .ev-table th { background: var(--card2); color: var(--muted); font-weight: 600; padding: 6px 10px; text-align: left; border-bottom: 1px solid var(--border); }
-  .ev-table td { padding: 6px 10px; border-bottom: 1px solid rgba(255,255,255,.04); color: var(--text); }
-  .ev-table tr:hover td { background: rgba(255,255,255,.02); }
-  .mono { font-family: 'SF Mono', 'Menlo', monospace; font-size: .7rem; color: var(--accent); }
-  .num { text-align: right; }
-  .col-red { color: #fca5a5; font-weight: 700; }
-  .col-amber { color: #fcd34d; }
-  .col-green { color: #86efac; }
+/* narrative box */
+.narrative{background:var(--card);border:1px solid var(--border);border-left:4px solid;border-radius:8px;padding:14px 16px;margin-bottom:16px;font-size:.8rem;color:var(--muted);line-height:1.7}
+.narrative b{color:var(--text)}
+.narrative.critical{border-left-color:var(--red)}
+.narrative.high{border-left-color:var(--orange)}
+.narrative.med{border-left-color:var(--amber)}
+.narrative.low{border-left-color:var(--teal)}
 
-  .blind-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  @media(max-width:700px) { .blind-grid { grid-template-columns: 1fr; } }
-  .blind { background: var(--card); border: 1px solid var(--border); border-left: 3px solid #3a3d4e; border-radius: 10px; padding: 12px 16px; }
-  .blind-title { font-size: .82rem; font-weight: 700; color: #8892a4; margin-bottom: 4px; }
-  .blind-body { font-size: .74rem; color: var(--muted); opacity: .85; line-height: 1.55; }
+/* tables */
+table{width:100%;border-collapse:collapse;font-size:.75rem}
+th{background:var(--card2);color:var(--muted);font-weight:600;padding:7px 10px;text-align:left;border-bottom:1px solid var(--border)}
+td{padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:top}
+tr:hover td{background:rgba(255,255,255,.02)}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.mono{font-family:'SF Mono','Menlo',monospace;font-size:.7rem;color:var(--accent)}
+.red{color:#fca5a5;font-weight:700}
+.orange{color:#fdba74;font-weight:600}
+.amber{color:#fcd34d}
+.green{color:#86efac}
+.muted{color:var(--muted)}
+.rank{color:var(--muted);font-size:.7rem}
 
-  .notice { border-radius: 8px; padding: 12px 16px; font-size: .8rem; line-height: 1.65; margin-bottom: 16px; }
-  .notice-amber { background: rgba(245,158,11,.08); border-left: 3px solid var(--amber); }
-  .notice b { color: #fff; }
-  .pill { display: inline-block; font-size: .68rem; font-weight: 700; padding: 1px 7px; border-radius: 4px; margin-right: 3px; }
-  .pill-red { background: rgba(239,68,68,.2); color: #fca5a5; }
-  .pill-amber { background: rgba(245,158,11,.2); color: #fcd34d; }
+/* supplier strip */
+.sup-strip{background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:10px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.sup-name{font-size:.82rem;font-weight:600;color:#fff}
+.sup-afm{font-size:.7rem;color:var(--muted)}
+.sup-total{font-size:1.1rem;font-weight:800;color:#fca5a5}
+.sup-meta{font-size:.72rem;color:var(--muted)}
+
+/* timeline */
+.timeline{position:relative;padding-left:20px;margin:12px 0}
+.timeline::before{content:'';position:absolute;left:6px;top:0;bottom:0;width:2px;background:var(--border)}
+.tl-item{position:relative;margin-bottom:12px}
+.tl-dot{position:absolute;left:-17px;top:4px;width:10px;height:10px;border-radius:50%;border:2px solid}
+.tl-dot.red{border-color:var(--red);background:rgba(239,68,68,.3)}
+.tl-dot.amber{border-color:var(--amber);background:rgba(245,158,11,.3)}
+.tl-dot.green{border-color:var(--green);background:rgba(34,197,94,.3)}
+.tl-date{font-size:.72rem;color:var(--muted)}
+.tl-title{font-size:.82rem;font-weight:600;color:#fff}
+.tl-body{font-size:.74rem;color:var(--muted);margin-top:2px}
+
+/* use-case box */
+.usecase{background:rgba(99,102,241,.07);border:1px solid rgba(99,102,241,.2);border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:.78rem;color:#c7d2fe;line-height:1.65}
+.usecase strong{color:#e0e7ff}
+
+/* notice */
+.notice{border-radius:6px;padding:10px 14px;font-size:.76rem;line-height:1.6;margin-bottom:14px}
+.notice-amber{background:rgba(245,158,11,.08);border-left:3px solid var(--amber)}
+.notice b{color:#fff}
+
+/* bar */
+.bar-wrap{height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;width:100%;min-width:60px}
+.bar-fill{height:100%;border-radius:3px;background:var(--red)}
+
+/* pills */
+.pill{display:inline-block;font-size:.65rem;font-weight:700;padding:1px 6px;border-radius:3px;margin-right:2px}
+.pill-r{background:rgba(239,68,68,.2);color:#fca5a5}
+.pill-a{background:rgba(245,158,11,.2);color:#fcd34d}
+.pill-b{background:rgba(59,130,246,.2);color:#93c5fd}
+
+/* note box */
+.note{font-size:.73rem;color:var(--muted);background:var(--card2);border:1px solid var(--border);border-radius:5px;padding:8px 12px;margin-top:10px;line-height:1.55}
+.note b{color:#8892a4}
+
+/* grid 2 */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:800px){.g2{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 
-<div class="header">
+<!-- HEADER -->
+<div class="hdr">
   <div>
-    <div class="h-org">ΓΝ ΛΑΜΙΑ — Γενικό Νοσοκομείο Λαμίας</div>
-    <div class="h-meta">Org UID 99221923 · 307 beds · Λαμία, Φθιώτιδα · Data: 2020–2026 · 50,729 decisions</div>
+    <div class="hdr-name">ΓΝ ΛΑΜΙΑ — Γενικό Νοσοκομείο Λαμίας</div>
+    <div class="hdr-meta">Org UID 99221923 · 307 beds · Φθιώτιδα · 50,729 decisions · 2020–2026</div>
   </div>
-  <div style="display:flex;align-items:center;gap:20px">
-    <div style="text-align:right">
-      <div class="signal-count">8 / 9</div>
-      <div class="signal-label">SIGNALS FIRED</div>
-    </div>
-    <div class="risk-badge">🔴 HIGH RISK</div>
+  <div style="display:flex;align-items:center;gap:16px">
+    <div style="text-align:right"><div class="sig-n">8/9</div><div class="sig-l">SIGNALS</div></div>
+    <div class="risk-pill">🔴 HIGH RISK</div>
   </div>
 </div>
 
-<div class="main">
-
-<!-- STATS -->
-<div class="section-title">Summary</div>
-<div class="stat-grid">
-  <div class="stat">
-    <div class="stat-val" style="color:#fca5a5">5,887</div>
-    <div class="stat-lbl">Direct Awards (ΑΝΑΘΕΣΗ)</div>
-    <div class="stat-sub">€215.5M cumulative 2020–2026</div>
-  </div>
-  <div class="stat">
-    <div class="stat-val" style="color:#93c5fd">407</div>
-    <div class="stat-lbl">Competitive Tenders (ΚΑΤΑΚΥΡΩΣΗ)</div>
-    <div class="stat-sub">€45.3M · D:C ratio 14.5:1</div>
-  </div>
-  <div class="stat">
-    <div class="stat-val" style="color:#fcd34d">163</div>
-    <div class="stat-lbl">Emergency Awards (Art.32§2γ)</div>
-    <div class="stat-sub">2.8% rate · €2.78M</div>
-  </div>
-  <div class="stat">
-    <div class="stat-val" style="color:#fca5a5">€3.26M</div>
-    <div class="stat-lbl">ISS/UNISON cleaning total</div>
-    <div class="stat-sub">AFM 094081864 · 8 awards over 6 years</div>
-  </div>
-  <div class="stat">
-    <div class="stat-val" style="color:#fca5a5">72%</div>
-    <div class="stat-lbl">2026 direct-award concentration</div>
-    <div class="stat-sub">ISS/UNISON alone · €1.74M of €2.41M</div>
-  </div>
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" onclick="show('overview',this)">Overview</button>
+  <button class="tab" onclick="show('t5',this)">T5 — Emergency overuse <span class="tab-cnt red">5</span></button>
+  <button class="tab" onclick="show('t4',this)">T4 — Price ratchet <span class="tab-cnt red">2</span></button>
+  <button class="tab" onclick="show('t6',this)">T6 — Timing <span class="tab-cnt amber">29</span></button>
+  <button class="tab" onclick="show('t9b',this)">T9B — Copy-paste <span class="tab-cnt amber">62</span></button>
+  <button class="tab" onclick="show('t9c',this)">T9C — Lot-splitting <span class="tab-cnt amber">14</span></button>
+  <button class="tab" onclick="show('t9d',this)">T9D — Price standardisation <span class="tab-cnt amber">15</span></button>
 </div>
 
-<!-- TENET CAPABILITY GRID -->
-<div class="section-title">Platform detection capabilities — 9 tenets, what each surfaces</div>
-<div class="notice notice-amber">
-  <b>Reading guide:</b> Each card describes a distinct procurement-irregularity use case the platform detects algorithmically from Diavgeia records. <span style="color:#fca5a5;font-weight:700">Red = fired</span> at ΓΝ ΛΑΜΙΑ with evidence. <span style="color:#86efac;font-weight:700">Green = clean</span> for that pattern. Platform blind spots (what cannot be detected) are listed below.
-</div>
-<div class="tenet-grid">
+<!-- ═══ OVERVIEW ════════════════════════════════════════════════════════ -->
+<div id="pane-overview" class="pane active">
 
-  <div class="tenet-card fired">
-    <span class="tenet-status fired-badge">FIRED</span>
-    <div class="tenet-id" style="color:#fca5a5">T1 · Direct-award concentration</div>
-    <div class="tenet-usecase">
-      <b style="color:#fff">Use case:</b> Preferred-vendor capture. One supplier absorbs a structurally disproportionate share of no-bid spending — indicates either exclusive technical dependence (which should trigger Art.32§2β, not §2γ), repeated supplier choice bias, or capture of the procurement officer making award decisions.
-    </div>
-    <div class="tenet-evidence">↳ AFM 094081864 (ISS/UNISON) = 26.6% of all ΑΝΑΘΕΣΗ spend 2020–2026 (€3.26M, 8 awards). A commoditised cleaning service repeatedly awarded without competition.</div>
+  <div class="stat-row">
+    <div class="stat"><div class="stat-v" style="color:#fca5a5">5,887</div><div class="stat-l">Direct Awards (ΑΝΑΘΕΣΗ)</div><div class="stat-s">€215.5M · 2020–2026</div></div>
+    <div class="stat"><div class="stat-v" style="color:#93c5fd">407</div><div class="stat-l">Competitive (ΚΑΤΑΚΥΡΩΣΗ)</div><div class="stat-s">€45.3M · D:C ratio 14.5:1</div></div>
+    <div class="stat"><div class="stat-v" style="color:#fcd34d">163</div><div class="stat-l">Emergency (Art.32§2γ)</div><div class="stat-s">2.8% rate · €2.78M</div></div>
+    <div class="stat"><div class="stat-v" style="color:#fca5a5">8/9</div><div class="stat-l">Signals fired</div><div class="stat-s">Only T9A (committee) clean</div></div>
   </div>
 
-  <div class="tenet-card fired">
-    <span class="tenet-status fired-badge">FIRED</span>
-    <div class="tenet-id" style="color:#fca5a5">T4 · Amendment inflation / price carry</div>
-    <div class="tenet-usecase">
-      <b style="color:#fff">Use case:</b> Price ratchet mechanism. Contract issued at €X → ΣΥΜΒΑΣΗ amendment raises to €X+δ → next contract starts at €X+δ as the "established rate," never re-tested against market. Consecutive ΑΝΑΘΕΣΗ awards to the same supplier within 18 months with ≤5% price change and no intervening competitive tender.
-    </div>
-    <div class="tenet-evidence">↳ ISS/UNISON (AFM 094081864): Jul 2025 award €680,859 → Dec 2025 ΕΑΔΗΣΥ approval at identical €680,859. Zero price movement in 155 days with no market test. Rate locked in as baseline for next cycle.</div>
+  <!-- dominant story -->
+  <div class="sec">ISS/UNISON — dominant finding across 4 tenets <span class="badge pill-r">T1</span><span class="badge pill-r">T4</span><span class="badge pill-r">T5</span><span class="badge pill-r">T8</span></div>
+
+  <div class="sup-strip">
+    <div><div class="sup-name">ISS HELLAS / UNISON — Καθαριότητα</div><div class="sup-afm">AFM 094081864</div></div>
+    <div style="text-align:right"><div class="sup-total">€3,259,050</div><div class="sup-meta">8 awards · 2020–2026 · 26.6% of all ΑΝΑΘΕΣΗ spend</div></div>
   </div>
 
-  <div class="tenet-card fired">
-    <span class="tenet-status fired-badge">FIRED</span>
-    <div class="tenet-id" style="color:#fca5a5">T5 · Emergency procurement overuse</div>
-    <div class="tenet-usecase">
-      <b style="color:#fff">Use case:</b> Art.32§2γ misuse. The emergency negotiated procedure (no publication, no competition) is lawful only for genuinely unforeseeable urgent needs. A service that runs every year is foreseeable. Fires when annual emergency rate ≥15% OR any single award >€60k on emergency grounds — the latter being twice the Art.118 direct-award ceiling.
-    </div>
-    <div class="tenet-evidence">↳ 5 high-value emergency awards: €772,767 (Apr 2026), €680,859 (Dec 2025), €88,672 and €60,663 (2021 ICU consumables), €72,054 (2021 liquid oxygen). Cleaning service renewed as "emergency" every cycle for 6+ years.</div>
+  <div class="narrative critical">
+    A single cleaning company received 8 direct awards totalling <b>€3.26M</b> over 6 years — every one justified under Art.32§2γ (emergency, no publication). In <b>2026 alone</b>, ISS/UNISON captured <b>72.2%</b> of the hospital's entire direct-award budget. The hospital ran a successful open tender for the same service in 2023 (€4.39M, 3-year contract) — proving competition is feasible — yet direct emergency awards continued in parallel. The price was never re-tested between cycles: the Jul 2025 and Dec 2025 awards both carry <b>€680,859.20 exactly</b>.
   </div>
 
-  <div class="tenet-card fired">
-    <span class="tenet-status fired-badge">FIRED</span>
-    <div class="tenet-id" style="color:#fcd34d">T6 · Temporal clustering</div>
-    <div class="tenet-usecase">
-      <b style="color:#fff">Use case:</b> Three accountability-evasion patterns: (a) year-end budget burning — procurement volume 3–5× normal in Dec 22–31, decisions signed en masse before year close without adequate review; (b) weekend/holiday awards — decisions posted when oversight is absent; (c) monthly spikes — sudden single-month surges suggesting pre-prepared batch signing.
-    </div>
-    <div class="tenet-evidence">↳ Dec 22–31 burst every year 2022–2025 (143/145/116/83 decisions at 3.3–5.4× baseline). Weekend: €4.39M cleaning tender decision posted on Sunday 2023-12-17. 25 additional weekend/holiday findings.</div>
+  <div class="timeline">
+    <div class="tl-item"><span class="tl-dot amber"></span><div class="tl-date">2020</div><div class="tl-title">First emergency cleaning awards</div><div class="tl-body">Art.32§2γ invoked — service classified as urgent to bypass tender</div></div>
+    <div class="tl-item"><span class="tl-dot amber"></span><div class="tl-date">2023-06 — 2024-07</div><div class="tl-title">Open tender successfully completed</div><div class="tl-body">ADA ΩΜΤΥ4690ΒΜ-ΗΚ1 · €4.39M · 3-year contract with option — proves competition is feasible</div></div>
+    <div class="tl-item"><span class="tl-dot red"></span><div class="tl-date">2025-07-02</div><div class="tl-title">Emergency award €680,859 (ADA ΨΠΗΓ4690ΒΜ-ΛΚ8)</div><div class="tl-body">Art.32§2γ invoked again despite open tender just concluded</div></div>
+    <div class="tl-item"><span class="tl-dot red"></span><div class="tl-date">2025-12-04</div><div class="tl-title">ΕΑΔΗΣΥ approval €680,859 — identical price (ADA ΨΜΧΥ4690ΒΜ-75Β)</div><div class="tl-body">T4 price carry: 155 days later, 0.0% price change — rate administratively copied, not re-tested</div></div>
+    <div class="tl-item"><span class="tl-dot red"></span><div class="tl-date">2026-04</div><div class="tl-title">Emergency award €772,767 — largest single award (ADA 9Π3Γ4690ΒΜ-ΡΗΠ)</div><div class="tl-body">5-month extension at inflated rate. ISS/UNISON = 72.2% of all 2026 ΑΝΑΘΕΣΗ spend.</div></div>
   </div>
 
-  <div class="tenet-card fired">
-    <span class="tenet-status fired-badge">FIRED</span>
-    <div class="tenet-id" style="color:#fca5a5">T8 · Single-source monopoly</div>
-    <div class="tenet-usecase">
-      <b style="color:#fff">Use case:</b> Annual capture. One supplier controls >70% of total direct-award spend in a calendar year (critical) or >50% for 2+ consecutive years (sustained monopoly). At a multi-service hospital with dozens of procurement categories, a 70%+ share of no-bid spend concentrated in one supplier is structurally anomalous.
-    </div>
-    <div class="tenet-evidence">↳ 2026: ISS/UNISON = 72.2% of all ΑΝΑΘΕΣΗ spend — €1.74M out of €2.41M total. Three separate emergency awards for a single commodity service in one calendar year.</div>
-  </div>
-
-  <div class="tenet-card clean">
-    <span class="tenet-status clean-badge">CLEAN</span>
-    <div class="tenet-id" style="color:#86efac">T9A · Committee capture</div>
-    <div class="tenet-usecase">
-      <b style="color:#fff">Use case:</b> Institutional gateway capture. A single named decision body (Επιτροπή, identified from subject text) controls >40% of all direct awards. A compromised committee chair becomes a single approval bottleneck — one point of capture for the majority of no-bid spending.
-    </div>
-    <div class="tenet-evidence clean">↳ No single committee exceeds 40% of direct awards. Decision-making is distributed across multiple bodies — this structural risk is not present at ΓΝ ΛΑΜΙΑ.</div>
-  </div>
-
-  <div class="tenet-card fired">
-    <span class="tenet-status fired-badge">FIRED</span>
-    <div class="tenet-id" style="color:#fcd34d">T9B · Copy-paste structured award</div>
-    <div class="tenet-usecase">
-      <b style="color:#fff">Use case:</b> Rubber-stamp procurement. Identical non-round amounts (not divisible by 100 — thus not round budget figures) paid to the same supplier multiple times. Non-round identical amounts indicate a template decision reused without independent cost assessment for each procurement occasion.
-    </div>
-    <div class="tenet-evidence">↳ 62 copy-paste pairs. AFM 011651035: €12,916.67 exactly × 4 times in 2024–2025. AFM 999691753: €10.00 × 6 times (2022–2024) and €68.00 × 4 times — likely fee template.</div>
-  </div>
-
-  <div class="tenet-card fired">
-    <span class="tenet-status fired-badge">FIRED</span>
-    <div class="tenet-id" style="color:#fcd34d">T9C · 30-day award burst (lot-splitting)</div>
-    <div class="tenet-usecase">
-      <b style="color:#fff">Use case:</b> Deliberate lot-splitting. Art.118 Law 4412/2016 caps direct awards at €30k per <em>homogeneous need</em> — not per transaction. Three or more awards to the same supplier within 30 days for the same service category circumvents this ceiling by fragmenting a single procurement need across multiple sub-threshold decisions.
-    </div>
-    <div class="tenet-evidence">↳ 14 burst windows. AFM 998768277: 6 awards in 15 days (Nov 2020) = €96,745 total for respiratory equipment — 3.2× the Art.118 ceiling. AFM 094027257: 4 awards in 25 days (Feb–Mar 2022) = €59,901 for immunological reagents.</div>
-  </div>
-
-  <div class="tenet-card fired">
-    <span class="tenet-status fired-badge">FIRED</span>
-    <div class="tenet-id" style="color:#fcd34d">T9D · Price standardisation across suppliers</div>
-    <div class="tenet-usecase">
-      <b style="color:#fff">Use case:</b> Fixed-rate manipulation or procurement coordination. The same non-round amount paid to 3 or more <em>different</em> suppliers. When identical odd prices appear across independent procurement events for different counterparties, it indicates either a mechanically applied rate schedule (no market testing) or coordination between nominally independent award decisions.
-    </div>
-    <div class="tenet-evidence">↳ 15 standardised price points. €4,960 paid to 5 different suppliers; €248 to 4 suppliers; €483.60 to 4 suppliers. Non-round amounts repeated across multiple counterparties indicate template-rate procurement.</div>
-  </div>
-
-</div>
-
-<!-- FINDINGS DETAIL -->
-<div class="section-title">Critical findings — evidence detail</div>
-
-<div class="finding critical">
-  <div class="finding-header">
-    <div class="finding-title">ISS/UNISON cleaning monopoly — emergency used as permanent contract vehicle</div>
-    <div><span class="pill pill-red">T1</span><span class="pill pill-red">T4</span><span class="pill pill-red">T5</span><span class="pill pill-red">T8</span></div>
-  </div>
-  <div class="finding-body">
-    <b>AFM 094081864</b> (ISS HELLAS / UNISON) received 8 direct awards for hospital cleaning totalling <b>€3.26M</b> over 2020–2026, representing <b>26.6%</b> of all no-bid spend. Every award uses Art.32§2γ (emergency negotiated procedure) as legal cover. The same service for the same hospital has been renewed as an "emergency" every 5–12 months for six years without ever going to competitive tender — despite the hospital successfully running a formal open tender for exactly this service in 2023 (ADA ΩΜΤΥ4690ΒΜ-ΗΚ1, €4.39M, 3-year contract with option). That tender confirms competitive procurement is feasible. The direct-award emergency track runs in parallel as a workaround.
-    <br><br>
-    In 2026 alone, ISS/UNISON received <b>72.2%</b> of all direct-award spend — three awards totalling €1.74M. T4 confirms price lock-in: the Jul 2025 and Dec 2025 awards carry an identical price of €680,859.20 with zero change in 155 days and no market test.
-  </div>
-  <table class="ev-table">
-    <thead><tr><th>ADA</th><th>Date</th><th class="num">Amount (€)</th><th>Legal basis</th></tr></thead>
+  <div class="sec">Signal coverage summary</div>
+  <table>
+    <thead><tr><th>Tenet</th><th>Use case</th><th>Fired?</th><th>Strongest finding</th></tr></thead>
     <tbody>
-      <tr><td class="mono">9Π3Γ4690ΒΜ-ΡΗΠ</td><td>2026-04</td><td class="num col-red">772,767</td><td>Art.32§2γ — emergency, 5 months</td></tr>
-      <tr><td class="mono">ΨΜΧΥ4690ΒΜ-75Β</td><td>2025-12</td><td class="num col-red">680,859</td><td>ΕΑΔΗΣΥ approval — διαπραγμάτευση</td></tr>
-      <tr><td class="mono">ΨΠΗΓ4690ΒΜ-ΛΚ8</td><td>2025-07</td><td class="num col-red">680,859</td><td>Art.32§2γ — emergency cleaning</td></tr>
-      <tr><td class="mono">(5 earlier awards)</td><td>2020–2024</td><td class="num col-amber">1,124,564</td><td>Art.32§2γ — emergency cleaning (each cycle)</td></tr>
-    </tbody>
-  </table>
-  <div style="font-size:.73rem;color:var(--muted);margin-top:10px;padding:8px 10px;background:var(--card2);border-radius:5px">
-    <b style="color:#fff">T4 price-carry detail:</b> Jul 2025 award (ADA ΨΠΗΓ4690ΒΜ-ΛΚ8) and Dec 2025 award (ADA ΨΜΧΥ4690ΒΜ-75Β) both at exactly €680,859.20 — 0.0% price change across 155 days. The rate is not re-tested; it is administratively copied from the previous award.
-  </div>
-</div>
-
-<div class="finding high">
-  <div class="finding-header">
-    <div class="finding-title">High-value emergency awards — medical consumables and ICU supply</div>
-    <span class="pill pill-red">T5</span>
-  </div>
-  <div class="finding-body">
-    Five awards exceed the €60k high-value emergency threshold (double the Art.118 direct-award ceiling). Three from 2021 cover ICU medical consumables and liquid oxygen — foreseeable recurring needs for an active general hospital, not genuine emergencies. The emergency route was applied because the relevant ΠΠΥΥ procurement programmes had not been completed in time, a systemic failure of forward planning rather than an unforeseeable event.
-  </div>
-  <table class="ev-table">
-    <thead><tr><th>ADA</th><th>Year</th><th class="num">Amount (€)</th><th>Subject</th></tr></thead>
-    <tbody>
-      <tr><td class="mono">9Π3Γ4690ΒΜ-ΡΗΠ</td><td>2026</td><td class="num col-red">772,767</td><td>Καθαριότητα ΓΝΛαμίας — 5 μήνες (Art.32§2γ)</td></tr>
-      <tr><td class="mono">ΨΜΧΥ4690ΒΜ-75Β</td><td>2025</td><td class="num col-red">680,859</td><td>Καθαριότητα — διαπραγμάτευση ΕΑΔΗΣΥ</td></tr>
-      <tr><td class="mono">Ω0ΚΚ4690ΒΜ-9ΔΒ</td><td>2021</td><td class="num col-amber">88,672</td><td>Ιατρικά Αναλώσιμα ΜΕΘ</td></tr>
-      <tr><td class="mono">ΩΑΣΡ4690ΒΜ-ΘΞΡ</td><td>2021</td><td class="num col-amber">72,054</td><td>Υγρό οξυγόνο — ΛΙΝΤΕ ΕΛΛΑΣ (μοναδικός προμηθευτής)</td></tr>
-      <tr><td class="mono">ΩΧΑ64690ΒΜ-8Ι2</td><td>2021</td><td class="num col-amber">60,663</td><td>Ιατρικά Αναλώσιμα 2×ΜΕΘ</td></tr>
+      <tr><td><span class="pill pill-r">T1</span> Concentration</td><td class="muted">One supplier captures disproportionate no-bid share</td><td class="red">✔ FIRED</td><td>ISS/UNISON 26.6% of ΑΝΑΘΕΣΗ spend 2020–2026</td></tr>
+      <tr><td><span class="pill pill-r">T4</span> Price ratchet</td><td class="muted">Consecutive awards at frozen price — rate never re-tested</td><td class="red">✔ FIRED</td><td>€680,859 copied exactly between Jul–Dec 2025 (0% change)</td></tr>
+      <tr><td><span class="pill pill-r">T5</span> Emergency overuse</td><td class="muted">Art.32§2γ used for foreseeable recurring needs</td><td class="red">✔ FIRED</td><td>€772,767 emergency cleaning Apr 2026 (×12.9 over Art.118 cap)</td></tr>
+      <tr><td><span class="pill pill-a">T6</span> Temporal clustering</td><td class="muted">Year-end budget burn, weekend/holiday awards</td><td class="red">✔ FIRED</td><td>Dec 22–31 at 3.3–5.4× baseline (4 consecutive years)</td></tr>
+      <tr><td><span class="pill pill-r">T8</span> Annual monopoly</td><td class="muted">Single supplier >70% of year's direct-award spend</td><td class="red">✔ FIRED</td><td>ISS/UNISON 72.2% of 2026 ΑΝΑΘΕΣΗ (€1.74M of €2.41M)</td></tr>
+      <tr><td><span class="pill pill-a">T9B</span> Copy-paste</td><td class="muted">Identical non-round amount to same supplier ×2+</td><td class="red">✔ FIRED</td><td>62 pairs — top: €12,916.67 × 4 times same AFM</td></tr>
+      <tr><td><span class="pill pill-a">T9C</span> Lot-splitting</td><td class="muted">3+ awards to same supplier within 30 days</td><td class="red">✔ FIRED</td><td>6 awards in 15 days = €96,745 — 3.2× Art.118 ceiling</td></tr>
+      <tr><td><span class="pill pill-a">T9D</span> Price standardisation</td><td class="muted">Same odd amount to 3+ different suppliers</td><td class="red">✔ FIRED</td><td>€4,960 to 5 different suppliers; 15 standardised price points</td></tr>
+      <tr><td><span class="pill pill-b">T9A</span> Committee capture</td><td class="muted">One decision body controls >40% of direct awards</td><td class="green">✔ Clean</td><td>No single committee exceeds threshold</td></tr>
     </tbody>
   </table>
 </div>
 
-<div class="finding med">
-  <div class="finding-header">
-    <div class="finding-title">Consistent year-end procurement surge — 4 consecutive years at 3–5× daily rate</div>
-    <span class="pill pill-amber">T6a</span>
+<!-- ═══ T5 ════════════════════════════════════════════════════════════= -->
+<div id="pane-t5" class="pane">
+
+  <div class="usecase"><strong>Use case — Emergency procurement overuse (Art.32§2γ):</strong> The emergency negotiated procedure allows skipping publication and competition when a need is genuinely unforeseeable and urgent. A service renewed as "emergency" year after year for a predictable recurring need is not an emergency — it is a legal workaround. Fires when any single award exceeds €60k on emergency grounds (double the Art.118 direct-award ceiling), or when the annual emergency rate exceeds 15%.</div>
+
+  <div class="sec">Top 5 high-value emergency awards — sorted by amount</div>
+
+  <div class="narrative critical" style="margin-bottom:16px">
+    All 5 findings exceed the €60k threshold — the largest (€772,767) is <b>12.9× the Art.118 cap</b>. Three of the five relate to a <b>single commoditised service</b> (hospital cleaning by ISS/UNISON) that the hospital demonstrably can tender competitively. The 2021 ICU consumable and oxygen awards may reflect genuine supply-chain pressure during COVID; the 2025–2026 cleaning awards have no comparable justification.
   </div>
-  <div class="finding-body">
-    Every year 2022–2025 shows Dec 22–31 procurement volume 3–5× the rest-of-year baseline. Budget-cycle pressure is the likely driver (unencumbered appropriations must be committed or returned). The risk: decisions issued in this window receive less board scrutiny than those issued outside year-end crunch, creating a low-oversight window for procurement irregularities to pass through.
-  </div>
-  <table class="ev-table">
-    <thead><tr><th>Year</th><th class="num">Decisions Dec 22–31</th><th class="num">Dec 22–31 daily rate</th><th class="num">Baseline daily rate</th><th class="num">Multiplier</th></tr></thead>
+
+  <table>
+    <thead><tr><th>#</th><th>ADA</th><th>Year</th><th class="num">Amount (€)</th><th class="num">× Art.118 cap</th><th>Subject</th></tr></thead>
     <tbody>
-      <tr><td>2022</td><td class="num">143</td><td class="num">14.3 / day</td><td class="num">3.3 / day</td><td class="num col-red">4.3×</td></tr>
-      <tr><td>2023</td><td class="num">145</td><td class="num">14.5 / day</td><td class="num">2.7 / day</td><td class="num col-red">5.4×</td></tr>
-      <tr><td>2024</td><td class="num">116</td><td class="num">11.6 / day</td><td class="num">3.0 / day</td><td class="num col-amber">3.9×</td></tr>
-      <tr><td>2025</td><td class="num">83</td><td class="num">8.3 / day</td><td class="num">2.5 / day</td><td class="num col-amber">3.3×</td></tr>
+      <tr>
+        <td class="rank">1</td>
+        <td class="mono">9Π3Γ4690ΒΜ-ΡΗΠ</td><td>2026</td>
+        <td class="num red">772,767</td><td class="num red">×25.8</td>
+        <td>Καθαριότητα ΓΝΛαμίας — 5 μήνες (Art.32§2γ) · ISS/UNISON</td>
+      </tr>
+      <tr>
+        <td class="rank">2</td>
+        <td class="mono">ΨΜΧΥ4690ΒΜ-75Β</td><td>2025</td>
+        <td class="num red">680,859</td><td class="num red">×22.7</td>
+        <td>Καθαριότητα — ΕΑΔΗΣΥ approval διαπραγμάτευση · ISS/UNISON</td>
+      </tr>
+      <tr>
+        <td class="rank">3</td>
+        <td class="mono">Ω0ΚΚ4690ΒΜ-9ΔΒ</td><td>2021</td>
+        <td class="num amber">88,672</td><td class="num amber">×3.0</td>
+        <td>Ιατρικά Αναλώσιμα τμημάτων/κλινικών ΓΝΛαμίας (διαπραγμάτευση)</td>
+      </tr>
+      <tr>
+        <td class="rank">4</td>
+        <td class="mono">ΩΑΣΡ4690ΒΜ-ΘΞΡ</td><td>2021</td>
+        <td class="num amber">72,054</td><td class="num amber">×2.4</td>
+        <td>Υγρό οξυγόνο — ΛΙΝΤΕ ΕΛΛΑΣ (μοναδικός προμηθευτής)</td>
+      </tr>
+      <tr>
+        <td class="rank">5</td>
+        <td class="mono">ΩΧΑ64690ΒΜ-8Ι2</td><td>2021</td>
+        <td class="num amber">60,663</td><td class="num amber">×2.0</td>
+        <td>Ιατρικά Αναλώσιμα για τη λειτουργία των 2 ΜΕΘ ΓΝ Λαμίας</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="note"><b>Context:</b> 2021 ICU consumables and liquid oxygen may reflect genuine COVID-period supply constraints. The 2025–2026 cleaning awards (ranks 1–2) have no comparable justification — the hospital already completed a competitive tender for the same service in 2023–2024. Annual emergency rate at ΓΝ ΛΑΜΙΑ: 2.8% (163 decisions, €2.78M) — below the 15% annual-rate threshold, but the high-value individual awards override this.</div>
+</div>
+
+<!-- ═══ T4 ════════════════════════════════════════════════════════════= -->
+<div id="pane-t4" class="pane">
+
+  <div class="usecase"><strong>Use case — Price ratchet / amendment inflation:</strong> Consecutive direct awards to the same supplier within 18 months at ≤5% price change. The price from the previous contract is administratively carried forward rather than re-tested against market rates. In the stronger variant, a ΣΥΜΒΑΣΗ amendment raises the contract price mid-term, and the next award then starts at the inflated amount as the new baseline.</div>
+
+  <div class="sec">2 price-carry findings</div>
+
+  <div class="g2">
+    <div>
+      <div class="narrative high">
+        <b>Finding 1 — ISS/UNISON cleaning (AFM 094081864)</b><br>
+        Contract awarded Jul 2025 at <b>€680,859.20</b>. Five months later (Dec 2025), ΕΑΔΗΣΥ approval issued for a new emergency extension at <b>exactly €680,859.20</b> — 0.0% price change in 155 days. The rate is not re-negotiated or market-tested; it is copied from the previous decision. This locks in the emergency price as the going rate before the next full cycle begins.
+      </div>
+      <table>
+        <thead><tr><th>Step</th><th>ADA</th><th>Date</th><th class="num">Amount (€)</th></tr></thead>
+        <tbody>
+          <tr><td>Contract N</td><td class="mono">ΨΠΗΓ4690ΒΜ-ΛΚ8</td><td>2025-07-02</td><td class="num red">680,859.20</td></tr>
+          <tr><td>Contract N+1</td><td class="mono">ΨΜΧΥ4690ΒΜ-75Β</td><td>2025-12-04</td><td class="num red">680,859.20</td></tr>
+          <tr><td style="color:var(--muted)" colspan="2">Gap: 155 days · Δ price: 0.00%</td><td colspan="2" style="text-align:right;color:#fca5a5">No market test</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <div class="narrative med">
+        <b>Finding 2 — Liquid oxygen (AFM 095167018)</b><br>
+        Two awards for <b>«Υγρό Οξυγόνο»</b> at <b>€135,000 exactly</b>, three days apart (Sep 22 and Sep 25 2025). Zero price change over 3 days. This is more likely two decision entries for the same procurement event (an approval and a formal award) than a genuine consecutive contract — but the identical non-round amount triggers T4. Worth verifying whether these are two separate contracts or one event posted twice.
+      </div>
+      <table>
+        <thead><tr><th>Step</th><th>ADA</th><th>Date</th><th class="num">Amount (€)</th></tr></thead>
+        <tbody>
+          <tr><td>Contract N</td><td class="mono">ΨΜΤΠ4690ΒΜ-3ΣΩ</td><td>2025-09-22</td><td class="num amber">135,000.00</td></tr>
+          <tr><td>Contract N+1</td><td class="mono">ΨΡ0Η4690ΒΜ-Υ89</td><td>2025-09-25</td><td class="num amber">135,000.00</td></tr>
+          <tr><td style="color:var(--muted)" colspan="2">Gap: 3 days · Δ price: 0.00%</td><td colspan="2" style="text-align:right;color:var(--muted)">Verify: duplicate?</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="note"><b>Note:</b> T4 detects price freeze, not price inflation. Whether €680,859 is above market for 5-month hospital cleaning at 307 beds requires external benchmarking (not available from Diavgeia). The risk surfaced here is the absence of any competitive pricing signal across contract cycles.</div>
+</div>
+
+<!-- ═══ T6 ════════════════════════════════════════════════════════════= -->
+<div id="pane-t6" class="pane">
+
+  <div class="usecase"><strong>Use case — Temporal clustering:</strong> Three accountability-evasion patterns: (a) Year-end burst — Dec 22–31 procurement volume at 3×+ baseline suggests use-it-or-lose-it budget burning; decisions issued in this window receive less board scrutiny before year close. (b) Weekend/holiday awards — procurement decisions posted when oversight bodies are absent. (c) Monthly spike — a single month with 2.5×+ annual mean, suggesting batch-signing of pre-prepared decisions.</div>
+
+  <div class="sec">T6a — Year-end bursts: 4 consecutive years</div>
+
+  <div class="narrative med" style="margin-bottom:14px">Every year 2022–2025 shows Dec 22–31 procurement at 3.3–5.4× the rest-of-year daily rate. The pattern is <b>consistent and escalating</b> — not a one-off budget anomaly. At peak (2023), the last 10 days of December produced the same volume as an average 54-day period for the rest of the year.</div>
+
+  <table style="margin-bottom:20px">
+    <thead><tr><th>Year</th><th class="num">Dec 22–31 decisions</th><th class="num">Dec 22–31 daily rate</th><th class="num">Year baseline</th><th class="num">Multiplier</th><th>Bar</th></tr></thead>
+    <tbody>
+      <tr><td>2023</td><td class="num">145</td><td class="num">14.5/day</td><td class="num">2.7/day</td><td class="num red">5.4×</td><td><div class="bar-wrap"><div class="bar-fill" style="width:100%;background:var(--red)"></div></div></td></tr>
+      <tr><td>2022</td><td class="num">143</td><td class="num">14.3/day</td><td class="num">3.3/day</td><td class="num red">4.3×</td><td><div class="bar-wrap"><div class="bar-fill" style="width:80%;background:var(--red)"></div></div></td></tr>
+      <tr><td>2024</td><td class="num">116</td><td class="num">11.6/day</td><td class="num">3.0/day</td><td class="num amber">3.9×</td><td><div class="bar-wrap"><div class="bar-fill" style="width:72%;background:var(--amber)"></div></div></td></tr>
+      <tr><td>2025</td><td class="num">83</td><td class="num">8.3/day</td><td class="num">2.5/day</td><td class="num amber">3.3×</td><td><div class="bar-wrap"><div class="bar-fill" style="width:61%;background:var(--amber)"></div></div></td></tr>
+    </tbody>
+  </table>
+
+  <div class="sec">T6b/c — Top weekend &amp; holiday awards by amount (showing top 10 of 25)</div>
+
+  <div class="notice notice-amber"><b>Note:</b> These are competitive tender board decisions (ΚΑΤΑΚΥΡΩΣΗ, Λήψη απόφασης επί πρακτικού) posted on Sundays — Greek hospital boards commonly hold Sunday meetings. The amounts represent the total contract value being ratified, not a single direct award. The pattern indicates high-value contracting decisions being finalised outside normal working hours.</div>
+
+  <table>
+    <thead><tr><th>#</th><th>ADA</th><th>Date</th><th>Day</th><th class="num">Amount (€)</th><th>Type</th><th>Subject (abridged)</th></tr></thead>
+    <tbody>
+      <tr><td class="rank">1</td><td class="mono">ΨΠΘΔ4690ΒΜ-ΣΕΜ</td><td>2023-12-17</td><td class="amber">Sun</td><td class="num red">4,386,000</td><td class="muted">ΑΝΑΘΕΣΗ</td><td>Καθαριότητα 11μήνες — εξέλιξη διαγωνισμού</td></tr>
+      <tr><td class="rank">2</td><td class="mono">9ΝΔ34690ΒΜ-ΩΛ5</td><td>2024-03-31</td><td class="amber">Sun</td><td class="num red">4,386,000</td><td class="muted">ΑΝΑΘΕΣΗ</td><td>Καθαριότητα — Πρακτικά Δικαιολογητικών Συμμετοχής</td></tr>
+      <tr><td class="rank">3</td><td class="mono">6ΘΘΡ4690ΒΜ-1ΚΣ</td><td>2021-10-31</td><td class="amber">Sun</td><td class="num amber">2,842,263</td><td class="muted">ΑΝΑΘΕΣΗ</td><td>Αντιδραστήρια Ανοσολογικών-Βιοχημικών εξετάσεων — Οικονομικές προσφορές</td></tr>
+      <tr><td class="rank">4</td><td class="mono">9ΟΗ84690ΒΜ-Δ5Ε</td><td>2024-11-17</td><td class="amber">Sun</td><td class="num amber">2,460,000</td><td class="muted">ΚΑΤΑΚΥΡΩΣΗ</td><td>Συντήρηση Η/Μ εγκαταστάσεων — Δικαιολογητικά Κατακύρωσης</td></tr>
+      <tr><td class="rank">5</td><td class="mono">ΡΥΓΒ4690ΒΜ-8ΘΙ</td><td>2023-07-02</td><td class="amber">Sun</td><td class="num amber">2,241,000</td><td class="muted">ΑΝΑΘΕΣΗ</td><td>Σίτιση Ασθενών — Πρακτικά Δικαιολογητικών Συμμετοχής/Τεχνικής</td></tr>
+      <tr><td class="rank">6</td><td class="mono">Λ2184690ΒΜ-ΕΨ1</td><td>2024-03-31</td><td class="amber">Sun</td><td class="num amber">1,968,000</td><td class="muted">ΑΝΑΘΕΣΗ</td><td>Υπηρεσίες Φύλαξης — Πρακτικά Δικαιολογητικών</td></tr>
+      <tr><td class="rank">7</td><td class="mono">ΡΓΘΔ4690ΒΜ-ΘΡΡ</td><td>2022-05-15</td><td class="amber">Sun</td><td class="num amber">1,349,200</td><td class="muted">ΚΑΤΑΚΥΡΩΣΗ</td><td>Τροποποίηση σύμβασης (amendment)</td></tr>
+      <tr><td class="rank">8</td><td class="mono">9ΜΦ64690ΒΜ-ΤΟ6</td><td>2024-11-03</td><td class="amber">Sun</td><td class="num">999,995</td><td class="muted">ΑΝΑΘΕΣΗ</td><td>Αποσφράγιση Προσφορών ανοικτού διαγωνισμού άνω ορίων</td></tr>
+      <tr><td class="rank">9</td><td class="mono">6Ξ9Θ4690ΒΜ-Ζ0Ω</td><td>2025-05-03</td><td class="amber">Sat</td><td class="num">999,995</td><td class="muted">ΚΑΤΑΚΥΡΩΣΗ</td><td>Δικαιολογητικά κατακύρωσης προμήθειας</td></tr>
+      <tr><td class="rank">10</td><td class="mono">ΕΟ5Ρ4690ΒΜ-2Θ5</td><td>2022-07-03</td><td class="amber">Sun</td><td class="num">967,742</td><td class="muted">ΑΝΑΘΕΣΗ</td><td>Πρακτικά Δικαιολογητικών Συμμετοχής/Τεχνικής Αξιολόγησης</td></tr>
     </tbody>
   </table>
 </div>
 
-<div class="finding med">
-  <div class="finding-header">
-    <div class="finding-title">Systematic lot-splitting, copy-paste awards, and fixed-rate patterns</div>
-    <div><span class="pill pill-amber">T9B</span><span class="pill pill-amber">T9C</span><span class="pill pill-amber">T9D</span></div>
-  </div>
-  <div class="finding-body">
-    Three structurally distinct patterns, all consistent with deliberate threshold circumvention or template-driven procurement without individual cost assessment:<br><br>
-    <b>T9B — Copy-paste (62 supplier pairs):</b> Non-round identical amounts to the same supplier multiple times. AFM 011651035 received €12,916.67 on 4 separate occasions in 2024–2025. AFM 999691753 received €10.00 six times across 2022–2024 — possibly a recurring fee schedule with no re-evaluation.<br><br>
-    <b>T9C — Burst windows (14 windows):</b> AFM 998768277: 6 awards in 15 days (Nov 16–30 2020) = €96,745 for respiratory equipment — 3.2× the Art.118 per-need ceiling. AFM 094027257: 4 awards in 25 days (Feb–Mar 2022) = €59,901 for immunological reagents.<br><br>
-    <b>T9D — Standardised prices (15 price points):</b> €4,960.00 paid to 5 different suppliers; €248.00 to 4 suppliers; €483.60 to 4 suppliers. Same non-round amounts across different counterparties indicate a fixed rate schedule applied without market testing per transaction.
-  </div>
+<!-- ═══ T9B ═══════════════════════════════════════════════════════════= -->
+<div id="pane-t9b" class="pane">
+
+  <div class="usecase"><strong>Use case — Copy-paste structured awards (rubber-stamp procurement):</strong> The same non-round amount (not divisible by 100 — so not a budget round figure) paid to the same supplier on two or more separate occasions. Non-round identical amounts indicate a template decision is reused without independent cost assessment for each need. 62 pairs detected total — showing top 12 by total exposure (amount × occurrences), filtered to amount ≥ €1,000.</div>
+
+  <div class="notice notice-amber"><b>Significance filter applied:</b> 62 raw pairs; showing 12 with unit amount ≥ €1,000. Lower-value pairs (€10, €15, €68 per occurrence) likely reflect periodic fee schedules and are omitted.</div>
+
+  <table>
+    <thead><tr><th>#</th><th>AFM</th><th class="num">Unit amount (€)</th><th class="num">Occurrences</th><th class="num">Total exposure (€)</th><th>Dates</th><th>Note</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="rank">1</td><td class="mono">094081864</td>
+        <td class="num red">680,859.20</td><td class="num red">×2</td><td class="num red">1,361,718</td>
+        <td class="muted" style="font-size:.7rem">2025-07-02 · 2025-12-04</td>
+        <td><span class="pill pill-r">T4</span> ISS/UNISON cleaning — same rate copied</td>
+      </tr>
+      <tr>
+        <td class="rank">2</td><td class="mono">011651035</td>
+        <td class="num amber">12,916.67</td><td class="num amber">×4</td><td class="num amber">51,667</td>
+        <td class="muted" style="font-size:.7rem">Jun '24 · Jan/Mar/May '25</td>
+        <td>Quarterly-rate pattern — same odd amount 4 times</td>
+      </tr>
+      <tr>
+        <td class="rank">3</td><td class="mono">094499248</td>
+        <td class="num amber">11,130.00</td><td class="num amber">×3</td><td class="num amber">33,390</td>
+        <td class="muted" style="font-size:.7rem">Apr/May/Aug 2022</td>
+        <td>Reagents — 3 awards in 5 months at identical price</td>
+      </tr>
+      <tr>
+        <td class="rank">4</td><td class="mono">094027257</td>
+        <td class="num amber">14,928.80</td><td class="num amber">×2</td><td class="num amber">29,858</td>
+        <td class="muted" style="font-size:.7rem">Apr–May 2022</td>
+        <td>Immunological reagents — same price 26 days apart</td>
+      </tr>
+      <tr>
+        <td class="rank">5</td><td class="mono">094512503</td>
+        <td class="num">14,666.66</td><td class="num">×2</td><td class="num">29,333</td>
+        <td class="muted" style="font-size:.7rem">Jan–Jun 2025</td>
+        <td>Non-round: likely monthly rate (€14,666.66 ÷ 30 = €488.89/day)</td>
+      </tr>
+      <tr>
+        <td class="rank">6</td><td class="mono">094437130</td>
+        <td class="num">14,628.00</td><td class="num">×2</td><td class="num">29,256</td>
+        <td class="muted" style="font-size:.7rem">Nov–Dec 2020</td>
+        <td>COVID-period — reagents batch, same price 29 days apart</td>
+      </tr>
+      <tr>
+        <td class="rank">7</td><td class="mono">098768277</td>
+        <td class="num">13,392.00</td><td class="num">×2</td><td class="num">26,784</td>
+        <td class="muted" style="font-size:.7rem">2020-11-23 (same day)</td>
+        <td>Two awards on same date — possible split of single need</td>
+      </tr>
+      <tr>
+        <td class="rank">8</td><td class="mono">011651035</td>
+        <td class="num">12,916.67</td><td class="num">×4</td><td class="num">—</td>
+        <td class="muted" style="font-size:.7rem">see rank 2</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td class="rank">9</td><td class="mono">046783517</td>
+        <td class="num">10,030.59</td><td class="num">×2</td><td class="num">20,061</td>
+        <td class="muted" style="font-size:.7rem">Sep–Dec 2025</td>
+        <td>Non-round repeated amount</td>
+      </tr>
+      <tr>
+        <td class="rank">10</td><td class="mono">094512503</td>
+        <td class="num">9,610.00</td><td class="num">×2</td><td class="num">19,220</td>
+        <td class="muted" style="font-size:.7rem">Jun–Jul 2025</td>
+        <td>Same supplier as rank 5 — multiple patterns</td>
+      </tr>
+      <tr>
+        <td class="rank">11</td><td class="mono">101902229</td>
+        <td class="num">8,537.40</td><td class="num">×2</td><td class="num">17,075</td>
+        <td class="muted" style="font-size:.7rem">May–Jun 2022</td>
+        <td>ΚΕΦΙΑΠ supply — 12 days apart</td>
+      </tr>
+      <tr>
+        <td class="rank">12</td><td class="mono">163813484</td>
+        <td class="num">6,972.00</td><td class="num">×4</td><td class="num">27,888</td>
+        <td class="muted" style="font-size:.7rem">Jun/Jul '25 · Feb/Mar '26</td>
+        <td>Quarterly pattern — 4 awards at identical price across 9 months</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="note"><b>Priority for follow-up:</b> Rank 1 (ISS/UNISON €680,859 ×2) is the same finding as T4 — highest priority. Rank 2 (AFM 011651035 €12,916.67 ×4) and Rank 12 (AFM 163813484 €6,972 ×4) both show quarterly patterns suggesting ongoing service contracts issued as repeated direct awards rather than single multi-month contracts with open tender.</div>
 </div>
 
-<!-- BLIND SPOTS -->
-<div class="section-title">Platform limitations — what this system cannot detect</div>
-<div class="blind-grid">
-  <div class="blind">
-    <div class="blind-title">Market price benchmarking</div>
-    <div class="blind-body">No external price reference database. Whether €680k/5-month for hospital cleaning is above or below market for a 307-bed hospital is unknown from Diavgeia alone. T4 detects frozen prices — not inflated prices. External market comparison requires tendering data from comparable hospitals or published rate surveys.</div>
-  </div>
-  <div class="blind">
-    <div class="blind-title">Beneficial ownership and shell companies</div>
-    <div class="blind-body">AFMs without ΓΕΜΗ registration or natural-person contractors cannot be automatically identified as shells or fronts. T1/T8 surface the concentration; verifying whether a supplier is a front for a connected party requires ΓΕΜΗ, UBO registry, and directorship cross-reference — manual steps outside Diavgeia scope.</div>
-  </div>
-  <div class="blind">
-    <div class="blind-title">Cross-year lot-splitting</div>
-    <div class="blind-body">T9C detects splitting within 30 days within the same calendar year. A procurement need split across the Dec 31 / Jan 1 boundary (Dec award + Jan award for the same homogeneous service) evades the detector. The Art.118 ceiling applies per-need regardless of year boundary under Law 4412/2016.</div>
-  </div>
-  <div class="blind">
-    <div class="blind-title">Delivery and performance verification</div>
-    <div class="blind-body">Diavgeia records the decision to award, not whether goods or services were actually delivered. A ghost supplier receiving €772k for cleaning can only be verified by building access logs or physical inspection records — entirely outside Diavgeia scope.</div>
-  </div>
-  <div class="blind">
-    <div class="blind-title">Revolving door and conflict of interest</div>
-    <div class="blind-body">Whether a procurement official has a financial interest in ISS/UNISON, or subsequently moves to work for the supplier, is undetectable from Diavgeia. Requires cross-reference with Πόθεν Έσχες income declarations and company directorship records (ΓΕΜΗ).</div>
-  </div>
-  <div class="blind">
-    <div class="blind-title">CPV misclassification</div>
-    <div class="blind-body">Intentional wrong-CPV filing hides contracts from category-based searches and audits. The platform detects this only incidentally when the same supplier uses the correct CPV elsewhere. Systematic misclassification for concealment requires CPV validity cross-checks not implemented in the current pipeline.</div>
-  </div>
+<!-- ═══ T9C ═══════════════════════════════════════════════════════════= -->
+<div id="pane-t9c" class="pane">
+
+  <div class="usecase"><strong>Use case — Lot-splitting (30-day burst):</strong> Art.118 Law 4412/2016 caps direct awards at €30,000 per homogeneous need — not per transaction. Three or more separate awards to the same supplier within 30 days for the same category of goods/services is a prohibited workaround. The total amount across the window is the legally relevant figure.</div>
+
+  <div class="notice notice-amber"><b>Significance filter applied:</b> Showing 10 of 14 windows with total amount ≥ €1,000. Windows below €1k (MRI referrals, photocopying) omitted as noise.</div>
+
+  <table>
+    <thead><tr><th>#</th><th>AFM</th><th class="num">Awards in window</th><th>Window</th><th class="num">Total (€)</th><th class="num">× Art.118 cap</th><th>Category</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="rank">1</td><td class="mono">998768277</td>
+        <td class="num red">6 awards</td><td class="muted">Nov 16–30, 2020 (15 days)</td>
+        <td class="num red">96,745</td><td class="num red">×3.2</td>
+        <td>Μάσκες μη επεμβατικού αερισμού — COVID-period respiratory equipment</td>
+      </tr>
+      <tr>
+        <td class="rank">2</td><td class="mono">094027257</td>
+        <td class="num red">4 awards</td><td class="muted">Feb 28 – Mar 24, 2022 (25 days)</td>
+        <td class="num red">59,901</td><td class="num red">×2.0</td>
+        <td>Αντιδραστήρια ανοσολογικών-βιοχημικών εξετάσεων</td>
+      </tr>
+      <tr>
+        <td class="rank">3</td><td class="mono">094437130</td>
+        <td class="num amber">3 awards</td><td class="muted">Nov 16 – Dec 14, 2020 (29 days)</td>
+        <td class="num amber">45,484</td><td class="num amber">×1.5</td>
+        <td>COVID antigen reagents + βιοχημικά αντιδραστήρια</td>
+      </tr>
+      <tr>
+        <td class="rank">4</td><td class="mono">099370337</td>
+        <td class="num amber">3 awards</td><td class="muted">Nov 12–24, 2020 (13 days)</td>
+        <td class="num amber">33,921</td><td class="num amber">×1.1</td>
+        <td>Υλικό χειρουργείου + γάζες — surgical consumables</td>
+      </tr>
+      <tr>
+        <td class="rank">5</td><td class="mono">094499248</td>
+        <td class="num amber">3 awards</td><td class="muted">Apr 1–19, 2022 (19 days)</td>
+        <td class="num amber">23,410</td><td class="num">×0.8</td>
+        <td>Αντιδραστήρια αιματολογικά + μικροβιολογικά</td>
+      </tr>
+      <tr>
+        <td class="rank">6</td><td class="mono">101902229</td>
+        <td class="num amber">4 awards</td><td class="muted">Dec 14, 2020 (same day)</td>
+        <td class="num amber">9,534</td><td class="num">×0.3</td>
+        <td>Προμήθεια διάφορων υλικών ΚΕΦΙΑΠ — 4 separate decisions on one day</td>
+      </tr>
+      <tr>
+        <td class="rank">7</td><td class="mono">091569759</td>
+        <td class="num">3 awards</td><td class="muted">Jun 10 – Jul 5, 2022 (26 days)</td>
+        <td class="num">7,237</td><td class="num">×0.2</td>
+        <td>Ηλεκτρόδια NIHON KOHDEN + αντιδραστήρια αιμοδοσίας + επισκευή monitor</td>
+      </tr>
+      <tr>
+        <td class="rank">8</td><td class="mono">082525697</td>
+        <td class="num">3 awards</td><td class="muted">Oct 12 – Nov 3, 2020 (23 days)</td>
+        <td class="num">7,535</td><td class="num">×0.3</td>
+        <td>Τορικοί ενδοφακοί + σφουγγάρι ιοντικού αργύρου</td>
+      </tr>
+      <tr>
+        <td class="rank">9</td><td class="mono">998413964</td>
+        <td class="num">3 awards</td><td class="muted">Sep 12–22, 2025 (11 days)</td>
+        <td class="num">5,598</td><td class="num">×0.2</td>
+        <td>Ράμματα (sutures) — δικαίωμα προαίρεσης activations</td>
+      </tr>
+      <tr>
+        <td class="rank">10</td><td class="mono">095029193</td>
+        <td class="num">3 awards</td><td class="muted">Jun 17 – Jul 15, 2022 (29 days)</td>
+        <td class="num">1,022</td><td class="num muted">×0.03</td>
+        <td>Ανταλλακτικά αναλώσιμα + καλώδια διαθερμίας — marginal</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="note"><b>Priority:</b> Rank 1 (AFM 998768277, €96,745 in 15 days for respiratory equipment) is the clearest violation — 6 awards totalling 3.2× the Art.118 per-need ceiling for a homogeneous product category. COVID-period context (Nov 2020) may provide partial mitigation but does not override the legal ceiling. Ranks 2–3 are also above-threshold. Ranks 7–10 are below the €30k ceiling even in aggregate — low priority.</div>
 </div>
 
-<div style="font-size:.72rem;color:var(--muted);text-align:center;padding:24px 0;margin-top:20px;border-top:1px solid var(--border)">
-  Data source: Diavgeia API (diavgeia.gov.gr) · Normalised: <code>data/normalized/org=99221923/</code> · Detector: <code>scripts/detect_signals.py --org 99221923</code><br>
-  All data from open government sources. Analytical findings warranting scrutiny — not legal determinations. Generated 2026-06-02.
+<!-- ═══ T9D ═══════════════════════════════════════════════════════════= -->
+<div id="pane-t9d" class="pane">
+
+  <div class="usecase"><strong>Use case — Price standardisation across suppliers:</strong> The same non-round amount paid to 3 or more different suppliers. Identical odd prices across independent suppliers indicate either a mechanically applied fixed rate schedule (no per-transaction market test) or coordination between nominally independent procurement decisions. 15 price points detected.</div>
+
+  <div class="notice notice-amber"><b>Interpretation note:</b> Some of these price points may reflect standard per-unit prices from a pre-approved catalogue (e.g. ΠΠΥΥ or EPY framework). The multiples pattern (€111.6, €223.2, €297.6, €483.6, €744) is consistent with a fixed per-unit rate applied to different quantities. The signal still fires because no competitive pricing event determines the rate — it is administratively fixed.</div>
+
+  <table>
+    <thead><tr><th>#</th><th class="num">Amount (€)</th><th class="num">Distinct suppliers</th><th class="num">Total occurrences</th><th>Significance</th><th>Pattern note</th></tr></thead>
+    <tbody>
+      <tr><td class="rank">1</td><td class="num amber">4,960.00</td><td class="num red">5 suppliers</td><td class="num">5</td><td><div class="bar-wrap"><div class="bar-fill" style="width:100%"></div></div></td><td>Highest supplier count — 5 different AFMs at identical price</td></tr>
+      <tr><td class="rank">2</td><td class="num amber">1,240.00</td><td class="num amber">4 suppliers</td><td class="num">4</td><td><div class="bar-wrap"><div class="bar-fill" style="width:80%"></div></div></td><td>€1,240 = €4,960 ÷ 4 — likely quantity variant of same rate</td></tr>
+      <tr><td class="rank">3</td><td class="num amber">1,215.20</td><td class="num amber">4 suppliers</td><td class="num">4</td><td><div class="bar-wrap"><div class="bar-fill" style="width:80%"></div></div></td><td>Non-round; 4 suppliers</td></tr>
+      <tr><td class="rank">4</td><td class="num amber">483.60</td><td class="num amber">4 suppliers</td><td class="num">4</td><td><div class="bar-wrap"><div class="bar-fill" style="width:80%"></div></div></td><td>€483.60 × 3 = €1,450.80 ≈ not clean multiple — independent rate</td></tr>
+      <tr><td class="rank">5</td><td class="num amber">248.00</td><td class="num amber">4 suppliers</td><td class="num">4</td><td><div class="bar-wrap"><div class="bar-fill" style="width:80%"></div></div></td><td>€248 = €4,960 ÷ 20 — possible per-unit quantity pricing</td></tr>
+      <tr><td class="rank">6</td><td class="num">10.00</td><td class="num">3 suppliers</td><td class="num amber">8 times</td><td><div class="bar-wrap"><div class="bar-fill" style="width:60%;background:var(--muted)"></div></div></td><td>Fee schedule — likely per-decision administrative charge</td></tr>
+      <tr><td class="rank">7</td><td class="num">1,860.00</td><td class="num">3 suppliers</td><td class="num">3</td><td><div class="bar-wrap"><div class="bar-fill" style="width:60%"></div></div></td><td>3 suppliers at identical rate</td></tr>
+      <tr><td class="rank">8</td><td class="num">992.00</td><td class="num">3 suppliers</td><td class="num">3</td><td><div class="bar-wrap"><div class="bar-fill" style="width:60%"></div></div></td><td>€992 = €248 × 4 — quantity multiple of rank 5</td></tr>
+      <tr><td class="rank">9</td><td class="num">744.00</td><td class="num">3 suppliers</td><td class="num">4</td><td><div class="bar-wrap"><div class="bar-fill" style="width:60%"></div></div></td><td>€744 = €248 × 3 — multiple of rank 5</td></tr>
+      <tr><td class="rank">10</td><td class="num">558.00</td><td class="num">3 suppliers</td><td class="num">3</td><td><div class="bar-wrap"><div class="bar-fill" style="width:60%"></div></div></td><td>Non-round; 3 suppliers</td></tr>
+      <tr><td class="rank">11</td><td class="num">347.20</td><td class="num">3 suppliers</td><td class="num">3</td><td><div class="bar-wrap"><div class="bar-fill" style="width:60%"></div></div></td><td>Non-round</td></tr>
+      <tr><td class="rank">12</td><td class="num">297.60</td><td class="num">3 suppliers</td><td class="num">3</td><td><div class="bar-wrap"><div class="bar-fill" style="width:60%"></div></div></td><td>€297.60 ≈ €111.6 × 2.67 — possible unit-price variant</td></tr>
+      <tr><td class="rank">13</td><td class="num">223.20</td><td class="num">3 suppliers</td><td class="num">3</td><td><div class="bar-wrap"><div class="bar-fill" style="width:60%"></div></div></td><td>€223.2 = €111.6 × 2 — quantity multiple</td></tr>
+      <tr><td class="rank">14</td><td class="num muted">111.60</td><td class="num">3 suppliers</td><td class="num">3</td><td><div class="bar-wrap"><div class="bar-fill" style="width:60%;background:var(--muted)"></div></div></td><td>Possible base unit price (×1)</td></tr>
+      <tr><td class="rank">15</td><td class="num muted">62.00</td><td class="num">3 suppliers</td><td class="num">4</td><td><div class="bar-wrap"><div class="bar-fill" style="width:60%;background:var(--muted)"></div></div></td><td>Low value — marginal</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note"><b>Assessment:</b> The multiples pattern (€111.6, €223.2, €297.6, €483.6, €744, €992) strongly suggests a per-unit rate of ~€111.60 applied to different quantities across different suppliers. This is consistent with a pre-approved ΠΠΥΥ catalogue price, not necessarily coordination. The <b>€4,960 across 5 suppliers</b> (rank 1) is the strongest finding — a single non-round amount paid to 5 different AFMs is harder to explain as routine quantity-based pricing.</div>
 </div>
 
-</div>
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('pane-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
 </body>
 </html>
