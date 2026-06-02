@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ΓΝ ΒΕΝΙΖΕΛΕΙΟ — Supplier Intelligence Brief</title>
+<style>
+  :root {
+    --bg:#0f1117;--card:#1a1d27;--card2:#1e2133;--border:#2a2d3e;
+    --text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;
+    --red:#ef4444;--amber:#f59e0b;--green:#22c55e;--blue:#3b82f6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;font-size:14px;line-height:1.6}
+  .header{background:var(--card);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between}
+  .header-left h1{font-size:1.1rem;font-weight:700;color:#fff}
+  .header-left .sub{color:var(--muted);font-size:.82rem;margin-top:2px}
+  .pills{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+  .pill{border-radius:9999px;padding:2px 9px;font-size:.72rem;font-weight:600;border:1px solid}
+  .pill-slate{background:rgba(100,116,139,.15);color:#94a3b8;border-color:rgba(100,116,139,.3)}
+  .pill-green{background:rgba(34,197,94,.1);color:#86efac;border-color:rgba(34,197,94,.25)}
+  .pill-blue{background:rgba(59,130,246,.12);color:#93c5fd;border-color:rgba(59,130,246,.25)}
+  .pill-amber{background:rgba(245,158,11,.1);color:#fde68a;border-color:rgba(245,158,11,.25)}
+  .tabs{background:var(--card);border-bottom:1px solid var(--border);display:flex;padding:0 24px;overflow-x:auto}
+  .tab{background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);cursor:pointer;font-size:.85rem;font-weight:500;padding:12px 16px;white-space:nowrap;transition:color .15s,border-color .15s}
+  .tab:hover{color:var(--text)}
+  .tab.active{border-bottom-color:var(--accent);color:#fff;font-weight:600}
+  .pane{display:none;padding:24px;max-width:1400px;margin:0 auto}
+  .pane.active{display:block}
+  .section-title{font-size:.88rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:20px 0 10px}
+  .kv{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:16px}
+  .kv-card{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:14px 16px}
+  .kv-label{font-size:.75rem;color:var(--muted);margin-bottom:4px}
+  .kv-val{font-size:1.2rem;font-weight:700;color:#fff}
+  .kv-sub{font-size:.72rem;color:var(--muted);margin-top:3px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{background:var(--card2);color:var(--muted);font-size:.75rem;font-weight:600;text-align:left;padding:8px 10px;border-bottom:1px solid var(--border)}
+  td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .ada{font-family:monospace;font-size:.78rem;color:var(--accent);text-decoration:none}
+  .ada:hover{text-decoration:underline}
+  .badge-green{background:rgba(34,197,94,.12);color:#86efac;border:1px solid rgba(34,197,94,.25);border-radius:4px;padding:1px 6px;font-size:.72rem;font-weight:600}
+  .badge-blue{background:rgba(59,130,246,.12);color:#93c5fd;border:1px solid rgba(59,130,246,.25);border-radius:4px;padding:1px 6px;font-size:.72rem;font-weight:600}
+  .badge-amber{background:rgba(245,158,11,.12);color:#fde68a;border:1px solid rgba(245,158,11,.25);border-radius:4px;padding:1px 6px;font-size:.72rem;font-weight:600}
+  .badge-slate{background:rgba(100,116,139,.15);color:#cbd5e1;border:1px solid rgba(100,116,139,.25);border-radius:4px;padding:1px 6px;font-size:.72rem;font-weight:600}
+  .notice{border-radius:8px;padding:12px 14px;font-size:.83rem;margin-bottom:12px}
+  .notice b{font-weight:700}
+  .notice-blue{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.25);color:#bfdbfe}
+  .notice-green{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);color:#bbf7d0}
+  .notice-slate{background:rgba(100,116,139,.08);border:1px solid rgba(100,116,139,.25);color:#cbd5e1}
+  .notice-amber{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);color:#fde68a}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>ΓΝ ΒΕΝΙΖΕΛΕΙΟ ΗΡΑΚΛΕΙΟΥ ΚΡΗΤΗΣ</h1>
+    <div class="sub">Org ID: 99221997 · ADA prefix: 46906Ο · Ηράκλειο, Κρήτη</div>
+    <div class="pills">
+      <span class="pill pill-slate">~550 beds</span>
+      <span class="pill pill-green">competitive procurement</span>
+      <span class="pill pill-slate">14,998 decisions</span>
+      <span class="pill pill-blue">1,112 ΚΑΤΑΚΥΡΩΣΗ</span>
+      <span class="pill pill-amber">T6 (1/9 signals)</span>
+    </div>
+  </div>
+  <div style="text-align:right;color:var(--muted);font-size:.78rem">
+    2019–2026<br>Analysis: 2026-06-03
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('overview',this)">Overview</button>
+  <button class="tab" onclick="showTab('competitive',this)">Competitive Awards</button>
+  <button class="tab" onclick="showTab('t6',this)">T6 · Oct 2024 Burst</button>
+</div>
+
+<!-- TAB 1: OVERVIEW -->
+<div id="pane-overview" class="pane active">
+
+  <div class="notice notice-green" style="margin-top:0">
+    <b>✓ Competitive procurement — not ΕΠΥ-routed.</b> Unlike most hospitals in this analysis, ΓΝ ΒΕΝΙΖΕΛΕΙΟ conducts procurement directly: 1,112 ΚΑΤΑΚΥΡΩΣΗ competitive awards (€94.1M), 420 tender notices (€127.6M budget), and only 6 ΑΝΑΘΕΣΗ direct awards (€581k) over 7 years. Emergency procurement rate: <b>0.3%</b> (3 Art.32§2γ decisions out of 1,170 procurement) — among the cleanest in the hospital dataset.
+  </div>
+  <div class="notice notice-amber">
+    <b>⚠️ Supplier IDs missing from ΚΑΤΑΚΥΡΩΣΗ.</b> While 1,112 competitive awards are published, the structured <code>supplier_tax_id</code> field is not populated for any ΚΑΤΑΚΥΡΩΣΗ decision. Supplier identity in award decisions can only be recovered via PDF/text lookup per ADA. This limits automated supplier analysis.
+  </div>
+
+  <div class="section-title">Key Metrics</div>
+  <div class="kv">
+    <div class="kv-card">
+      <div class="kv-label">Total Decisions</div>
+      <div class="kv-val">14,998</div>
+      <div class="kv-sub">2019–2026 (7.5 yrs)</div>
+    </div>
+    <div class="kv-card">
+      <div class="kv-label">ΚΑΤΑΚΥΡΩΣΗ (competitive)</div>
+      <div class="kv-val" style="color:var(--green)">1,112</div>
+      <div class="kv-sub">€94.1M total awards</div>
+    </div>
+    <div class="kv-card">
+      <div class="kv-label">ΑΝΑΘΕΣΗ (direct award)</div>
+      <div class="kv-val" style="color:var(--green)">6</div>
+      <div class="kv-sub">€581k total — minimal</div>
+    </div>
+    <div class="kv-card">
+      <div class="kv-label">ΠΕΡΙΛΗΨΗ ΔΙΑΚΗΡΥΞΗΣ</div>
+      <div class="kv-val">420</div>
+      <div class="kv-sub">€127.6M budget (tenders)</div>
+    </div>
+    <div class="kv-card">
+      <div class="kv-label">Emergency Procurement</div>
+      <div class="kv-val" style="color:var(--green)">3</div>
+      <div class="kv-sub">0.3% of procurement</div>
+    </div>
+    <div class="kv-card">
+      <div class="kv-label">Signals Fired</div>
+      <div class="kv-val" style="color:var(--amber)">1/9</div>
+      <div class="kv-sub">T6 only (Oct 2024 batch)</div>
+    </div>
+  </div>
+
+  <div class="section-title">Comparison: Emergency Procurement Rate by Hospital</div>
+  <table>
+    <thead>
+      <tr>
+        <th>Hospital</th>
+        <th class="num">Art.32§2γ Decisions</th>
+        <th class="num">Total Procurement</th>
+        <th class="num">Rate</th>
+        <th>Assessment</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="background:rgba(239,68,68,.04)">
+        <td>ΓΝ ΙΠΠΟΚΡΑΤΕΙΟ (99222000)</td>
+        <td class="num">149</td>
+        <td class="num">~700</td>
+        <td class="num" style="color:#f87171">~21%</td>
+        <td><span class="badge-amber">escalating T5 signal</span></td>
+      </tr>
+      <tr style="background:rgba(239,68,68,.04)">
+        <td>ΓΝ ΤΡΙΚΑΛΩΝ (99221946)</td>
+        <td class="num">included</td>
+        <td class="num">multiple</td>
+        <td class="num" style="color:#f87171">high</td>
+        <td><span class="badge-amber">T5 fired</span></td>
+      </tr>
+      <tr style="background:rgba(239,68,68,.04)">
+        <td>ΓΝΑ ΑΧΕΠΑ (99221998)</td>
+        <td class="num">included</td>
+        <td class="num">multiple</td>
+        <td class="num" style="color:#f87171">high</td>
+        <td><span class="badge-amber">T5 fired</span></td>
+      </tr>
+      <tr style="background:rgba(34,197,94,.04)">
+        <td><b>ΓΝ ΒΕΝΙΖΕΛΕΙΟ (99221997)</b></td>
+        <td class="num"><b>3</b></td>
+        <td class="num"><b>1,170</b></td>
+        <td class="num" style="color:#86efac"><b>0.3%</b></td>
+        <td><span class="badge-green">excellent — competitive</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="section-title" style="margin-top:24px">Competitive Awards by Year</div>
+  <table>
+    <thead>
+      <tr>
+        <th>Year</th>
+        <th class="num">ΚΑΤΑΚΥΡΩΣΗ</th>
+        <th class="num">Awards Total</th>
+        <th class="num">Tenders</th>
+        <th class="num">Tender Budget</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>2019</td><td class="num">97</td><td class="num">€8,235,466</td><td class="num">57</td><td class="num">€50,323,226</td><td><span class="badge-slate">high tender budget (multi-year frameworks?)</span></td></tr>
+      <tr><td>2020</td><td class="num">168</td><td class="num">€8,859,949</td><td class="num">84</td><td class="num">€8,525,642</td><td><span class="badge-amber">COVID procurement activity rises</span></td></tr>
+      <tr><td>2021</td><td class="num">289</td><td class="num">€19,048,687</td><td class="num">68</td><td class="num">€36,432,110</td><td><span class="badge-amber">peak year — post-COVID restocking surge</span></td></tr>
+      <tr><td>2022</td><td class="num">271</td><td class="num">€25,328,690</td><td class="num">49</td><td class="num">€7,957,103</td><td><span class="badge-amber">high award values</span></td></tr>
+      <tr><td>2023</td><td class="num">110</td><td class="num">€10,690,386</td><td class="num">70</td><td class="num">€11,742,689</td><td><span class="badge-slate">normalising</span></td></tr>
+      <tr><td>2024</td><td class="num">77</td><td class="num">€9,765,106</td><td class="num">42</td><td class="num">€6,915,704</td><td><span class="badge-amber">Oct batch burst (32 awards in Oct)</span></td></tr>
+      <tr><td>2025</td><td class="num">63</td><td class="num">€8,853,435</td><td class="num">50</td><td class="num">€5,684,319</td><td><span class="badge-slate">steady</span></td></tr>
+      <tr><td>2026</td><td class="num">37</td><td class="num">€3,342,525</td><td class="num">—</td><td class="num">—</td><td><span class="badge-slate">Jan–May only</span></td></tr>
+      <tr style="background:var(--card2);font-weight:700">
+        <td>Total</td><td class="num">1,112</td><td class="num">€94,124,244</td><td class="num">420</td><td class="num">€127,580,794</td><td></td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+
+<!-- TAB 2: COMPETITIVE AWARDS -->
+<div id="pane-competitive" class="pane">
+
+  <div class="section-title" style="margin-top:0">Feed Structure</div>
+  <div class="notice notice-slate">
+    ΓΝ ΒΕΝΙΖΕΛΕΙΟ uses ΚΑΤΑΚΥΡΩΣΗ (evaluation-of-qualification-documents decisions + final awards combined) as its primary procurement transparency mechanism. The hospital Board publishes each evaluation step in the competitive tender process under this decision type. Subjects consistently follow the pattern "Αξιολόγηση Δικαιολογητικών [Κατακύρωσης/Συμμετοχής]" — Greek procurement law requires each evaluation step to be individually published on Diavgeia.
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Decision Type</th>
+        <th class="num">Count</th>
+        <th class="num">Amount Total (€)</th>
+        <th>Supplier IDs</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ</td>
+        <td class="num">10,452</td>
+        <td class="num">€52,691,053</td>
+        <td><span class="badge-slate">14/10452</span></td>
+        <td>Budget commitments; supplier field rarely used</td>
+      </tr>
+      <tr>
+        <td><b>ΚΑΤΑΚΥΡΩΣΗ</b></td>
+        <td class="num">1,112</td>
+        <td class="num">€94,124,244</td>
+        <td><span class="badge-amber">0/1112 — no supplier IDs</span></td>
+        <td>Competitive awards; PDF-only supplier identification</td>
+      </tr>
+      <tr>
+        <td>ΛΟΙΠΕΣ ΑΤΟΜΙΚΕΣ ΔΙΟΙΚΗΤΙΚΕΣ ΠΡΑΞΕΙΣ</td>
+        <td class="num">1,775</td>
+        <td class="num">€559,351</td>
+        <td><span class="badge-slate">none</span></td>
+        <td>Administrative acts</td>
+      </tr>
+      <tr>
+        <td>ΠΕΡΙΛΗΨΗ ΔΙΑΚΗΡΥΞΗΣ</td>
+        <td class="num">420</td>
+        <td class="num">€127,580,794</td>
+        <td><span class="badge-slate">none</span></td>
+        <td>Tender notices (budget estimates)</td>
+      </tr>
+      <tr>
+        <td>ΕΓΚΡΙΣΗ ΔΑΠΑΝΗΣ</td>
+        <td class="num">268</td>
+        <td class="num">€6,906,306</td>
+        <td><span class="badge-amber">268/268 — AFM 996978666 only</span></td>
+        <td>Expenditure approvals; hospital own AFM as payer</td>
+      </tr>
+      <tr>
+        <td>ΠΡΑΞΗ ΣΥΛΛΟΓΙΚΟΥ ΟΡΓΑΝΟΥ</td>
+        <td class="num">437</td>
+        <td class="num">€1,189,355</td>
+        <td><span class="badge-slate">none</span></td>
+        <td>Board decisions (committee minutes)</td>
+      </tr>
+      <tr>
+        <td>ΚΑΝΟΝΙΣΤΙΚΗ ΠΡΑΞΗ</td>
+        <td class="num">231</td>
+        <td class="num">€2,092,763</td>
+        <td><span class="badge-slate">none</span></td>
+        <td>Regulatory/specification decisions</td>
+      </tr>
+      <tr>
+        <td><b>ΑΝΑΘΕΣΗ ΕΡΓΩΝ / ΠΡΟΜΗΘΕΙΩΝ / ΥΠΗΡΕΣΙΩΝ / ΜΕΛΕΤΩΝ</b></td>
+        <td class="num">6</td>
+        <td class="num">€580,956</td>
+        <td><span class="badge-slate">0/6</span></td>
+        <td>Very few direct awards — confirmed competitive procurement preference</td>
+      </tr>
+      <tr>
+        <td>ΟΡΙΣΤΙΚΟΠΟΙΗΣΗ ΠΛΗΡΩΜΗΣ</td>
+        <td class="num">89</td>
+        <td class="num">€112,415</td>
+        <td><span class="badge-slate">89/89 (own AFM)</span></td>
+        <td>Payment finalizations (payer = hospital)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="section-title">Top ΚΑΤΑΚΥΡΩΣΗ Awards (by amount, with amounts visible)</div>
+  <div class="notice notice-slate">
+    ΚΑΤΑΚΥΡΩΣΗ decisions at ΓΝ ΒΕΝΙΖΕΛΕΙΟ include both the board ratification of tender evaluation steps and the actual award decisions. Subject text describes the tender/category; supplier names appear only in the PDF documents, not in structured API fields.
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>ADA</th>
+        <th>Year</th>
+        <th class="num">Amount (€)</th>
+        <th>Subject</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a href="https://diavgeia.gov.gr/doc/ΨΘ1146906Ο-5ΨΠ" class="ada" target="_blank">ΨΘ1146906Ο-5ΨΠ</a></td>
+        <td>2020</td>
+        <td class="num">€1,596,612</td>
+        <td>Δ/ξη 40/2018 — Προμήθεια ΑΝΤΙΔΡΑΣΤΗΡΙΩΝ</td>
+      </tr>
+      <tr>
+        <td><a href="https://diavgeia.gov.gr/doc/965Θ46906Ο-Ο2Φ" class="ada" target="_blank">965Θ46906Ο-Ο2Φ</a></td>
+        <td>2024</td>
+        <td class="num">€843,592</td>
+        <td>Oct 2024 batch — Ηλεκτρ. Άνω Ορίων Διαγωνισμός (Oct burst)</td>
+      </tr>
+      <tr>
+        <td><a href="https://diavgeia.gov.gr/doc/Ψ61146906Ο-Η6Ρ" class="ada" target="_blank">Ψ61146906Ο-Η6Ρ</a></td>
+        <td>2024</td>
+        <td class="num">€550,389</td>
+        <td>Oct 2024 batch — Διεθνής Ανοικτός Άνω Ορίων Διαγωνισμός</td>
+      </tr>
+      <tr>
+        <td><a href="https://diavgeia.gov.gr/doc/9ΑΟΩ46906Ο-ΞΞΛ" class="ada" target="_blank">9ΑΟΩ46906Ο-ΞΞΛ</a></td>
+        <td>2024</td>
+        <td class="num">€355,494</td>
+        <td>Oct 2024 batch — Ηλεκτρ. Άνω Ορίων Διαγωνισμός</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="section-title">Signal Detection Results</div>
+  <table>
+    <thead>
+      <tr><th>Signal</th><th>Result</th><th>Reason</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>T1 · Direct award concentration</td><td><span class="badge-green">CLEAN</span></td><td>No ΑΝΑΘΕΣΗ with supplier+amount data</td></tr>
+      <tr><td>T4 · Amendment inflation</td><td><span class="badge-green">CLEAN</span></td><td>No amendment chain detected</td></tr>
+      <tr><td>T5 · Emergency procurement overuse</td><td><span class="badge-green">CLEAN</span></td><td>3/1,170 = 0.3% (excellent rate)</td></tr>
+      <tr><td><b>T6 · Temporal clustering</b></td><td><span class="badge-amber">FIRED</span></td><td>Oct 2024: 32 ΚΑΤΑΚΥΡΩΣΗ (4.1× mean of 8/month) — year-end batch</td></tr>
+      <tr><td>T8 · Single-source monopoly</td><td><span class="badge-green">CLEAN</span></td><td>No ΑΝΑΘΕΣΗ with supplier+amount</td></tr>
+      <tr><td>T9A · Committee capture</td><td><span class="badge-green">CLEAN</span></td><td>Only 6 direct awards total</td></tr>
+      <tr><td>T9B · Copy-paste structured award</td><td><span class="badge-green">CLEAN</span></td><td>No patterns</td></tr>
+      <tr><td>T9C · 30-day award burst</td><td><span class="badge-green">CLEAN</span></td><td>No bursts</td></tr>
+      <tr><td>T9D · Price standardisation</td><td><span class="badge-green">CLEAN</span></td><td>No multi-supplier price patterns</td></tr>
+    </tbody>
+  </table>
+
+</div>
+
+<!-- TAB 3: T6 BURST -->
+<div id="pane-t6" class="pane">
+
+  <div class="section-title" style="margin-top:0">T6 · Oct 2024 — Competitive Award Batch</div>
+  <div class="notice notice-amber">
+    <b>T6 fires: October 2024 — 32 ΚΑΤΑΚΥΡΩΣΗ decisions, 4.1× monthly mean (baseline: 8/month).</b> Total amount: €4,679,584. This is NOT an emergency procurement burst — all 32 are competitive tender evaluation/award decisions. Pattern: Greek public hospitals typically batch-finalize multiple competitive tenders in Q4 (Oct–Dec) before year-end budget deadlines. No individual award exceeds €1M. Assessment: <b>administrative seasonality, not a corruption signal</b>.
+  </div>
+
+  <div class="section-title">Oct 2024 ΚΑΤΑΚΥΡΩΣΗ Decisions (top 15 by amount)</div>
+  <table>
+    <thead>
+      <tr>
+        <th>ADA</th>
+        <th class="num">Amount (€)</th>
+        <th>Subject (truncated)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td><a href="https://diavgeia.gov.gr/doc/965Θ46906Ο-Ο2Φ" class="ada" target="_blank">965Θ46906Ο-Ο2Φ</a></td><td class="num">€843,592</td><td>Αξιολόγηση Δικαιολογητικών Κατακύρωσης — Ηλεκτρ. Διαγωνισμός Άνω Ορίων</td></tr>
+      <tr><td><a href="https://diavgeia.gov.gr/doc/Ψ61146906Ο-Η6Ρ" class="ada" target="_blank">Ψ61146906Ο-Η6Ρ</a></td><td class="num">€550,389</td><td>Αξιολόγηση Δικαιολογητικών Κατακύρωσης — Διεθνής Ανοικτός Διαγωνισμός</td></tr>
+      <tr><td><a href="https://diavgeia.gov.gr/doc/9ΑΟΩ46906Ο-ΞΞΛ" class="ada" target="_blank">9ΑΟΩ46906Ο-ΞΞΛ</a></td><td class="num">€355,494</td><td>Αξιολόγηση Δικαιολογητικών Κατακύρωσης — Ηλεκτρ. Διαγωνισμός Άνω Ορίων</td></tr>
+      <tr><td><a href="https://diavgeia.gov.gr/doc/6ΜΠ446906Ο-ΨΒ9" class="ada" target="_blank">6ΜΠ446906Ο-ΨΒ9</a></td><td class="num">€240,420</td><td>Αξιολόγηση Δικαιολογητικών Κατακύρωσης — Ηλεκτρ. Διαγωνισμός Κάτω Ορίων</td></tr>
+      <tr><td><a href="https://diavgeia.gov.gr/doc/Ψ5ΟΥ46906Ο-ΩΤΥ" class="ada" target="_blank">Ψ5ΟΥ46906Ο-ΩΤΥ</a></td><td class="num">€234,145</td><td>Αξιολόγηση Δικαιολογητικών Κατακύρωσης — Ηλεκτρ. Διαγωνισμός Κάτω Ορίων</td></tr>
+      <tr><td><a href="https://diavgeia.gov.gr/doc/96Κ146906Ο-ΠΒΜ" class="ada" target="_blank">96Κ146906Ο-ΠΒΜ</a></td><td class="num">€223,200</td><td>Αξιολόγηση Δικαιολογητικών Κατακύρωσης — Τακτικός Διαγωνισμός</td></tr>
+      <tr><td><a href="https://diavgeia.gov.gr/doc/ΨΘ0Β46906Ο-Β1Φ" class="ada" target="_blank">ΨΘ0Β46906Ο-Β1Φ</a></td><td class="num">€190,000</td><td>Αξιολόγηση Δικαιολογητικών Κατακύρωσης — Ηλεκτρ. Ανοικτός Κάτω Ορίων</td></tr>
+      <tr><td><a href="https://diavgeia.gov.gr/doc/98ΝΩ46906Ο-ΧΨ9" class="ada" target="_blank">98ΝΩ46906Ο-ΧΨ9</a></td><td class="num">€185,293</td><td>Αξιολόγηση Δικαιολογητικών Κατακύρωσης — Ηλεκτρ. Ανοικτός Κάτω Ορίων</td></tr>
+      <tr><td><a href="https://diavgeia.gov.gr/doc/6ΡΘΤ46906Ο-ΚΝΛ" class="ada" target="_blank">6ΡΘΤ46906Ο-ΚΝΛ</a></td><td class="num">€180,257</td><td>Αξιολόγηση Δικαιολογητικών Κατακύρωσης — Ηλεκτρ. Ανοικτός Κάτω Ορίων</td></tr>
+      <tr><td><a href="https://diavgeia.gov.gr/doc/9ΣΘ346906Ο-ΛΣ7" class="ada" target="_blank">9ΣΘ346906Ο-ΛΣ7</a></td><td class="num">€174,801</td><td>Αξιολόγηση Δικαιολογητικών Κατακύρωσης — Ηλεκτρ. Ανοικτός Κάτω Ορίων</td></tr>
+      <tr><td><a href="https://diavgeia.gov.gr/doc/9ΨΣΡ46906Ο-ΠΑ0" class="ada" target="_blank">9ΨΣΡ46906Ο-ΠΑ0</a></td><td class="num">€154,800</td><td>Αξιολόγηση Δικαιολογητικών Κατακύρωσης — Τακτικός Ανοικτός Κάτω Ορίων</td></tr>
+      <tr><td><a href="https://diavgeia.gov.gr/doc/Ψ9ΡΜ46906Ο-ΠΓΗ" class="ada" target="_blank">Ψ9ΡΜ46906Ο-ΠΓΗ</a></td><td class="num">€153,470</td><td>Αξιολόγηση Δικαιολογητικών Κατακύρωσης — Ηλεκτρ. Ανοικτός Κάτω Ορίων</td></tr>
+      <tr><td><a href="https://diavgeia.gov.gr/doc/ΨΤΦΧ46906Ο-ΓΣΨ" class="ada" target="_blank">ΨΤΦΧ46906Ο-ΓΣΨ</a></td><td class="num">€119,000</td><td>Αξιολόγηση Δικαιολογητικών Κατακύρωσης — Ηλεκτρ. Ανοικτός Κάτω Ορίων</td></tr>
+      <tr><td><a href="https://diavgeia.gov.gr/doc/9ΙΠΑ46906Ο-ΤΟΛ" class="ada" target="_blank">9ΙΠΑ46906Ο-ΤΟΛ</a></td><td class="num">€112,475</td><td>Αξιολόγηση Δικαιολογητικών Κατακύρωσης — Τακτικός Ανοικτός Κάτω Ορίων</td></tr>
+      <tr><td><a href="https://diavgeia.gov.gr/doc/996Η46906Ο-Ι37" class="ada" target="_blank">996Η46906Ο-Ι37</a></td><td class="num">€110,000</td><td>Αξιολόγηση Δικαιολογητικών Κατακύρωσης — Ηλεκτρ. Ανοικτός Κάτω Ορίων</td></tr>
+    </tbody>
+  </table>
+
+  <div class="notice notice-slate" style="margin-top:16px">
+    <b>Assessment:</b> The October 2024 batch represents year-end procurement finalization — a well-documented pattern in Greek public procurement where hospital boards complete all pending tenders before the December budget cycle. The spread of award sizes (€112k–€844k), diverse tender types, and absence of any single dominant supplier AFM (none populated) indicates normal competitive activity. T6 signal is a scheduling artifact, not a corruption indicator.
+  </div>
+
+</div>
+
+<script>
+function showTab(id, btn) {
+  document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('pane-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>
