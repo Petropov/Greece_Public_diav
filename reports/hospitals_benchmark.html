@@ -161,7 +161,7 @@
     <div class="card">
       <div class="card-title">⚠️ Data Quality &amp; Comparability Notes</div>
       <div class="gap-y mt8">
-        <div class="notice notice-amber"><b>ΕΠΥ Routing (ΓΝ ΚΑΡΔΙΤΣΑ, ΓΝ ΛΑΡΙΣΑ):</b> 0 ΑΝΑΘΕΣΗ records. Procurement routed through ΕΠΥ (Επιτροπή Προμηθειών Υγείας, AFM 999336270) and published under that org-ID. These hospitals' own feeds reveal nothing about their procurement.</div>
+        <div class="notice notice-amber"><b>ΕΠΥ Routing (ΓΝ ΚΑΡΔΙΤΣΑ, ΓΝ ΚΟΖΑΝΗΣ ΜΑΜΑΤΣΕΙΟ):</b> 0 ΑΝΑΘΕΣΗ records. Procurement routed through ΕΠΥ (Επιτροπή Προμηθειών Υγείας, AFM 999336270) and published under that org-ID. These hospitals' own feeds reveal nothing about their procurement.</div>
         <div class="notice notice-amber"><b>ΑΝΑΛΗΨΗ amounts corrupted:</b> ΓΝΑ ΕΥΑΓΓΕΛΙΣΜΟΣ = €10B+ (capped), ΓΝ ΣΕΡΡΩΝ = €369M (impossible). All ΑΝΑΛΗΨΗ amounts are excluded from monetary comparisons.</div>
         <div class="notice notice-amber"><b>ΓΝΑ ΕΥΑΓΓΕΛΙΣΜΟΣ 2024 spike:</b> €60.6M of the €60.7M total ΑΝΑΘΕΣΗ appears in 2024 only (zero in all other years). Almost certainly a data reclassification event, not actual procurement. Excluded from amount comparisons.</div>
         <div class="notice notice-blue"><b>Coverage:</b> ΓΝΑ ΑΧΕΠΑ and ΓΝΑ ΕΥΑΓΓΕΛΙΣΜΟΣ data starts 2019; all others start 2020.</div>
@@ -193,7 +193,7 @@
           <td class="num" style="color:var(--muted)">0</td><td class="num" style="color:var(--muted)">—</td>
           <td class="num" style="color:var(--muted)">0</td><td class="num" style="color:var(--muted)">—</td>
           <td class="num" style="color:var(--muted)">N/A</td><td class="num" style="color:var(--muted)">N/M</td></tr>
-        <tr><td><b>ΓΝ ΛΑΡΙΣΑ</b></td><td class="num">350</td><td class="num">35,381</td>
+        <tr><td><b>ΓΝ ΚΟΖΑΝΗΣ ΜΑΜΑΤΣΕΙΟ ⚠️</b></td><td class="num">~400</td><td class="num">35,381</td>
           <td class="num" style="color:var(--muted)">0</td><td class="num" style="color:var(--muted)">—</td>
           <td class="num">15</td><td class="num">€0.2M</td>
           <td class="num" style="color:var(--muted)">N/A</td><td class="num" style="color:var(--muted)">N/M</td></tr>
@@ -242,7 +242,7 @@
 
   <div class="card" style="margin-bottom:18px">
     <div class="card-title">Decision Type Composition — 100% Stacked (count basis)</div>
-    <div class="card-sub">Each bar = one hospital. Stack shows what proportion of all decisions belong to each type. Note: ΛΑΜΙΑ is 11.6% ΑΝΑΘΕΣΗ; ΚΑΡΔΙΤΣΑ / ΛΑΡΙΣΑ are 0%.</div>
+    <div class="card-sub">Each bar = one hospital. Stack shows what proportion of all decisions belong to each type. Note: ΛΑΜΙΑ is 11.6% ΑΝΑΘΕΣΗ; ΚΑΡΔΙΤΣΑ / ΚΟΖΑΝΗ are 0%.</div>
     <div class="chart-wrap" style="height:380px">
       <canvas id="chartProfile"></canvas>
     </div>
@@ -287,7 +287,7 @@
 <div id="tab-procurement" class="tab-pane">
   <div class="section-head">
     <h2>Procurement Comparison</h2>
-    <p>Direct awards (ΑΝΑΘΕΣΗ) vs competitive tenders (ΚΑΤΑΚΥΡΩΣΗ) — for the 5 hospitals where procurement records exist. ΓΝ ΚΑΡΔΙΤΣΑ and ΓΝ ΛΑΡΙΣΑ excluded (zero records in own feed).</p>
+    <p>Direct awards (ΑΝΑΘΕΣΗ) vs competitive tenders (ΚΑΤΑΚΥΡΩΣΗ) — for the 5 hospitals where procurement records exist. ΓΝ ΚΑΡΔΙΤΣΑ and ΓΝ ΚΟΖΑΝΗΣ ΜΑΜΑΤΣΕΙΟ excluded (zero records in own feed).</p>
   </div>
 
   <div class="grid-2" style="margin-bottom:18px">
@@ -347,7 +347,7 @@
 <div id="tab-trends" class="tab-pane">
   <div class="section-head">
     <h2>Year-over-Year Procurement Trends</h2>
-    <p>Annual direct-award and competitive-award amounts for hospitals with usable yearly data. ΓΝ ΚΑΡΔΙΤΣΑ and ΓΝ ΛΑΡΙΣΑ omitted (no procurement records). 2026 = partial year.</p>
+    <p>Annual direct-award and competitive-award amounts for hospitals with usable yearly data. ΓΝ ΚΑΡΔΙΤΣΑ and ΓΝ ΚΟΖΑΝΗΣ ΜΑΜΑΤΣΕΙΟ omitted (no procurement records). 2026 = partial year.</p>
   </div>
 
   <div class="grid-2" style="margin-bottom:18px">
@@ -412,7 +412,7 @@ const HOSPITALS = [
       {r:"low",t:"No signals — procurement invisible (ΕΠΥ-routed) + T6 false positives resolved",b:"Previously flagged T6 year-end ΣΥΜΒΑΣΗ burst (46–66× baseline) resolved: all 759 ΣΥΜΒΑΣΗ decisions are employment contracts (ΙΔΟΧ, ΣΟΧ, ΕΣΠΑ, ΕΠΙΚΟΥΡΙΚΟΙ, trainee doctors) not procurement contracts. After expanded T6 employment filter, 0 genuine signals detected. 0 ΑΝΑΘΕΣΗ confirms near-total ΕΠΥ routing — actual procurement spend completely invisible from this feed."}],
     notes:"0 ΑΝΑΘΕΣΗ — procurement fully routed through ΕΠΥ. 759 ΣΥΜΒΑΣΗ = 100% employment contracts (physician, nursing, support staff). 11,837 ΚΑΝΟΝΙΣΤΙΚΗ ΠΡΑΞΗ (32%) is unusually high regulatory-decision share. Procurement exposure completely invisible from this feed."
   },
-  { id:"99221920", name:"ΓΝ ΛΑΡΙΣΑ", city:"Λάρισα", beds:350, total:35381,
+  { id:"99221920", name:"ΓΝ ΚΟΖΑΝΗΣ ΜΑΜΑΤΣΕΙΟ ⚠️", city:"Κοζάνη", beds:400, total:35381,
     direct_count:0, direct_amount:0, comp_count:15, comp_amount:236519,
     emerg_count:0, emerg_amount:0, emerg_rate:0,
     rank:"clean", signals:0, pills:[],

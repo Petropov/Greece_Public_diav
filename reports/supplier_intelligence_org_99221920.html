@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ΓΝ ΚΟΖΑΝΗΣ ΜΑΜΑΤΣΕΙΟ — Supplier Intelligence Brief</title>
+<style>
+  :root {
+    --bg:#0f1117;--card:#1a1d27;--card2:#1e2133;--border:#2a2d3e;
+    --text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;
+    --red:#ef4444;--amber:#f59e0b;--green:#22c55e;--blue:#3b82f6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;font-size:14px;line-height:1.6}
+  .header{background:var(--card);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between}
+  .header-left h1{font-size:1.1rem;font-weight:700;color:#fff}
+  .header-left .sub{color:var(--muted);font-size:.82rem;margin-top:2px}
+  .pills{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+  .pill{border-radius:9999px;padding:2px 9px;font-size:.72rem;font-weight:600;border:1px solid}
+  .pill-slate{background:rgba(100,116,139,.15);color:#94a3b8;border-color:rgba(100,116,139,.3)}
+  .pill-green{background:rgba(34,197,94,.1);color:#86efac;border-color:rgba(34,197,94,.25)}
+  .pill-blue{background:rgba(59,130,246,.12);color:#93c5fd;border-color:rgba(59,130,246,.25)}
+  .pill-red{background:rgba(239,68,68,.12);color:#fca5a5;border-color:rgba(239,68,68,.3)}
+  .tabs{background:var(--card);border-bottom:1px solid var(--border);display:flex;padding:0 24px;overflow-x:auto}
+  .tab{background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);cursor:pointer;font-size:.85rem;font-weight:500;padding:12px 16px;white-space:nowrap;transition:color .15s,border-color .15s}
+  .tab:hover{color:var(--text)}
+  .tab.active{border-bottom-color:var(--accent);color:#fff;font-weight:600}
+  .pane{display:none;padding:24px;max-width:1400px;margin:0 auto}
+  .pane.active{display:block}
+  .section-title{font-size:.88rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:20px 0 10px}
+  .kv{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:16px}
+  .kv-card{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:14px 16px}
+  .kv-label{font-size:.75rem;color:var(--muted);margin-bottom:4px}
+  .kv-val{font-size:1.2rem;font-weight:700;color:#fff}
+  .kv-sub{font-size:.72rem;color:var(--muted);margin-top:3px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{background:var(--card2);color:var(--muted);font-size:.75rem;font-weight:600;text-align:left;padding:8px 10px;border-bottom:1px solid var(--border)}
+  td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .ada{font-family:monospace;font-size:.78rem;color:var(--accent);text-decoration:none}
+  .ada:hover{text-decoration:underline}
+  .badge-green{background:rgba(34,197,94,.12);color:#86efac;border:1px solid rgba(34,197,94,.25);border-radius:4px;padding:1px 6px;font-size:.72rem;font-weight:600}
+  .badge-blue{background:rgba(59,130,246,.12);color:#93c5fd;border:1px solid rgba(59,130,246,.25);border-radius:4px;padding:1px 6px;font-size:.72rem;font-weight:600}
+  .badge-slate{background:rgba(100,116,139,.15);color:#cbd5e1;border:1px solid rgba(100,116,139,.25);border-radius:4px;padding:1px 6px;font-size:.72rem;font-weight:600}
+  .notice{border-radius:8px;padding:12px 14px;font-size:.83rem;margin-bottom:12px}
+  .notice b{font-weight:700}
+  .notice-blue{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.25);color:#bfdbfe}
+  .notice-green{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);color:#bbf7d0}
+  .notice-slate{background:rgba(100,116,139,.08);border:1px solid rgba(100,116,139,.25);color:#cbd5e1}
+  .notice-amber{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);color:#fde68a}
+  .notice-red{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);color:#fca5a5}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>ΓΝ ΚΟΖΑΝΗΣ «ΜΑΜΑΤΣΕΙΟ» — Γενικό Νοσοκομείο Κοζάνης ⚠️</h1>
+    <div class="sub">Org ID 99221920 · Κοζάνη · ~400 beds · Diavgeia 2020–2026 · ADA prefix 4690ΒΣ</div>
+    <div class="pills">
+      <span class="pill pill-green">0 signals — clean</span>
+      <span class="pill pill-blue">ΕΠΥ-routed direct awards</span>
+      <span class="pill pill-red">Org mislabeled ⚠️</span>
+    </div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="show('overview',this)">Overview</button>
+  <button class="tab" onclick="show('awards',this)">Competitive Awards</button>
+</div>
+
+<script>
+function show(id,btn){
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('pane-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+
+<!-- ═══════════════ OVERVIEW ═══════════════ -->
+<div class="pane active" id="pane-overview">
+
+  <div class="notice notice-red">
+    <b>⚠️ Org identity correction (2026-06-02):</b> This org (99221920, ADA prefix 4690ΒΣ) was previously labeled as "ΓΝ ΛΑΡΙΣΑ" in earlier analysis. Decision subjects and governance records explicitly identify the issuing body as "Γενικό Νοσοκομείο Κοζάνης «ΜΑΜΑΤΣΕΙΟ»" — the regional hospital in Κοζάνη (Western Macedonia). ΓΝ ΛΑΡΙΣΑ is a different, larger hospital with a different org-ID. All prior references to ΓΝ ΛΑΡΙΣΑ under this org-ID are erroneous. This correction propagated to risk_ranking.html and hospitals_benchmark.html.
+  </div>
+
+  <div class="notice notice-blue">
+    <b>ΕΠΥ Routing for Direct Awards — Partial Visibility:</b> ΓΝ ΚΟΖΑΝΗΣ ΜΑΜΑΤΣΕΙΟ routes direct award (ΑΝΑΘΕΣΗ) procurement through ΕΠΥ (Επιτροπή Προμηθειών Υγείας), which publishes under a separate org-ID. The hospital's own feed shows <b>zero ΑΝΑΘΕΣΗ decisions</b>. However, unlike ΓΝ ΚΑΡΔΙΤΣΑ, the hospital does publish its own competitive tender process (28 ΠΕΡΙΛΗΨΗ ΔΙΑΚΗΡΥΞΗΣ tender notices and 15 ΚΑΤΑΚΥΡΩΣΗ competitive awards). Competitive procurement is partially visible; direct procurement is blind.
+  </div>
+
+  <div class="kv">
+    <div class="kv-card"><div class="kv-label">Total decisions (all types)</div><div class="kv-val">35,381</div><div class="kv-sub">2020–2026</div></div>
+    <div class="kv-card"><div class="kv-label">ΑΝΑΘΕΣΗ (direct awards)</div><div class="kv-val" style="color:var(--blue)">0</div><div class="kv-sub">All routed through ΕΠΥ</div></div>
+    <div class="kv-card"><div class="kv-label">ΚΑΤΑΚΥΡΩΣΗ (competitive)</div><div class="kv-val">15</div><div class="kv-sub">€236,519 total visible</div></div>
+    <div class="kv-card"><div class="kv-label">Tender notices (ΠΕΡΙΛΗΨΗ)</div><div class="kv-val">28</div><div class="kv-sub">Active tendering activity</div></div>
+    <div class="kv-card"><div class="kv-label">Signals fired</div><div class="kv-val" style="color:var(--green)">0 / 9</div><div class="kv-sub">All detectors: no data or clean</div></div>
+    <div class="kv-card"><div class="kv-label">New wing (2026)</div><div class="kv-val">✓</div><div class="kv-sub">Νέα Πτέρυγα — equipment procurement</div></div>
+  </div>
+
+  <div class="section-title">Signal summary</div>
+  <table>
+    <thead><tr><th>Tenet</th><th>Result</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>T1 · Concentration</td>
+        <td><span class="badge-blue">no data</span></td>
+        <td>Zero ΑΝΑΘΕΣΗ in feed. Only 3 ΚΑΤΑΚΥΡΩΣΗ have supplier_tax_id — insufficient for concentration analysis.</td>
+      </tr>
+      <tr>
+        <td>T4 · Amendment inflation</td>
+        <td><span class="badge-blue">no data</span></td>
+        <td>Zero ΑΝΑΘΕΣΗ baseline contracts — T4 cannot run.</td>
+      </tr>
+      <tr>
+        <td>T5 · Emergency overuse</td>
+        <td><span class="badge-green">clean</span></td>
+        <td>Zero Art.32§2γ procurement decisions found 2020–2026.</td>
+      </tr>
+      <tr>
+        <td>T6 · Temporal clustering</td>
+        <td><span class="badge-green">clean</span></td>
+        <td>Previously fired false positive on ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ bursts. Resolved by commit 63cb7a6 (T6 now scoped to procurement decision types only). No genuine procurement clustering.</td>
+      </tr>
+      <tr>
+        <td>T8 · Single-source monopoly</td>
+        <td><span class="badge-blue">no data</span></td>
+        <td>Zero ΑΝΑΘΕΣΗ. 3 ΚΑΤΑΚΥΡΩΣΗ with supplier_tax_id (€4k DPO, €86k medical equipment, €53k IT). Insufficient for meaningful T8 analysis.</td>
+      </tr>
+      <tr>
+        <td>T9A-D · Structural patterns</td>
+        <td><span class="badge-blue">no data</span></td>
+        <td>Zero ΑΝΑΘΕΣΗ — T9 family cannot run.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="notice notice-amber" style="margin-top:16px">
+    <b>Important: "0 signals" ≠ "clean procurement"</b><br>
+    As with ΓΝ ΚΑΡΔΙΤΣΑ, the zero-signal result at ΓΝ ΚΟΖΑΝΗΣ ΜΑΜΑΤΣΕΙΟ reflects partial structural invisibility. Direct award procurement (the highest-risk procurement category) is entirely ΕΠΥ-routed and unobservable from this feed. The visible competitive procurement (€236k ΚΑΤΑΚΥΡΩΣΗ over 7 years, all individually small) does not trigger any signals. A full risk assessment would require accessing ΕΠΥ's feed filtered to ΚΟΖΑΝΗ contracts.
+  </div>
+
+  <div class="section-title">Feed composition</div>
+  <table>
+    <thead><tr><th>Decision type</th><th class="num">Count</th><th class="num">% of total</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ</td><td class="num">15,705</td><td class="num">44.4%</td><td>Budget commitments — amounts unreliable</td></tr>
+      <tr><td>ΟΡΙΣΤΙΚΟΠΟΙΗΣΗ ΠΛΗΡΩΜΗΣ</td><td class="num">14,106</td><td class="num">39.9%</td><td>Payment finalizations</td></tr>
+      <tr><td>ΚΑΝΟΝΙΣΤΙΚΗ ΠΡΑΞΗ</td><td class="num">2,443</td><td class="num">6.9%</td><td>Regulatory/governance decisions</td></tr>
+      <tr><td>ΛΟΙΠΕΣ ΑΤΟΜΙΚΕΣ ΠΡΑΞΕΙΣ</td><td class="num">1,996</td><td class="num">5.6%</td><td>Individual administrative acts (includes salary scale adjustments, appointments)</td></tr>
+      <tr><td>ΕΠΙΤΡΟΠΙΚΟ ΕΝΤΑΛΜΑ</td><td class="num">964</td><td class="num">2.7%</td><td>Committee warrants — financial authorizations</td></tr>
+      <tr><td>ΙΣΟΛΟΓΙΣΜΟΣ – ΑΠΟΛΟΓΙΣΜΟΣ</td><td class="num">75</td><td class="num">0.2%</td><td>Annual balance sheets and budget execution reports</td></tr>
+      <tr><td>ΠΕΡΙΛΗΨΗ ΔΙΑΚΗΡΥΞΗΣ</td><td class="num">28</td><td class="num">&lt;0.1%</td><td>Tender notices — active competitive procurement (4–6/year)</td></tr>
+      <tr><td>ΚΑΤΑΚΥΡΩΣΗ</td><td class="num">15</td><td class="num">&lt;0.1%</td><td>Competitive awards — see Awards tab</td></tr>
+      <tr><td>ΠΡΑΞΗ ΣΥΛΛΟΓΙΚΟΥ ΟΡΓΑΝΟΥ</td><td class="num">15</td><td class="num">&lt;0.1%</td><td>Committee/working group decisions</td></tr>
+      <tr><td>ΕΓΚΡΙΣΗ ΠΡΟΥΠΟΛΟΓΙΣΜΟΥ</td><td class="num">6</td><td class="num">&lt;0.1%</td><td>Budget approvals</td></tr>
+      <tr><td>ΠΡΟΚΗΡΥΞΗ ΠΛΗΡΩΣΗΣ ΘΕΣΕΩΝ</td><td class="num">10</td><td class="num">&lt;0.1%</td><td>Vacancy announcements</td></tr>
+      <tr><td><b>ΑΝΑΘΕΣΗ</b></td><td class="num" style="color:var(--blue)"><b>0</b></td><td class="num">0%</td><td><b>Zero direct awards — all ΕΠΥ-routed</b></td></tr>
+      <tr><td>ΣΥΜΒΑΣΗ</td><td class="num" style="color:var(--blue)">0</td><td class="num">0%</td><td>No contract publications in own feed (employment contracts published under ΚΑΝΟΝΙΣΤΙΚΗ or ΛΟΙΠΕΣ)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="notice notice-blue" style="margin-top:16px">
+    <b>Key difference from ΓΝ ΚΑΡΔΙΤΣΑ:</b> ΓΝ ΚΟΖΑΝΗΣ ΜΑΜΑΤΣΕΙΟ publishes its own competitive tender activity (28 tender notices, 15 ΚΑΤΑΚΥΡΩΣΗ) while routing all direct awards through ΕΠΥ. This split — own competitive process but centralized direct awards — is a less complete form of ΕΠΥ routing than ΚΑΡΔΙΤΣΑ's total delegation. The hospital appears to tender higher-value, complex items itself while ΕΠΥ handles routine consumable procurement.
+  </div>
+
+</div>
+
+<!-- ═══════════════ COMPETITIVE AWARDS ═══════════════ -->
+<div class="pane" id="pane-awards">
+
+  <div class="notice notice-slate">
+    <b>Competitive awards (ΚΑΤΑΚΥΡΩΣΗ):</b> 15 competitive tender awards over 2020–2026, total €236,519. Most awards do not have amounts populated in the normalized data. Only 5 have amounts; only 3 have supplier_tax_id. All are individually small (highest single award: €85,796 for medical equipment for the new wing, 2026). No concentration or emergency patterns detectable.
+  </div>
+
+  <div class="section-title">All ΚΑΤΑΚΥΡΩΣΗ decisions (2020–2026)</div>
+  <table>
+    <thead><tr><th>Year</th><th>Category / Subject (summary)</th><th class="num">Amount</th><th>AFM</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>2020</td><td>Industrial washing machine (Σ.Δ. 01/2020) — for GN Kozani needs</td><td class="num">—</td><td>—</td><td>First competitive award in dataset</td></tr>
+      <tr><td>2021</td><td>Software maintenance — hospital management systems (Σ.Δ. re-tender)</td><td class="num">—</td><td>—</td><td>IT maintenance re-tender</td></tr>
+      <tr><td>2023</td><td>Reagents — contrast agents and chemical reagents (Δ. 22/2022, Α/Α 171835)</td><td class="num">—</td><td>—</td><td>Diagnostic reagents, international open tender</td></tr>
+      <tr><td>2024</td><td>DPO services — Data Protection Officer (ΑΠΟΦΑΣΗ 454/18.12.2023)</td><td class="num">€4,000</td><td>801025172</td><td>Annual DPO compliance services</td></tr>
+      <tr><td>2024</td><td>Laparoscopic cholecystectomy surgical set (ΠΕΡΙΛΗΨΗ ΠΡΟΜΗΘΕΙΑΣ)</td><td class="num">€60,000</td><td>—</td><td>Surgical consumables</td></tr>
+      <tr><td>2024</td><td>Medical equipment — surgical chairs (Δ. 25/2024, Α/Α 357013)</td><td class="num">—</td><td>—</td><td>Electric surgeon's chair</td></tr>
+      <tr><td>2024</td><td>Medical equipment — digital optical biometry (Δ. 25/2024, Α/Α 357010)</td><td class="num">—</td><td>—</td><td>Ophthalmic diagnostic</td></tr>
+      <tr><td>2024</td><td>Medical equipment — co-surgeon chair (Δ. 25/2024, Α/Α 357014)</td><td class="num">—</td><td>—</td><td>Surgical furniture</td></tr>
+      <tr><td>2025</td><td>Kidney dialysis consumables (Δ. 9/2025, Α/Α 368219)</td><td class="num">—</td><td>—</td><td>Dialysis supplies for GN Kozani</td></tr>
+      <tr><td>2025</td><td>Reagents — contrast agents and chemical reagents (Δ. 16/2025, Α/Α 370630)</td><td class="num">—</td><td>—</td><td>Renewal of 2023 diagnostic reagents contract</td></tr>
+      <tr><td>2025</td><td>Pest control / disinfection services (Πρ. 32/2025)</td><td class="num">€4,000</td><td>—</td><td>Annual pest control services</td></tr>
+      <tr><td>2025</td><td>Blood and biological material transport services (Πρ. 29/2025, 30k budget)</td><td class="num">€30,000</td><td>—</td><td>Blood courier — essential clinical service</td></tr>
+      <tr><td>2026</td><td>Blood grouping reagents (Δ. 01/2026, Α/Α 390928)</td><td class="num">—</td><td>—</td><td>Blood bank diagnostics</td></tr>
+      <tr><td>2026</td><td>Medical equipment — Νέα Πτέρυγα (Δ. 3/2026, Α/Α 388051)</td><td class="num">€85,796</td><td>95029193</td><td>New wing medical equipment — largest single ΚΑΤΑΚΥΡΩΣΗ</td></tr>
+      <tr><td>2026</td><td>IT equipment — Νέα Πτέρυγα (Δ. 4/2026, Α/Α 388052)</td><td class="num">€52,724</td><td>802001400</td><td>New wing information systems equipment</td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-title">ΚΑΤΑΚΥΡΩΣΗ by year</div>
+  <table>
+    <thead><tr><th>Year</th><th class="num">Count</th><th class="num">Amount (visible)</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>2020</td><td class="num">1</td><td class="num">—</td><td>Washing machine — routine equipment</td></tr>
+      <tr><td>2021</td><td class="num">1</td><td class="num">—</td><td>Software maintenance re-tender</td></tr>
+      <tr><td>2022</td><td class="num">0</td><td class="num">—</td><td>No ΚΑΤΑΚΥΡΩΣΗ published in own feed</td></tr>
+      <tr><td>2023</td><td class="num">1</td><td class="num">—</td><td>Diagnostic reagents</td></tr>
+      <tr><td>2024</td><td class="num">5</td><td class="num">€64,000</td><td>DPO + laparoscopy set + 3× surgical equipment</td></tr>
+      <tr><td>2025</td><td class="num">4</td><td class="num">€34,000</td><td>Kidney dialysis consumables + reagents + pest control + blood transport</td></tr>
+      <tr><td>2026</td><td class="num">3</td><td class="num">€138,519</td><td>Blood bank + new wing medical equipment + new wing IT — largest batch due to Νέα Πτέρυγα opening</td></tr>
+    </tbody>
+  </table>
+
+  <div class="notice notice-green" style="margin-top:12px">
+    <b>Assessment:</b> All 15 competitive awards are individually small (max €85,796), categorically diverse, and follow standard competitive tendering procedures (international and national open tenders). The 2026 increase is explained by the Νέα Πτέρυγα (new hospital wing) equipping procurement. No concentration, no emergency shortcuts, no repeated single-supplier patterns detectable. The hospital's competitive procurement appears procedurally sound for the items visible in this feed.
+  </div>
+
+  <div class="notice notice-blue">
+    <b>Supplier visibility:</b> Only 3 of 15 ΚΑΤΑΚΥΡΩΣΗ have a supplier_tax_id: AFM 801025172 (DPO services, €4k), AFM 95029193 (medical equipment for new wing, €85,796), and AFM 802001400 (IT equipment for new wing, €52,724). ΓΕΜΗ lookup for these AFMs is pending. The majority of competitive award winners are not captured in normalized data — amounts were populated but contractor identity was not extracted.
+  </div>
+
+</div>
+
+</body>
+</html>
