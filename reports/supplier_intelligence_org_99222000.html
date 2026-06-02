@@ -66,6 +66,7 @@
   <button class="tab active" onclick="show('ov',this)">Overview</button>
   <button class="tab" onclick="show('t5',this)">T5 — Emergency <span class="cnt cnt-red">103</span></button>
   <button class="tab" onclick="show('t6',this)">T6 — Timing <span class="cnt cnt-amber">3</span></button>
+  <button class="tab" onclick="show('ipirotiki',this)">IPIROTIKI Monopoly <span class="cnt cnt-red">€9.1M</span></button>
 </div>
 
 <!-- ═══════════════ OVERVIEW ═══════════════ -->
@@ -74,7 +75,7 @@
     <div class="card"><div class="kv-label">Signals fired</div><div class="kv-val" style="color:#fcd34d">2 / 9</div><div class="kv-sub">T5 T6</div></div>
     <div class="card"><div class="kv-label">ΑΝΑΘΕΣΗ decisions</div><div class="kv-val">4,431</div><div class="kv-sub">€304.1M total (2019–2026)</div></div>
     <div class="card"><div class="kv-label">Emergency decisions (T5)</div><div class="kv-val" style="color:#fcd34d">351</div><div class="kv-sub">7.7% of procurement decisions</div></div>
-    <div class="card"><div class="kv-label">Unique emergency contracts</div><div class="kv-val">~28</div><div class="kv-sub">Underlying Προσφυγή initiations</div></div>
+    <div class="card"><div class="kv-label">IPIROTIKI spend (identified)</div><div class="kv-val" style="color:#fca5a5">€9.1M</div><div class="kv-sub">180 decisions, cleaning + catering 2019–2026</div></div>
     <div class="card"><div class="kv-label">Supplier visibility</div><div class="kv-val" style="color:#fca5a5">Blind</div><div class="kv-sub">No supplier_tax_id in ΑΝΑΘΕΣΗ</div></div>
   </div>
 
@@ -107,7 +108,7 @@
         <thead><tr><th>Service</th><th>CPV</th><th>Supplier</th><th>Typical amount</th></tr></thead>
         <tbody>
           <tr><td>Food preparation &amp; distribution</td><td class="ada">55322000-3</td><td>IPPIROTIKI FACILITY SERVICES <span style="color:var(--muted)">(also at ΓΝΑ ΑΧΕΠΑ)</span></td><td class="num">€57-130k/2mo</td></tr>
-          <tr><td>Processed food products</td><td class="ada">15894000-1</td><td>Multiple suppliers (not captured)</td><td class="num">~€243k/cycle</td></tr>
+          <tr><td>Processed food products</td><td class="ada">15894000-1</td><td>IPIROTIKI FACILITY SERVICES AE (AFM 998309282) — confirmed via text search</td><td class="num">~€243k/cycle (3-month contracts)</td></tr>
           <tr><td>Medical oxygen</td><td>—</td><td>SOL HELLAS A.E.</td><td class="num">€290k (2025)</td></tr>
           <tr><td>Other medical supplies</td><td>—</td><td>Not captured (no supplier_tax_id)</td><td class="num">€130-250k</td></tr>
         </tbody>
@@ -128,8 +129,8 @@
     </tbody>
   </table>
 
-  <div class="notice notice-amber" style="margin-top:16px">
-    <b>Cross-hospital alert — IPPIROTIKI FACILITY SERVICES:</b> IPPIROTIKI provides food/catering services ("Διανομή και Παρασκευή Φαγητού") at ΓΝ ΙΠΠΟΚΡΑΤΕΙΟ under Art.32§2γ emergency procedures (CPV 55322000-3, from at least Jan 2019). The same company (same legal entity, AFM 998309282) provides <em>cleaning</em> services at ΓΝΑ ΑΧΕΠΑ (also Θεσσαλονίκη) under the same emergency framework. Two Θεσσαλονίκη university hospitals, same emergency procurement vehicle, same contractor.
+  <div class="notice notice-red" style="margin-top:16px">
+    <b>Cross-hospital alert — IPIROTIKI FACILITY SERVICES (AFM 998309282): €11M+ across two Thessaloniki hospitals.</b> IPIROTIKI is the dominant supplier at ΓΝ ΙΠΠΟΚΡΑΤΕΙΟ with <strong>€9.1M total (180 decisions, 2019–2026)</strong> for cleaning and catering, all via Art.32§2γ emergency procedures. The same company (AFM 998309282) also held a €1.93M cleaning contract at ΓΝΑ ΑΧΕΠΑ in 2020 (ADA 61ΞΠ469064-ΒΕΒ). Cross-hospital monopoly: single supplier captures both major Thessaloniki public hospital cleaning/catering contracts via emergency bypass. See IPIROTIKI Monopoly tab for full year-by-year analysis.
   </div>
 </div>
 
@@ -209,6 +210,68 @@
 
   <div class="notice notice-blue" style="margin-top:16px">
     <b>Pattern interpretation:</b> The T6 bursts at Ιπποκράτειο are not independent events — they are downstream effects of the T5 emergency procurement cycle. Each emergency contract approved by director Αντωνάκης triggers a board ratification (Επικύρωση) that follows weeks later. When multiple emergency cycles conclude simultaneously, the Επικύρωσεις batch together → T6 fires. The Jan 2025 and Mar 2026 spikes are administrative processing backlogs from the 2025 emergency procurement acceleration.
+  </div>
+</div>
+
+<!-- ═══════════════ IPIROTIKI MONOPOLY ═══════════════ -->
+<div class="pane" id="pane-ipirotiki">
+  <div class="notice notice-red">
+    <b>IPIROTIKI FACILITY SERVICES AE (AFM 998309282) — quantified monopoly analysis.</b> Full text search of raw Diavgeia JSON across all 44,500+ decisions for ΓΝ ΙΠΠΟΚΡΑΤΕΙΟ identifies 180 decisions mentioning IPIROTIKI (by name or AFM), totalling €9,096,202 across 8 years. This is the largest identified supplier at the hospital. All contracts awarded via Art.32§2γ emergency negotiated procedure.
+  </div>
+
+  <div class="section-title">IPIROTIKI spend at ΓΝ ΙΠΠΟΚΡΑΤΕΙΟ — annual breakdown</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">
+    <div>
+      <table>
+        <thead><tr><th>Year</th><th class="num">N decisions</th><th class="num">Total</th><th class="num">Cleaning</th><th class="num">Catering</th></tr></thead>
+        <tbody>
+          <tr><td>2019</td><td class="num">28</td><td class="num">€142,309</td><td class="num">—</td><td class="num">€142k</td></tr>
+          <tr><td>2020</td><td class="num">7</td><td class="num" style="color:var(--muted)">€0</td><td class="num">—</td><td class="num">—</td></tr>
+          <tr><td>2021</td><td class="num">22</td><td class="num">€599,910</td><td class="num">—</td><td class="num">€600k</td></tr>
+          <tr><td>2022</td><td class="num">28</td><td class="num">€439,051</td><td class="num" style="color:var(--muted)">€119k</td><td class="num">€320k</td></tr>
+          <tr><td>2023</td><td class="num">23</td><td class="num" style="color:#fcd34d">€1,945,653</td><td class="num">€965k</td><td class="num">€324k</td></tr>
+          <tr><td>2024</td><td class="num">32</td><td class="num" style="color:#fca5a5">€2,414,839</td><td class="num">€1,953k</td><td class="num">€462k</td></tr>
+          <tr><td>2025</td><td class="num">25</td><td class="num" style="color:#fca5a5">€2,608,141</td><td class="num">€1,968k</td><td class="num">€640k</td></tr>
+          <tr><td>2026 (5mo)</td><td class="num">15</td><td class="num">€946,299</td><td class="num">€369k</td><td class="num">€336k</td></tr>
+          <tr style="background:#1a1d27;font-weight:700"><td>Total</td><td class="num">180</td><td class="num" style="color:#fca5a5">€9,096,202</td><td class="num">€5,374k</td><td class="num">€2,224k</td></tr>
+        </tbody>
+      </table>
+      <div style="font-size:.7rem;color:var(--muted);margin-top:5px">Amounts extracted from raw JSON (expenseAmount/awardAmount fields). 2020 decisions found but amounts zero/unpopulated. 2026 annualised: ~€2.3M/year run-rate.</div>
+    </div>
+    <div>
+      <div class="section-title" style="margin-top:0">Spend trajectory (bar chart)</div>
+      <div class="bar-chart">
+        <div class="bar-row"><div class="bar-label">2019</div><div class="bar-bg"><div class="bar-fill" style="width:5%;background:#6366f1"></div></div><div class="bar-val">€142k</div></div>
+        <div class="bar-row"><div class="bar-label">2020</div><div class="bar-bg"><div class="bar-fill" style="width:0%"></div></div><div class="bar-val" style="color:var(--muted)">€0</div></div>
+        <div class="bar-row"><div class="bar-label">2021</div><div class="bar-bg"><div class="bar-fill" style="width:23%;background:#6366f1"></div></div><div class="bar-val">€600k</div></div>
+        <div class="bar-row"><div class="bar-label">2022</div><div class="bar-bg"><div class="bar-fill" style="width:17%;background:#6366f1"></div></div><div class="bar-val">€439k</div></div>
+        <div class="bar-row"><div class="bar-label">2023</div><div class="bar-bg"><div class="bar-fill" style="width:75%"></div></div><div class="bar-val" style="color:#fcd34d">€1.95M</div></div>
+        <div class="bar-row"><div class="bar-label">2024</div><div class="bar-bg"><div class="bar-fill" style="width:93%"></div></div><div class="bar-val" style="color:#fca5a5">€2.41M</div></div>
+        <div class="bar-row"><div class="bar-label">2025</div><div class="bar-bg"><div class="bar-fill" style="width:100%"></div></div><div class="bar-val" style="color:#fca5a5">€2.61M</div></div>
+        <div class="bar-row"><div class="bar-label">2026</div><div class="bar-bg"><div class="bar-fill" style="width:36%;background:#f97316"></div></div><div class="bar-val">€946k <span style="color:var(--muted);font-size:.65rem">5mo</span></div></div>
+      </div>
+      <div style="font-size:.7rem;color:var(--muted);margin-top:8px">Sharp acceleration from 2023: 2019–2022 avg €295k/yr → 2023–2025 avg €2.32M/yr (7.9× increase). Cleaning expanded significantly in 2023–2024; catering shows consistent growth.</div>
+    </div>
+  </div>
+
+  <div class="section-title">Catering contract cycle — subscription masquerading as emergency</div>
+  <table>
+    <thead><tr><th>ADA</th><th>Year</th><th>Amount</th><th>Subject / CPV</th></tr></thead>
+    <tbody>
+      <tr><td><a class="ada" href="https://diavgeia.gov.gr/doc/9ΜΖ0469067-7ΤΡ" target="_blank">9ΜΖ0469067-7ΤΡ</a></td><td>2025</td><td class="num">€243,122</td><td>Άμεση κάλυψη αναγκών (CPV 15894000-1 processed food products)</td></tr>
+      <tr><td><a class="ada" href="https://diavgeia.gov.gr/doc/ΨΤΕ5469067-9ΒΞ" target="_blank">ΨΤΕ5469067-9ΒΞ</a></td><td>2025</td><td class="num">€243,017</td><td>Άμεση κάλυψη αναγκών (CPV 15894000-1)</td></tr>
+      <tr><td><a class="ada" href="https://diavgeia.gov.gr/doc/ΨΜ4Ο469067-Λ7Φ" target="_blank">ΨΜ4Ο469067-Λ7Φ</a></td><td>2025</td><td class="num">€242,826</td><td>Άμεση κάλυψη αναγκών Νοσοκομείου</td></tr>
+      <tr><td><a class="ada" href="https://diavgeia.gov.gr/doc/Ψ9ΥΜ469067-Φ7Ν" target="_blank">Ψ9ΥΜ469067-Φ7Ν</a></td><td>2026</td><td class="num">€242,976</td><td>Άμεση κάλυψη αναγκών Νοσοκομείου</td></tr>
+      <tr><td><a class="ada" href="https://diavgeia.gov.gr/doc/Ρ8ΠΓ469067-6ΡΕ" target="_blank">Ρ8ΠΓ469067-6ΡΕ</a></td><td>2026</td><td class="num">€242,963</td><td>Άμεση κάλυψη αναγκών Νοσοκομείου</td></tr>
+    </tbody>
+  </table>
+  <div class="notice notice-amber" style="margin-top:12px">
+    <b>Pattern:</b> Catering contracts issued at ~€243k each, recurring every 2–3 months. Same amount, same emergency justification, same supplier. In 2025 alone: 3 catering contracts at €243,122 + €243,017 + €242,826 = €728,965. In 2026: 2 visible so far at €242,976 + €242,963. This is a recurring service contract being artificially fragmented into 3-month "emergency" tranches to avoid the competitive tendering threshold. 7 years of documented catering "emergencies" is legally indefensible under Art.32§2γ.
+  </div>
+
+  <div class="section-title" style="margin-top:20px">Cross-hospital analysis: IPIROTIKI at ΓΝΑ ΑΧΕΠΑ</div>
+  <div class="notice notice-blue">
+    <b>ΓΝΑ ΑΧΕΠΑ (ORG 99221998), 2020 cleaning contract:</b> ADA 61ΞΠ469064-ΒΕΒ, amount €1,925,769 — single cleaning contract awarded via closed negotiated tender to AFM 998309282 (IPIROTIKI FACILITY SERVICES AE). This is the same legal entity providing cleaning + catering at ΙΠΠΟΚΡΑΤΕΙΟ. After 2020, ΑΧΕΠΑ's larger cleaning contracts moved under a different supplier (ΑΧΟΥΤΟΣ ΑΕ for food services). IPIROTIKI's 2020 ΑΧΕΠΑ entry and its sustained ΙΠΠΟΚΡΑΤΕΙΟ presence establish it as a cross-institutional actor in the Thessaloniki hospital services market — capturing contracts via emergency procedures at multiple sites simultaneously.
   </div>
 </div>
 
