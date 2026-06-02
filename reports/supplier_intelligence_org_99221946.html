@@ -65,7 +65,7 @@
   <button class="tab active" onclick="show('ov',this)">Overview</button>
   <button class="tab" onclick="show('t4',this)">T4 — Price ratchet <span class="cnt cnt-red">5</span></button>
   <button class="tab" onclick="show('t8',this)">T8 — Monopoly <span class="cnt cnt-red">4</span></button>
-  <button class="tab" onclick="show('t6',this)">T6 — Timing <span class="cnt cnt-amber">4</span></button>
+  <button class="tab" onclick="show('t6',this)">T6 — Timing <span class="cnt cnt-amber">2</span></button>
   <button class="tab" onclick="show('t9b',this)">T9B — Copy-paste <span class="cnt cnt-amber">162</span></button>
   <button class="tab" onclick="show('t9cd',this)">T9C+T9D — Structured pricing <span class="cnt cnt-amber">19</span></button>
 </div>
@@ -127,7 +127,7 @@
       <tr><td>T1 · Concentration</td><td><span class="badge-amber">FIRED</span></td><td class="num">1</td><td>AFM 94510036 (ΓΕΝ ΚΑ ΑΕ) = 34.2% of 2020-2026 direct-award spend (€2.36M)</td></tr>
       <tr><td>T4 · Amendment inflation</td><td><span class="badge-red">FIRED</span></td><td class="num">5</td><td>ΓΕΝ ΚΑ ΑΕ amendment "ΛΟΓΩ ΑΥΞΗΣΗ" → price locked; MEDIPRIME €54,997.96 × 5 yrs; SIEMENS, MEDITRUST, ΠΑΠΑΠΟΣΤΟΛΟΥ annual carry-forwards</td></tr>
       <tr><td>T5 · Emergency overuse</td><td><span class="badge-green">CLEAN</span></td><td class="num">0</td><td>No emergency awards detected — consistent with strong competitive procurement record</td></tr>
-      <tr><td>T6 · Timing</td><td><span class="badge-amber">FIRED</span></td><td class="num">4</td><td>2024 Dec burst 3.2×; weekend/holiday ΣΥΜΒΑΣΗ awards; Jul 2022 monthly spike 2.6×</td></tr>
+      <tr><td>T6 · Timing</td><td><span class="badge-amber">FIRED</span></td><td class="num">2</td><td>Weekend award Dec 2020 (ΚΑΛΛΙΤΣΑΡΗ, €7,890); holiday award May 1 2024 (ΜΑΥΡΟΓΕΝΗΣ, €16,950 surgical implants). Year-end Dec 2024 and Jul 2022 clusters were employment contracts — filtered by updated T6 employment detector.</td></tr>
       <tr><td>T8 · Monopoly</td><td><span class="badge-red">FIRED</span></td><td class="num">4</td><td>AFM 70419338 (laundry, 2022 €1.09M, 73.9%); ΓΕΝ ΚΑ ΑΕ 2025 72.3%, 2026 93.5%; sustained monopoly 2025-2026</td></tr>
       <tr><td>T9B · Copy-paste</td><td><span class="badge-amber">FIRED</span></td><td class="num">162</td><td>MEDIPRIME €54,997.96 × 5 yrs; AFM 997802911 €18,277.60 × 5 (same May date each year); ΓΕΝ ΚΑ ΑΕ €800,381 × 2</td></tr>
       <tr><td>T9C · Lot-splitting</td><td><span class="badge-amber">FIRED</span></td><td class="num">1</td><td>AFM 91569759: 3 awards Nov 3-14 2025, €25,711 total</td></tr>
@@ -261,45 +261,34 @@
 <!-- ═══════════════ T6 ═══════════════ -->
 <div class="pane" id="pane-t6">
   <div class="notice notice-indigo">
-    <b>T6 — Temporal clustering:</b> Detects abnormal concentrations of procurement decisions in year-end windows, weekends, public holidays, or specific months. At ΓΝ ΤΡΙΚΑΛΑ: 4 findings — one year-end burst, one weekend award, one public holiday award, and one monthly spike.
+    <b>T6 — Temporal clustering:</b> Detects procurement decisions posted on weekends, public holidays, or in unusual temporal clusters. At ΓΝ ΤΡΙΚΑΛΑ: 2 genuine findings — both are weekend/holiday ΣΥΜΒΑΣΗ postings. Previously detected year-end Dec 2024 burst (3.2×) and Jul 2022 monthly spike (2.6×) have been reclassified as employment contract batches after T6 detector update (commit dd4d0f3).
   </div>
 
   <table>
     <thead><tr><th>Finding</th><th>Date</th><th>ADA</th><th>Amount</th><th>Context</th></tr></thead>
     <tbody>
       <tr>
-        <td><span class="badge-amber">Year-end burst</span></td>
-        <td>Dec 22-31 2024</td>
-        <td>—</td>
-        <td class="num">45 decisions</td>
-        <td>3.2× baseline daily rate (4.5/day vs 1.4/day). Year-end administrative signing pressure — 45 ΣΥΜΒΑΣΗ decisions in 10 days, consistent with fiscal year deadline.</td>
-      </tr>
-      <tr>
         <td><span class="badge-amber">Weekend award</span></td>
         <td>Sat 2020-12-12</td>
         <td><a class="ada" href="https://diavgeia.gov.gr/doc/6Ρ4Ψ46907Φ-ΥΘΠ" target="_blank">6Ρ4Ψ46907Φ-ΥΘΠ</a></td>
         <td class="num">€7,890</td>
-        <td>ΣΥΜΒΑΣΗ 293/2020 ΜΕ ΚΑΛΛΙΤΣΑΡΗ ΣΤΑΥΡΟΥΛΑ — "ΠΑΡΟΧΗ ΥΠΗΡΕΣΙΩΝ ΙΑΤΡΟΥ ΕΡΓΑΣΙΑΣ". An employment/service contract for an occupational physician posted on a Saturday. Low amount, likely administrative (backdate entry).</td>
+        <td>ΣΥΜΒΑΣΗ 293/2020 ΜΕ ΚΑΛΛΙΤΣΑΡΗ ΣΤΑΥΡΟΥΛΑ — "ΠΑΡΟΧΗ ΥΠΗΡΕΣΙΩΝ ΙΑΤΡΟΥ ΕΡΓΑΣΙΑΣ". Occupational physician service contract posted Saturday. Low amount, likely backdate administrative entry.</td>
       </tr>
       <tr>
         <td><span class="badge-amber">Holiday award</span></td>
         <td>May 1 2024 (Labour Day)</td>
         <td><a class="ada" href="https://diavgeia.gov.gr/doc/6ΓΒΘ46907Φ-ΞΡΡ" target="_blank">6ΓΒΘ46907Φ-ΞΡΡ</a></td>
         <td class="num">€16,950</td>
-        <td>ΣΥΜΒΑΣΗ 125/2024 ΜΕ ΑΝΑΣΤΑΣΙΟΣ ΜΑΥΡΟΓΕΝΗΣ — "ΠΡΟΜΗΘΕΙΑ ΧΕΙΡΟΥΡΓΙΚΑ ΜΟΣΧΕΥΜΑΤΑ" (surgical implants). A surgical implant supply contract posted on May 1. Likely backdated administrative posting.</td>
-      </tr>
-      <tr>
-        <td><span class="badge-amber">Monthly spike</span></td>
-        <td>Jul 2022</td>
-        <td>—</td>
-        <td class="num">72 decisions</td>
-        <td>2.6× monthly mean (27.7/month). July 2022 spike includes the anomalous €1.09M laundry extension (see T8 tab) plus normal operations. The laundry decision alone inflates this month's administrative count significantly.</td>
+        <td>ΣΥΜΒΑΣΗ 125/2024 ΜΕ ΑΝΑΣΤΑΣΙΟΣ ΜΑΥΡΟΓΕΝΗΣ — "ΠΡΟΜΗΘΕΙΑ ΧΕΙΡΟΥΡΓΙΚΑ ΜΟΣΧΕΥΜΑΤΑ" (surgical implants). Supply contract for surgical implants posted on Greek Labour Day. Likely backdated administrative posting.</td>
       </tr>
     </tbody>
   </table>
 
   <div class="notice notice-blue" style="margin-top:16px">
-    <b>Assessment:</b> The T6 findings at ΓΝ ΤΡΙΚΑΛΑ are mostly administrative/contextual: year-end signing pressure, backdate postings, and a monthly spike driven by the T8 anomaly. They are worth noting for completeness but are not independently significant compared to the T4/T8 cleaning contract patterns.
+    <b>Assessment:</b> The 2 T6 findings at ΓΝ ΤΡΙΚΑΛΑ are administrative backdate entries (weekend and holiday postings) with low amounts. Not independently significant — the core risk patterns are in T4 (ΓΕΝ ΚΑ ΑΕ price ratchet) and T8 (laundry anomaly + cleaning monopoly).
+  </div>
+  <div class="notice notice-blue" style="margin-top:8px">
+    <b>Previously flagged (now resolved):</b> Dec 2024 year-end burst (3.2×, 45 decisions) and Jul 2022 monthly spike (2.6×, 72 decisions) were reclassified after detector update: the ΣΥΜΒΑΣΗ decisions in those clusters were employment contract batches (ΣΟΧ, ΕΣΠΑ-funded staff, physician specialization training), not procurement. T6 employment keyword filter expanded in commit dd4d0f3.
   </div>
 </div>
 

@@ -162,7 +162,7 @@
       <div class="card-title">⚠️ Data Quality &amp; Comparability Notes</div>
       <div class="gap-y mt8">
         <div class="notice notice-amber"><b>ΕΠΥ Routing (ΓΝ ΚΑΡΔΙΤΣΑ, ΓΝ ΛΑΡΙΣΑ):</b> 0 ΑΝΑΘΕΣΗ records. Procurement routed through ΕΠΥ (Επιτροπή Προμηθειών Υγείας, AFM 999336270) and published under that org-ID. These hospitals' own feeds reveal nothing about their procurement.</div>
-        <div class="notice notice-amber"><b>ΑΝΑΛΗΨΗ amounts corrupted:</b> ΓΝΑ ΕΥΑΓΓΕΛΙΣΜΟΣ = €10B+ (capped), ΓΝ ΑΜΦΙΣΣΑ = €369M for a 120-bed hospital. All ΑΝΑΛΗΨΗ amounts are excluded from monetary comparisons.</div>
+        <div class="notice notice-amber"><b>ΑΝΑΛΗΨΗ amounts corrupted:</b> ΓΝΑ ΕΥΑΓΓΕΛΙΣΜΟΣ = €10B+ (capped), ΓΝ ΣΕΡΡΩΝ = €369M (impossible). All ΑΝΑΛΗΨΗ amounts are excluded from monetary comparisons.</div>
         <div class="notice notice-amber"><b>ΓΝΑ ΕΥΑΓΓΕΛΙΣΜΟΣ 2024 spike:</b> €60.6M of the €60.7M total ΑΝΑΘΕΣΗ appears in 2024 only (zero in all other years). Almost certainly a data reclassification event, not actual procurement. Excluded from amount comparisons.</div>
         <div class="notice notice-blue"><b>Coverage:</b> ΓΝΑ ΑΧΕΠΑ and ΓΝΑ ΕΥΑΓΓΕΛΙΣΜΟΣ data starts 2019; all others start 2020.</div>
       </div>
@@ -203,7 +203,7 @@
           <td class="num">407</td><td class="num">€45.3M</td>
           <td class="num" style="color:#fca5a5;font-weight:700">14.5:1</td>
           <td class="num" style="color:var(--amber)">2.8%</td></tr>
-        <tr><td><b>ΓΝ ΑΜΦΙΣΣΑ</b></td><td class="num">120</td><td class="num">25,764</td>
+        <tr><td><b>ΓΝ ΣΕΡΡΩΝ</b></td><td class="num">~300</td><td class="num">25,764</td>
           <td class="num">184</td><td class="num">€0.8M</td>
           <td class="num">82</td><td class="num">€0.4M</td>
           <td class="num">2.2:1</td><td class="num" style="color:var(--muted)">1.6%</td></tr>
@@ -370,8 +370,8 @@
       <div class="chart-wrap" style="height:260px"><canvas id="chartTrikala"></canvas></div>
     </div>
     <div class="card">
-      <div class="card-title">ΓΝ ΑΜΦΙΣΣΑ — Direct vs Competitive (€M/year)</div>
-      <div class="card-sub">Very low volumes (120-bed hospital). 2025 direct spike to €0.34M. Emergency only 2020–2022 (€90k total). ΑΝΑΛΗΨΗ amount (€369M) is corrupt — excluded.</div>
+      <div class="card-title">ΓΝ ΣΕΡΡΩΝ — Direct vs Competitive (€M/year)</div>
+      <div class="card-sub">Low volumes despite ~300-bed size (partial ΕΠΥ routing). 2025 direct spike to €0.34M. Emergency only 2020–2022 (€90k total). ΑΝΑΛΗΨΗ amount (€369M) is corrupt — excluded.</div>
       <div class="chart-wrap" style="height:260px"><canvas id="chartAmfissa"></canvas></div>
     </div>
   </div>
@@ -404,13 +404,13 @@ const HOSPITALS = [
   { id:"99221913", name:"ΓΝ ΚΑΡΔΙΤΣΑ", city:"Καρδίτσα", beds:266, total:37166,
     direct_count:0, direct_amount:0, comp_count:0, comp_amount:0,
     emerg_count:0, emerg_amount:0, emerg_rate:0,
-    rank:"#20", signals:1, pills:["T6"],
+    rank:"clean", signals:0, pills:[],
     type_counts:{"ΑΝΑΘΕΣΗ":0,"ΚΑΤΑΚΥΡΩΣΗ":0,"ΣΥΜΒΑΣΗ":759,"ΠΕΡΙΛΗΨΗ":2,"ΑΝΑΛΗΨΗ":6617,"ΟΡΙΣΤΙΚΟΠΟΙΗΣΗ":17035,"ΕΠΙΤΡΟΠΙΚΟ":0,"ΚΑΝΟΝΙΣΤΙΚΗ":11837,"ΛΟΙΠΕΣ":916},
     yd:{}, yc:{}, ye:{},
     suppliers:[],
     findings:[
-      {r:"med",t:"T6 — Year-end ΣΥΜΒΑΣΗ burst (46–66× baseline)",b:"After filtering out ΑΝΑΛΗΨΗ false positives, T6 still fires on ΣΥΜΒΑΣΗ (contract) decisions: 51–80 contracts posted in Dec 22–31 at 46–66× the baseline daily rate (2021–2025 every year). Consistent pattern of contracts signed at year-end deadline pressure. Not accounting noise — these are actual procurement contracts."}],
-    notes:"0 ΑΝΑΘΕΣΗ — procurement routed through ΕΠΥ. 11,837 ΚΑΝΟΝΙΣΤΙΚΗ ΠΡΑΞΗ (32% of decisions) is unusually high. Procurement exposure completely invisible from this feed. Year-end contract surge confirmed genuine signal."
+      {r:"low",t:"No signals — procurement invisible (ΕΠΥ-routed) + T6 false positives resolved",b:"Previously flagged T6 year-end ΣΥΜΒΑΣΗ burst (46–66× baseline) resolved: all 759 ΣΥΜΒΑΣΗ decisions are employment contracts (ΙΔΟΧ, ΣΟΧ, ΕΣΠΑ, ΕΠΙΚΟΥΡΙΚΟΙ, trainee doctors) not procurement contracts. After expanded T6 employment filter, 0 genuine signals detected. 0 ΑΝΑΘΕΣΗ confirms near-total ΕΠΥ routing — actual procurement spend completely invisible from this feed."}],
+    notes:"0 ΑΝΑΘΕΣΗ — procurement fully routed through ΕΠΥ. 759 ΣΥΜΒΑΣΗ = 100% employment contracts (physician, nursing, support staff). 11,837 ΚΑΝΟΝΙΣΤΙΚΗ ΠΡΑΞΗ (32%) is unusually high regulatory-decision share. Procurement exposure completely invisible from this feed."
   },
   { id:"99221920", name:"ΓΝ ΛΑΡΙΣΑ", city:"Λάρισα", beds:350, total:35381,
     direct_count:0, direct_amount:0, comp_count:15, comp_amount:236519,
@@ -443,7 +443,7 @@ const HOSPITALS = [
       {r:"med",t:"T1 — Anomalous amount outlier",b:"Single ΑΝΑΘΕΣΗ decision with amount significantly above peer average for the same CPV category, after filtering AFM-as-amount data-entry errors."}],
     notes:"Highest-ranked hospital (8/9 signals). €215.5M cumulative ΑΝΑΘΕΣΗ exceeds larger Athens hospitals in absolute count. ΑΝΑΛΗΨΗ amounts = 0 in normalized data (submitted without amounts). T4 now confirmed: ISS/UNISON price carry-forward and ΕΑΔΗΣΥ-linked award pattern detected."
   },
-  { id:"99221942", name:"ΓΝ ΑΜΦΙΣΣΑ", city:"Άμφισσα", beds:120, total:25764,
+  { id:"99221942", name:"ΓΝ ΣΕΡΡΩΝ", city:"Σέρρες", beds:300, total:25764,
     direct_count:184, direct_amount:815277, comp_count:82, comp_amount:448296,
     emerg_count:3, emerg_amount:90000, emerg_rate:1.6,
     rank:"#20", signals:1, pills:["T6"],
@@ -453,8 +453,8 @@ const HOSPITALS = [
     ye:{"2020":0.04,"2021":0.04,"2022":0},
     suppliers:[],
     findings:[
-      {r:"low",t:"T6 — Marginal year-end procurement burst",b:"After ΑΝΑΛΗΨΗ/ΑΝΑΤΡΟΠΗ filter applied, T6 still fires with 3 findings: Dec 22-31 procurement decisions 3.2× baseline in 2021 and 2022, and a Nov 2023 monthly spike (2.8×). Marginal signals exactly at threshold — borderline genuine vs. seasonal procurement patterns."}],
-    notes:"ΑΝΑΛΗΨΗ amount (€369M) corrupt — impossible for 120-bed hospital. Direct award average (€4.4k/decision) is plausible for small items. 2025 direct spike to €0.34M warrants monitoring."
+      {r:"low",t:"T6 — Marginal year-end procurement burst",b:"T6 fires with 3 genuine procurement findings: Dec 22-31 ΑΝΑΘΕΣΗ/ΚΑΤΑΚΥΡΩΣΗ clusters 3.2× baseline in 2021 (COVID cleaning/security contract extensions) and 2022 (auditors, digitization software), plus a Nov 2023 monthly spike (2.8×, 9 small direct awards). All confirmed procurement — not employment contract noise. Marginal signals exactly at threshold."}],
+    notes:"⚠️ NOTE: Previously mislabeled as ΓΝ ΑΜΦΙΣΣΑ — decision subjects confirm this is ΓΝ ΣΕΡΡΩΝ (Γενικό Νοσοκομείο Σερρών). ADA prefix: 469071. Bed count approximate (~300). ΑΝΑΛΗΨΗ amount (€369M) corrupt. Direct award average €4.4k/decision is plausible for small items via Art.118. 2025 direct spike to €0.34M warrants monitoring."
   },
   { id:"99221946", name:"ΓΝ ΤΡΙΚΑΛΑ", city:"Τρίκαλα", beds:300, total:69379,
     direct_count:220, direct_amount:9619335, comp_count:1991, comp_amount:35082368,
