@@ -89,6 +89,52 @@ T6_MIN_YEAR_DECISIONS = 20   # min procurement decisions in a year for T6a to fi
                               # (was 3000 all-decisions; now scoped to procurement types)
 T6_WEEKEND_AMOUNT = 5_000  # €5k minimum for a weekend award to be flagged
 T6_MONTHLY_MULTIPLIER = 2.5
+# ΣΥΜΒΑΣΗ rows that are employment contracts (ΙΔΟΧ fixed-term staff), not procurement.
+# These are posted in large batches (e.g. auxiliary medical staff renewals) and produce
+# false-positive temporal spikes if included in T6 analysis.
+#
+# Pattern sources observed in hospital data (2020-2026):
+#   ΙΔΟΧ / Ι.Δ.Ο.Χ / ΙΔΙΩΤΙΚΟΥ ΔΙΚΑΙΟΥ ΟΡΙΣΜΕΝΟΥ ΧΡΟΝΟΥ  — standard ΙΔΟΧ wording
+#   ΕΠΙΚΟΥΡΙΚ              — auxiliary medical staff (ΕΠΙΚΟΥΡΙΚΟΙ ΙΑΤΡΟΙ)
+#   ΕΙΔΙΚΕΥΟΜΕΝ            — trainee doctors (ειδικευόμενοι)
+#   ΕΡΓΑΣΙΑΣ               — employment (genitive): "ΣΥΜΒΑΣΗ ΕΡΓΑΣΙΑΣ" / "ΕΠΕΚΤΑΣΗ ΣΥΜΒΑΣΗΣ ΕΡΓΑΣΙΑΣ"
+#                            (note: "ΕΡΓΑΣΙΕΣ/ΕΡΓΑΣΙΩΝ" = construction works ≠ affected)
+#   ΠΑΡΑΤΑΣΗ ΣΥΜΒΑΣΗΣ      — contract extension: in ΣΥΜΒΑΣΗ type, always employment (person surname);
+#                            verified zero procurement amounts > €5k across all hospital orgs
+#   ΣΟΧ                    — ΣΟΧ fixed-term auxiliary staff contracts
+#   ΕΣΠΑ                   — ESPA-funded employment contracts (batch-posted in July)
+#   ΙΑΤΡΟΥ / ΝΟΣΗΛΕΥΤ      — individual doctor / nurse employment contracts
+T6_EMPLOYMENT_KEYWORDS = (
+    # Standard ΙΔΟΧ wording (various spellings/formats)
+    "ΙΔΟΧ",
+    r"Ι\.Δ\.Ο\.Χ",
+    "ΙΔΙΩΤΙΚΟΥ ΔΙΚΑΙΟΥ ΟΡΙΣΜΕΝΟΥ",
+    "ΟΡΙΣΜΕΝΟΥ ΧΡΟΝΟΥ",
+    # Staff categories
+    "ΕΠΙΚΟΥΡΙΚ",
+    "ΕΙΔΙΚΕΥΟΜΕΝ",
+    "ΕΙΔΙΚΕΥΣ",          # training period (ΕΙΔΙΚΕΥΣΗ)
+    "ΕΦΗΜΕΡΙ",           # on-call shifts (ΕΦΗΜΕΡΙΕΣ doctors)
+    # Employment contract language
+    "ΕΡΓΑΣΙΑΣ",          # genitive "of employment" (≠ ΕΡΓΑΣΙΕΣ/ΕΡΓΑΣΙΩΝ = construction works)
+    "ΙΔΙΩΤ",             # ΙΔΙΩΤΗΣ/ΙΔΙΩΤΩΝ/ΙΔΙΩΤΗ/ΙΔΙΩΤΙΚΟΥ — private doctors
+    r"ΤΡΟΠΟΠΟΙΗΣ.{0,20}ΣΥΜΒΑΣ.{0,5}ΙΔ",
+    # Contract extension patterns (incl. common spelling mistakes in hospital data)
+    "ΠΑΡΑΤΑΣΗ ΣΥΜΒΑΣΗΣ",
+    "ΠΑΡΑΤΑΣΗ ΣΥΜΒΑΣΗ",  # nominative without Σ
+    "ΠΑΡΑΤΑΣΗ ΕΩΣ",      # extension to date without ΣΥΜΒΑΣΗΣ
+    r"ΠΑΡΑΤ.Η ΣΥΜΒ",     # typos: ΠΑΡΑΤΣΗ, ΠΑΡΑΤΣΑΗ
+    "ΠΑΡΑΤΑΣΗΣ ΣΥΜΒΑΣΗΣ", # genitive form (also a typo variant)
+    # Employment scheme codes
+    "ΣΟΧ",
+    "ΟΑΕΔ",
+    "ΔΥΠΑ",              # successor to ΟΑΕΔ (2022+)
+    "ΕΣΠΑ",              # ESPA-funded employment
+    # Staff job titles
+    "ΙΑΤΡΟΥ",
+    "ΝΟΣΗΛΕΥΤ",
+    "ΠΡΟΣΩΠΙΚΟΥ ΚΑΘΑΡΙΟΤΗΤΑΣ",
+)
 
 T4_AMOUNT_TOLERANCE = 0.05   # consecutive awards within 5% considered price carry-forward
 T4_MIN_AMOUNT = 50_000        # ignore carry-forwards below €50k
@@ -389,6 +435,14 @@ def detect_t6(df: pd.DataFrame) -> dict:
     # operations — NOT procurement anomalies.  Including them produces false positives
     # for every hospital and municipality that batches financial entries at Dec 31.
     proc = df[is_procurement(df)].copy()
+    # Drop ΣΥΜΒΑΣΗ rows that are ΙΔΟΧ employment contracts (fixed-term staff renewals),
+    # not procurement contracts. These batch-post in large groups (e.g. Dec) and cause
+    # spurious temporal spikes.
+    employment_mask = (
+        (proc["decision_type"] == "ΣΥΜΒΑΣΗ") &
+        subject_contains(proc, T6_EMPLOYMENT_KEYWORDS)
+    )
+    proc = proc[~employment_mask]
     findings = []
 
     # ── T6a: year-end burst ──
