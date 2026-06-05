@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ΓΝΑ ΕΥΑΓΓΕΛΙΣΜΟΣ — Supplier Intelligence Brief</title>
+<style>
+  :root {
+    --bg:#0f1117;--card:#1a1d27;--card2:#1e2133;--border:#2a2d3e;
+    --text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;
+    --red:#ef4444;--amber:#f59e0b;--green:#22c55e;--blue:#3b82f6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;font-size:14px;line-height:1.6}
+  .header{background:var(--card);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between}
+  .header-left h1{font-size:1.1rem;font-weight:700;color:#fff}
+  .header-left .sub{color:var(--muted);font-size:.82rem;margin-top:2px}
+  .pills{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+  .pill{border-radius:9999px;padding:2px 9px;font-size:.72rem;font-weight:600;border:1px solid}
+  .pill-slate{background:rgba(100,116,139,.15);color:#94a3b8;border-color:rgba(100,116,139,.3)}
+  .pill-green{background:rgba(34,197,94,.1);color:#86efac;border-color:rgba(34,197,94,.25)}
+  .pill-amber{background:rgba(245,158,11,.12);color:#fcd34d;border-color:rgba(245,158,11,.3)}
+  .tabs{background:var(--card);border-bottom:1px solid var(--border);display:flex;padding:0 24px;overflow-x:auto}
+  .tab{background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);cursor:pointer;font-size:.85rem;font-weight:500;padding:12px 16px;white-space:nowrap;transition:color .15s,border-color .15s}
+  .tab:hover{color:var(--text)}
+  .tab.active{border-bottom-color:var(--accent);color:#fff;font-weight:600}
+  .pane{display:none;padding:24px;max-width:1400px;margin:0 auto}
+  .pane.active{display:block}
+  .section-title{font-size:.88rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:20px 0 10px}
+  .kv{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:16px}
+  .kv-card{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:14px 16px}
+  .kv-label{font-size:.75rem;color:var(--muted);margin-bottom:4px}
+  .kv-val{font-size:1.2rem;font-weight:700;color:#fff}
+  .kv-sub{font-size:.72rem;color:var(--muted);margin-top:3px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{background:var(--card2);color:var(--muted);font-size:.75rem;font-weight:600;text-align:left;padding:8px 10px;border-bottom:1px solid var(--border)}
+  td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .ada{font-family:monospace;font-size:.78rem;color:var(--accent);text-decoration:none}
+  .ada:hover{text-decoration:underline}
+  .badge-green{background:rgba(34,197,94,.12);color:#86efac;border:1px solid rgba(34,197,94,.25);border-radius:4px;padding:1px 6px;font-size:.72rem;font-weight:600}
+  .badge-blue{background:rgba(59,130,246,.12);color:#93c5fd;border:1px solid rgba(59,130,246,.25);border-radius:4px;padding:1px 6px;font-size:.72rem;font-weight:600}
+  .badge-amber{background:rgba(245,158,11,.15);color:#fcd34d;border:1px solid rgba(245,158,11,.3);border-radius:4px;padding:1px 6px;font-size:.72rem;font-weight:600;white-space:nowrap}
+  .badge-slate{background:rgba(100,116,139,.15);color:#cbd5e1;border:1px solid rgba(100,116,139,.25);border-radius:4px;padding:1px 6px;font-size:.72rem;font-weight:600}
+  .notice{border-radius:8px;padding:12px 14px;font-size:.83rem;margin-bottom:12px}
+  .notice b{font-weight:700}
+  .notice-blue{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.25);color:#bfdbfe}
+  .notice-green{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);color:#bbf7d0}
+  .notice-slate{background:rgba(100,116,139,.08);border:1px solid rgba(100,116,139,.25);color:#cbd5e1}
+  .notice-amber{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);color:#fde68a}
+  .notice-red{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);color:#fca5a5}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>ΓΝΑ ΕΥΑΓΓΕΛΙΣΜΟΣ — Γ.Ν.Α. «Ο ΕΥΑΓΓΕΛΙΣΜΟΣ» – ΟΦΘΑΛΜΙΑΤΡΕΙΟ – ΠΟΛΥΚΛΙΝΙΚΗ</h1>
+    <div class="sub">Org ID 99221993 · Αθήνα · ~500+ beds (combined entity) · Diavgeia 2019–2026 · ADA prefix 4690ΩΧ</div>
+    <div class="pills">
+      <span class="pill pill-green">0 signals — clean</span>
+      <span class="pill pill-amber">ΑΝΑΘΕΣΗ feed unreliable</span>
+      <span class="pill pill-slate">0 supplier_tax_id</span>
+    </div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="show('overview',this)">Overview</button>
+  <button class="tab" onclick="show('feed',this)">Feed Quality</button>
+</div>
+
+<script>
+function show(id,btn){
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('pane-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+
+<!-- OVERVIEW -->
+<div class="pane active" id="pane-overview">
+
+  <div class="notice notice-amber">
+    <b>ΑΝΑΘΕΣΗ feed quality issue — heterogeneous decision type usage:</b> ΓΝΑ ΕΥΑΓΓΕΛΙΣΜΟΣ publishes 3,372 decisions under the ΑΝΑΘΕΣΗ decision type, but the majority are <em>not</em> genuine direct award procurement decisions. The feed contains equipment repair authorizations (~878), small procurement requests (~793), ΕΓΚΡΙΣΗ ΔΑΠΑΝΗΣ payment approvals (~229), legal cost authorizations (~135), tender cancellations (~58), and tender clarifications (~8). Zero ΑΝΑΘΕΣΗ have a supplier_tax_id, making the entire feed invisible to T1/T8/T9 analysis.
+  </div>
+
+  <div class="kv">
+    <div class="kv-card"><div class="kv-label">Total decisions (all types)</div><div class="kv-val">43,255</div><div class="kv-sub">2019–2026</div></div>
+    <div class="kv-card"><div class="kv-label">ΑΝΑΘΕΣΗ (nominal)</div><div class="kv-val" style="color:var(--amber)">3,372</div><div class="kv-sub">0 supplier_tax_id — all blind</div></div>
+    <div class="kv-card"><div class="kv-label">ΚΑΤΑΚΥΡΩΣΗ (competitive)</div><div class="kv-val">1</div><div class="kv-sub">Blood bank 2021 (ΦΟΙΝΙΞ)</div></div>
+    <div class="kv-card"><div class="kv-label">Tender notices (ΠΕΡΙΛΗΨΗ)</div><div class="kv-val">254</div><div class="kv-sub">Active competitive tendering</div></div>
+    <div class="kv-card"><div class="kv-label">Signals fired</div><div class="kv-val" style="color:var(--green)">0 / 9</div><div class="kv-sub">All detectors: no usable data</div></div>
+    <div class="kv-card"><div class="kv-label">Emergency decisions</div><div class="kv-val" style="color:var(--green)">0</div><div class="kv-sub">No Art.32§2γ found</div></div>
+  </div>
+
+  <div class="section-title">Signal summary</div>
+  <table>
+    <thead><tr><th>Tenet</th><th>Result</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>T1 · Concentration</td>
+        <td><span class="badge-blue">blind</span></td>
+        <td>Zero supplier_tax_id in 3,372 ΑΝΑΘΕΣΗ. Cannot identify any supplier, let alone compute concentration.</td>
+      </tr>
+      <tr>
+        <td>T4 · Amendment inflation</td>
+        <td><span class="badge-blue">blind</span></td>
+        <td>No ΤΡΟΠΟΠΟΙΗΣΗ decisions identifiable — heterogeneous ΑΝΑΘΕΣΗ feed makes amendment detection unreliable.</td>
+      </tr>
+      <tr>
+        <td>T5 · Emergency overuse</td>
+        <td><span class="badge-green">clean</span></td>
+        <td>Zero Art.32§2γ procurement decisions found 2019–2026.</td>
+      </tr>
+      <tr>
+        <td>T6 · Temporal clustering</td>
+        <td><span class="badge-green">clean</span></td>
+        <td>Previously fired false positive from ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ burst. Resolved by T6 scope fix (commit 63cb7a6). No genuine procurement clustering detectable.</td>
+      </tr>
+      <tr>
+        <td>T8 · Single-source monopoly</td>
+        <td><span class="badge-blue">blind</span></td>
+        <td>Zero supplier_tax_id — T8 cannot run.</td>
+      </tr>
+      <tr>
+        <td>T9A-D · Structural patterns</td>
+        <td><span class="badge-blue">blind</span></td>
+        <td>Zero supplier_tax_id — T9 family cannot run.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="notice notice-amber" style="margin-top:16px">
+    <b>Important: "0 signals" ≠ "clean procurement"</b><br>
+    ΓΝΑ ΕΥΑΓΓΕΛΙΣΜΟΣ is one of Athens's largest hospitals (combined entity with Ophthalmology clinic and Polyclinic). Its estimated annual procurement is tens of millions of euros. The zero-signal result reflects <em>data quality failure</em> — not a single ΑΝΑΘΕΣΗ in 7 years has a supplier_tax_id, making all T1/T8/T9 detectors blind. The ΑΝΑΘΕΣΗ feed functions as a general administrative notice board. A meaningful assessment would require ADA-level Diavgeia lookup or ΕΠΥ feed cross-referencing.
+  </div>
+
+  <div class="section-title">Procurement activity by year</div>
+  <table>
+    <thead><tr><th>Year</th><th class="num">ΑΝΑΘΕΣΗ</th><th class="num">ΠΕΡΙΛΗΨΗ</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>2019</td><td class="num">8</td><td class="num">61</td><td>Dataset start — very few ΑΝΑΘΕΣΗ; active competitive tendering</td></tr>
+      <tr><td>2020</td><td class="num">500</td><td class="num">77</td><td>COVID-driven acceleration — large jump in administrative postings</td></tr>
+      <tr><td>2021</td><td class="num">547</td><td class="num">27</td><td>COVID maintenance peak — high repair/equipment authorizations</td></tr>
+      <tr><td>2022</td><td class="num">431</td><td class="num">5</td><td>Post-COVID normalization; tender notices drop (possible ΕΠΥ routing increase)</td></tr>
+      <tr><td>2023</td><td class="num">427</td><td class="num">15</td><td>Stable</td></tr>
+      <tr><td>2024</td><td class="num" style="color:var(--amber)">672</td><td class="num">33</td><td><b>Spike</b> — driven by tender 127/2024 clarification rounds (5×€8.37M tender budget misattributed as direct-award amounts). Not a procurement anomaly — see Feed Quality tab.</td></tr>
+      <tr><td>2025</td><td class="num">484</td><td class="num">30</td><td>Return to normal range</td></tr>
+      <tr><td>2026</td><td class="num">303</td><td class="num">6</td><td>Partial year (~May 2026)</td></tr>
+    </tbody>
+  </table>
+
+</div>
+
+<!-- FEED QUALITY -->
+<div class="pane" id="pane-feed">
+
+  <div class="notice notice-blue">
+    <b>Feed quality analysis:</b> ΓΝΑ ΕΥΑΓΓΕΛΙΣΜΟΣ uses the ΑΝΑΘΕΣΗ decision type as a catchall for administrative procurement-adjacent actions. The categories below were inferred from subject-text analysis of the 3,372 ΑΝΑΘΕΣΗ rows.
+  </div>
+
+  <div class="section-title">ΑΝΑΘΕΣΗ subject categories</div>
+  <table>
+    <thead><tr><th>Category</th><th class="num">Count (approx.)</th><th>Description</th><th>Signal impact</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Repair/maintenance (ΕΠΙΣΚΕΥΗ/ΣΥΝΤΗΡΗΣΗ)</td>
+        <td class="num">~878</td>
+        <td>Work orders for equipment repairs (medical devices, HVAC, electrical systems). "ΑΠΟΦΑΣΗ ΕΠΙΣΚΕΥΗΣ ΙΑΤΡΟΤΕΧΝΟΛΟΓΙΚΟΥ ΕΞΟΠΛΙΣΜΟΥ", "ΑΠΟΦΑΣΗ ΕΠΙΣΚΕΥΗΣ ΔΙΑΡΡΟΩΝ"</td>
+        <td>Should be ΚΑΝΟΝΙΣΤΙΚΗ ΠΡΑΞΗ — no supplier data.</td>
+      </tr>
+      <tr>
+        <td>Procurement (ΠΡΟΜΗΘΕΙΑ)</td>
+        <td class="num">~793</td>
+        <td>Purchase approvals for specific items. "ΑΠΟΦΑΣΗ ΕΓΚΡΙΣΗΣ ΠΡΟΜΗΘΕΙΑΣ ΛΑΒΙΔΩΝ ΑΟΡΤΗΣ", "ΠΡΟΜΗΘΕΙΑ ΠΙΕΣΟΜΕΤΡΩΝ". Closest to genuine ΑΝΑΘΕΣΗ — no supplier_tax_id populated.</td>
+        <td>Genuine direct awards, contractor identity missing — T1/T8 blind.</td>
+      </tr>
+      <tr>
+        <td>Budget approvals (ΕΓΚΡΙΣΗ ΔΑΠΑΝΗΣ)</td>
+        <td class="num">~229</td>
+        <td>Payment authorizations, legal costs, utility bills, insurance. "ΑΠΟΦΑΣΗ ΑΝΑΝΕΩΣΗΣ ΑΣΦΑΛΙΣΤΙΚΗΣ ΣΥΜΒΑΣΗΣ ΕΞΑΜΗΝΟΥ"</td>
+        <td>Not procurement — administrative financial decisions misclassified.</td>
+      </tr>
+      <tr>
+        <td>Legal costs</td>
+        <td class="num">~135</td>
+        <td>Court fees, attorney costs, legal submissions. "ΕΓΚΡΙΣΗ ΔΑΠΑΝΗΣ ΣΧΕΤΙΚΑ ΜΕ ΑΙΤΗΣΗ ΑΝΑΨΗΛΑΦΗΣΗΣ", "ΕΓΚΡΙΣΗ ΕΦΕΣΗ"</td>
+        <td>Not procurement — misclassified administrative acts.</td>
+      </tr>
+      <tr>
+        <td>Tender cancellations (ΜΑΤΑΙΩΣΗ)</td>
+        <td class="num">~58</td>
+        <td>Cancelled tenders with budgeted amounts. "ΑΠΟΦΑΣΗ ΜΑΤΑΙΩΣΗΣ ΓΙΑ ΤΟΝ ΑΡΙΘΜ. 126/2024 ΑΝΟΙΚΤΟ ΗΛΕΚΤΡΟΝΙΚΟ ΔΙΑΓΩΝΙΣΜΟ ΑΝΩ ΤΩΝ ΟΡΙΩΝ"</td>
+        <td>Inflates ΑΝΑΘΕΣΗ totals — tender budgets appear as direct-award amounts.</td>
+      </tr>
+      <tr>
+        <td>Tender clarifications (Διευκρινίσεις)</td>
+        <td class="num">~8</td>
+        <td>Responses to tenderer queries, each carrying the full tender budget amount. Tender 127/2024 has 5 separate clarification notices each at €8.37M = €41.8M phantom amount.</td>
+        <td><b>Severely inflates apparent totals.</b> Single tender 127/2024 = €41.8M phantom amount from clarification rounds.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="section-title">The 2024 spike — tender 127/2024 dissected</div>
+  <div class="notice notice-slate">
+    <b>Tender 127/2024 — Cleaning Services (Ανοικτός Ηλεκτρονικός Διαγωνισμός ΑΝΩ ΤΩΝ ΟΡΙΩΝ):</b><br>
+    Budget: €8,367,535 (above EU thresholds — international open tender)<br>
+    Clarification rounds published under ΑΝΑΘΕΣΗ type: 5 (Parts I–V)<br>
+    Each carries the full €8.37M budget as the "amount" field<br>
+    Apparent ΑΝΑΘΕΣΗ total for just this one tender: €41.8M<br>
+    <br>
+    Additionally: ΕΑΔΗΣΥ compliance order (€4.6M) and date shift (€4.1M) also published under ΑΝΑΘΕΣΗ type.<br>
+    These are administrative tender process decisions, not direct awards to any supplier.
+  </div>
+
+  <div class="section-title">The single ΚΑΤΑΚΥΡΩΣΗ (2021)</div>
+  <table>
+    <thead><tr><th>Year</th><th>Subject</th><th class="num">Amount</th><th>Winner</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>2021</td>
+        <td>Κατακύρωση Σ.Δ. 77/2020 — Τράπεζα Αίματος 1,500L για Τμήμα Αιμοδοσίας</td>
+        <td class="num">—</td>
+        <td>ΦΟΙΝΙΞ (medical equipment supplier — AFM not captured)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="section-title">Competitive tendering (ΠΕΡΙΛΗΨΗ ΔΙΑΚΗΡΥΞΗΣ) — 254 tender notices</div>
+  <table>
+    <thead><tr><th>Year</th><th class="num">Count</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>2019</td><td class="num">61</td><td>High activity — procurement backlog catch-up. Categories: medical equipment, surgical supplies</td></tr>
+      <tr><td>2020</td><td class="num">77</td><td>COVID-driven tendering acceleration (PPE, ventilators, diagnostics, reagents)</td></tr>
+      <tr><td>2021</td><td class="num">27</td><td>Post-COVID normalization</td></tr>
+      <tr><td>2022</td><td class="num">5</td><td>Sharp drop — possible ΕΠΥ routing increase for routine categories</td></tr>
+      <tr><td>2023</td><td class="num">15</td><td>Recovery</td></tr>
+      <tr><td>2024</td><td class="num">33</td><td>Rising — includes large cleaning services tender 127/2024 and related processes</td></tr>
+      <tr><td>2025</td><td class="num">30</td><td>Maintained</td></tr>
+      <tr><td>2026</td><td class="num">6</td><td>Partial year</td></tr>
+    </tbody>
+  </table>
+
+  <div class="notice notice-green" style="margin-top:12px">
+    <b>Assessment:</b> The 254 tender notices confirm ΓΝΑ ΕΥΑΓΓΕΛΙΣΜΟΣ is an active procurement entity with substantial competitive tendering. The failure to publish corresponding ΚΑΤΑΚΥΡΩΣΗ decisions (only 1 in 7 years against 254 notices) suggests competitive award decisions are published under other types or via ΕΠΥ. The ΑΝΑΘΕΣΗ feed's zero supplier_tax_id rate is a systemic data quality failure that makes automated signal detection impossible — not an absence of procurement risk.
+  </div>
+
+</div>
+
+</body>
+</html>

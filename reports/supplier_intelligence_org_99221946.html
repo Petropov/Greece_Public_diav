@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ΓΝ ΤΡΙΚΑΛΑ — Procurement Intelligence Brief</title>
+<style>
+  :root{--bg:#0f1117;--card:#1a1d27;--card2:#1e2133;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--red:#ef4444;--orange:#f97316;--amber:#f59e0b;--green:#22c55e;--teal:#14b8a6;--blue:#3b82f6}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;font-size:14px;line-height:1.6}
+  .header{background:var(--card);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+  .header-title{font-size:1.05rem;font-weight:700;color:#fff}
+  .header-sub{color:var(--muted);font-size:.8rem;margin-top:2px}
+  .badge{background:rgba(99,102,241,.15);color:var(--accent);border:1px solid rgba(99,102,241,.3);border-radius:9999px;padding:3px 10px;font-size:.75rem;font-weight:600}
+  .tabs{background:var(--card);border-bottom:1px solid var(--border);display:flex;padding:0 24px;overflow-x:auto}
+  .tab{background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);cursor:pointer;font-size:.83rem;font-weight:500;padding:11px 14px;white-space:nowrap;transition:color .15s,border-color .15s}
+  .tab:hover{color:var(--text)}
+  .tab.active{border-bottom-color:var(--accent);color:#fff;font-weight:600}
+  .tab .cnt{display:inline-block;background:rgba(99,102,241,.2);color:var(--accent);border-radius:9999px;padding:1px 6px;font-size:.68rem;margin-left:4px}
+  .tab .cnt-red{background:rgba(239,68,68,.2);color:#fca5a5}
+  .tab .cnt-amber{background:rgba(245,158,11,.2);color:#fcd34d}
+  .pane{display:none;padding:24px;max-width:1300px;margin:0 auto}
+  .pane.active{display:block}
+  .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:900px){.grid-4{grid-template-columns:1fr 1fr}.grid-2{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 18px}
+  .kv-label{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
+  .kv-val{font-size:1.3rem;font-weight:700;line-height:1.2}
+  .kv-sub{font-size:.7rem;color:var(--muted);margin-top:2px}
+  .notice{border-radius:8px;padding:12px 16px;font-size:.82rem;line-height:1.7;margin-bottom:16px}
+  .notice-amber{background:rgba(245,158,11,.08);border-left:3px solid var(--amber)}
+  .notice-red{background:rgba(239,68,68,.08);border-left:3px solid var(--red)}
+  .notice-blue{background:rgba(59,130,246,.08);border-left:3px solid var(--blue)}
+  .notice-indigo{background:rgba(99,102,241,.08);border-left:3px solid var(--accent)}
+  .notice-green{background:rgba(34,197,94,.08);border-left:3px solid var(--green)}
+  .notice b{color:#fff}
+  table{width:100%;border-collapse:collapse;font-size:.78rem}
+  th{background:#111320;color:var(--muted);font-weight:600;padding:7px 10px;text-align:left;border-bottom:1px solid var(--border);font-size:.7rem;text-transform:uppercase;letter-spacing:.04em}
+  td{padding:7px 10px;border-bottom:1px solid rgba(42,45,62,.5);vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  tr:hover td{background:rgba(99,102,241,.04)}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .ada{font-family:monospace;font-size:.73rem;color:#93c5fd}
+  .badge-red{background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.3);border-radius:4px;padding:2px 7px;font-size:.7rem;font-weight:600}
+  .badge-amber{background:rgba(245,158,11,.15);color:#fcd34d;border:1px solid rgba(245,158,11,.3);border-radius:4px;padding:2px 7px;font-size:.7rem;font-weight:600}
+  .badge-green{background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.3);border-radius:4px;padding:2px 7px;font-size:.7rem;font-weight:600}
+  .section-title{font-size:.88rem;font-weight:700;color:#fff;margin:18px 0 10px}
+  .flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:12px;background:rgba(99,102,241,.06);border-radius:8px;border:1px solid rgba(99,102,241,.2)}
+  .flow-box{background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:10px 14px;font-size:.78rem}
+  .flow-arrow{color:var(--muted);font-size:1.2rem}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-title">ΓΕΝΙΚΟ ΝΟΣΟΚΟΜΕΙΟ ΤΡΙΚΑΛΩΝ (ΓΝ ΤΡΙΚΑΛΑ)</div>
+    <div class="header-sub">Org 99221946 · 300 beds · 69,379 decisions (2019–2026) · €9.62M cumulative ΑΝΑΘΕΣΗ · Best D:C ratio in cohort (0.11)</div>
+  </div>
+  <span class="badge">7 signals fired · rank #4</span>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="show('ov',this)">Overview</button>
+  <button class="tab" onclick="show('t4',this)">T4 — Price ratchet <span class="cnt cnt-red">5</span></button>
+  <button class="tab" onclick="show('t8',this)">T8 — Monopoly <span class="cnt cnt-red">4</span></button>
+  <button class="tab" onclick="show('t6',this)">T6 — Timing <span class="cnt cnt-amber">2</span></button>
+  <button class="tab" onclick="show('t9b',this)">T9B — Copy-paste <span class="cnt cnt-amber">162</span></button>
+  <button class="tab" onclick="show('t9cd',this)">T9C+T9D — Structured pricing <span class="cnt cnt-amber">19</span></button>
+</div>
+
+<!-- ═══════════════ OVERVIEW ═══════════════ -->
+<div class="pane active" id="pane-ov">
+  <div class="grid-4" style="margin-bottom:20px">
+    <div class="card"><div class="kv-label">Signals fired</div><div class="kv-val" style="color:#fca5a5">7 / 9</div><div class="kv-sub">T1 T4 T6 T8 T9B T9C T9D</div></div>
+    <div class="card"><div class="kv-label">ΑΝΑΘΕΣΗ decisions</div><div class="kv-val">220</div><div class="kv-sub">€9.62M total (2019–2026)</div></div>
+    <div class="card"><div class="kv-label">ΓΕΝ ΚΑ ΑΕ share</div><div class="kv-val" style="color:#fca5a5">34.2%</div><div class="kv-sub">€2.36M of 2020–2026 direct</div></div>
+    <div class="card"><div class="kv-label">D:C ratio</div><div class="kv-val" style="color:#86efac">0.11</div><div class="kv-sub">Most competitive hospital in cohort</div></div>
+  </div>
+
+  <div class="notice notice-amber">
+    <b>Context: ΓΝ ΤΡΙΚΑΛΑ is unusual in this cohort.</b> With 1,991 ΚΑΤΑΚΥΡΩΣΗ (competitive tender finalisations) vs. only 220 ΑΝΑΘΕΣΗ (direct awards), ΓΝ ΤΡΙΚΑΛΑ has the lowest direct-to-competitive ratio (0.11) of all 9 hospitals studied. The 7 signals are real but concentrated in a small subset of service contracts — primarily cleaning services (ΓΕΝ ΚΑ ΑΕ), equipment maintenance renewals, and an anomalous laundry contract. The signals should be viewed against a backdrop of predominantly competitive procurement.
+  </div>
+
+  <div class="section-title">ΓΕΝ ΚΑ ΑΕ (AFM 94510036) — Cleaning services monopoly</div>
+  <div class="notice notice-red">
+    <b>T1+T4+T8 converge on a single supplier.</b> ΓΕΝ ΚΑ ΑΕ has 34.2% of all direct-award spend (2020–2026), 72.3-93.5% annual monopoly in 2025-2026, and an amendment-inflation pattern where the cleaning contract was amended to a higher price that then became the base for the next contract cycle.
+  </div>
+  <div class="flow" style="margin-bottom:16px">
+    <div class="flow-box">
+      <div style="font-size:.7rem;color:var(--muted)">ΣΥΜΒΑΣΗ 10/2025</div>
+      <div style="font-weight:700">~€755k</div>
+      <div style="font-size:.7rem;color:var(--muted)">Original cleaning contract</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box" style="border-color:rgba(239,68,68,.4)">
+      <div style="font-size:.7rem;color:#fca5a5">ΤΡΟΠΟΠΟΙΗΣΗ</div>
+      <div style="font-weight:700;color:#fcd34d">€800,381</div>
+      <div style="font-size:.7rem;color:var(--muted)">Amendment "ΛΟΓΩ ΑΥΞΗΣΗ"</div>
+      <div style="font-size:.68rem;color:var(--muted)">ADA ΨΥΖΚ46907Φ-4ΣΓ · Apr 30 2025</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box" style="border-color:rgba(239,68,68,.4)">
+      <div style="font-size:.7rem;color:#fca5a5">ΣΥΜΒΑΣΗ 49/2026</div>
+      <div style="font-weight:700;color:#fca5a5">€800,381</div>
+      <div style="font-size:.7rem;color:var(--muted)">New contract at inflated price</div>
+      <div style="font-size:.68rem;color:var(--muted)">ADA 9ΨΛΖ46907Φ-Σ0Τ · Mar 31 2026</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">
+      <div style="font-size:.7rem;color:#fca5a5">Cumulative</div>
+      <div style="font-weight:700;color:#fca5a5">€2.36M</div>
+      <div style="font-size:.7rem;color:var(--muted)">3 contracts 2025-2026</div>
+      <div style="font-size:.68rem;color:var(--muted)">93.5% of 2026 direct-award spend</div>
+    </div>
+  </div>
+
+  <div class="notice notice-amber">
+    <b>Cross-hospital alert — ΓΕΝ ΚΑ ΑΕ (AFM 94510036):</b> This supplier also appears as a direct-award recipient at ΓΝΑ ΑΧΕΠΑ Θεσσαλονίκης (T8, 2019, 100% of that year's direct-award spend). Same company winning direct awards at two separate hospitals in different cities (Τρίκαλα + Θεσσαλονίκη).
+  </div>
+
+  <div class="section-title">Signal coverage</div>
+  <table>
+    <thead><tr><th>Tenet</th><th>Status</th><th>Findings</th><th>Key evidence</th></tr></thead>
+    <tbody>
+      <tr><td>T1 · Concentration</td><td><span class="badge-amber">FIRED</span></td><td class="num">1</td><td>AFM 94510036 (ΓΕΝ ΚΑ ΑΕ) = 34.2% of 2020-2026 direct-award spend (€2.36M)</td></tr>
+      <tr><td>T4 · Amendment inflation</td><td><span class="badge-red">FIRED</span></td><td class="num">5</td><td>ΓΕΝ ΚΑ ΑΕ amendment "ΛΟΓΩ ΑΥΞΗΣΗ" → price locked; MEDIPRIME €54,997.96 × 5 yrs; SIEMENS, MEDITRUST, ΠΑΠΑΠΟΣΤΟΛΟΥ annual carry-forwards</td></tr>
+      <tr><td>T5 · Emergency overuse</td><td><span class="badge-green">CLEAN</span></td><td class="num">0</td><td>No emergency awards detected — consistent with strong competitive procurement record</td></tr>
+      <tr><td>T6 · Timing</td><td><span class="badge-amber">FIRED</span></td><td class="num">2</td><td>Weekend award Dec 2020 (ΚΑΛΛΙΤΣΑΡΗ, €7,890); holiday award May 1 2024 (ΜΑΥΡΟΓΕΝΗΣ, €16,950 surgical implants). Year-end Dec 2024 and Jul 2022 clusters were employment contracts — filtered by updated T6 employment detector.</td></tr>
+      <tr><td>T8 · Monopoly</td><td><span class="badge-red">FIRED</span></td><td class="num">4</td><td>AFM 70419338 (laundry, 2022 €1.09M, 73.9%); ΓΕΝ ΚΑ ΑΕ 2025 72.3%, 2026 93.5%; sustained monopoly 2025-2026</td></tr>
+      <tr><td>T9B · Copy-paste</td><td><span class="badge-amber">FIRED</span></td><td class="num">162</td><td>MEDIPRIME €54,997.96 × 5 yrs; AFM 997802911 €18,277.60 × 5 (same May date each year); ΓΕΝ ΚΑ ΑΕ €800,381 × 2</td></tr>
+      <tr><td>T9C · Lot-splitting</td><td><span class="badge-amber">FIRED</span></td><td class="num">1</td><td>AFM 91569759: 3 awards Nov 3-14 2025, €25,711 total</td></tr>
+      <tr><td>T9D · Price standardisation</td><td><span class="badge-amber">FIRED</span></td><td class="num">18</td><td>Standard amounts €5,580/€5,456/€4,464/€3,720/€2,480 across 3-6 suppliers each</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ═══════════════ T4 ═══════════════ -->
+<div class="pane" id="pane-t4">
+  <div class="notice notice-indigo">
+    <b>T4 — Amendment inflation / price carry-forward:</b> Detects when a contract amendment raises the price, and the next contract cycle begins at the inflated price — effectively laundering a price increase through an amendment rather than a competitive re-tender. Also fires on consecutive contracts to the same supplier at identical prices (price carry without negotiation).
+  </div>
+
+  <div class="section-title">T4 findings — ranked by significance</div>
+
+  <div class="card" style="margin-bottom:12px;border-color:rgba(239,68,68,.3)">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div style="font-weight:700;color:#fca5a5">#1 · ΓΕΝ ΚΑ ΑΕ (AFM 94510036) — Cleaning contract amendment inflation</div>
+      <span class="badge-red">HIGH PRIORITY</span>
+    </div>
+    <div style="margin:10px 0">
+      <div class="flow">
+        <div class="flow-box"><div style="font-size:.68rem;color:var(--muted)">Contract N (ΤΡΟΠΟΠΟΙΗΣΗ)</div><div class="ada">ΨΥΖΚ46907Φ-4ΣΓ</div><div>2025-04-30 · <b>€800,381.51</b></div><div style="font-size:.7rem;color:var(--muted)">"ΛΟΓΩ ΑΥΞΗΣΗ" (due to price increase)</div></div>
+        <div class="flow-arrow">335 days →</div>
+        <div class="flow-box" style="border-color:rgba(239,68,68,.4)"><div style="font-size:.68rem;color:var(--muted)">Contract N+1</div><div class="ada">9ΨΛΖ46907Φ-Σ0Τ</div><div>2026-03-31 · <b>€800,381.51</b></div><div style="font-size:.7rem;color:var(--muted)">ΣΥΜΒΑΣΗ 49/2026 — same price, 0.0% diff</div></div>
+      </div>
+    </div>
+    <div style="font-size:.75rem;color:var(--muted)">The amendment explicitly cites "ΑΥΞΗΣΗ" (price increase) as justification for inflating the contract from the original amount. The next contract is then signed at the inflated amount, locking in the higher price as the new baseline. T8 confirms: ΓΕΝ ΚΑ ΑΕ = 93.5% of 2026 ΑΝΑΘΕΣΗ spend.</div>
+  </div>
+
+  <div class="card" style="margin-bottom:12px">
+    <div style="font-weight:700;color:#fcd34d">#2 · MEDIPRIME ΑΕ (AFM 998283526) — Medical equipment maintenance × 5 years at identical price</div>
+    <div style="margin:10px 0">
+      <div class="flow">
+        <div class="flow-box"><div style="font-size:.68rem;color:var(--muted)">ΣΥΜΒΑΣΗ 176/2020</div><div class="ada">ΩΜΣΩ46907Φ-ΡΨΙ</div><div>2020-08-13 · €54,997.96</div></div>
+        <div class="flow-arrow">398d →</div>
+        <div class="flow-box"><div style="font-size:.68rem;color:var(--muted)">ΣΥΜΒΑΣΗ 194/2021</div><div class="ada">6Σ8Χ46907Φ-8Τ8</div><div>2021-09-15 · €54,997.96</div></div>
+        <div class="flow-arrow">→ 2023 → 2024 →</div>
+        <div class="flow-box" style="border-color:rgba(245,158,11,.3)"><div style="font-size:.68rem;color:var(--muted)">2025 renewal</div><div>€54,997.96</div><div style="font-size:.68rem;color:#fcd34d">5th cycle: 0% change</div></div>
+      </div>
+    </div>
+    <div style="font-size:.75rem;color:var(--muted)">Medical equipment repair/maintenance contract renewed 5 consecutive years (2020-2025) at exactly €54,997.96 — zero price adjustment. Also fires T9B (copy-paste amount). The amount is suspiciously below the €60k T5 emergency threshold and below €55k for simplified procedure.</div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div style="font-weight:700;color:#94a3b8">#3 · SIEMENS (AFM 94456875) — Coronary angiography maintenance</div>
+      <div style="font-size:.75rem;margin:8px 0;color:var(--muted)">
+        ΣΥΜΒΑΣΗ 265/2024 → ΣΥΜΒΑΣΗ 258/2025<br>
+        <span class="ada">9ΣΙΕ46907Φ-ΚΑΧ</span> → <span class="ada">996246907Φ-60Ω</span><br>
+        Nov 1 2024 → Nov 3 2025 (367 days)<br>
+        €56,216.12 both times · 0.0% diff
+      </div>
+      <div style="font-size:.73rem;color:var(--muted)">Annual maintenance contract for στεφανιογράφος (coronary cathlab). Subject of 2025 contract adds "(ΠΡΟΑΙΡΕΣΗ)" — option clause, suggesting the price was agreed in advance. Normal annual medical equipment maintenance pattern.</div>
+    </div>
+    <div class="card">
+      <div style="font-weight:700;color:#94a3b8">#4 · MEDITRUST ΕΠΕ (AFM 92482025) — Respirator repair</div>
+      <div style="font-size:.75rem;margin:8px 0;color:var(--muted)">
+        ΣΥΜΒΑΣΗ 177/2020 → ΣΥΜΒΑΣΗ 199/2021<br>
+        <span class="ada">ΩΙΔ246907Φ-Β0Ψ</span> → <span class="ada">Ψ4Α846907Φ-Μ3Δ</span><br>
+        Sep 1 2020 → Sep 20 2021 (384 days)<br>
+        €82,557 → €83,410 (+1.03%)
+      </div>
+      <div style="font-size:.73rem;color:var(--muted)">Medical equipment repair/maintenance for AVEA respirators. 1% price increase is within normal range. Note: MEDITRUST also appears in a 2022 amendment (ΤΡΟΠΟΠΟΙΗΣΗ ΣΥΜΒΑΣΗΣ 199.1/2021 ΛΟΓΩ ΑΠΟΣΥΡΣΗΣ 3 ΑΝΑΠΝΕΥΣΤΗΡΩΝ ΑVEA at €76,935) after respiratory equipment was retired.</div>
+    </div>
+    <div class="card" style="grid-column:1/-1">
+      <div style="font-weight:700;color:#94a3b8">#5 · ΠΑΠΑΠΟΣΤΟΛΟΥ Ν. ΑΕ (AFM 95029193) — Medical equipment maintenance</div>
+      <div style="font-size:.75rem;margin:8px 0;color:var(--muted)">
+        ΣΥΜΒΑΣΗ 272/2024 → ΣΥΜΒΑΣΗ 265/2025 · Nov 2024 → Nov 2025 (369 days) · €50,564.72 both times · 0.0% diff
+        <br><span class="ada">6Ω8Ρ46907Φ-ΙΔΩ</span> → <span class="ada">Ψ3Υ946907Φ-Η2Ο</span>
+      </div>
+      <div style="font-size:.73rem;color:var(--muted)">Annual medical equipment maintenance. Subject adds "(ΠΡΟΑΙΡΕΣΗ)" in 2025. Same pattern as SIEMENS — pre-agreed option clause.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ T8 ═══════════════ -->
+<div class="pane" id="pane-t8">
+  <div class="notice notice-indigo">
+    <b>T8 — Single-source monopoly:</b> Fires when a single supplier accounts for ≥70% of annual direct-award spend (critical) or ≥50% for 2+ consecutive years (sustained). At ΓΝ ΤΡΙΚΑΛΑ: 4 findings covering 2022, 2025, 2026, and a sustained 2025-2026 pattern. ΓΕΝ ΚΑ ΑΕ dominates the 2025-2026 direct-award landscape.
+  </div>
+
+  <table>
+    <thead><tr><th>Year(s)</th><th>Supplier AFM</th><th>Supplier (from subject)</th><th>Total ΑΝΑΘΕΣΗ</th><th>Share</th><th>Contracts</th><th>Rule</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>2022</td>
+        <td class="ada">70419338</td>
+        <td>ΑΝΑΣΣΑ ΓΕΩΡΓΙΑ Φ. ΠΕΡΙΣΤΕΡΗ <br><span style="font-size:.7rem;color:var(--muted)">Laundry collection services (ΥΠΗΡΕΣΙΕΣ ΣΥΛΛΟΓΗΣ ΡΟΥΧΩΝ ΓΙΑ ΠΛΥΣΙΜΟ)</span></td>
+        <td class="num">€1,094,288</td>
+        <td class="num" style="color:#fca5a5">73.9%</td>
+        <td class="num">1</td>
+        <td><span class="badge-red">T8 critical</span></td>
+      </tr>
+      <tr>
+        <td>2025</td>
+        <td class="ada">94510036</td>
+        <td>ΓΕΝ ΚΑ ΑΕ — cleaning services</td>
+        <td class="num">€1,556,239</td>
+        <td class="num" style="color:#fca5a5">72.3%</td>
+        <td class="num">2</td>
+        <td><span class="badge-red">T8 critical</span></td>
+      </tr>
+      <tr>
+        <td>2026</td>
+        <td class="ada">94510036</td>
+        <td>ΓΕΝ ΚΑ ΑΕ — cleaning services (ΣΥΜΒΑΣΗ 49/2026)</td>
+        <td class="num">€800,381</td>
+        <td class="num" style="color:#fca5a5">93.5%</td>
+        <td class="num">1</td>
+        <td><span class="badge-red">T8 critical</span></td>
+      </tr>
+      <tr>
+        <td>2025–2026</td>
+        <td class="ada">94510036</td>
+        <td>ΓΕΝ ΚΑ ΑΕ — sustained monopoly</td>
+        <td class="num">€2,356,620</td>
+        <td class="num" style="color:#fca5a5">82.9% avg</td>
+        <td class="num">3</td>
+        <td><span class="badge-red">T8 sustained</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="notice notice-red" style="margin-top:16px">
+    <b>⚠ Laundry services anomaly (2022, ADA 96Φ046907Φ-Υ21):</b> A "2-month extension of ΣΥΜΒΑΣΗ 182.2/2021 for laundry collection services" (ΥΠΗΡΕΣΙΕΣ ΣΥΛΛΟΓΗΣ ΡΟΥΧΩΝ ΓΙΑ ΠΛΥΣΙΜΟ) shows an amount of <b>€1,094,288</b>. The original annual laundry contract (ΣΥΜΒΑΣΗ 124/2020) was €59,118. At €1.09M for 2 months, the rate is 18.5× the annual contract value — implying either (a) a data entry error where a different amount was recorded, or (b) a genuine price inflation. The same supplier (AFM 70419338, ΑΝΑΣΣΑ ΓΕΩΡΓΙΑ Φ. ΠΕΡΙΣΤΕΡΗ) had prior contracts at €59,118 (2020) and a small extension (€9,853 in 2021). The 2022 amount warrants ADA-level verification.
+  </div>
+</div>
+
+<!-- ═══════════════ T6 ═══════════════ -->
+<div class="pane" id="pane-t6">
+  <div class="notice notice-indigo">
+    <b>T6 — Temporal clustering:</b> Detects procurement decisions posted on weekends, public holidays, or in unusual temporal clusters. At ΓΝ ΤΡΙΚΑΛΑ: 2 genuine findings — both are weekend/holiday ΣΥΜΒΑΣΗ postings. Previously detected year-end Dec 2024 burst (3.2×) and Jul 2022 monthly spike (2.6×) have been reclassified as employment contract batches after T6 detector update (commit dd4d0f3).
+  </div>
+
+  <table>
+    <thead><tr><th>Finding</th><th>Date</th><th>ADA</th><th>Amount</th><th>Context</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="badge-amber">Weekend award</span></td>
+        <td>Sat 2020-12-12</td>
+        <td><a class="ada" href="https://diavgeia.gov.gr/doc/6Ρ4Ψ46907Φ-ΥΘΠ" target="_blank">6Ρ4Ψ46907Φ-ΥΘΠ</a></td>
+        <td class="num">€7,890</td>
+        <td>ΣΥΜΒΑΣΗ 293/2020 ΜΕ ΚΑΛΛΙΤΣΑΡΗ ΣΤΑΥΡΟΥΛΑ — "ΠΑΡΟΧΗ ΥΠΗΡΕΣΙΩΝ ΙΑΤΡΟΥ ΕΡΓΑΣΙΑΣ". Occupational physician service contract posted Saturday. Low amount, likely backdate administrative entry.</td>
+      </tr>
+      <tr>
+        <td><span class="badge-amber">Holiday award</span></td>
+        <td>May 1 2024 (Labour Day)</td>
+        <td><a class="ada" href="https://diavgeia.gov.gr/doc/6ΓΒΘ46907Φ-ΞΡΡ" target="_blank">6ΓΒΘ46907Φ-ΞΡΡ</a></td>
+        <td class="num">€16,950</td>
+        <td>ΣΥΜΒΑΣΗ 125/2024 ΜΕ ΑΝΑΣΤΑΣΙΟΣ ΜΑΥΡΟΓΕΝΗΣ — "ΠΡΟΜΗΘΕΙΑ ΧΕΙΡΟΥΡΓΙΚΑ ΜΟΣΧΕΥΜΑΤΑ" (surgical implants). Supply contract for surgical implants posted on Greek Labour Day. Likely backdated administrative posting.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="notice notice-blue" style="margin-top:16px">
+    <b>Assessment:</b> The 2 T6 findings at ΓΝ ΤΡΙΚΑΛΑ are administrative backdate entries (weekend and holiday postings) with low amounts. Not independently significant — the core risk patterns are in T4 (ΓΕΝ ΚΑ ΑΕ price ratchet) and T8 (laundry anomaly + cleaning monopoly).
+  </div>
+  <div class="notice notice-blue" style="margin-top:8px">
+    <b>Previously flagged (now resolved):</b> Dec 2024 year-end burst (3.2×, 45 decisions) and Jul 2022 monthly spike (2.6×, 72 decisions) were reclassified after detector update: the ΣΥΜΒΑΣΗ decisions in those clusters were employment contract batches (ΣΟΧ, ΕΣΠΑ-funded staff, physician specialization training), not procurement. T6 employment keyword filter expanded in commit dd4d0f3.
+  </div>
+</div>
+
+<!-- ═══════════════ T9B ═══════════════ -->
+<div class="pane" id="pane-t9b">
+  <div class="notice notice-indigo">
+    <b>T9B — Copy-paste structured award:</b> Detects identical non-round amounts to the same supplier across multiple decisions. In health procurement, this can indicate rigid fee schedules (legitimate) or contract fragmentation to avoid tender thresholds (suspicious). At ΓΝ ΤΡΙΚΑΛΑ: 162 findings total, 158 with amount ≥€1,000. Many are annual equipment maintenance contracts at fixed prices.
+  </div>
+  <div class="notice notice-amber">
+    <b>Filter applied:</b> Showing top 15 findings by amount × occurrences (significance proxy). Full 162 findings include many small-value medical supply fee schedules (€2,108-€5,580) which represent standard catalog pricing, not structural irregularities.
+  </div>
+
+  <div class="section-title">Top 15 T9B findings by significance (amount × count)</div>
+  <table>
+    <thead><tr><th>#</th><th>Supplier AFM</th><th>Unit amount</th><th>Occurrences</th><th>Total</th><th>Date range</th><th>Assessment</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td class="ada">94510036</td><td class="num">€800,381.51</td><td class="num">2</td><td class="num" style="color:#fca5a5">€1,600,763</td><td>2025-04-30 → 2026-03-31</td><td>ΓΕΝ ΚΑ ΑΕ cleaning — T4 price carry. Same amount = amendment price locked in as new contract base.</td></tr>
+      <tr><td>2</td><td class="ada">94297699</td><td class="num">€133,920.00</td><td class="num">3</td><td class="num" style="color:#fcd34d">€401,760</td><td>Jun 2020 → Jun 2021 → Jun 2022</td><td>Annual service contract, same June date each year. Identity unknown (no subject data).</td></tr>
+      <tr><td>3</td><td class="ada">998283526</td><td class="num">€54,997.96</td><td class="num">5</td><td class="num" style="color:#fcd34d">€274,990</td><td>2020–2025 (5 consecutive years)</td><td><b>MEDIPRIME ΑΕ</b> — medical equipment maintenance. Same to-the-cent amount for 5 years. Also T4 finding. Amount is below €55k ceiling for simplified procedure.</td></tr>
+      <tr><td>4</td><td class="ada">94073495</td><td class="num">€80,104.00</td><td class="num">2</td><td class="num">€160,208</td><td>Jul 2024 → May 2025</td><td>Annual equipment maintenance contract.</td></tr>
+      <tr><td>5</td><td class="ada">99876011</td><td class="num">€77,365.16</td><td class="num">2</td><td class="num">€154,730</td><td>Jan 24 2024 → Jan 24 2025</td><td>Same amount, same calendar date year over year.</td></tr>
+      <tr><td>6</td><td class="ada">94056437</td><td class="num">€40,920.00</td><td class="num">3</td><td class="num">€122,760</td><td>Jan 2021 → Nov 2021 → May 2022</td><td>Round-year amount, ΦΙΛΙΠΣ ΕΛΛΑΣ style equipment maintenance.</td></tr>
+      <tr><td>7</td><td class="ada">94058260</td><td class="num">€59,892.00</td><td class="num">2</td><td class="num">€119,784</td><td>Jan 2020 → Jan 2021</td><td>Annual maintenance contract, same January date.</td></tr>
+      <tr><td>8</td><td class="ada">94456875</td><td class="num">€56,216.12</td><td class="num">2</td><td class="num">€112,432</td><td>Nov 2024 → Nov 2025</td><td>SIEMENS στεφανιογράφος — also T4 finding. Annual renewal.</td></tr>
+      <tr><td>9</td><td class="ada">82525697</td><td class="num">€52,848.22</td><td class="num">2</td><td class="num">€105,696</td><td>Aug 2024 → May 2025</td><td>Annual maintenance.</td></tr>
+      <tr><td>10</td><td class="ada">99518023</td><td class="num">€50,845.58</td><td class="num">2</td><td class="num">€101,691</td><td>Jun 2023 → Jun 2024</td><td>Annual maintenance, same June date.</td></tr>
+      <tr><td>11</td><td class="ada">95029193</td><td class="num">€50,564.72</td><td class="num">2</td><td class="num">€101,129</td><td>Nov 2024 → Nov 2025</td><td>ΠΑΠΑΠΟΣΤΟΛΟΥ — also T4 finding. Annual maintenance.</td></tr>
+      <tr><td>12</td><td class="ada">95444407</td><td class="num">€45,861.49</td><td class="num">2</td><td class="num">€91,723</td><td>Jun 2023 → Jun 2024</td><td>Annual maintenance, same June date.</td></tr>
+      <tr><td>13</td><td class="ada">997802911</td><td class="num">€18,277.60</td><td class="num">5</td><td class="num">€91,388</td><td>Dec 2020 → Feb 2022 → May 2023 → May 2024 → May 2025</td><td>Same amount, May dates from 2022 onward. Service contract renewed annually.</td></tr>
+      <tr><td>14</td><td class="ada">36142859</td><td class="num">€42,074.63</td><td class="num">2</td><td class="num">€84,149</td><td>Sep 2023 → Jul 2024</td><td>Annual maintenance.</td></tr>
+      <tr><td>15</td><td class="ada">997799268</td><td class="num">€38,588.80</td><td class="num">2</td><td class="num">€77,178</td><td>Nov 2024 → Nov 2025</td><td>Annual maintenance, same November date.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="notice notice-blue" style="margin-top:16px">
+    <b>Pattern note:</b> The majority of T9B findings at ΓΝ ΤΡΙΚΑΛΑ are legitimate annual medical equipment maintenance contracts where the price is set in the original contract and carries forward. The hospital uses option clauses ("ΠΡΟΑΙΡΕΣΗ") that allow renewal at the agreed price. The structurally suspicious finding is MEDIPRIME (€54,997.96 × 5 years with zero price change) — combined with T4, this represents a 5-year price freeze for medical equipment maintenance that should have been subject to at least annual adjustment for CPI or equipment age.
+  </div>
+</div>
+
+<!-- ═══════════════ T9C + T9D ═══════════════ -->
+<div class="pane" id="pane-t9cd">
+  <div class="notice notice-indigo">
+    <b>T9C — 30-day award burst (lot-splitting):</b> Fires when 3+ awards go to the same supplier within 30 days, and the combined value would exceed the direct-award threshold (Art.118). Detects procurement fragmented into below-threshold lots to avoid tender requirements.<br><br>
+    <b>T9D — Price standardisation across suppliers:</b> Fires when an identical non-round amount appears in awards to 3+ distinct suppliers. May indicate a fixed pricing catalog (common in health procurement) or coordinated pricing.
+  </div>
+
+  <div class="section-title">T9C — Lot-splitting (1 finding)</div>
+  <table>
+    <thead><tr><th>Supplier AFM</th><th>Window</th><th>Awards</th><th>Total</th><th>Subject</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="ada">91569759</td>
+        <td>Nov 3–14 2025 (11 days)</td>
+        <td class="num">3</td>
+        <td class="num" style="color:#fcd34d">€25,711</td>
+        <td>ΤΡΟΠΟΠΟΙΗΣΗ ΣΥΜΒΑΣ... — contract modification. The 3 awards within 11 days are contract amendments/modifications, not separate direct awards. Marginal T9C finding.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="section-title" style="margin-top:20px">T9D — Price standardisation across suppliers (top 10 of 18 findings)</div>
+  <table>
+    <thead><tr><th>#</th><th>Standardised amount</th><th>Distinct suppliers</th><th>Total occurrences</th><th>Assessment</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td class="num">€5,580.00</td><td class="num" style="color:#fcd34d">6</td><td class="num">8</td><td>6 different suppliers at this exact amount. Likely a standardised procedure/service fee (lab test, consultation, etc.) — standard health catalog pricing.</td></tr>
+      <tr><td>2</td><td class="num">€5,456.00</td><td class="num" style="color:#fcd34d">5</td><td class="num">8</td><td>5 suppliers. Very close to €5,580 — may be the same service at a slightly different price point in different years.</td></tr>
+      <tr><td>3</td><td class="num">€4,464.00</td><td class="num">4</td><td class="num">5</td><td>4 suppliers, 5 occurrences. Standard fee schedule amount.</td></tr>
+      <tr><td>4</td><td class="num">€2,480.00</td><td class="num">4</td><td class="num">6</td><td>4 suppliers. Small standardised amount.</td></tr>
+      <tr><td>5</td><td class="num">€3,720.00</td><td class="num">4</td><td class="num">6</td><td>4 suppliers. €3,720 = €5,580 × 2/3 — possible variant of the same fee schedule.</td></tr>
+      <tr><td>6</td><td class="num">€5,257.60</td><td class="num">3</td><td class="num">3</td><td>3 suppliers. Unusual precision (0.6 cents) — could indicate a rate × quantity calculation.</td></tr>
+      <tr><td>7</td><td class="num">€4,340.00</td><td class="num">3</td><td class="num">4</td><td>Standard fee schedule.</td></tr>
+      <tr><td>8</td><td class="num">€2,232.00</td><td class="num">3</td><td class="num">4</td><td>Very small amounts — likely per-unit supplies.</td></tr>
+      <tr><td>9</td><td class="num">€1,240.00</td><td class="num">3</td><td class="num">4</td><td>Small standardised amount.</td></tr>
+      <tr><td>10</td><td class="num">€3,100.00</td><td class="num">3</td><td class="num">3</td><td>Standard supply amount.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="notice notice-blue" style="margin-top:16px">
+    <b>T9D context for Greek hospitals:</b> In Greek public healthcare, many medical supplies, laboratory tests, and consultancy services are procured at nationally standardised prices set by the Ministry of Health or ΕΠΥ price catalogs. The presence of identical amounts across multiple suppliers is often consistent with catalog pricing, not coordination. The T9D findings at ΓΝ ΤΡΙΚΑΛΑ — all below €6,000 per occurrence — are consistent with standard catalog-priced supply contracts and are lower-priority signals.
+  </div>
+</div>
+
+<script>
+function show(id,btn){
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('pane-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

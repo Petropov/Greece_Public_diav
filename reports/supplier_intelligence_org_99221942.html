@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ΓΝ ΣΕΡΡΩΝ — Supplier Intelligence Brief</title>
+<style>
+  :root {
+    --bg:#0f1117;--card:#1a1d27;--card2:#1e2133;--border:#2a2d3e;
+    --text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;
+    --red:#ef4444;--amber:#f59e0b;--green:#22c55e;--blue:#3b82f6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;font-size:14px;line-height:1.6}
+  .header{background:var(--card);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between}
+  .header-left h1{font-size:1.1rem;font-weight:700;color:#fff}
+  .header-left .sub{color:var(--muted);font-size:.82rem;margin-top:2px}
+  .pills{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+  .pill{border-radius:9999px;padding:2px 9px;font-size:.72rem;font-weight:600;border:1px solid}
+  .pill-slate{background:rgba(100,116,139,.15);color:#94a3b8;border-color:rgba(100,116,139,.3)}
+  .pill-amber{background:rgba(245,158,11,.12);color:#fcd34d;border-color:rgba(245,158,11,.3)}
+  .pill-green{background:rgba(34,197,94,.1);color:#86efac;border-color:rgba(34,197,94,.25)}
+  .pill-red{background:rgba(239,68,68,.12);color:#fca5a5;border-color:rgba(239,68,68,.3)}
+  .tabs{background:var(--card);border-bottom:1px solid var(--border);display:flex;padding:0 24px;overflow-x:auto}
+  .tab{background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);cursor:pointer;font-size:.85rem;font-weight:500;padding:12px 16px;white-space:nowrap;transition:color .15s,border-color .15s}
+  .tab:hover{color:var(--text)}
+  .tab.active{border-bottom-color:var(--accent);color:#fff;font-weight:600}
+  .pane{display:none;padding:24px;max-width:1400px;margin:0 auto}
+  .pane.active{display:block}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px 20px;margin-bottom:16px}
+  .card-title{font-size:.9rem;font-weight:600;color:#fff;margin-bottom:6px}
+  .section-title{font-size:.88rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:20px 0 10px}
+  .kv{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:16px}
+  .kv-card{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:14px 16px}
+  .kv-label{font-size:.75rem;color:var(--muted);margin-bottom:4px}
+  .kv-val{font-size:1.2rem;font-weight:700;color:#fff}
+  .kv-sub{font-size:.72rem;color:var(--muted);margin-top:3px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{background:var(--card2);color:var(--muted);font-size:.75rem;font-weight:600;text-align:left;padding:8px 10px;border-bottom:1px solid var(--border)}
+  td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .ada{font-family:monospace;font-size:.78rem;color:var(--accent);text-decoration:none}
+  .ada:hover{text-decoration:underline}
+  .badge-amber{background:rgba(245,158,11,.15);color:#fcd34d;border:1px solid rgba(245,158,11,.3);border-radius:4px;padding:1px 6px;font-size:.72rem;font-weight:600;white-space:nowrap}
+  .badge-green{background:rgba(34,197,94,.12);color:#86efac;border:1px solid rgba(34,197,94,.25);border-radius:4px;padding:1px 6px;font-size:.72rem;font-weight:600}
+  .badge-blue{background:rgba(59,130,246,.12);color:#93c5fd;border:1px solid rgba(59,130,246,.25);border-radius:4px;padding:1px 6px;font-size:.72rem;font-weight:600}
+  .badge-red{background:rgba(239,68,68,.12);color:#fca5a5;border:1px solid rgba(239,68,68,.25);border-radius:4px;padding:1px 6px;font-size:.72rem;font-weight:600}
+  .notice{border-radius:8px;padding:12px 14px;font-size:.83rem;margin-bottom:12px}
+  .notice b{font-weight:700}
+  .notice-amber{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);color:#fde68a}
+  .notice-blue{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.25);color:#bfdbfe}
+  .notice-green{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);color:#bbf7d0}
+  .notice-red{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);color:#fca5a5}
+  .notice-indigo{background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.25);color:#c7d2fe}
+  .notice-slate{background:rgba(100,116,139,.08);border:1px solid rgba(100,116,139,.25);color:#cbd5e1}
+  .gap-y>*+*{margin-top:10px}
+  .mt8{margin-top:8px}
+  .cnt{border-radius:9999px;padding:1px 7px;font-size:.72rem;font-weight:700}
+  .cnt-amber{background:rgba(245,158,11,.18);color:#fcd34d;border:1px solid rgba(245,158,11,.3)}
+  .cnt-green{background:rgba(34,197,94,.12);color:#86efac;border:1px solid rgba(34,197,94,.25)}
+  .cluster-header td{background:rgba(245,158,11,.06);font-weight:600;color:#fde68a;border-top:2px solid rgba(245,158,11,.25)}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>ΓΝ ΣΕΡΡΩΝ — Γενικό Νοσοκομείο Σερρών ⚠️</h1>
+    <div class="sub">Org ID 99221942 · Σέρρες · ~300 beds · Diavgeia 2019–2026 · ADA prefix 469071</div>
+    <div class="pills">
+      <span class="pill pill-amber">T6 timing</span>
+      <span class="pill pill-slate">1 / 9 signals</span>
+      <span class="pill pill-red">Org mislabeled ⚠️</span>
+    </div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="show('overview',this)">Overview</button>
+  <button class="tab" onclick="show('t6',this)">T6 — Timing <span class="cnt cnt-amber">3</span></button>
+</div>
+
+<script>
+function show(id,btn){
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('pane-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+
+<!-- ═══════════════ OVERVIEW ═══════════════ -->
+<div class="pane active" id="pane-overview">
+
+  <div class="notice notice-red">
+    <b>⚠️ Org identity correction (2026-06-02):</b> This org (99221942, ADA prefix 469071) was previously mislabeled as "ΓΝ ΑΜΦΙΣΣΑ" in earlier analysis. Decision subjects explicitly identify the issuing body as "Γενικό Νοσοκομείο Σερρών" — the hospital in Σέρρες (Macedonia). All prior references to ΓΝ ΑΜΦΙΣΣΑ under this org-ID are erroneous. ΓΝ ΑΜΦΙΣΣΑ has a different org-ID and ADA prefix. This correction propagated to risk_ranking.html and hospitals_benchmark.html (commit 36a6520).
+  </div>
+
+  <div class="kv">
+    <div class="kv-card"><div class="kv-label">Total decisions (all types)</div><div class="kv-val">25,764</div><div class="kv-sub">2019–2026</div></div>
+    <div class="kv-card"><div class="kv-label">ΑΝΑΘΕΣΗ (direct awards)</div><div class="kv-val" style="color:var(--amber)">184</div><div class="kv-sub">€815,277 total</div></div>
+    <div class="kv-card"><div class="kv-label">ΚΑΤΑΚΥΡΩΣΗ (competitive)</div><div class="kv-val">82</div><div class="kv-sub">€448,296 total</div></div>
+    <div class="kv-card"><div class="kv-label">Signals fired</div><div class="kv-val" style="color:var(--amber)">1 / 9</div><div class="kv-sub">T6 (temporal clustering)</div></div>
+    <div class="kv-card"><div class="kv-label">Emergency decisions</div><div class="kv-val" style="color:var(--green)">0</div><div class="kv-sub">No Art.32§2γ found</div></div>
+    <div class="kv-card"><div class="kv-label">Supplier visibility</div><div class="kv-val" style="color:var(--red)">0%</div><div class="kv-sub">No supplier_tax_id in any decision</div></div>
+  </div>
+
+  <div class="section-title">Signal summary</div>
+  <table>
+    <thead><tr><th>Tenet</th><th>Result</th><th>Findings</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>T1 · Concentration</td>
+        <td><span class="badge-blue">blind</span></td>
+        <td class="num">—</td>
+        <td>No supplier_tax_id in any ΑΝΑΘΕΣΗ row — T1 cannot run</td>
+      </tr>
+      <tr>
+        <td>T4 · Amendment inflation</td>
+        <td><span class="badge-green">clean</span></td>
+        <td class="num">—</td>
+        <td>No ΤΡΟΠΟΠΟΙΗΣΗ pairs with baseline decisions found</td>
+      </tr>
+      <tr>
+        <td>T5 · Emergency overuse</td>
+        <td><span class="badge-green">clean</span></td>
+        <td class="num">0</td>
+        <td>Zero Art.32§2γ procurement decisions found 2019–2026</td>
+      </tr>
+      <tr>
+        <td>T6 · Temporal clustering</td>
+        <td><span class="badge-amber">FIRED</span></td>
+        <td class="num">3</td>
+        <td>Dec 2021 (3.2×, COVID service extensions), Dec 2022 (3.2×, year-end batch), Nov 2023 (2.8×, infrastructure cluster). See T6 tab.</td>
+      </tr>
+      <tr>
+        <td>T8 · Single-source monopoly</td>
+        <td><span class="badge-blue">blind</span></td>
+        <td class="num">—</td>
+        <td>No supplier_tax_id — T8 cannot run</td>
+      </tr>
+      <tr>
+        <td>T9A-D · Structural patterns</td>
+        <td><span class="badge-blue">blind</span></td>
+        <td class="num">—</td>
+        <td>No supplier_tax_id — T9 family cannot run</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="section-title">Procurement overview by year</div>
+  <table>
+    <thead><tr><th>Year</th><th class="num">ΑΝΑΘΕΣΗ (direct)</th><th class="num">ΚΑΤΑΚΥΡΩΣΗ (competitive)</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>2019</td><td class="num">—</td><td class="num">—</td><td>Pre-2020 data sparse</td></tr>
+      <tr><td>2020</td><td class="num">~18</td><td class="num">—</td><td>COVID period — some service extensions visible</td></tr>
+      <tr><td>2021</td><td class="num">~22</td><td class="num">~8</td><td>Dec 2021 T6 cluster (COVID Law 4820/2021 service replacements)</td></tr>
+      <tr><td>2022</td><td class="num">~30</td><td class="num">~20</td><td>Dec 2022 T6 cluster (year-end batch: auditors, software, radiology)</td></tr>
+      <tr><td>2023</td><td class="num">~55</td><td class="num">~28</td><td>Nov 2023 T6 cluster (infrastructure maintenance burst)</td></tr>
+      <tr><td>2024</td><td class="num">~40</td><td class="num">~20</td><td>Normal pattern</td></tr>
+      <tr><td>2025–2026</td><td class="num">~19</td><td class="num">~6</td><td>Partial year</td></tr>
+      <tr style="font-weight:600"><td>Total</td><td class="num">184</td><td class="num">82</td><td>€815,277 ΑΝΑΘΕΣΗ + €448,296 ΚΑΤΑΚΥΡΩΣΗ = €1,263,573 visible</td></tr>
+    </tbody>
+  </table>
+
+  <div class="notice notice-blue" style="margin-top:16px">
+    <b>Data visibility note:</b> ΓΝ ΣΕΡΡΩΝ publishes 184 ΑΝΑΘΕΣΗ decisions (€815k over 7 years) — a small but non-trivial direct procurement feed for a ~300-bed regional hospital. Unlike large Athens hospitals routed through ΕΠΥ, ΣΕΡΡΩΝ appears to manage its own smaller procurement directly. However, zero supplier_tax_id means T1/T8/T9 analysis is entirely blind. The T6 timing anomalies are the only machine-detectable signals.
+  </div>
+
+</div>
+
+<!-- ═══════════════ T6 ═══════════════ -->
+<div class="pane" id="pane-t6">
+
+  <div class="notice notice-indigo">
+    <b>T6 — Temporal clustering:</b> Detects months where procurement decision volume is ≥2.5× the hospital's own baseline rate. ΓΝ ΣΕΡΡΩΝ has 3 genuine findings: Dec 2021 (COVID-mandated service replacements), Dec 2022 (year-end budget flush), and Nov 2023 (infrastructure maintenance cluster). Employment contract ΣΥΜΒΑΣΗ batches are excluded by the T6 employment filter (commit dd4d0f3).
+  </div>
+
+  <div class="section-title">T6 findings summary</div>
+  <table>
+    <thead><tr><th>Month</th><th class="num">Decisions</th><th class="num">Multiplier</th><th>Pattern</th><th>Assessment</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Dec 2021</td>
+        <td class="num">2</td>
+        <td class="num" style="color:var(--amber)">3.2×</td>
+        <td>COVID service extensions (cleaning + security)</td>
+        <td><span class="badge-amber">Explain: COVID law</span></td>
+      </tr>
+      <tr>
+        <td>Dec 2022</td>
+        <td class="num">4</td>
+        <td class="num" style="color:var(--amber)">3.2×</td>
+        <td>Year-end batch: auditors, software, radiology</td>
+        <td><span class="badge-amber">Moderate: year-end flush</span></td>
+      </tr>
+      <tr>
+        <td>Nov 2023</td>
+        <td class="num">9</td>
+        <td class="num" style="color:var(--amber)">2.8×</td>
+        <td>Infrastructure/IT maintenance cluster</td>
+        <td><span class="badge-amber">Moderate: pre-budget-year maintenance</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ─── CLUSTER 1: Dec 2021 ─── -->
+  <div class="section-title">Cluster 1 — December 2021 (3.2× baseline)</div>
+
+  <div class="notice notice-amber">
+    <b>Context — COVID Law 4820/2021 art.206:</b> Law 4820/2021 (August 2021) introduced mandatory COVID vaccination for healthcare workers and suspended unvaccinated staff without pay effective November 1, 2021. Many hospitals lost cleaning and security staff overnight and urgently contracted replacement service providers. ΓΝ ΣΕΡΡΩΝ's Dec 2021 burst reflects exactly this: extensions of cleaning and security contracts citing art.206 suspensions as the triggering event. This is a documented national phenomenon, not hospital-specific anomaly.
+  </div>
+
+  <table>
+    <thead><tr><th>Date</th><th>Type</th><th>ADA</th><th>Subject / Contractor</th><th class="num">Amount</th><th>Assessment</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Dec 2021</td>
+        <td>ΑΝΑΘΕΣΗ</td>
+        <td><a class="ada" href="https://diavgeia.gov.gr/doc/6ΡΕΥ469071-Λ65" target="_blank">6ΡΕΥ469071-Λ65</a></td>
+        <td>ΤΕΝ ΜΙΧΑΛΗΣ — Παράταση σύμβασης καθαριότητας (art.206 Ν.4820/2021)</td>
+        <td class="num" style="color:var(--amber)">€56,029.18</td>
+        <td>Cleaning service extension — COVID vaccine mandate suspension. Direct extension of existing contractor; no competitive issue.</td>
+      </tr>
+      <tr>
+        <td>Dec 2021</td>
+        <td>ΑΝΑΘΕΣΗ</td>
+        <td><a class="ada" href="https://diavgeia.gov.gr/doc/6Κ7Ρ469071-ΘΦΦ" target="_blank">6Κ7Ρ469071-ΘΦΦ</a></td>
+        <td>EFFICIENT FACILITY SERVICES — Παράταση σύμβασης φύλαξης (art.206 Ν.4820/2021)</td>
+        <td class="num" style="color:var(--amber)">€14,171.01</td>
+        <td>Security guard extension — same COVID law trigger. Total Dec 2021: €70,200 in 2 direct awards, both legally grounded.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="notice notice-green">
+    <b>Assessment — Dec 2021 cluster:</b> Both decisions explicitly cite Law 4820/2021 art.206 (vaccination mandate suspensions). This was a nationally mandated emergency affecting all Greek public hospitals simultaneously; ΓΝ ΣΕΡΡΩΝ's response is consistent with the legal framework. The T6 flag is technically correct (volume spike) but the underlying cause is unambiguous and exogenous. No procurement irregularity.
+  </div>
+
+  <!-- ─── CLUSTER 2: Dec 2022 ─── -->
+  <div class="section-title">Cluster 2 — December 2022 (3.2× baseline)</div>
+
+  <div class="notice notice-blue">
+    <b>Context — Year-end budget flush:</b> Greek public hospitals typically accelerate procurement in December to exhaust annual budget allocations before fiscal year close. The Dec 2022 cluster contains 4 decisions spanning different categories (audit services, software, radiology equipment) — characteristic of genuine year-end catch-up rather than a single suspicious contract burst.
+  </div>
+
+  <table>
+    <thead><tr><th>Date</th><th>Type</th><th>ADA</th><th>Subject</th><th class="num">Amount</th><th>Assessment</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Dec 2022</td>
+        <td>ΚΑΤΑΚΥΡΩΣΗ</td>
+        <td><a class="ada" href="https://diavgeia.gov.gr/doc/ΨΔΔΡ469071-ΘΧΟ" target="_blank">ΨΔΔΡ469071-ΘΧΟ</a></td>
+        <td>Κατακύρωση — Ελεγκτικές/Λογιστικές υπηρεσίες</td>
+        <td class="num">—</td>
+        <td>Competitive tender award for audit services. Clean process — went through ΚΑΤΑΚΥΡΩΣΗ.</td>
+      </tr>
+      <tr>
+        <td>Dec 2022</td>
+        <td>ΑΝΑΘΕΣΗ</td>
+        <td><a class="ada" href="https://diavgeia.gov.gr/doc/6ΛΦΙ469071-Π37" target="_blank">6ΛΦΙ469071-Π37</a></td>
+        <td>Αναθεση — Διαλειτουργικότητα λογισμικού</td>
+        <td class="num">€5,580</td>
+        <td>Software interoperability direct award. Below €10k threshold — routine.</td>
+      </tr>
+      <tr>
+        <td>Dec 2022</td>
+        <td>ΣΥΜΒΑΣΗ</td>
+        <td><a class="ada" href="https://diavgeia.gov.gr/doc/Ψ04Λ469071-ΜΡ4" target="_blank">Ψ04Λ469071-ΜΡ4</a></td>
+        <td>Σύμβαση — Ελεγκτικές/Λογιστικές υπηρεσίες</td>
+        <td class="num">€2,852</td>
+        <td>Contract signing following the ΚΑΤΑΚΥΡΩΣΗ above. Same audit services, expected ΣΥΜΒΑΣΗ follow-on.</td>
+      </tr>
+      <tr>
+        <td>Dec 2022</td>
+        <td>ΚΑΤΑΚΥΡΩΣΗ</td>
+        <td><a class="ada" href="https://diavgeia.gov.gr/doc/ΡΙΦΤ469071-ΘΜΛ" target="_blank">ΡΙΦΤ469071-ΘΜΛ</a></td>
+        <td>Κατακύρωση — Ακτινολογικός εξοπλισμός</td>
+        <td class="num">€6,900</td>
+        <td>Radiology equipment competitive tender. Low value, legitimate procurement type.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="notice notice-green">
+    <b>Assessment — Dec 2022 cluster:</b> 4 decisions across 4 different categories (audit services, software, audit contract signing, radiology equipment). Two are ΚΑΤΑΚΥΡΩΣΗ (competitive awards), one is a routine ΣΥΜΒΑΣΗ follow-on, one is a sub-€10k direct award. This is a typical year-end procurement batch, not a suspicious burst of direct awards to a single supplier. No irregularity identified.
+  </div>
+
+  <!-- ─── CLUSTER 3: Nov 2023 ─── -->
+  <div class="section-title">Cluster 3 — November 2023 (2.8× baseline)</div>
+
+  <div class="notice notice-blue">
+    <b>Context — Pre-budget-year infrastructure maintenance:</b> The Nov 2023 cluster (9 decisions) consists entirely of small infrastructure and IT maintenance direct awards. This pattern — 9 small awards in one month — suggests a batch processing of routine maintenance procurement before year-end, possibly tied to annual maintenance cycles or budget availability. All amounts are individually small (€990–€18,600). The cluster value is notable for its breadth (9 distinct contractors/categories) rather than any single large award.
+  </div>
+
+  <table>
+    <thead><tr><th>Date</th><th>Type</th><th>ADA</th><th>Subject</th><th class="num">Amount</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Nov 2023</td>
+        <td>ΑΝΑΘΕΣΗ</td>
+        <td><a class="ada" href="https://diavgeia.gov.gr/doc/95Β1469071-ΒΜΓ" target="_blank">95Β1469071-ΒΜΓ</a></td>
+        <td>Αναβάθμιση αίθουσας server / Computer room upgrade</td>
+        <td class="num">€18,600</td>
+      </tr>
+      <tr>
+        <td>Nov 2023</td>
+        <td>ΑΝΑΘΕΣΗ</td>
+        <td><a class="ada" href="https://diavgeia.gov.gr/doc/Ψ0ΑΥ469071-ΕΣΡ" target="_blank">Ψ0ΑΥ469071-ΕΣΡ</a></td>
+        <td>Συντήρηση μετασχηματιστών / Transformer maintenance</td>
+        <td class="num">€4,975</td>
+      </tr>
+      <tr>
+        <td>Nov 2023</td>
+        <td>ΑΝΑΘΕΣΗ</td>
+        <td><a class="ada" href="https://diavgeia.gov.gr/doc/Ψ1ΜΛ469071-8Ω9" target="_blank">Ψ1ΜΛ469071-8Ω9</a></td>
+        <td>ORCO λογισμικό / ORCO hospital management software</td>
+        <td class="num">€14,434</td>
+      </tr>
+      <tr>
+        <td>Nov 2023</td>
+        <td>ΑΝΑΘΕΣΗ</td>
+        <td><a class="ada" href="https://diavgeia.gov.gr/doc/Ψ7Π4469071-ΤΙ0" target="_blank">Ψ7Π4469071-ΤΙ0</a></td>
+        <td>Λογισμικό τράπεζας αίματος / Blood bank software</td>
+        <td class="num">€7,440</td>
+      </tr>
+      <tr>
+        <td>Nov 2023</td>
+        <td>ΑΝΑΘΕΣΗ</td>
+        <td><a class="ada" href="https://diavgeia.gov.gr/doc/66ΧΞ469071-ΓΨΗ" target="_blank">66ΧΞ469071-ΓΨΗ</a></td>
+        <td>Υπηρεσίες DPO (Υπεύθυνος Προστασίας Δεδομένων)</td>
+        <td class="num">€13,000</td>
+      </tr>
+      <tr>
+        <td>Nov 2023</td>
+        <td>ΑΝΑΘΕΣΗ</td>
+        <td><a class="ada" href="https://diavgeia.gov.gr/doc/ΨΟΦΔ469071-ΑΦ1" target="_blank">ΨΟΦΔ469071-ΑΦ1</a></td>
+        <td>Πετρέλαιο θέρμανσης / Heating oil</td>
+        <td class="num">—</td>
+      </tr>
+      <tr>
+        <td>Nov 2023</td>
+        <td>ΑΝΑΘΕΣΗ</td>
+        <td><a class="ada" href="https://diavgeia.gov.gr/doc/9ΑΖΖ469071-6ΕΝ" target="_blank">9ΑΖΖ469071-6ΕΝ</a></td>
+        <td>Απεντόμωση / Pest control</td>
+        <td class="num">€990</td>
+      </tr>
+      <tr>
+        <td>Nov 2023</td>
+        <td>ΑΝΑΘΕΣΗ</td>
+        <td><a class="ada" href="https://diavgeia.gov.gr/doc/ΨΖΘΛ469071-Ρ6Κ" target="_blank">ΨΖΘΛ469071-Ρ6Κ</a></td>
+        <td>Συντήρηση πυροσβεστήρων / Fire extinguisher maintenance</td>
+        <td class="num">€4,498</td>
+      </tr>
+      <tr>
+        <td>Nov 2023</td>
+        <td>ΑΝΑΘΕΣΗ</td>
+        <td>—</td>
+        <td>(1 additional ΑΝΑΘΕΣΗ — subject not captured)</td>
+        <td class="num">—</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="notice notice-green">
+    <b>Assessment — Nov 2023 cluster:</b> 9 small direct awards across 8–9 distinct categories (server room, transformers, hospital software x2, DPO services, heating oil, pest control, fire extinguishers). No single supplier dominates. The largest individual awards are computer room (€18,600) and ORCO software (€14,434), both below the €20k threshold for simplified procedures. This is a routine annual maintenance batch — consistent with pre-winter operational preparation. No supplier_tax_id is available to check for concentration, but the categorical diversity argues against structured steering.
+  </div>
+
+  <!-- ─── Overall T6 Assessment ─── -->
+  <div class="section-title">Overall T6 assessment</div>
+
+  <div class="notice notice-amber">
+    <b>Summary:</b> ΓΝ ΣΕΡΡΩΝ has 3 genuine T6 findings, all with plausible explanations: (1) Dec 2021 = COVID Law 4820/2021 mandated service contract replacements (exogenous, documented nationally); (2) Dec 2022 = year-end budget flush with mixed competitive/direct procurement; (3) Nov 2023 = annual infrastructure maintenance batch. None of the 3 clusters shows the hallmarks of procurement fraud (single beneficiary, inflated amounts, missing competitive process). The hospital's overall visibility is limited by zero supplier_tax_id across all decisions — a deeper investigation would require manual ADA-level review or ΓΕΜΗ cross-referencing of contractor names from decision subjects.
+  </div>
+
+  <div class="notice notice-slate">
+    <b>T6 employment filter note:</b> ΓΝ ΣΕΡΡΩΝ also publishes ΣΥΜΒΑΣΗ employment contract batches (ΙΔΟΧ physicians, ΣΟΧ auxiliary staff) which historically fired false T6 signals at other hospitals. These are correctly excluded by the T6 employment filter (commit dd4d0f3, keyword list expanded 2026-06-02). The 3 findings above are post-filter genuine procurement spikes.
+  </div>
+
+</div>
+
+</body>
+</html>

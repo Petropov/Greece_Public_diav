@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ΓΝ ΚΑΡΔΙΤΣΑ — Supplier Intelligence Brief</title>
+<style>
+  :root {
+    --bg:#0f1117;--card:#1a1d27;--card2:#1e2133;--border:#2a2d3e;
+    --text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;
+    --red:#ef4444;--amber:#f59e0b;--green:#22c55e;--blue:#3b82f6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;font-size:14px;line-height:1.6}
+  .header{background:var(--card);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between}
+  .header-left h1{font-size:1.1rem;font-weight:700;color:#fff}
+  .header-left .sub{color:var(--muted);font-size:.82rem;margin-top:2px}
+  .pills{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+  .pill{border-radius:9999px;padding:2px 9px;font-size:.72rem;font-weight:600;border:1px solid}
+  .pill-slate{background:rgba(100,116,139,.15);color:#94a3b8;border-color:rgba(100,116,139,.3)}
+  .pill-green{background:rgba(34,197,94,.1);color:#86efac;border-color:rgba(34,197,94,.25)}
+  .pill-blue{background:rgba(59,130,246,.12);color:#93c5fd;border-color:rgba(59,130,246,.25)}
+  .tabs{background:var(--card);border-bottom:1px solid var(--border);display:flex;padding:0 24px;overflow-x:auto}
+  .tab{background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);cursor:pointer;font-size:.85rem;font-weight:500;padding:12px 16px;white-space:nowrap;transition:color .15s,border-color .15s}
+  .tab:hover{color:var(--text)}
+  .tab.active{border-bottom-color:var(--accent);color:#fff;font-weight:600}
+  .pane{display:none;padding:24px;max-width:1400px;margin:0 auto}
+  .pane.active{display:block}
+  .section-title{font-size:.88rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:20px 0 10px}
+  .kv{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:16px}
+  .kv-card{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:14px 16px}
+  .kv-label{font-size:.75rem;color:var(--muted);margin-bottom:4px}
+  .kv-val{font-size:1.2rem;font-weight:700;color:#fff}
+  .kv-sub{font-size:.72rem;color:var(--muted);margin-top:3px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{background:var(--card2);color:var(--muted);font-size:.75rem;font-weight:600;text-align:left;padding:8px 10px;border-bottom:1px solid var(--border)}
+  td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .ada{font-family:monospace;font-size:.78rem;color:var(--accent);text-decoration:none}
+  .ada:hover{text-decoration:underline}
+  .badge-green{background:rgba(34,197,94,.12);color:#86efac;border:1px solid rgba(34,197,94,.25);border-radius:4px;padding:1px 6px;font-size:.72rem;font-weight:600}
+  .badge-blue{background:rgba(59,130,246,.12);color:#93c5fd;border:1px solid rgba(59,130,246,.25);border-radius:4px;padding:1px 6px;font-size:.72rem;font-weight:600}
+  .badge-slate{background:rgba(100,116,139,.15);color:#cbd5e1;border:1px solid rgba(100,116,139,.25);border-radius:4px;padding:1px 6px;font-size:.72rem;font-weight:600}
+  .notice{border-radius:8px;padding:12px 14px;font-size:.83rem;margin-bottom:12px}
+  .notice b{font-weight:700}
+  .notice-blue{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.25);color:#bfdbfe}
+  .notice-green{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);color:#bbf7d0}
+  .notice-slate{background:rgba(100,116,139,.08);border:1px solid rgba(100,116,139,.25);color:#cbd5e1}
+  .notice-amber{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);color:#fde68a}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>ΓΝ ΚΑΡΔΙΤΣΑ — Γενικό Νοσοκομείο Καρδίτσας</h1>
+    <div class="sub">Org ID 99221913 · Καρδίτσα · ~200 beds · Diavgeia 2020–2026</div>
+    <div class="pills">
+      <span class="pill pill-green">0 signals — clean</span>
+      <span class="pill pill-blue">Total ΕΠΥ routing</span>
+      <span class="pill pill-slate">Procurement-blind feed</span>
+    </div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="show('overview',this)">Overview</button>
+  <button class="tab" onclick="show('feed',this)">Feed Composition</button>
+</div>
+
+<script>
+function show(id,btn){
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('pane-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+
+<!-- ═══════════════ OVERVIEW ═══════════════ -->
+<div class="pane active" id="pane-overview">
+
+  <div class="notice notice-blue">
+    <b>Total ΕΠΥ Routing — Zero Procurement Visibility:</b> ΓΝ ΚΑΡΔΙΤΣΑ is the most structurally opaque hospital in this study. Its Diavgeia feed contains <b>zero ΑΝΑΘΕΣΗ decisions and zero ΚΑΤΑΚΥΡΩΣΗ decisions</b> over the entire 2020–2026 period. Every euro of goods and services procurement is routed through ΕΠΥ (Επιτροπή Προμηθειών Υγείας), which publishes under a separate org-ID. The hospital's own feed consists entirely of employment contracts, payment orders, and administrative governance decisions. No procurement signal detection is possible from this data.
+  </div>
+
+  <div class="kv">
+    <div class="kv-card"><div class="kv-label">Total decisions (all types)</div><div class="kv-val">37,166</div><div class="kv-sub">2020–2026</div></div>
+    <div class="kv-card"><div class="kv-label">ΑΝΑΘΕΣΗ (direct awards)</div><div class="kv-val" style="color:var(--green)">0</div><div class="kv-sub">Zero over 7 years</div></div>
+    <div class="kv-card"><div class="kv-label">ΚΑΤΑΚΥΡΩΣΗ (competitive)</div><div class="kv-val" style="color:var(--green)">0</div><div class="kv-sub">Zero over 7 years</div></div>
+    <div class="kv-card"><div class="kv-label">Signals fired</div><div class="kv-val" style="color:var(--green)">0 / 9</div><div class="kv-sub">All detectors: no data</div></div>
+    <div class="kv-card"><div class="kv-label">ΣΥΜΒΑΣΗ (employment)</div><div class="kv-val">759</div><div class="kv-sub">100% employment contracts</div></div>
+    <div class="kv-card"><div class="kv-label">Tender notices</div><div class="kv-val">2</div><div class="kv-sub">Both minor (2021, 2022)</div></div>
+  </div>
+
+  <div class="section-title">Signal summary</div>
+  <table>
+    <thead><tr><th>Tenet</th><th>Result</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>T1 · Concentration</td>
+        <td><span class="badge-blue">no data</span></td>
+        <td>Zero ΑΝΑΘΕΣΗ in feed — T1 cannot run. All procurement is ΕΠΥ-routed.</td>
+      </tr>
+      <tr>
+        <td>T4 · Amendment inflation</td>
+        <td><span class="badge-blue">no data</span></td>
+        <td>Zero ΑΝΑΘΕΣΗ baseline contracts — T4 cannot detect amendments.</td>
+      </tr>
+      <tr>
+        <td>T5 · Emergency overuse</td>
+        <td><span class="badge-green">clean</span></td>
+        <td>Zero Art.32§2γ procurement decisions found. No emergency direct awards.</td>
+      </tr>
+      <tr>
+        <td>T6 · Temporal clustering</td>
+        <td><span class="badge-green">clean</span></td>
+        <td>No procurement decisions to cluster. Note: 759 ΣΥΜΒΑΣΗ employment contracts are correctly excluded by T6 employment filter (commit dd4d0f3). Historical false positives from ΙΔΟΧ/ΣΟΧ batches fully resolved.</td>
+      </tr>
+      <tr>
+        <td>T8 · Single-source monopoly</td>
+        <td><span class="badge-blue">no data</span></td>
+        <td>Zero ΑΝΑΘΕΣΗ — T8 cannot run.</td>
+      </tr>
+      <tr>
+        <td>T9A-D · Structural patterns</td>
+        <td><span class="badge-blue">no data</span></td>
+        <td>Zero ΑΝΑΘΕΣΗ and zero supplier_tax_id — T9 family cannot run.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="notice notice-amber" style="margin-top:16px">
+    <b>Important: "0 signals" ≠ "clean procurement"</b><br>
+    ΓΝ ΚΑΡΔΙΤΣΑ's zero-signal result reflects <em>structural invisibility</em>, not verified clean procurement. The hospital routes all goods and services procurement through ΕΠΥ, making it impossible to assess supplier concentration, emergency overuse, timing anomalies, or amendment inflation at the hospital level. A full assessment would require analysing ΕΠΥ's feed filtered to ΚΑΡΔΙΤΣΑ contracts — which is outside the scope of this per-hospital analysis. The "clean" designation in the risk ranking refers to the absence of detectable signals from the hospital's own Diavgeia feed only.
+  </div>
+
+  <div class="notice notice-green">
+    <b>T6 employment filter resolution (2026-06-02):</b> In earlier analysis, ΓΝ ΚΑΡΔΙΤΣΑ's 759 ΣΥΜΒΑΣΗ employment contract batches triggered T6 timing anomaly signals (46–66× baseline in some months). After expanding the T6 employment filter to cover ΣΟΧ, ΕΣΠΑ, ΕΙΔΙΚΕΥΟΜΕΝ, ΟΡΙΣΜΕΝΟΥ ΧΡΟΝΟΥ, and ΠΑΡΑΤΑΣΗ ΣΥΜΒΑΣΗΣ patterns (commit dd4d0f3), all 759 ΣΥΜΒΑΣΗ are correctly classified as employment contracts and excluded from the T6 procurement detector. The hospital has now 0 signals.
+  </div>
+
+</div>
+
+<!-- ═══════════════ FEED COMPOSITION ═══════════════ -->
+<div class="pane" id="pane-feed">
+
+  <div class="notice notice-slate">
+    <b>Feed structure:</b> ΓΝ ΚΑΡΔΙΤΣΑ's 37,166 Diavgeia decisions are dominated by financial and administrative record-keeping — payment finalizations (46%), regulatory governance (32%), and budget commitments (18%). Procurement decisions are entirely absent. The 759 ΣΥΜΒΑΣΗ rows are employment contracts (see breakdown below).
+  </div>
+
+  <div class="section-title">Decision type breakdown</div>
+  <table>
+    <thead><tr><th>Decision type</th><th class="num">Count</th><th class="num">% of total</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>ΟΡΙΣΤΙΚΟΠΟΙΗΣΗ ΠΛΗΡΩΜΗΣ</td><td class="num">17,035</td><td class="num">45.8%</td><td>Payment finalizations — amounts not populated in normalized data</td></tr>
+      <tr><td>ΚΑΝΟΝΙΣΤΙΚΗ ΠΡΑΞΗ</td><td class="num">11,837</td><td class="num">31.8%</td><td>Regulatory/governance decisions (committees, protocols, policy)</td></tr>
+      <tr><td>ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ</td><td class="num">6,617</td><td class="num">17.8%</td><td>Budget commitment records — amounts partially populated but unreliable</td></tr>
+      <tr><td>ΣΥΜΒΑΣΗ</td><td class="num">759</td><td class="num">2.0%</td><td><b>All employment contracts</b> — ΙΔΟΧ, ΣΟΧ, ΕΣΠΑ, ΕΠΙΚΟΥΡΙΚΟΙ, ΕΙΔΙΚΕΥΟΜΕΝΟΙ (see below)</td></tr>
+      <tr><td>ΛΟΙΠΕΣ ΑΤΟΜΙΚΕΣ ΠΡΑΞΕΙΣ</td><td class="num">535</td><td class="num">1.4%</td><td>Other individual administrative acts</td></tr>
+      <tr><td>ΕΓΚΡΙΣΗ ΔΑΠΑΝΗΣ</td><td class="num">272</td><td class="num">0.7%</td><td>Payment orders (ΕΝΤΟΛΕΣ ΠΛΗΡΩΜΗΣ — payment execution, not procurement approval)</td></tr>
+      <tr><td>ΙΣΟΛΟΓΙΣΜΟΣ – ΑΠΟΛΟΓΙΣΜΟΣ</td><td class="num">60</td><td class="num">0.2%</td><td>Annual financial statements and budget execution reports</td></tr>
+      <tr><td>ΕΓΚΡΙΣΗ ΠΡΟΥΠΟΛΟΓΙΣΜΟΥ</td><td class="num">22</td><td class="num">&lt;0.1%</td><td>Annual budget approvals</td></tr>
+      <tr><td>ΔΙΟΡΙΣΜΟΣ</td><td class="num">20</td><td class="num">&lt;0.1%</td><td>Staff appointments</td></tr>
+      <tr><td>ΠΡΟΚΗΡΥΞΗ ΠΛΗΡΩΣΗΣ ΘΕΣΕΩΝ</td><td class="num">6</td><td class="num">&lt;0.1%</td><td>Vacancy announcements</td></tr>
+      <tr><td>ΠΕΡΙΛΗΨΗ ΔΙΑΚΗΡΥΞΗΣ</td><td class="num">2</td><td class="num">&lt;0.1%</td><td>Tender notices — only 2 in 7 years (see below)</td></tr>
+      <tr><td>ΠΡΑΞΗ ΣΥΛΛΟΓΙΚΟΥ ΟΡΓΑΝΟΥ</td><td class="num">1</td><td class="num">&lt;0.1%</td><td>Collective body decision</td></tr>
+      <tr><td><b>ΑΝΑΘΕΣΗ</b></td><td class="num" style="color:var(--blue)"><b>0</b></td><td class="num">0%</td><td><b>Zero direct awards over 2020–2026</b></td></tr>
+      <tr><td><b>ΚΑΤΑΚΥΡΩΣΗ</b></td><td class="num" style="color:var(--blue)"><b>0</b></td><td class="num">0%</td><td><b>Zero competitive tender awards over 2020–2026</b></td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-title">ΣΥΜΒΑΣΗ employment contract breakdown (759 total)</div>
+  <table>
+    <thead><tr><th>Category</th><th class="num">Count (approx.)</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>ΠΑΡΑΤΑΣΗ ΣΥΜΒΑΣΗΣ (any type)</td><td class="num">~528</td><td>Contract extensions — covers ΙΔΟΧ, ΣΟΧ, ΕΣΠΑ renewals. Most ΣΥΜΒΑΣΗ rows are extensions, not new hires.</td></tr>
+      <tr><td>ΙΔΟΧ / ΕΠΙΚΟΥΡΙΚΟΙ (incl. ΙΔΙΩΤΙΚΟΥ ΔΙΚΑΙΟΥ ΟΡΙΣΜΕΝΟΥ)</td><td class="num">~441</td><td>Fixed-term private law contracts — ΙΔΟΧ physicians and auxiliary medical staff (ΕΠΙΚΟΥΡΙΚΟΙ)</td></tr>
+      <tr><td>ΙΑΤΡΟΙ / ΝΟΣΗΛΕΥΤΕΣ</td><td class="num">~147</td><td>ΤΟΠΟΘΕΤΗΣΗ/ΣΥΜΒΑΣΗ ΙΑΤΡΟΥ and nursing staff contracts including trainee doctors (ΕΙΔΙΚΕΥΟΜΕΝΟΙ)</td></tr>
+      <tr><td>ΕΙΔΙΚΕΥΟΜΕΝΟΙ ΙΑΤΡΟΙ</td><td class="num">~102</td><td>Medical specialization trainee contracts (hospital-funded residency posts)</td></tr>
+      <tr><td>ΣΟΧ (state-funded auxiliary staff)</td><td class="num">~63</td><td>Auxiliary staff hired via ΣΟΧ state employment program (ΑΣΕΠ announcement process)</td></tr>
+      <tr><td>ΕΣΠΑ (EU co-funded employment)</td><td class="num">~19</td><td>EU structural fund employment contracts (ESPA co-financed auxiliary healthcare staff)</td></tr>
+    </tbody>
+  </table>
+  <div class="notice notice-slate" style="margin-top:8px">Note: Categories overlap (a single decision can be both ΠΑΡΑΤΑΣΗ and ΙΔΟΧ). Counts sum to more than 759.</div>
+
+  <div class="section-title">ΣΥΜΒΑΣΗ volume by year</div>
+  <table>
+    <thead><tr><th>Year</th><th class="num">Count</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>2020</td><td class="num">33</td><td>Low — early COVID period, normal staffing churn</td></tr>
+      <tr><td>2021</td><td class="num">90</td><td>Rising — COVID auxiliary staff surge begins</td></tr>
+      <tr><td>2022</td><td class="num">192</td><td>Peak growth — post-COVID staffing normalization via ΙΔΟΧ/ΣΟΧ programs</td></tr>
+      <tr><td>2023</td><td class="num">226</td><td>Peak — batch extension of 2022 cohorts under N.5007/2022 art.20</td></tr>
+      <tr><td>2024</td><td class="num">120</td><td>Declining — ΙΔΟΧ contracts reaching end of extension limits</td></tr>
+      <tr><td>2025</td><td class="num">86</td><td>Further decline — remaining staff converted to permanent or not renewed</td></tr>
+      <tr><td>2026</td><td class="num">12</td><td>Partial year (through ~May 2026)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-title">The 2 tender notices (only procurement-adjacent decisions in 7 years)</div>
+  <table>
+    <thead><tr><th>Year</th><th>Subject</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>2021</td>
+        <td>ΠΕΡΙΛΗΨΗ ΔΙΑΚΗΡΥΞΗΣ 35/2021 — ΜΕΣΑ ΕΡΓΑΣΤΗΡΙΑΚΗΣ ΚΑΛΛΙΕΡΓΕΙΑΣ</td>
+        <td>Lab culture media — small tender notice. The actual award likely published under ΕΠΥ.</td>
+      </tr>
+      <tr>
+        <td>2022</td>
+        <td>Έρευνα αγοράς — Ταχείς ελέγχοι αντιγόνων SARS-CoV-2 (rapid tests)</td>
+        <td>COVID rapid test market research. Emergency medical supplies procurement — likely ΕΠΥ-routed award.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="notice notice-blue" style="margin-top:16px">
+    <b>Comparison with non-ΕΠΥ-routed hospitals:</b><br>
+    ΓΝ ΛΑΜΙΑ (similar size, ~250 beds): 5,887 ΑΝΑΘΕΣΗ, €19.3M direct awards, 8/9 signals fired.<br>
+    ΓΝ ΤΡΙΚΑΛΑ (~500 beds): 3,721 ΑΝΑΘΕΣΗ, €14.8M direct awards, 7/9 signals fired.<br>
+    ΓΝ ΚΑΡΔΙΤΣΑ (~200 beds): 0 ΑΝΑΘΕΣΗ, €0 visible direct awards, 0/9 signals.<br><br>
+    The contrast is stark. For a ~200-bed hospital with ~€5–8M/year estimated procurement (based on typical Greek regional hospital benchmarks), zero visible ΑΝΑΘΕΣΗ over 7 years means ΕΠΥ centrally procures an estimated €35–56M of goods and services on behalf of this hospital without any searchable entry in the hospital's own Diavgeia feed.
+  </div>
+
+</div>
+
+</body>
+</html>

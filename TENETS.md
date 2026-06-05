@@ -8,10 +8,12 @@
 
 ## T1 · Direct Award Concentration
 **What:** Contracts issued without competitive tender (άμεση ανάθεση).  
-**Signal:** Supplier receiving >X% of an org's total direct awards over a rolling 3-year window.  
+**Signal:** Supplier receiving >25% of spend or >30% of count in org's total direct awards (DIRECT_AWARD_TYPES only) across all years with data.  
 **Why it matters:** Greek law (4412/2016 Art. 118) caps direct awards at €30k. Repeated use to the same supplier is a proxy for a captured procurement process.  
 **Data:** `decision_type = ΑΝΑΘΕΣΗ`, `supplier_tax_id`, `amount`, `issue_date`  
-**Status:** ✅ Implemented
+**Status:** ✅ Implemented (`detect_signals.py T1`)  
+**Fires in:** 3/23 orgs — ORG 50200 (ΜΑΝΑΡΙΤΣΑΣ 62%), ΝΟΣ. ΛΑΜΙΑΣ (ISS/UNISON 27%), ΝΟΣ. ΤΡΙΚΑΛΩΝ (ΓΕΝ ΚΑ ΑΕ 34%)  
+**Caveats:** Limited by sparse supplier_tax_id coverage (~2–10% of decisions). Includes AFM-as-amount filter and self-referential org-VAT exclusion.
 
 ---
 
@@ -123,7 +125,7 @@
 
 | # | Tenet | Effort | Data ready? | Priority |
 |---|-------|--------|-------------|----------|
-| T1 | Direct award concentration | Low | ✅ | Done |
+| T1 | Direct award concentration | Low | ✅ | Done ✅ |
 | T2 | Structuring | Low | ✅ | Done |
 | T3 | Cross-org benchmark | Medium | 🔄 | High |
 | T8 | Single-source monopoly | Low | ✅ | High |

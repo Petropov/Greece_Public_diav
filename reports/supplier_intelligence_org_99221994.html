@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ΓΝΑ ΛΑΙΚΟ — Supplier Intelligence Brief</title>
+<style>
+  :root {
+    --bg:#0f1117;--card:#1a1d27;--card2:#1e2133;--border:#2a2d3e;
+    --text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;
+    --red:#ef4444;--amber:#f59e0b;--green:#22c55e;--blue:#3b82f6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;font-size:14px;line-height:1.6}
+  .header{background:var(--card);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between}
+  .header-left h1{font-size:1.1rem;font-weight:700;color:#fff}
+  .header-left .sub{color:var(--muted);font-size:.82rem;margin-top:2px}
+  .pills{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+  .pill{border-radius:9999px;padding:2px 9px;font-size:.72rem;font-weight:600;border:1px solid}
+  .pill-slate{background:rgba(100,116,139,.15);color:#94a3b8;border-color:rgba(100,116,139,.3)}
+  .pill-green{background:rgba(34,197,94,.1);color:#86efac;border-color:rgba(34,197,94,.25)}
+  .pill-blue{background:rgba(59,130,246,.12);color:#93c5fd;border-color:rgba(59,130,246,.25)}
+  .pill-amber{background:rgba(245,158,11,.1);color:#fde68a;border-color:rgba(245,158,11,.25)}
+  .tabs{background:var(--card);border-bottom:1px solid var(--border);display:flex;padding:0 24px;overflow-x:auto}
+  .tab{background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);cursor:pointer;font-size:.85rem;font-weight:500;padding:12px 16px;white-space:nowrap;transition:color .15s,border-color .15s}
+  .tab:hover{color:var(--text)}
+  .tab.active{border-bottom-color:var(--accent);color:#fff;font-weight:600}
+  .pane{display:none;padding:24px;max-width:1400px;margin:0 auto}
+  .pane.active{display:block}
+  .section-title{font-size:.88rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:20px 0 10px}
+  .kv{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:16px}
+  .kv-card{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:14px 16px}
+  .kv-label{font-size:.75rem;color:var(--muted);margin-bottom:4px}
+  .kv-val{font-size:1.2rem;font-weight:700;color:#fff}
+  .kv-sub{font-size:.72rem;color:var(--muted);margin-top:3px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{background:var(--card2);color:var(--muted);font-size:.75rem;font-weight:600;text-align:left;padding:8px 10px;border-bottom:1px solid var(--border)}
+  td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .ada{font-family:monospace;font-size:.78rem;color:var(--accent);text-decoration:none}
+  .ada:hover{text-decoration:underline}
+  .badge-green{background:rgba(34,197,94,.12);color:#86efac;border:1px solid rgba(34,197,94,.25);border-radius:4px;padding:1px 6px;font-size:.72rem;font-weight:600}
+  .badge-blue{background:rgba(59,130,246,.12);color:#93c5fd;border:1px solid rgba(59,130,246,.25);border-radius:4px;padding:1px 6px;font-size:.72rem;font-weight:600}
+  .badge-amber{background:rgba(245,158,11,.12);color:#fde68a;border:1px solid rgba(245,158,11,.25);border-radius:4px;padding:1px 6px;font-size:.72rem;font-weight:600}
+  .badge-slate{background:rgba(100,116,139,.15);color:#cbd5e1;border:1px solid rgba(100,116,139,.25);border-radius:4px;padding:1px 6px;font-size:.72rem;font-weight:600}
+  .notice{border-radius:8px;padding:12px 14px;font-size:.83rem;margin-bottom:12px}
+  .notice b{font-weight:700}
+  .notice-blue{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.25);color:#bfdbfe}
+  .notice-green{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);color:#bbf7d0}
+  .notice-slate{background:rgba(100,116,139,.08);border:1px solid rgba(100,116,139,.25);color:#cbd5e1}
+  .notice-amber{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);color:#fde68a}
+  .bar-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+  .bar-label{font-size:.78rem;color:var(--text);min-width:200px}
+  .bar-track{flex:1;background:rgba(255,255,255,.06);border-radius:3px;height:8px;overflow:hidden}
+  .bar-fill{height:100%;border-radius:3px;transition:width .3s}
+  .bar-val{font-size:.78rem;color:var(--muted);min-width:60px;text-align:right;font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>ΓΕΝΙΚΟ ΝΟΣΟΚΟΜΕΙΟ ΑΘΗΝΩΝ «ΛΑΪΚΟ»</h1>
+    <div class="sub">Org ID: 99221994 · AFM 999332719 · ADA prefix: 4690Ω8 · Αθήνα</div>
+    <div class="pills">
+      <span class="pill pill-slate">~800 beds</span>
+      <span class="pill pill-amber">ΕΠΥ-routing</span>
+      <span class="pill pill-slate">42,032 decisions</span>
+      <span class="pill pill-slate">348k search records</span>
+      <span class="pill pill-green">0/9 signals</span>
+    </div>
+  </div>
+  <div style="text-align:right;color:var(--muted);font-size:.78rem">
+    2019–2026<br>Analysis: 2026-06-03
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('overview',this)">Overview</button>
+  <button class="tab" onclick="showTab('feed',this)">Feed Composition</button>
+</div>
+
+<!-- TAB 1: OVERVIEW -->
+<div id="pane-overview" class="pane active">
+
+  <div class="notice notice-amber" style="margin-top:0">
+    <b>⚠️ Complete ΕΠΥ-routing — zero visible procurement.</b> ΓΝΑ ΛΑΙΚΟ routes all medical supplies, cleaning, catering and major services through ΕΠΥ (Επιτροπή Προμηθειών Υγείας). Its own Diavgeia feed contains 133 ΑΝΑΘΕΣΗ decisions over 7 years totalling €20,500 — equivalent to petty cash. Estimated invisible ΕΠΥ-routed spend: <b>€130–150M/year</b> based on ΟΡΙΣΤΙΚΟΠΟΙΗΣΗ ΠΛΗΡΩΜΗΣ totals (€1.018B, 2019–2026).
+  </div>
+
+  <div class="section-title">Key Metrics</div>
+  <div class="kv">
+    <div class="kv-card">
+      <div class="kv-label">Total Decisions</div>
+      <div class="kv-val">42,032</div>
+      <div class="kv-sub">2019–2026 (7.5 yrs)</div>
+    </div>
+    <div class="kv-card">
+      <div class="kv-label">Search-Export Records</div>
+      <div class="kv-val">348,032</div>
+      <div class="kv-sub">total in monthly feeds</div>
+    </div>
+    <div class="kv-card">
+      <div class="kv-label">ΑΝΑΘΕΣΗ (direct award)</div>
+      <div class="kv-val" style="color:var(--green)">133</div>
+      <div class="kv-sub">total €20,500 — negligible</div>
+    </div>
+    <div class="kv-card">
+      <div class="kv-label">ΚΑΤΑΚΥΡΩΣΗ</div>
+      <div class="kv-val" style="color:var(--green)">0</div>
+      <div class="kv-sub">no competitive awards</div>
+    </div>
+    <div class="kv-card">
+      <div class="kv-label">ΠΕΡΙΛΗΨΗ ΔΙΑΚΗΡΥΞΗΣ</div>
+      <div class="kv-val">38</div>
+      <div class="kv-sub">€14.5M budget estimates</div>
+    </div>
+    <div class="kv-card">
+      <div class="kv-label">ΟΡΙΣΤΙΚΟΠΟΙΗΣΗ ΠΛΗΡΩΜΗΣ</div>
+      <div class="kv-val">23,256</div>
+      <div class="kv-sub">€1.018B total payments</div>
+    </div>
+    <div class="kv-card">
+      <div class="kv-label">Signals Fired</div>
+      <div class="kv-val" style="color:var(--green)">0/9</div>
+      <div class="kv-sub">no genuine findings</div>
+    </div>
+    <div class="kv-card">
+      <div class="kv-label">Hospital AFM</div>
+      <div class="kv-val" style="font-size:.95rem">999332719</div>
+      <div class="kv-sub">Γ.Ν.Α. ΛΑΪΚΟ</div>
+    </div>
+  </div>
+
+  <div class="section-title">Comparison: ΕΠΥ-routing hospitals</div>
+  <table>
+    <thead>
+      <tr>
+        <th>Hospital</th>
+        <th class="num">ΑΝΑΘΕΣΗ</th>
+        <th class="num">ΑΝΑΘΕΣΗ Total</th>
+        <th class="num">ΚΑΤΑΚΥΡΩΣΗ</th>
+        <th>Feed Signature</th>
+        <th>Estimated Invisible Spend</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><b>ΓΝΑ ΛΑΙΚΟ</b> (99221994)</td>
+        <td class="num">133</td>
+        <td class="num">€20,500</td>
+        <td class="num">0</td>
+        <td><span class="badge-amber">ΟΡΙΣΤΙΚΟΠΟΙΗΣΗ dominant</span></td>
+        <td>€130–150M/yr (from payment totals)</td>
+      </tr>
+      <tr>
+        <td>ΓΝ ΚΑΡΔΙΤΣΑ (99221913)</td>
+        <td class="num">0</td>
+        <td class="num">€0</td>
+        <td class="num">0</td>
+        <td><span class="badge-slate">ΣΥΜΒΑΣΗ employment only</span></td>
+        <td>€35–56M/yr (estimated)</td>
+      </tr>
+      <tr>
+        <td>ΓΝ ΚΟΖΑΝΗΣ ΜΑΜΑΤΣΕΙΟ (99221920)</td>
+        <td class="num">0</td>
+        <td class="num">€0</td>
+        <td class="num">15</td>
+        <td><span class="badge-slate">minimal ΚΑΤΑΚΥΡΩΣΗ</span></td>
+        <td>€40–60M/yr (estimated)</td>
+      </tr>
+      <tr style="background:rgba(34,197,94,.04)">
+        <td>ΓΝ ΛΑΜΙΑ (99221923) — reference</td>
+        <td class="num">5,887</td>
+        <td class="num">€19.3M</td>
+        <td class="num">762</td>
+        <td><span class="badge-green">full direct-award feed</span></td>
+        <td>visible (7/9 signals)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="section-title" style="margin-top:24px">Payment Totals by Year (ΟΡΙΣΤΙΚΟΠΟΙΗΣΗ ΠΛΗΡΩΜΗΣ)</div>
+  <div class="notice notice-slate">
+    <b>Note on payment data:</b> ΟΡΙΣΤΙΚΟΠΟΙΗΣΗ ΠΛΗΡΩΜΗΣ decisions at ΓΝΑ ΛΑΙΚΟ record the hospital itself (AFM 999332719) as the <em>payer</em> in the <code>sponsorAFMName</code> field — not the beneficiary. Beneficiary supplier data is unavailable in the structured API response for this decision type at this hospital. Amounts represent total hospital expenditure per year, not awards to individual suppliers.
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Year</th>
+        <th class="num">Decisions</th>
+        <th class="num">Total Payments</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>2019</td><td class="num">2,853</td><td class="num">€74,190,367</td><td><span class="badge-slate">baseline</span></td></tr>
+      <tr><td>2020</td><td class="num">3,140</td><td class="num">€178,249,491</td><td><span class="badge-amber">↑ COVID emergency spend surge</span></td></tr>
+      <tr><td>2021</td><td class="num">3,313</td><td class="num">€194,314,198</td><td><span class="badge-amber">↑ peak COVID year</span></td></tr>
+      <tr><td>2022</td><td class="num">3,249</td><td class="num">€92,760,217</td><td><span class="badge-slate">post-COVID normalisation</span></td></tr>
+      <tr><td>2023</td><td class="num">3,512</td><td class="num">€210,458,991</td><td><span class="badge-amber">↑ highest year — backlog clearing?</span></td></tr>
+      <tr><td>2024</td><td class="num">3,584</td><td class="num">€133,997,174</td><td><span class="badge-slate">normalising</span></td></tr>
+      <tr><td>2025</td><td class="num">3,468</td><td class="num">€63,923,043</td><td><span class="badge-slate">partial (through reported months)</span></td></tr>
+      <tr><td>2026</td><td class="num">1,137</td><td class="num">€70,128,635</td><td><span class="badge-slate">Jan–May only</span></td></tr>
+      <tr style="background:var(--card2);font-weight:700">
+        <td>Total</td><td class="num">24,256</td><td class="num">€1,017,962,116</td><td></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="notice notice-blue" style="margin-top:16px">
+    <b>ΕΠΥ comparison:</b> ΓΝ ΛΑΜΙΑ (comparable size, full procurement feed) shows €19.3M in direct awards over 6 years. At the same procurement intensity, ΛΑΙΚΟ's €130–150M/year total spend implies <b>€8–12M/year in direct awards alone</b> that are completely invisible. ΕΠΥ-routing creates structural opacity for one of Greece's largest tertiary-care hospitals.
+  </div>
+
+</div>
+
+<!-- TAB 2: FEED COMPOSITION -->
+<div id="pane-feed" class="pane">
+
+  <div class="section-title" style="margin-top:0">Decision Type Breakdown</div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Decision Type</th>
+        <th class="num">Count</th>
+        <th class="num">% of Feed</th>
+        <th class="num">Amount (€)</th>
+        <th>Supplier IDs</th>
+        <th>Intelligence Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><b>ΟΡΙΣΤΙΚΟΠΟΙΗΣΗ ΠΛΗΡΩΜΗΣ</b></td>
+        <td class="num">23,256</td>
+        <td class="num">55.3%</td>
+        <td class="num">€1,018,022,115</td>
+        <td><span class="badge-amber">hospital own AFM only</span></td>
+        <td>Aggregate spend visible; individual beneficiaries not in structured API</td>
+      </tr>
+      <tr>
+        <td>ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ</td>
+        <td class="num">9,546</td>
+        <td class="num">22.7%</td>
+        <td class="num">€953,690,994</td>
+        <td><span class="badge-slate">none</span></td>
+        <td>Budget commitments — no supplier data</td>
+      </tr>
+      <tr>
+        <td>ΚΑΝΟΝΙΣΤΙΚΗ ΠΡΑΞΗ</td>
+        <td class="num">7,464</td>
+        <td class="num">17.8%</td>
+        <td class="num">€125,974,409</td>
+        <td><span class="badge-slate">none</span></td>
+        <td>Regulatory/specification decisions; subjects describe intended purchases</td>
+      </tr>
+      <tr>
+        <td>ΛΟΙΠΕΣ ΑΤΟΜΙΚΕΣ ΔΙΟΙΚΗΤΙΚΕΣ ΠΡΑΞΕΙΣ</td>
+        <td class="num">1,563</td>
+        <td class="num">3.7%</td>
+        <td class="num">—</td>
+        <td><span class="badge-slate">none</span></td>
+        <td>Administrative acts</td>
+      </tr>
+      <tr>
+        <td><b>ΑΝΑΘΕΣΗ ΕΡΓΩΝ / ΠΡΟΜΗΘΕΙΩΝ / ΥΠΗΡΕΣΙΩΝ / ΜΕΛΕΤΩΝ</b></td>
+        <td class="num">133</td>
+        <td class="num">0.3%</td>
+        <td class="num">€20,500</td>
+        <td><span class="badge-slate">86/133 populated</span></td>
+        <td>Mostly &quot;ΚΑΤΑΘΕΣΗ ΠΡΟΣΦΟΡΩΝ&quot; (invitation for quotes) — not actual awards. Total negligible.</td>
+      </tr>
+      <tr>
+        <td>ΠΕΡΙΛΗΨΗ ΔΙΑΚΗΡΥΞΗΣ</td>
+        <td class="num">38</td>
+        <td class="num">0.1%</td>
+        <td class="num">€14,486,272</td>
+        <td><span class="badge-slate">none</span></td>
+        <td>Tender notices — budget estimates only, no awards</td>
+      </tr>
+      <tr>
+        <td>ΕΓΚΡΙΣΗ ΔΑΠΑΝΗΣ</td>
+        <td class="num">6</td>
+        <td class="num">&lt;0.1%</td>
+        <td class="num">€172,746</td>
+        <td><span class="badge-green">6/6 with AFM</span></td>
+        <td>Expenditure approval — has supplier data</td>
+      </tr>
+      <tr>
+        <td>Other (ΙΣΟΛΟΓΙΣΜΟΣ, ΕΓΚΥΚΛΙΟΣ…)</td>
+        <td class="num">66</td>
+        <td class="num">0.2%</td>
+        <td class="num">—</td>
+        <td><span class="badge-slate">none</span></td>
+        <td>Non-procurement</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="section-title">ΑΝΑΘΕΣΗ Category Detail (133 decisions)</div>
+  <div class="notice notice-slate">
+    The 133 ΑΝΑΘΕΣΗ decisions are not direct awards in the normal sense. Subject text patterns reveal they are primarily <b>calls for quotation</b> ("ΚΑΤΑΘΕΣΗ ΠΡΟΣΦΟΡΩΝ ΜΕΧΡΙ...") and approvals of small maintenance works (renovations, repairs, equipment purchases under €20k). None involve cleaning, catering, or major service contracts — confirming complete ΕΠΥ routing for all recurring services.
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Year</th>
+        <th class="num">Count</th>
+        <th class="num">Total Amount</th>
+        <th>Dominant Subject Types</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>2019</td><td class="num">55</td><td class="num">€0</td><td>ΑΝΑΚΑΙΝΙΣΗ, ΕΡΓΑΣΙΕΣ, ΠΡΟΜΗΘΕΙΑ (maintenance/repair)</td></tr>
+      <tr><td>2020</td><td class="num">30</td><td class="num">€0</td><td>COVID-era renovations, equipment replacements</td></tr>
+      <tr><td>2021</td><td class="num">16</td><td class="num">€0</td><td>ΕΡΓΑΣΙΕΣ (works), ΠΡΟΜΗΘΕΙΑ (supplies)</td></tr>
+      <tr><td>2022</td><td class="num">9</td><td class="num">€0</td><td>Maintenance works</td></tr>
+      <tr><td>2023</td><td class="num">19</td><td class="num">€20,500</td><td>ΑΝΑΚΑΙΝΙΣΗ ΓΡΑΦΕΙΟΥ €7k, ΚΑΘΙΣΜΑΤΑ €15k, small works</td></tr>
+      <tr><td>2024</td><td class="num">4</td><td class="num">€0</td><td>Minor maintenance</td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-title">Signal Detection Results</div>
+  <table>
+    <thead>
+      <tr><th>Signal</th><th>Result</th><th>Reason</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>T1 · Single large direct award</td><td><span class="badge-green">CLEAN</span></td><td>No ΑΝΑΘΕΣΗ with amount &gt; threshold</td></tr>
+      <tr><td>T4 · Amendment inflation</td><td><span class="badge-green">CLEAN</span></td><td>No amendable contracts</td></tr>
+      <tr><td>T5 · Emergency procurement overuse</td><td><span class="badge-green">CLEAN</span></td><td>0 emergency decisions (0/133)</td></tr>
+      <tr><td>T6 · Temporal clustering</td><td><span class="badge-green">CLEAN</span></td><td>No clusters in procurement feed</td></tr>
+      <tr><td>T8 · Single-source monopoly</td><td><span class="badge-green">CLEAN</span></td><td>No direct awards with supplier+amount</td></tr>
+      <tr><td>T9A · Committee capture</td><td><span class="badge-green">CLEAN</span></td><td>Only 133 direct awards total</td></tr>
+      <tr><td>T9B · Copy-paste structured award</td><td><span class="badge-green">CLEAN</span></td><td>No structured awards</td></tr>
+      <tr><td>T9C · 30-day award burst</td><td><span class="badge-amber">WEAK</span></td><td>AFM 999332719 (hospital's own AFM), 4 awards Jan 2019 — false positive, same payer-as-supplier artifact</td></tr>
+      <tr><td>T9D · Price standardisation</td><td><span class="badge-green">CLEAN</span></td><td>No multi-supplier patterns</td></tr>
+    </tbody>
+  </table>
+
+  <div class="notice notice-amber" style="margin-top:16px">
+    <b>Pipeline data quality note:</b> For ΟΡΙΣΤΙΚΟΠΟΙΗΣΗ ΠΛΗΡΩΜΗΣ decisions, the normalization script captures <code>extraFieldValues.sponsor[0].sponsorAFMName.afm</code> as <code>supplier_tax_id</code>. This is the <em>payer</em>'s AFM (the hospital itself), not the beneficiary/supplier. This creates a spurious "single supplier" (hospital own AFM) accounting for €1.018B. A fix to the normalization script is pending.
+  </div>
+
+</div>
+
+<script>
+function showTab(id, btn) {
+  document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('pane-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

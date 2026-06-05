@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Risk Ranking — Procurement Signal Sweep</title>
+<style>
+  :root {
+    --red: #dc2626; --orange: #ea580c; --yellow: #ca8a04;
+    --green: #16a34a; --bg: #0f172a; --surface: #1e293b;
+    --border: #334155; --text: #e2e8f0; --muted: #94a3b8;
+    --accent: #38bdf8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+
+  .hero { background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%); padding: 48px 32px 36px; border-bottom: 1px solid var(--border); }
+  .hero h1 { font-size: 2rem; font-weight: 700; color: #fff; margin-bottom: 8px; }
+  .hero p { color: var(--muted); font-size: 0.95rem; max-width: 700px; }
+  .hero .meta { display: flex; gap: 24px; margin-top: 20px; }
+  .hero .meta span { background: #1e293b; border: 1px solid var(--border); border-radius: 6px; padding: 6px 14px; font-size: 0.82rem; color: var(--muted); }
+  .hero .meta span strong { color: var(--text); }
+
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+  /* Stats bar */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 28px 0; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; }
+  .stat .val { font-size: 2rem; font-weight: 700; color: var(--accent); }
+  .stat .lbl { font-size: 0.8rem; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--border); margin-bottom: 28px; }
+  .tab { padding: 10px 20px; font-size: 0.88rem; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; transition: all .2s; background: none; border-top: none; border-left: none; border-right: none; }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .pane { display: none; }
+  .pane.active { display: block; }
+
+  /* Risk table */
+  .risk-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  .risk-table th { background: var(--surface); color: var(--muted); font-weight: 600; text-align: left; padding: 10px 14px; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border); }
+  .risk-table td { padding: 11px 14px; border-bottom: 1px solid rgba(51,65,85,0.5); vertical-align: top; }
+  .risk-table tr:hover td { background: rgba(30,41,59,0.5); }
+
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+  .badge-red { background: rgba(220,38,38,.15); color: #f87171; border: 1px solid rgba(220,38,38,.3); }
+  .badge-orange { background: rgba(234,88,12,.15); color: #fb923c; border: 1px solid rgba(234,88,12,.3); }
+  .badge-yellow { background: rgba(202,138,4,.15); color: #facc15; border: 1px solid rgba(202,138,4,.3); }
+  .badge-green { background: rgba(22,163,74,.15); color: #4ade80; border: 1px solid rgba(22,163,74,.3); }
+
+  .tenet-pill { display: inline-block; padding: 1px 7px; border-radius: 10px; font-size: 0.72rem; font-weight: 700; margin: 1px; background: rgba(56,189,248,.12); color: var(--accent); border: 1px solid rgba(56,189,248,.25); }
+  .tenet-pill.t5 { background: rgba(220,38,38,.12); color: #f87171; border-color: rgba(220,38,38,.25); }
+  .tenet-pill.t8 { background: rgba(234,88,12,.12); color: #fb923c; border-color: rgba(234,88,12,.25); }
+  .tenet-pill.t9a { background: rgba(168,85,247,.12); color: #c084fc; border-color: rgba(168,85,247,.25); }
+
+  /* Signal freq table */
+  .freq-bar { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .freq-bar-fill { height: 100%; border-radius: 4px; background: var(--accent); }
+
+  /* Findings */
+  .finding-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 22px 24px; margin-bottom: 16px; }
+  .finding-card.critical { border-left: 3px solid var(--red); }
+  .finding-card.high { border-left: 3px solid #ea580c; }
+  .finding-card h3 { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .finding-card .org-tag { color: var(--muted); font-size: 0.82rem; margin-bottom: 10px; }
+  .finding-card .amount { font-size: 1.4rem; font-weight: 700; color: #f87171; margin: 8px 0; }
+  .finding-card .detail { font-size: 0.84rem; color: var(--muted); line-height: 1.6; }
+  .finding-card .detail strong { color: var(--text); }
+  .finding-card .ada { font-family: monospace; font-size: 0.78rem; color: var(--accent); margin-top: 8px; }
+
+  .cross-link { display: inline-block; margin-top: 8px; padding: 3px 10px; background: rgba(168,85,247,.12); color: #c084fc; border: 1px solid rgba(168,85,247,.3); border-radius: 4px; font-size: 0.78rem; }
+
+  /* Network */
+  .network-note { background: rgba(168,85,247,.07); border: 1px solid rgba(168,85,247,.25); border-radius: 8px; padding: 16px 20px; margin: 16px 0; font-size: 0.86rem; }
+  .network-note strong { color: #c084fc; }
+
+  footer { border-top: 1px solid var(--border); padding: 24px; text-align: center; color: var(--muted); font-size: 0.8rem; margin-top: 48px; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="container">
+    <h1>🔍 Procurement Risk Ranking</h1>
+    <p>Multi-signal sweep across 23 public bodies. Seven detectors covering emergency procurement abuse, temporal clustering, single-source monopoly, copy-paste awards, burst windows, price standardisation, and committee capture.</p>
+    <div class="meta">
+      <span><strong>25</strong> organisations</span>
+      <span><strong>7</strong> signal detectors</span>
+      <span><strong>T5·T6·T8·T9A·T9B·T9C·T9D</strong> tenets</span>
+      <span>Data: Diavgeia 2018–2026</span>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="stats">
+    <div class="stat">
+      <div class="val">22/23</div>
+      <div class="lbl">Orgs with ≥1 signal</div>
+    </div>
+    <div class="stat">
+      <div class="val">10</div>
+      <div class="lbl">🔴 High-risk orgs (≥5 signals)</div>
+    </div>
+    <div class="stat">
+      <div class="val">€4.96M</div>
+      <div class="lbl">Largest single anomalous direct award</div>
+    </div>
+    <div class="stat">
+      <div class="val">8 detectors</div>
+      <div class="lbl">T1·T5·T6·T8·T9A·T9B·T9C·T9D</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="show('ranking')">Risk Ranking</button>
+    <button class="tab" onclick="show('findings')">Top Findings</button>
+    <button class="tab" onclick="show('signals')">Signal Frequency</button>
+    <button class="tab" onclick="show('network')">Cross-Org Network</button>
+    <button class="tab" onclick="show('hospitals')">Hospital Pattern</button>
+  </div>
+
+  <!-- RANKING TAB -->
+  <div id="ranking" class="pane active">
+    <table class="risk-table">
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Org ID</th>
+          <th>Organisation</th>
+          <th>Signals</th>
+          <th>Tenets fired</th>
+          <th>Top finding</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>🔴 #1</td><td>50200</td><td><strong>ΑΠΟΚΕΝΤΡΩΜΕΝΗ ΔΙΟ/ΣΗ ΘΕΣΣΑΛΙΑΣ-ΣΤ.ΕΛ.</strong></td>
+          <td><span class="badge badge-red">7 / 8</span></td>
+          <td>
+            <span class="tenet-pill t8">T1</span><span class="tenet-pill t5">T5</span><span class="tenet-pill t8">T6</span>
+            <span class="tenet-pill t8">T8</span>
+            <span class="tenet-pill">T9B</span><span class="tenet-pill">T9C</span><span class="tenet-pill">T9D</span>
+          </td>
+          <td style="color:var(--muted);font-size:.82rem">T1: ΜΑΝΑΡΙΤΣΑΣ 62% of spend · €4.96M direct award wrong CPV · €679k heating oil + €348k fuel direct awards</td>
+        </tr>
+        <tr>
+          <td>🔴 #3</td><td>6166</td><td><strong>ΔΗΜΟΣ ΛΑΜΙΑΙΩΝ</strong></td>
+          <td><span class="badge badge-red">6 / 8</span></td>
+          <td>
+            <span class="tenet-pill t5">T5</span><span class="tenet-pill t8">T6</span>
+            <span class="tenet-pill t9a">T9A</span>
+            <span class="tenet-pill">T9B</span><span class="tenet-pill">T9C</span><span class="tenet-pill">T9D</span>
+          </td>
+          <td style="color:var(--muted);font-size:.82rem">T9A committee capture 50% · ΘΕΜΗΣ ΧΕΙΜΑΡΑΣ T9B/T9C · ⚠ T8 reclassified: monopoly finding was on ΚΑΤΑΚΥΡΩΣΗ (competitive tender), not direct award</td>
+        </tr>
+        <tr>
+          <td>🔴 #1</td><td>99221923</td><td><strong>ΓΝ ΛΑΜΙΑΣ</strong></td>
+          <td><span class="badge badge-red">7 / 8</span></td>
+          <td>
+            <span class="tenet-pill t8">T1</span><span class="tenet-pill t5">T5</span><span class="tenet-pill t8">T6</span>
+            <span class="tenet-pill t8">T8</span>
+            <span class="tenet-pill">T9B</span><span class="tenet-pill">T9C</span><span class="tenet-pill">T9D</span>
+          </td>
+          <td style="color:var(--muted);font-size:.82rem">T1: ISS/UNISON 27% of spend · €773k + €681k emergency cleaning · T8: 71.5% of 2026</td>
+        </tr>
+        <tr>
+          <td>🔴 #4</td><td>50226</td><td>ΛΙΜΕΝΙΚΟ ΤΑΜΕΙΟ ΦΘΙΩΤΙΔΑΣ</td>
+          <td><span class="badge badge-red">5</span></td>
+          <td>
+            <span class="tenet-pill t8">T6</span><span class="tenet-pill t8">T8</span>
+            <span class="tenet-pill">T9B</span><span class="tenet-pill">T9C</span><span class="tenet-pill">T9D</span>
+          </td>
+          <td style="color:var(--muted);font-size:.82rem">ΑΡΙΣΤΟΤΕΛΗΣ ΠΑΠΑΒΑΣΙΛΕΙΟΥ ΚΑΙ ΣΙΑ ΕΕ security monopoly</td>
+        </tr>
+        <tr>
+          <td>🟠 #10</td><td>6030</td><td>ΔΗΜΟΣ ΑΜΦΙΚΛΕΙΑΣ-ΕΛΑΤΕΙΑΣ</td>
+          <td><span class="badge badge-orange">4</span></td>
+          <td>
+            <span class="tenet-pill t8">T6</span>
+            <span class="tenet-pill">T9B</span><span class="tenet-pill">T9C</span><span class="tenet-pill">T9D</span>
+          </td>
+          <td style="color:var(--muted);font-size:.82rem">ΣΚΥΡΟΔΕΜΑ ΣΤΕΡΕΑΣ 54% of 2020 spend · ΤΣΑΜΗΣ ΟΕ 67.6% of 2026 spend (€301k) · ⚠ T8 excluded: ADA Ρ76ΛΩΨΚ-ΤΙ3 amount=€800M = AFM (data entry error, now filtered)</td>
+        </tr>
+        <tr>
+          <td>🔴 #4</td><td>6154</td><td>ΔΗΜΟΣ ΚΟΖΑΝΗΣ</td>
+          <td><span class="badge badge-red">5</span></td>
+          <td>
+            <span class="tenet-pill t5">T5</span><span class="tenet-pill t8">T6</span>
+            <span class="tenet-pill">T9B</span><span class="tenet-pill">T9C</span><span class="tenet-pill">T9D</span>
+          </td>
+          <td style="color:var(--muted);font-size:.82rem">€348k + €345k emergency negotiated awards</td>
+        </tr>
+        <tr>
+          <td>🟠 #10</td><td>6176</td><td>ΔΗΜΟΣ ΛΟΚΡΩΝ</td>
+          <td><span class="badge badge-orange">4</span></td>
+          <td>
+            <span class="tenet-pill t8">T6</span>
+            <span class="tenet-pill">T9B</span><span class="tenet-pill">T9C</span><span class="tenet-pill">T9D</span>
+          </td>
+          <td style="color:var(--muted);font-size:.82rem">ΛΟΥΙΖΟΣ ΕΦΡΑΙΜ (natural person) capturing maintenance spend · ⚠ T8 excluded: ADA Ψ1ΩΕΩΛΤ-ΥΝΜ amount=€172M = AFM (data entry error, now filtered)</td>
+        </tr>
+        <tr>
+          <td>🔴 #4</td><td>6179</td><td>ΔΗΜΟΣ ΜΑΚΡΑΚΩΜΗΣ</td>
+          <td><span class="badge badge-red">5</span></td>
+          <td>
+            <span class="tenet-pill t8">T6</span><span class="tenet-pill t8">T8</span>
+            <span class="tenet-pill">T9B</span><span class="tenet-pill">T9C</span><span class="tenet-pill">T9D</span>
+          </td>
+          <td style="color:var(--muted);font-size:.82rem">AFM 803119436: 77.1% of 2026 direct-award spend (€2.4M) — ΑΝΑΘΕΣΗ for construction (Αναπλαση Σπερχειάδας, ADA 92ΨΑΩΛ2-Σ1Τ) · ⚠ €2.4M direct award exceeds Art. 118 €30k cap</td>
+        </tr>
+        <tr>
+          <td>🔴 #4</td><td>6202</td><td>ΔΗΜΟΣ ΜΩΛΟΥ-ΑΓΙΟΥ ΚΩΝΣΤΑΝΤΙΝΟΥ</td>
+          <td><span class="badge badge-red">5</span></td>
+          <td>
+            <span class="tenet-pill t8">T6</span><span class="tenet-pill t8">T8</span>
+            <span class="tenet-pill">T9B</span><span class="tenet-pill">T9C</span><span class="tenet-pill">T9D</span>
+          </td>
+          <td style="color:var(--muted);font-size:.82rem">T8 top supplier is another municipality — inter-municipal service anomaly</td>
+        </tr>
+        <tr>
+          <td>🔴 #4</td><td>6289</td><td>ΔΗΜΟΣ ΣΤΥΛΙΔΑΣ</td>
+          <td><span class="badge badge-red">5</span></td>
+          <td>
+            <span class="tenet-pill t5">T5</span><span class="tenet-pill t8">T6</span>
+            <span class="tenet-pill">T9B</span><span class="tenet-pill">T9C</span><span class="tenet-pill">T9D</span>
+          </td>
+          <td style="color:var(--muted);font-size:.82rem">€278k + €221k emergency awards · AFM 121208903 (electrical): 44 awards €830k via per-district splitting (Πελασγία/Εχιναίοι/Στυλίδα) · ΤΣΑΜΗΣ ΟΕ T9B same-day multi-awards</td>
+        </tr>
+        <tr>
+          <td>🔴 #4</td><td>99221946</td><td>ΓΝ ΤΡΙΚΑΛΩΝ</td>
+          <td><span class="badge badge-red">5</span></td>
+          <td>
+            <span class="tenet-pill t8">T1</span><span class="tenet-pill t8">T6</span>
+            <span class="tenet-pill">T9B</span><span class="tenet-pill">T9C</span><span class="tenet-pill">T9D</span>
+          </td>
+          <td style="color:var(--muted);font-size:.82rem">T1: ΓΕΝ ΚΑ ΑΕ 34% of cleaning spend · T4 amendment inflation (Contract 10/2025 → €800k) · emergency procedure overuse</td>
+        </tr>
+        <tr>
+          <td>🟠 #10</td><td>50449</td><td>ΤΕΧΝΙΚΟ ΕΠΙΜΕΛΗΤΗΡΙΟ</td>
+          <td><span class="badge badge-orange">4</span></td>
+          <td>
+            <span class="tenet-pill t8">T6</span><span class="tenet-pill t8">T8</span>
+            <span class="tenet-pill">T9B</span><span class="tenet-pill">T9C</span>
+          </td>
+          <td style="color:var(--muted);font-size:.82rem"></td>
+        </tr>
+        <tr>
+          <td>🟠 #10</td><td>6298</td><td>ΔΗΜΟΣ ΤΡΙΛΟΦΟΥ</td>
+          <td><span class="badge badge-orange">4</span></td>
+          <td>
+            <span class="tenet-pill t8">T6</span>
+            <span class="tenet-pill">T9B</span><span class="tenet-pill">T9C</span><span class="tenet-pill">T9D</span>
+          </td>
+          <td style="color:var(--muted);font-size:.82rem">T6 weekend award €5.74M · year-end bursts</td>
+        </tr>
+        <tr>
+          <td>🟠 #10</td><td>99221998</td><td>ΓΝΑ ΑΧΕΠΑ</td>
+          <td><span class="badge badge-orange">4†</span></td>
+          <td>
+            <span class="tenet-pill t8">T1</span><span class="tenet-pill t5">T5</span>
+            <span class="tenet-pill t8">T6</span><span class="tenet-pill t8">T8</span>
+          </td>
+          <td style="color:var(--muted);font-size:.82rem">T1: AFM 998309282 = 92.6% of 2020 direct-award spend · T5: ΑΧΟΥΤΟΣ ΕΠΙΣΙΤΙΣΜΟΣ emergency cleaning 2019–2026, €1.32M (2025) · T6†/T8† limited to ΑΝΑΤΡΟΠΗ / 2019–2021 data</td>
+        </tr>
+        <tr>
+          <td>🟠 #15</td><td>50304</td><td>ΔΕΥΑ ΛΑΜΙΑΣ</td>
+          <td><span class="badge badge-orange">3</span></td>
+          <td>
+            <span class="tenet-pill">T9B</span><span class="tenet-pill">T9C</span><span class="tenet-pill">T9D</span>
+          </td>
+          <td style="color:var(--muted);font-size:.82rem">Copy-paste micro-awards</td>
+        </tr>
+        <tr>
+          <td>🟡 #17</td><td>6079</td><td>ΔΗΜΟΣ ΔΕΛΦΩΝ</td>
+          <td><span class="badge badge-yellow">2</span></td>
+          <td>
+            <span class="tenet-pill t5">T5</span><span class="tenet-pill t8">T6</span>
+          </td>
+          <td style="color:var(--muted);font-size:.82rem">€1.4M emergency · ⚠ T8 reclassified: monopoly finding was ΚΑΤΑΚΥΡΩΣΗ/ΣΥΜΒΑΣΗ (competitive), not direct award</td>
+        </tr>
+        <tr>
+          <td>🟠 #15</td><td>6272</td><td>ΔΗΜΟΣ ΣΕΡΡΩΝ</td>
+          <td><span class="badge badge-orange">3</span></td>
+          <td>
+            <span class="tenet-pill t8">T6</span><span class="tenet-pill t8">T8</span>
+            <span class="tenet-pill">T9C</span>
+          </td>
+          <td style="color:var(--muted);font-size:.82rem">Monopoly supplier + burst</td>
+        </tr>
+        <tr>
+          <td>🟡 #17</td><td>50432</td><td>ΠΥΡΟΣΒΕΣΤΙΚΗ ΥΠ. ΛΑΜΙΑΣ</td>
+          <td><span class="badge badge-yellow">2</span></td>
+          <td>
+            <span class="tenet-pill t5">T5</span><span class="tenet-pill t8">T6</span>
+          </td>
+          <td style="color:var(--muted);font-size:.82rem">€395k emergency award</td>
+        </tr>
+        <tr>
+          <td>🟡 #17</td><td>51546</td><td>ΔΕΥΑ ΔΕΛΦΩΝ</td>
+          <td><span class="badge badge-yellow">2†</span></td>
+          <td>
+            <span class="tenet-pill t8">T6</span><span class="tenet-pill t8">T8</span>
+          </td>
+          <td style="color:var(--muted);font-size:.82rem">T8: AFM 91536962 · 100% of direct-award spend (€7.3k, 1 record) — data-sparse, weak signal</td>
+        </tr>
+        <tr>
+          <td>🟡 #20</td><td>99221920</td><td>ΓΝ ΚΟΖΑΝΗΣ ΜΑΜΑΤΣΕΙΟ ⚠️</td>
+          <td><span class="badge badge-yellow">1†</span></td>
+          <td>
+            <span class="tenet-pill t8">T6</span>
+          </td>
+          <td style="color:var(--muted);font-size:.82rem">Year-end reversals €1.1M, €646k · ⚠ T8 reclassified: single-supplier finding was ΚΑΤΑΚΥΡΩΣΗ/ΣΥΜΒΑΣΗ, not direct award</td>
+        </tr>
+        <tr>
+          <td>🟡 #20</td><td>6135</td><td>ΔΗΜΟΣ ΘΗΒΑΙΩΝ</td>
+          <td><span class="badge badge-yellow">1</span></td>
+          <td><span class="tenet-pill t8">T6</span></td>
+          <td style="color:var(--muted);font-size:.82rem">Year-end burst only</td>
+        </tr>
+        <tr>
+          <td>🟢 clean</td><td>99221913</td><td>ΓΝ ΚΑΡΔΙΤΣΑΣ</td>
+          <td><span class="badge badge-green">0</span></td>
+          <td>—</td>
+          <td style="color:var(--muted);font-size:.82rem">T6 false positive resolved (all ΣΥΜΒΑΣΗ = employment contracts). 0 ΑΝΑΘΕΣΗ — full ΕΠΥ routing.</td>
+        </tr>
+        <tr>
+          <td>🟡 #20</td><td>99221942</td><td>ΓΝ ΣΕΡΡΩΝ ⚠️</td>
+          <td><span class="badge badge-yellow">1</span></td>
+          <td><span class="tenet-pill t8">T6</span></td>
+          <td style="color:var(--muted);font-size:.82rem">T6 marginal: Dec 2021/2022 year-end + Nov 2023. Previously mislabeled ΓΝ ΑΜΦΙΣΣΑ.</td>
+        </tr>
+        <tr>
+          <td>🟡 #20</td><td>99221993</td><td>ΓΝΑ ΕΥΑΓΓΕΛΙΣΜΟΣ</td>
+          <td><span class="badge badge-yellow">1†</span></td>
+          <td><span class="tenet-pill t8">T6</span></td>
+          <td style="color:var(--muted);font-size:.82rem">T6: year-end batch commits (ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ) — 3,372 direct awards with no supplier data; deeper analysis pending hydration</td>
+        </tr>
+        <tr style="opacity:.6">
+          <td>🟢 #25</td><td>50621</td><td>ΔΕΥΑ ΣΕΡΡΩΝ</td>
+          <td><span class="badge badge-green">0 CLEAN</span></td>
+          <td>—</td>
+          <td style="color:var(--muted);font-size:.82rem">No signals detected — benchmark baseline</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- FINDINGS TAB -->
+  <div id="findings" class="pane">
+
+    <div class="finding-card critical">
+      <h3>🚨 T8 — €4.96M direct award: pine cone collection, no tender</h3>
+      <div class="org-tag">ORG 50200 · ΑΠΟΚΕΝΤΡΩΜΕΝΗ ΔΙΟΙΚΗΣΗ ΘΕΣΣΑΛΙΑΣ-ΣΤΕΡΕΑΣ ΕΛΛΑΔΑΣ · 2021</div>
+      <div class="amount">€4,960,000</div>
+      <div class="detail">
+        <strong>Supplier:</strong> ΜΑΝΑΡΙΤΣΑΣ ΕΥΑΓΓΕΛΟΣ-ΚΩΝΣΤΑΝΤΙΝΟΣ (AFM 054537472)<br>
+        <strong>Subject:</strong> "ΣΥΜΒΑΣΗ ΣΥΛΛΟΓΗ ΚΩΝΩΝ ΧΑΛΕΠΙΟΥ ΠΕΥΚΗΣ ΑΠΟ ΤΗ ΣΥΣΤΑΔΑ 15α ΤΟΥ ΙΔΙΩΤΙΚΟΥ ΔΑΣΟΥΣ ΠΡΟΚΟΠΙΟΥ-ΔΡΑΖΙΟΥ ΚΑΙ ΑΠΟ ΤΗ ΣΥΣΤΑΔΑ 2β ΤΟΥ ΔΙΑΚΑΤΕΧΟΜΕΝΟΥ ΔΑΣΟΥΣ ΚΕΧΡΙΩΝ-ΛΟΓΓΟΥ"<br><br>
+        A €4.96M direct award (Δ.1) for pine cone harvesting from two specific privately-owned forest stands in Central Greece, signed without competitive tender under Law 4412/2016 Art. 118 — a provision capped at €30,000. This single contract represents <strong>77.6% of all direct-award spend by this decentralised administration in 2021</strong>. The same supplier appears again in 2020 (€51k contract, same forestry context) and 2021 (€4k award same day), suggesting an ongoing relationship. A second supplier (AFM 082453034 · ΑΘΑΝΑΣΙΟΣ ΚΑΙ ΚΩΝΣΤΑΝΤΙΝΟΣ ΝΙΚΟΠΟΥΛΟΣ ΟΕ) captures 86% of 2026 direct-award spend (€679k).
+      </div>
+      <div class="ada">ADA: 6696ΟΡ10-ΚΙΗ</div>
+    </div>
+
+    <div class="finding-card critical">
+      <h3>🚨 T8 + T5 — Cleaning services monopoly at Lamia General Hospital</h3>
+      <div class="org-tag">ORG 99221923 · ΓΕΝΙΚΟ ΝΟΣΟΚΟΜΕΙΟ ΛΑΜΙΑΣ · 2025–2026</div>
+      <div class="amount">€1,454,000 in emergency awards</div>
+      <div class="detail">
+        <strong>Supplier:</strong> ISS / UNISON FACILITY SERVICES (AFM 094081864)<br>
+        <strong>T8:</strong> 71.5% of 2026 direct-award spend (€1.74M, 3 contracts) — single-source monopoly<br>
+        <strong>T5 — Emergency awards:</strong><br>
+        &nbsp;• 2025: €680,859 — ΕΑΔΗΣΥ consent for negotiated procedure without publication<br>
+        &nbsp;• 2026: €772,767 — Cleaning services extended 5 additional months via negotiated procedure<br>
+        &nbsp;• 2021: €60,663 + €88,672 + €72,054 — ICU consumables and medical gas emergency awards<br><br>
+        The 5-month cleaning extension (2026) is the clearest red flag: this is a recurring service that should have been subject to an open tender. Resorting to the emergency procedure for a routine operational need — cleaning hospital premises — is a direct misuse of Art. 32 of Dir. 2014/24/EU. A €4.386M Sunday decision (17/12/2023) in the same org further triggers T6 temporal clustering.
+      </div>
+      <div class="ada">Key ADAs: 9Π3Γ4690ΒΜ-ΡΗΠ · ΨΜΧΥ4690ΒΜ-75Β · ΩΧΑ64690ΒΜ-8Ι2</div>
+    </div>
+
+    <div class="finding-card high">
+      <h3>⚠️ T9A — Committee capture: 50% of Lamia direct awards through one body</h3>
+      <div class="org-tag">ORG 6166 · ΔΗΜΟΣ ΛΑΜΙΑΙΩΝ · 2019–2024</div>
+      <div class="detail">
+        <strong>Body:</strong> ΕΠΙΤΡΟΠΗ ΣΥΝΤΗΡΗΣΗΣ ΚΑΙ ΕΠΙΣΚΕΥΗΣ ΟΧΗΜΑΤΩΝ (Vehicle Maintenance Committee)<br>
+        This single committee is responsible for <strong>50% of all direct awards</strong> in the municipality — over 5,600 decisions. If this body is captured (through personal relationships, rotation manipulation, or external pressure), half of all non-competitive spending is controlled by a single chokepoint. The T9C burst detector confirms that suppliers like ΚΩΝ ΜΑΝΤΕΣ and ΑΓΑΜ ΤΣΑΚΩΝΙΤΗΣ receive multiple awards within narrow 30-day windows — consistent with contract-splitting against the same underlying need.
+      </div>
+    </div>
+
+    <div class="finding-card high">
+      <h3>⚠️ T8 — €2.4M construction contract filed as direct award (ΑΝΑΘΕΣΗ), ×80 the Art.118 cap</h3>
+      <div class="org-tag">ORG 6179 · ΔΗΜΟΣ ΜΑΚΡΑΚΩΜΗΣ · 2026</div>
+      <div class="amount">€2,400,149.94</div>
+      <div class="detail">
+        <strong>Subject:</strong> "ΣΥΜΒΑΣΗ ΚΑΤΑΣΚΕΥΗΣ ΕΡΓΟΥ: «ΑΝΑΠΛΑΣΗ ΙΣΤΟΡΙΚΟΥ ΚΕΝΤΡΟΥ ΣΠΕΡΧΕΙΑΔΑΣ»"<br>
+        <strong>Supplier:</strong> AFM 803119436 (unnamed in Diavgeia record)<br>
+        <strong>Decision type:</strong> ΑΝΑΘΕΣΗ ΕΡΓΩΝ / ΠΡΟΜΗΘΕΙΩΝ / ΥΠΗΡΕΣΙΩΝ / ΜΕΛΕΤΩΝ (direct award)<br>
+        <strong>Share:</strong> 77.1% of all 2026 direct-award spend by the municipality (€3.54M total)<br><br>
+        A construction contract for the restoration of the historic center of Σπερχειάδα worth €2.4M is filed on Diavgeia as an ΑΝΑΘΕΣΗ (direct award under Art. 118 of Law 4412/2016). The direct award cap under Art. 118 is <strong>€30,000</strong> — this contract is <strong>80× that limit</strong> with no competitive tender recorded.<br><br>
+        <strong>Two possible explanations — both require investigation:</strong>
+        <ol style="margin:8px 0 0 20px">
+          <li><strong>Misclassified decision type:</strong> The contract was actually awarded through an open or restricted tender (a ΚΑΤΑΚΥΡΩΣΗ or ΣΥΜΒΑΣΗ), and the ΑΝΑΘΕΣΗ decision type was entered in error. In this case, the underlying tender ADA should exist and can verify this.</li>
+          <li><strong>Genuine direct award violation:</strong> A €2.4M construction contract was awarded without competitive tender, in violation of Arts. 118 and 27 of Law 4412/2016 and EU Dir. 2014/24/EU. This is a <em>void contract</em> under Greek law and would require referral to ΕΑΔΗΣΥ and Ελεγκτικό Συνέδριο.</li>
+        </ol>
+      </div>
+      <div class="ada">ADA: 92ΨΑΩΛ2-Σ1Τ · Date: 2026-02-25</div>
+    </div>
+
+    <div class="finding-card high">
+      <h3>⚠️ T5 — Emergency procurement of fuel: €348k direct award</h3>
+      <div class="org-tag">ORG 50200 · ΑΠΟΚΕΝΤΡΩΜΕΝΗ ΔΙΟΙΚΗΣΗ ΘΕΣΣΑΛΙΑΣ-ΣΤΕΡΕΑΣ ΕΛΛΑΔΑΣ · 2022</div>
+      <div class="amount">€348,792</div>
+      <div class="detail">
+        <strong>Subject:</strong> "Απευθείας ανάθεση προμήθεια καυσίμων κίνησης και θέρμανσης για το έτος 2022"<br>
+        Annual fuel supply awarded as a direct award via negotiated procedure — fuel procurement is a fully foreseeable annual need with mature market competition. Use of the emergency bypass for an annual operational supply is a clear misuse of the negotiated-without-publication procedure. The total budgeted value (€348k) far exceeds the €30k Art. 118 cap for direct awards and the €140k threshold for EU publication.
+      </div>
+      <div class="ada">ADA: 6ΦΕ7ΟΡ10-Φ67</div>
+    </div>
+
+    <div class="finding-card high">
+      <h3>⚠️ T5 — Large emergency awards in ΔΗΜΟΣ ΚΟΖΑΝΗΣ and ΔΗΜΟΣ ΣΤΥΛΙΔΑΣ</h3>
+      <div class="org-tag">ORG 6154 + ORG 6289</div>
+      <div class="detail">
+        <strong>ΚΟΖΑΝΗ:</strong> Two awards of €348,336 and €345,476 via negotiated procedure — near-identical amounts in the same category, suggesting a split of a single need or the same contract repeated through an emergency mechanism.<br>
+        <strong>ΣΤΥΛΙΔΑ:</strong> €278,169 and €220,720 in emergency awards — disproportionate scale for a small municipality (population ~5,000). The €278k award alone exceeds the EU publication threshold.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SIGNALS TAB -->
+  <div id="signals" class="pane">
+    <table class="risk-table">
+      <thead>
+        <tr>
+          <th>Tenet</th>
+          <th>Description</th>
+          <th>Fires in</th>
+          <th>Coverage</th>
+          <th>Legal basis</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="badge badge-orange">T1</span></td>
+          <td>Direct award concentration (>25% of spend to one supplier over full history)</td>
+          <td>4 / 25</td>
+          <td>
+            <div class="freq-bar"><div class="freq-bar-fill" style="width:16%"></div></div>
+            <span style="font-size:.8rem;color:var(--muted)">16%</span>
+          </td>
+          <td style="font-size:.78rem;color:var(--muted)">Art. 118 N. 4412/2016 · OLAF Red Flag</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-red">T6</span></td>
+          <td>Temporal clustering (year-end burst, weekend/holiday awards)</td>
+          <td>21 / 25</td>
+          <td>
+            <div class="freq-bar"><div class="freq-bar-fill" style="width:84%"></div></div>
+            <span style="font-size:.8rem;color:var(--muted)">84%</span>
+          </td>
+          <td style="font-size:.78rem;color:var(--muted)">Art. 56 N. 4412/2016 · budget rules</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-orange">T9B</span></td>
+          <td>Copy-paste structured award (same non-round amount, same supplier)</td>
+          <td>18 / 25</td>
+          <td>
+            <div class="freq-bar"><div class="freq-bar-fill" style="width:72%"></div></div>
+            <span style="font-size:.8rem;color:var(--muted)">72%</span>
+          </td>
+          <td style="font-size:.78rem;color:var(--muted)">Art. 6 N. 4412/2016 (anti-splitting)</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-orange">T9C</span></td>
+          <td>30-day award burst (3+ awards same supplier within rolling month)</td>
+          <td>18 / 25</td>
+          <td>
+            <div class="freq-bar"><div class="freq-bar-fill" style="width:72%"></div></div>
+            <span style="font-size:.8rem;color:var(--muted)">72%</span>
+          </td>
+          <td style="font-size:.78rem;color:var(--muted)">Art. 6 N. 4412/2016 · Dir. 2014/24/EU Art. 6</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-yellow">T9D</span></td>
+          <td>Price standardisation (same non-round amount to 3+ different suppliers)</td>
+          <td>15 / 25</td>
+          <td>
+            <div class="freq-bar"><div class="freq-bar-fill" style="width:60%"></div></div>
+            <span style="font-size:.8rem;color:var(--muted)">60%</span>
+          </td>
+          <td style="font-size:.78rem;color:var(--muted)">Competition law · Art. 101 TFEU</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-orange">T8</span></td>
+          <td>Single-source monopoly (one supplier >50–70% of annual category spend)</td>
+          <td>9 / 25</td>
+          <td>
+            <div class="freq-bar"><div class="freq-bar-fill" style="width:36%"></div></div>
+            <span style="font-size:.8rem;color:var(--muted)">36%</span>
+          </td>
+          <td style="font-size:.78rem;color:var(--muted)">Art. 118 N. 4412/2016 · OLAF indicators</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-red">T5</span></td>
+          <td>Emergency procurement overuse (negotiated without publication)</td>
+          <td>9 / 25</td>
+          <td>
+            <div class="freq-bar"><div class="freq-bar-fill" style="width:36%"></div></div>
+            <span style="font-size:.8rem;color:var(--muted)">36%</span>
+          </td>
+          <td style="font-size:.78rem;color:var(--muted)">Art. 32 Dir. 2014/24/EU · Art. 32 N. 4412/2016</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-red">T9A</span></td>
+          <td>Committee capture (single body controls >40% of direct awards)</td>
+          <td>1 / 25</td>
+          <td>
+            <div class="freq-bar"><div class="freq-bar-fill" style="width:4%"></div></div>
+            <span style="font-size:.8rem;color:var(--muted)">4%</span>
+          </td>
+          <td style="font-size:.78rem;color:var(--muted)">Governance / anti-corruption</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="margin-top:28px;padding:20px;background:var(--surface);border:1px solid var(--border);border-radius:10px;font-size:.86rem;color:var(--muted)">
+      <strong style="color:var(--text)">Methodology note:</strong> T6 fires in 83% of organisations (20/24; one additional weak firing excluded as false positive) because year-end budget absorption and some weekend contract signings are structurally common in Greek public administration. T6 alone is a weak signal; it gains evidentiary weight when co-occurring with T5, T8, or T9A. The high co-occurrence rate of T9B + T9C + T9D (all three in 13/24 orgs) suggests that copy-paste procurement templates are endemic — this may reflect administrative convenience as much as fraud, but the pattern is a reliable discriminator for further manual review. T8 detects single-source monopoly on <em>direct awards only</em> (ΑΝΑΘΕΣΗ ΕΡΓΩΝ / ΠΡΟΜΗΘΕΙΩΝ / ΥΠΗΡΕΣΙΩΝ / ΜΕΛΕΤΩΝ); competitive tender finalisations (ΚΑΤΑΚΥΡΩΣΗ) and signed contracts (ΣΥΜΒΑΣΗ) are excluded from T8 analysis. † = signal fired on non-award decisions (ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ); treated as weak pending supplier-level hydration.
+    </div>
+  </div>
+
+  <!-- HOSPITALS TAB -->
+  <div id="hospitals" class="pane">
+
+    <div class="network-note" style="background:rgba(220,38,38,.07);border-color:rgba(220,38,38,.3)">
+      <strong style="color:#f87171">🏥 Recurring pattern: Hospital cleaning/services monopoly via emergency procedure.</strong>
+      Four Greek public hospitals in our dataset show systematic use of the negotiated-without-publication emergency bypass for routine cleaning and catering services. Combined cross-hospital emergency spend: <strong style="color:#f87171">€18.5M+</strong> (2019–2026) via emergency procedures for predictable, recurring hospital operations.
+    </div>
+
+    <div class="finding-card critical">
+      <h3>ΓΝ ΛΑΜΙΑΣ — ISS / UNISON FACILITY SERVICES (AFM 094081864)</h3>
+      <div class="org-tag">ORG 99221923 · T1 + T5 + T6 + T8 + T9B + T9C + T9D · 7 tenets total</div>
+      <div class="amount">€3,259,050 via direct award (2020–2026)</div>
+      <div class="detail">
+        <strong>27% of all direct-award spend</strong> over the full 7-year period, concentrated in large single contracts.<br>
+        <strong>T8 (2026):</strong> 71.5% of 2026 direct-award spend (€1.74M, 3 contracts)<br>
+        <strong>T5 emergency awards:</strong> €680,859 (Jul 2025) + €772,767 (Apr 2026) via negotiated-without-publication<br>
+        The Apr 2026 award explicitly states: <em>"Cleaning services extended 5 additional months via negotiated procedure."</em><br>
+        <strong>ΕΑΔΗΣΥ approval (Dec 2025):</strong> A Dec 2025 ΕΑΔΗΣΥ consent decision (€680,859) confirms the hospital formally sought regulatory approval to use the emergency bypass again — then awarded another large contract. This is the second documented emergency-extension cycle, evidence of a systemic pattern not a one-off.<br>
+        <strong>T4 signal:</strong> A Feb 2026 contract amendment (Τροποποίηση σύμβασης, €482,701) mirrors the ΓΝ ΤΡΙΚΑΛΩΝ T4 amendment-inflation pattern.<br>
+        <strong>Note on name:</strong> AFM 094081864 appears as "ISS FACILITY SERVICES" in some ADAs and "UNISON FACILITY SERVICES" in others — may reflect a corporate rebranding. Requires verification.
+      </div>
+      <div class="ada">Key ADAs: 9Π3Γ4690ΒΜ-ΡΗΠ (€773k, Apr 2026) · ΨΜΧΥ4690ΒΜ-75Β (€681k, Jul 2025) · ΕΑΔΗΣΥ approval (Dec 2025)</div>
+    </div>
+
+    <div class="finding-card high">
+      <h3>ΓΝ ΤΡΙΚΑΛΩΝ — ΓΕΝ ΚΑ ΑΕ (AFM 094510036)</h3>
+      <div class="org-tag">ORG 99221946 · T1 fired · 5 tenets total</div>
+      <div class="amount">€2,356,620 via direct award (2025–2026)</div>
+      <div class="detail">
+        <strong>ΓΕΝ ΚΑ ΕΤΑΙΡΕΙΑ ΟΛΟΚΛΗΡΩΜΕΝΗΣ ΔΙΑΧΕΙΡΙΣΗΣ ΚΤΗΡΙΑΚΩΝ ΕΓΚΑΤΑΣΤΑΣΕΩΝ ΑΕ</strong><br>
+        <strong>34% of all direct-award spend</strong> across 3 contracts.<br>
+        <strong>T4 pattern visible:</strong> Contract 10/2025 (€755,857) → Amendment upward to €800,382 → Next contract 49/2026 at exactly €800,382 (same amount copied from amendment). This is the textbook amendment-inflation lifecycle: original contract below threshold → amendment crosses threshold → next contract priced off inflated base.<br><br>
+        <strong>Timeline:</strong><br>
+        &nbsp;• 2025-03-30 — Contract 10/2025: €755,857 (ADA: ΨΕΗΠ46907Φ-Ψ6Φ)<br>
+        &nbsp;• 2025-04-29 — Amendment to contract 10/2025: +€800,382 (ADA: ΨΥΖΚ46907Φ-4ΣΓ)<br>
+        &nbsp;• 2026-05-30 — Contract 49/2026: €800,382 — same amount as amendment (ADA: 9ΨΛΖ46907Φ-Σ0Τ)
+      </div>
+    </div>
+
+    <div class="finding-card" style="border-left:3px solid var(--border);opacity:.85">
+      <h3>ΓΝΑ ΕΥΑΓΓΕΛΙΣΜΟΣ — Data pending hydration (ORG 99221993)</h3>
+      <div class="org-tag">ORG 99221993 · T6 (weak) · 1 tenet — signals limited by supplier data gaps</div>
+      <div class="amount">3,372 direct award decisions · 0 with supplier data (search-only coverage)</div>
+      <div class="detail">
+        Athens' Evangelismos Hospital is the largest hospital in the dataset: 43,255 normalised decisions (2019–2026), including 3,372 ΑΝΑΘΕΣΗ direct award decisions — none with supplier identity in the current dataset.<br><br>
+        <strong>What we can say:</strong> The hospital runs large-scale competitive tenders for high-value procurement (open electronic tenders for angiography materials €8.4M, immunology exams €4.1M, cleaning services €4.6M via ΑΕΠΠ/ΕΑΔΗΣΥ arbitration). Budget commitments to AFM 999336270 (ΕΠΥ / central health purchasing body) total €40.6M across 4,955 batch entries — this is centralised procurement, not direct award concentration.<br><br>
+        <strong>What we cannot say:</strong> 3,341/3,372 ΑΝΑΘΕΣΗ decisions are hydrated but all have empty <code>person</code> and <code>awardAmount</code> fields in the Diavgeia JSON. Inspection shows these are largely committee procedural decisions (clarifications on competitive tenders, date postponements, approval of tender specifications) filed under the ΑΝΑΘΕΣΗ category — not actual direct supplier awards. T1/T8/T9B/T9C/T9D signals cannot fire without supplier-level data. T6 fired on ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ batch commits (not direct awards) — false positive in hospital context.<br><br>
+        <strong>Observation:</strong> The hospital's Diavgeia ΑΝΑΘΕΣΗ decisions systematically lack the <code>extraFieldValues.person</code> (supplier) and <code>extraFieldValues.awardAmount</code> fields that must be populated when recording direct awards. If any of the 3,372 ΑΝΑΘΕΣΗ records represent genuine direct awards (not competitive-tender procedural steps), this is a data transparency compliance failure under Law 4412/2016 Art. 118 publication requirements.
+      </div>
+    </div>
+
+    <div class="finding-card high">
+      <h3>ΓΝΑ ΑΧΕΠΑ — ΑΧΟΥΤΟΣ ΕΠΙΣΙΤΙΣΜΟΣ ΑΕ (cleaning emergency monopoly, 2019–2026)</h3>
+      <div class="org-tag">ORG 99221998 · T1 + T5 + T6† + T8 · 4 tenets total</div>
+      <div class="amount">€5.8M+ in emergency cleaning/catering negotiated procedures (2019–2026)</div>
+      <div class="detail">
+        ΑΧΕΠΑ hospital in Thessaloniki mirrors the ΓΝ ΛΑΜΙΑΣ pattern: recurring use of the <em>negotiated-without-publication</em> emergency bypass for cleaning and catering services over 7 consecutive years.<br><br>
+        <strong>T5 — High-value emergency awards (selected):</strong><br>
+        &nbsp;• 2019: €153k–€170k × 6 cleaning negotiated procedures (5 separate awards in 6 months)<br>
+        &nbsp;• 2020: €1,925,769 (ADA: 61ΞΠ469064-ΒΕΒ) — single cleaning contract via closed negotiated tender<br>
+        &nbsp;• 2020: €214,891 (ADA: 9Ι6Β469064-2ΜΡ) — food services ΑΧΟΥΤΟΣ, negotiated without publication<br>
+        &nbsp;• 2022: €1,143,947 (ADA: 6Φ4Σ469064-ΟΧ8) — ΑΧΟΥΤΟΣ food/cleaning, negotiated without publication<br>
+        &nbsp;• 2024: €847,425 (ADA: ΨΖΔ7469064-5Ρ2) — ΑΧΟΥΤΟΣ, negotiated without publication<br>
+        &nbsp;• <strong>2025: €1,316,326 (ADA: ΨΒΛΛ469064-ΥΡΖ) — latest emergency extension, Jan 2025</strong><br>
+        &nbsp;• 2026: €218,897 × 3 (ADAs: ΨΒΖ3469064-ΚΣΥ, 9ΤΚΘ469064-8Μ9, ΨΕ1Υ469064-5ΨΕ) — same amount awarded 3 separate times in 3 consecutive months<br><br>
+        <strong>T1 (2019–2021):</strong> AFM 998309282 captured 99.7% of direct-award spend in 2020 (€982k, 2 contracts). After 2021 procurement routes through ΕΠΥ centralised body — direct award supplier data sparse from 2022 onward.<br><br>
+        <strong>T8 (2019–2021):</strong> Three separate years each show 100% or near-100% concentration in a single supplier — consistent with a revolving single-source arrangement.<br><br>
+        <strong>Pattern note:</strong> ΑΧΕΠΑ is the second large public hospital in this dataset to show systematic emergency-procedure use for cleaning services spanning 5+ years. The 2026 three-award series (same amount, same month-on-month) is consistent with contract-splitting or rolling monthly extensions — each below the threshold that would trigger EU publication.
+      </div>
+      <div class="ada">Key ADAs: ΨΒΛΛ469064-ΥΡΖ (€1.32M, 2025) · 61ΞΠ469064-ΒΕΒ (€1.93M, 2020) · 6Φ4Σ469064-ΟΧ8 (€1.14M, 2022)</div>
+    </div>
+
+    <div class="finding-card high">
+      <h3>ΓΝ ΙΠΠΟΚΡΑΤΕΙΟ — IPIROTIKI FACILITY SERVICES AE (AFM 998309282)</h3>
+      <div class="org-tag">ORG 99222000 · T5 (103 findings) + T6 (3 findings) · €9.1M cleaning + catering (2019–2026)</div>
+      <div class="amount">€9,096,202 total IPIROTIKI spend — 180 decisions across 8 years</div>
+      <div class="detail">
+        <strong>IPIROTIKI FACILITY SERVICES AE</strong> (AFM 998309282) holds both cleaning and catering contracts at Greece's largest Thessaloniki teaching hospital (835 beds). All procurement via Art.32§2γ emergency negotiated procedure — no competitive tender since at least 2019.<br><br>
+        <strong>Year-by-year breakdown:</strong><br>
+        &nbsp;• 2019: n=28, €142k (catering start)<br>
+        &nbsp;• 2021: n=22, €600k (cleaning enters)<br>
+        &nbsp;• 2022: n=28, €439k (catering €320k + cleaning ramp-up)<br>
+        &nbsp;• 2023: n=23, €1.95M (cleaning €965k + catering €324k + other €657k) ← sharp acceleration<br>
+        &nbsp;• 2024: n=32, <strong>€2.41M</strong> (cleaning €1.95M + catering €462k)<br>
+        &nbsp;• 2025: n=25, <strong>€2.61M</strong> (cleaning €1.97M + catering €640k) ← peak<br>
+        &nbsp;• 2026 (5 months): n=15, €946k (cleaning €369k + catering €336k + other €241k) — annualised ~€2.3M<br><br>
+        <strong>Catering contract cycle:</strong> 3-month contracts at ~€243k each, renewed continuously. ADA 9ΜΖ0469067-7ΤΡ (€243,122), ΨΤΕ5469067-9ΒΞ (€243,017), ΨΜ4Ο469067-Λ7Φ (€242,826) — same amount, same emergency justification, same supplier, different months. This is a subscription masquerading as an emergency.<br><br>
+        <strong>Cross-hospital alert:</strong> The same company (AFM 998309282) also held a €1.93M cleaning contract at ΓΝΑ ΑΧΕΠΑ (2020, ADA 61ΞΠ469064-ΒΕΒ). Both are Θεσσαλονίκη university hospitals. Both used Art.32§2γ. Cross-hospital monopoly for a single service company across the two largest Thessaloniki public hospitals.
+      </div>
+      <div class="ada">Key ADAs: 9ΜΖ0469067-7ΤΡ (€243k catering, 2025) · 6ΙΚΡ469067-9ΕΛ (€290k oxygen, 2025) · 61ΞΠ469064-ΒΕΒ (€1.93M ΑΧΕΠΑ cleaning, 2020)</div>
+    </div>
+
+    <div class="finding-card" style="border-left:3px solid var(--green);opacity:.9">
+      <h3>ΓΝ ΒΕΝΙΖΕΛΕΙΟ ΗΡΑΚΛΕΙΟΥ — Competitive procurement exemplar</h3>
+      <div class="org-tag">ORG 99221997 · 0 signals · best D:C ratio in dataset (0.005:1)</div>
+      <div class="amount">1,112 ΚΑΤΑΚΥΡΩΣΗ (€94.1M) vs 6 ΑΝΑΘΕΣΗ (€581k) — 2019–2026</div>
+      <div class="detail">
+        Βενιζέλειο (550 beds, Ηράκλειο) is the reference case for compliant hospital procurement. Every year from 2019–2026, competitive awards far exceed direct awards by count and value. Emergency rate: 0.3% (3 decisions for COVID-period negotiated procedures in 2020, now closed).<br><br>
+        <strong>D:C ratio 0.005:1</strong> — for every 1 direct award, 185 competitive tenders are run. Surpasses prior benchmark ΓΝ ΤΡΙΚΑΛΑ (0.11:1).<br>
+        <strong>No signals:</strong> Zero T4 (no amendment inflation), T5 (no emergency overuse), T8 (no monopoly), T9 (no lot-splitting).<br>
+        <strong>Notable:</strong> Supplier IDs are absent from ΚΑΤΑΚΥΡΩΣΗ structured fields — detectors cannot fire on competitive award suppliers. The clean profile is real: no artificial signals, no pattern matching. This hospital's procurement governance model should be the target standard for the sector.
+      </div>
+    </div>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px 24px;margin-top:20px">
+      <h3 style="margin-bottom:12px;font-size:.95rem">Common pattern: why this matters</h3>
+      <div style="font-size:.86rem;color:var(--muted);line-height:1.7">
+        Hospital cleaning and catering are <strong style="color:var(--text)">predictable, recurring needs</strong> with well-established market competition in Greece (multiple companies compete at scale). There is no legitimate basis for invoking the emergency negotiated procedure (Art. 32 Dir. 2014/24/EU) for a routine annual service contract. When the same company is continuously renewed via emergency extension rather than open tender:
+        <ul style="margin:10px 0 10px 20px">
+          <li>The hospital avoids the competition that would force pricing downward</li>
+          <li>The incumbent company faces no competitive pressure to improve service or price</li>
+          <li>Each extension resets the clock and prevents any challenger from participating</li>
+          <li>The cumulative value (€3.26M ISS/UNISON + €5.8M ΑΧΟΥΤΟΣ/ΑΧΕΠΑ + <strong style="color:#f87171">€9.1M IPIROTIKI/ΙΠΠΟΚΡΑΤΕΙΟ</strong> = <strong style="color:#f87171">€18.2M+</strong> across 3 hospitals) far exceeds EU publication thresholds</li>
+        </ul>
+        This pattern should be referred to <strong style="color:var(--text)">ΕΑΔΗΣΥ</strong> (procurement oversight authority) and the relevant hospital boards. ΓΝ ΒΕΝΙΖΕΛΕΙΟ demonstrates that full compliance is achievable — its 0.005:1 D:C ratio shows the same category of hospital can run all major procurement via open competition.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- NETWORK TAB -->
+  <div id="network" class="pane">
+
+    <div class="network-note">
+      <strong>⚠️ Cross-organisation supplier links detected.</strong> The following suppliers appear in direct awards from <em>multiple</em> organisations in this dataset. This does not imply wrongdoing — a company can legitimately supply multiple municipalities — but when the same supplier appears as a T8 monopolist in more than one organisation, the combined risk profile warrants cross-org investigation.
+    </div>
+
+    <div class="finding-card" style="border-left:3px solid #c084fc">
+      <h3>🔗 ΚΩΝ ΜΑΝΤΕΣ ΔΗΜ ΤΣΑΜΗΣ ΟΕ — appears in <strong>3</strong> organisations</h3>
+      <div class="detail">
+        <strong>ORG 6166 (ΔΗΜΟΣ ΛΑΜΙΑΙΩΝ):</strong> T9B copy-paste awards + T9C burst window + T8 monopoly candidate in vehicle maintenance<br>
+        <strong>ORG 6030 (ΔΗΜΟΣ ΑΜΦΙΚΛΕΙΑΣ-ΕΛΑΤΕΙΑΣ):</strong> 67.6% of 2026 direct-award spend (€301k) — below T8 threshold; T8 previously fired on a data entry error record (filtered)<br>
+        <strong>ORG 6289 (ΔΗΜΟΣ ΣΤΥΛΙΔΑΣ):</strong> T9B copy-paste awards on same day — €20,670 × 3 (2022-04-20), €20,669.99 × 3 (2023-04-28), €9,350 × 3 (2022-04-06), €6,670 × 3 (2022-04-15) — identical amounts issued on the same calendar date<br><br>
+        AFM 82785679 wins vehicle maintenance contracts across three geographically proximate municipalities (Λαμία, Αμφίκλεια, Στυλίδα) in Central Greece without competitive tendering. The same-day multi-award pattern in ORG 6289 (multiple awards on April 20, April 6, April 15 etc.) is consistent with artificially splitting a single repair job into multiple sub-threshold direct awards.
+        <span class="cross-link">🔗 Cross-org link — 3 municipalities, 1 supplier</span>
+      </div>
+    </div>
+
+    <div class="finding-card" style="border-left:3px solid #c084fc">
+      <h3>🔗 AFM 092624702 (vehicle repair) — appears in 5 organisations</h3>
+      <div class="detail">
+        <strong>ORG 6289 (ΔΗΜΟΣ ΣΤΥΛΙΔΑΣ):</strong> 51 awards, €640k (largest concentration)<br>
+        <strong>ORG 6030 (ΔΗΜΟΣ ΑΜΦΙΚΛΕΙΑΣ-ΕΛΑΤΕΙΑΣ):</strong> 17 awards, €151k<br>
+        <strong>ORG 6202 (ΔΗΜΟΣ ΜΩΛΟΥ-ΑΓ.ΚΩΝΣΤΑΝΤΙΝΟΥ):</strong> 27 awards, €62k<br>
+        <strong>ORG 50304 (ΔΕΥΑ ΛΑΜΙΑΣ):</strong> 32 awards, €11k<br>
+        <strong>ORG 6176 (ΔΗΜΟΣ ΛΟΚΡΩΝ):</strong> 2 awards, €2k<br><br>
+        A second unregistered vehicle repair supplier (no ΓΕΜΗ match for AFM 092624702) winning vehicle maintenance contracts across 5 Central Greece municipalities without competitive tendering. All awards are of type ΑΝΑΘΕΣΗ (direct award). Combined with the ΤΣΑΜΗΣ ΟΕ pattern, this suggests a <strong>regional vehicle maintenance cluster</strong> where 2 suppliers between them hold vehicle repair contracts in at least 6 of the 24 organisations in this dataset.
+        <span class="cross-link">🔗 Cross-org link — 5 municipalities, unregistered supplier</span>
+      </div>
+    </div>
+
+    <div class="finding-card" style="border-left:3px solid #c084fc">
+      <h3>🏥 ISS / UNISON FACILITY SERVICES — hospital cleaning monopoly</h3>
+      <div class="detail">
+        <strong>ORG 99221923 (ΓΝ ΛΑΜΙΑΣ):</strong> AFM 094081864 · 71.5% of 2026 direct-award spend · €773k + €681k emergency awards<br><br>
+        ISS Facility Services is a large multinational — presence in a single hospital is not anomalous per se. However, the continued use of the <em>emergency</em> negotiated procedure for a recurring operational service (cleaning) rather than running an open tender, sustained over multiple years (2021–2026), is the red flag. The company's name appears as both "ISS FACILITY SERVICES" and "UNISON FACILITY SERVICES" in different Diavgeia records under the same AFM — a possible rebranding or data entry inconsistency that warrants verification.
+      </div>
+    </div>
+
+    <div class="finding-card" style="border-left:3px solid #c084fc">
+      <h3>🏥 IPIROTIKI FACILITY SERVICES AE — cross-hospital cleaning + catering monopoly</h3>
+      <div class="detail">
+        <strong>ORG 99222000 (ΓΝ ΙΠΠΟΚΡΑΤΕΙΟ Θεσσαλονίκης):</strong> AFM 998309282 · €9.1M total (2019–2026) · cleaning + catering via Art.32§2γ · 180 decisions<br>
+        <strong>ORG 99221998 (ΓΝΑ ΑΧΕΠΑ Θεσσαλονίκης):</strong> AFM 998309282 · €1.93M cleaning contract (2020, ADA 61ΞΠ469064-ΒΕΒ) · also Art.32§2γ<br><br>
+        The same company holds service contracts at <strong>both</strong> largest Thessaloniki public hospitals simultaneously via emergency procurement bypass. At ΙΠΠΟΚΡΑΤΕΙΟ: continuous since Jan 2019, now running at ~€2.4–2.6M/year (cleaning + catering). At ΑΧΕΠΑ: large 2020 cleaning contract (no subsequent records visible in normalized data). Combined Thessaloniki footprint: <strong style="color:#f87171">€11M+</strong>. Cross-hospital monopoly for the same company across both major Thessaloniki university hospitals, both using the same emergency procedure, indicates systematic market capture rather than isolated emergency events.
+        <span class="cross-link">🔗 Cross-org link — 2 Thessaloniki hospitals, 1 supplier, same emergency bypass</span>
+      </div>
+    </div>
+
+    <div class="finding-card" style="border-left:3px solid #c084fc">
+      <h3>🌲 ΜΑΝΑΡΙΤΣΑΣ ΕΥΑΓΓΕΛΟΣ-ΚΩΝΣΤΑΝΤΙΝΟΣ — forestry direct award</h3>
+      <div class="detail">
+        <strong>ORG 50200 (ΑΠΟΚΕΝΤΡΩΜΕΝΗ ΔΙΟ/ΣΗ):</strong> AFM 054537472 · €4,960,000 single contract 2021 · multiple smaller awards 2020<br><br>
+        A natural person receiving a nearly €5M direct award for pine cone harvesting from specific, named private forest stands. The specificity of the parcel references (Συστάδα 15α, Συστάδα 2β) suggests this contract was written around a particular supplier. The €4,960,000 figure is 77.6% of the Decentralised Administration's entire 2021 direct-award spend — achieved through a mechanism capped at €30,000.
+        <span class="cross-link">🔴 Highest-value anomaly in dataset</span>
+      </div>
+    </div>
+
+    <table class="risk-table" style="margin-top:20px">
+      <thead>
+        <tr>
+          <th>Supplier</th>
+          <th>AFM</th>
+          <th>Orgs</th>
+          <th>Total known value</th>
+          <th>Risk</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>ΜΑΝΑΡΙΤΣΑΣ ΕΥΑΓΓΕΛΟΣ-ΚΩΝΣΤΑΝΤΙΝΟΣ</td>
+          <td style="font-family:monospace">054537472</td>
+          <td>50200</td>
+          <td style="color:#f87171">€5,037,268</td>
+          <td><span class="badge badge-red">Critical</span></td>
+        </tr>
+        <tr>
+          <td>IPIROTIKI FACILITY SERVICES AE</td>
+          <td style="font-family:monospace">998309282</td>
+          <td>99222000, 99221998</td>
+          <td style="color:#f87171">€11M+ (2 hospitals)</td>
+          <td><span class="badge badge-red">Critical</span></td>
+        </tr>
+        <tr>
+          <td>ISS / UNISON FACILITY SERVICES</td>
+          <td style="font-family:monospace">094081864</td>
+          <td>99221923</td>
+          <td style="color:#f87171">€3,259,050</td>
+          <td><span class="badge badge-red">Critical</span></td>
+        </tr>
+        <tr>
+          <td>ΚΩΝ ΜΑΝΤΕΣ ΔΗΜ ΤΣΑΜΗΣ ΟΕ</td>
+          <td style="font-family:monospace">082785679</td>
+          <td>6166, 6030, 6289</td>
+          <td style="color:#fb923c">€446,000+ + T9B in 6289</td>
+          <td><span class="badge badge-orange">High</span></td>
+        </tr>
+        <tr>
+          <td>ΑΘΑΝΑΣΙΟΣ ΚΑΙ ΚΩΝΣΤΑΝΤΙΝΟΣ ΝΙΚΟΠΟΥΛΟΣ ΟΕ</td>
+          <td style="font-family:monospace">082453034</td>
+          <td>50200</td>
+          <td style="color:#fb923c">€683,364</td>
+          <td><span class="badge badge-orange">High</span></td>
+        </tr>
+        <tr>
+          <td>ΘΕΜΗΣ ΧΕΙΜΑΡΑΣ ΚΑΙ ΣΙΑ EE</td>
+          <td style="font-family:monospace">—</td>
+          <td>6166</td>
+          <td style="color:#fb923c">T8 + T9C</td>
+          <td><span class="badge badge-orange">High</span></td>
+        </tr>
+        <tr>
+          <td>AFM 092624702 (vehicle repair, unregistered)</td>
+          <td style="font-family:monospace">092624702</td>
+          <td>6289, 6030, 6202, 50304, 6176</td>
+          <td style="color:#fb923c">€865k across 5 orgs</td>
+          <td><span class="badge badge-orange">High</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div><!-- /container -->
+
+<footer>
+  <div class="container">
+    All signals derived from open government data (Diavgeia). No legal findings — patterns warranting scrutiny by competent authorities. Detectors: T5·T6·T8·T9A·T9B·T9C·T9D per <a href="TENETS.md" style="color:var(--accent)">TENETS.md</a>.
+  </div>
+</footer>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>

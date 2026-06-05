@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ΓΝΑ ΣΙΣΜΑΝΟΓΛΕΙΟ — Supplier Intelligence Brief</title>
+<style>
+  :root {
+    --bg:#0f1117;--card:#1a1d27;--card2:#1e2133;--border:#2a2d3e;
+    --text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;
+    --red:#ef4444;--amber:#f59e0b;--green:#22c55e;--blue:#3b82f6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;font-size:14px;line-height:1.6}
+  .header{background:var(--card);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between}
+  .header-left h1{font-size:1.1rem;font-weight:700;color:#fff}
+  .header-left .sub{color:var(--muted);font-size:.82rem;margin-top:2px}
+  .pills{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+  .pill{border-radius:9999px;padding:2px 9px;font-size:.72rem;font-weight:600;border:1px solid}
+  .pill-slate{background:rgba(100,116,139,.15);color:#94a3b8;border-color:rgba(100,116,139,.3)}
+  .pill-amber{background:rgba(245,158,11,.12);color:#fcd34d;border-color:rgba(245,158,11,.3)}
+  .pill-green{background:rgba(34,197,94,.1);color:#86efac;border-color:rgba(34,197,94,.25)}
+  .tabs{background:var(--card);border-bottom:1px solid var(--border);display:flex;padding:0 24px;overflow-x:auto}
+  .tab{background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);cursor:pointer;font-size:.85rem;font-weight:500;padding:12px 16px;white-space:nowrap;transition:color .15s,border-color .15s}
+  .tab:hover{color:var(--text)}
+  .tab.active{border-bottom-color:var(--accent);color:#fff;font-weight:600}
+  .pane{display:none;padding:24px;max-width:1400px;margin:0 auto}
+  .pane.active{display:block}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px 20px;margin-bottom:16px}
+  .card-title{font-size:.9rem;font-weight:600;color:#fff;margin-bottom:6px}
+  .section-title{font-size:.88rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:20px 0 10px}
+  .kv{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:16px}
+  .kv-card{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:14px 16px}
+  .kv-label{font-size:.75rem;color:var(--muted);margin-bottom:4px}
+  .kv-val{font-size:1.2rem;font-weight:700;color:#fff}
+  .kv-sub{font-size:.72rem;color:var(--muted);margin-top:3px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{background:var(--card2);color:var(--muted);font-size:.75rem;font-weight:600;text-align:left;padding:8px 10px;border-bottom:1px solid var(--border)}
+  td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .ada{font-family:monospace;font-size:.78rem;color:var(--accent);text-decoration:none}
+  .ada:hover{text-decoration:underline}
+  .badge-amber{background:rgba(245,158,11,.15);color:#fcd34d;border:1px solid rgba(245,158,11,.3);border-radius:4px;padding:1px 6px;font-size:.72rem;font-weight:600;white-space:nowrap}
+  .badge-green{background:rgba(34,197,94,.12);color:#86efac;border:1px solid rgba(34,197,94,.25);border-radius:4px;padding:1px 6px;font-size:.72rem;font-weight:600}
+  .badge-blue{background:rgba(59,130,246,.12);color:#93c5fd;border:1px solid rgba(59,130,246,.25);border-radius:4px;padding:1px 6px;font-size:.72rem;font-weight:600}
+  .notice{border-radius:8px;padding:12px 14px;font-size:.83rem;margin-bottom:12px}
+  .notice b{font-weight:700}
+  .notice-amber{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);color:#fde68a}
+  .notice-blue{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.25);color:#bfdbfe}
+  .notice-green{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);color:#bbf7d0}
+  .notice-red{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);color:#fca5a5}
+  .notice-indigo{background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.25);color:#c7d2fe}
+  .gap-y>*+*{margin-top:10px}
+  .mt8{margin-top:8px}
+  .signal-row{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--border)}
+  .signal-row:last-child{border-bottom:none}
+  .cnt{border-radius:9999px;padding:1px 7px;font-size:.72rem;font-weight:700}
+  .cnt-amber{background:rgba(245,158,11,.18);color:#fcd34d;border:1px solid rgba(245,158,11,.3)}
+  .cnt-green{background:rgba(34,197,94,.12);color:#86efac;border:1px solid rgba(34,197,94,.25)}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>ΓΝΑ ΣΙΣΜΑΝΟΓΛΕΙΟ — Γενικό Νοσοκομείο Αττικής «Σισμανόγλειο»</h1>
+    <div class="sub">Org ID 99221990 · Αθήνα (Μαρούσι) · ~480 beds · Diavgeia 2019–2026</div>
+    <div class="pills">
+      <span class="pill pill-amber">T8 marginal</span>
+      <span class="pill pill-slate">ΕΠΥ-routed</span>
+      <span class="pill pill-slate">1 / 9 signals</span>
+    </div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="show('overview',this)">Overview</button>
+  <button class="tab" onclick="show('t8',this)">T8 — Monopoly <span class="cnt cnt-amber">1</span></button>
+</div>
+
+<script>
+function show(id,btn){
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('pane-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+
+<!-- ═══════════════ OVERVIEW ═══════════════ -->
+<div class="pane active" id="pane-overview">
+
+  <div class="notice notice-amber">
+    <b>ΕΠΥ Routing — Near-Zero Procurement Visibility:</b> ΓΝΑ ΣΙΣΜΑΝΟΓΛΕΙΟ routes the overwhelming majority of its procurement through ΕΠΥ (Επιτροπή Προμηθειών Υγείας, AFM 999336270), which publishes decisions under its own org-ID. Only 10 ΑΝΑΘΕΣΗ decisions appear in ΣΙΣΜΑΝΟΓΛΕΙΟ's own Diavgeia feed over 7 years (2019–2026). The hospital's actual procurement exposure is structurally invisible from this feed.
+  </div>
+
+  <div class="kv">
+    <div class="kv-card"><div class="kv-label">Total decisions (all types)</div><div class="kv-val">41,625</div><div class="kv-sub">2019–2026</div></div>
+    <div class="kv-card"><div class="kv-label">ΑΝΑΘΕΣΗ (direct awards)</div><div class="kv-val" style="color:var(--amber)">10</div><div class="kv-sub">Includes ΕΠΥ-routed categories</div></div>
+    <div class="kv-card"><div class="kv-label">ΚΑΤΑΚΥΡΩΣΗ (competitive)</div><div class="kv-val">0</div><div class="kv-sub">0% visible competitive tenders</div></div>
+    <div class="kv-card"><div class="kv-label">Signals fired</div><div class="kv-val" style="color:var(--amber)">1 / 9</div><div class="kv-sub">T8 (marginal)</div></div>
+    <div class="kv-card"><div class="kv-label">Emergency decisions</div><div class="kv-val" style="color:var(--green)">0</div><div class="kv-sub">No Art.32§2γ found</div></div>
+    <div class="kv-card"><div class="kv-label">Beds (approx.)</div><div class="kv-val">480</div><div class="kv-sub">Major Attica hospital</div></div>
+  </div>
+
+  <div class="section-title">Signal summary</div>
+  <table>
+    <thead><tr><th>Tenet</th><th>Result</th><th>Findings</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>T1 · Concentration</td>
+        <td><span class="badge-green">clean</span></td>
+        <td class="num">—</td>
+        <td>No supplier_tax_id in any direct award</td>
+      </tr>
+      <tr>
+        <td>T4 · Amendment inflation</td>
+        <td><span class="badge-green">clean</span></td>
+        <td class="num">—</td>
+        <td>Insufficient ΑΝΑΘΕΣΗ data for comparison</td>
+      </tr>
+      <tr>
+        <td>T5 · Emergency overuse</td>
+        <td><span class="badge-green">clean</span></td>
+        <td class="num">0</td>
+        <td>Zero Art.32§2γ procurement decisions found 2019–2026</td>
+      </tr>
+      <tr>
+        <td>T6 · Temporal clustering</td>
+        <td><span class="badge-green">clean</span></td>
+        <td class="num">—</td>
+        <td>Previously fired on 28 ΙΔΟΧ physician employment batches (Dec 2020 COVID). Resolved by T6 employment filter (commit dd4d0f3).</td>
+      </tr>
+      <tr>
+        <td>T8 · Single-source monopoly</td>
+        <td><span class="badge-amber">FIRED</span></td>
+        <td class="num">1</td>
+        <td>AFM 997516863 = 100% of 2020 direct-award spend (€241k). Only 1 year with supplier data. COVID-period security services. Marginal.</td>
+      </tr>
+      <tr>
+        <td>T9A-D · Structural patterns</td>
+        <td><span class="badge-green">clean</span></td>
+        <td class="num">—</td>
+        <td>Insufficient ΑΝΑΘΕΣΗ data (10 total, 1 with supplier_tax_id)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="section-title">Feed composition context</div>
+
+  <div class="notice notice-blue">
+    <b>Why so few ΑΝΑΘΕΣΗ?</b> The 41,625 total decisions are dominated by ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ (budget commitments, 31,386 rows), ΚΑΝΟΝΙΣΤΙΚΗ ΠΡΑΞΗ (governance, 8,414), and ΟΡΙΣΤΙΚΟΠΟΙΗΣΗ ΠΛΗΡΩΜΗΣ (payment finalizations, 870). Only 10 ΑΝΑΘΕΣΗ appear over 7 years — typical for hospitals that use ΕΠΥ routing. The actual procurement volume (estimated tens of millions of euros for a 480-bed hospital) is published under ΕΠΥ's org-ID, not this hospital's feed.
+  </div>
+
+  <div class="notice notice-blue">
+    <b>Benchmarking context:</b> ΓΝΑ ΣΙΣΜΑΝΟΓΛΕΙΟ is one of the largest hospitals in Athens (part of the Σισμανόγλειο-Αμαλία Fleming complex). The near-zero ΑΝΑΘΕΣΗ count (10 over 7 years) compared to ΓΝ ΛΑΜΙΑ (5,887 ΑΝΑΘΕΣΗ) or ΓΝ ΙΠΠΟΚΡΑΤΕΙΟ (4,431 ΑΝΑΘΕΣΗ) reflects institutional routing practice, not a difference in procurement volume.
+  </div>
+
+  <table>
+    <thead><tr><th>Decision type</th><th>Count</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>ΑΝΑΛΗΨΗ ΥΠΟΧΡΕΩΣΗΣ</td><td class="num">31,386</td><td>Budget commitments — amounts partially corrupt, excluded from analysis</td></tr>
+      <tr><td>ΚΑΝΟΝΙΣΤΙΚΗ ΠΡΑΞΗ</td><td class="num">8,414</td><td>Regulatory/governance decisions</td></tr>
+      <tr><td>ΛΟΙΠΕΣ ΑΤΟΜΙΚΕΣ ΠΡΑΞΕΙΣ</td><td class="num">830</td><td>Other administrative decisions</td></tr>
+      <tr><td>ΟΡΙΣΤΙΚΟΠΟΙΗΣΗ ΠΛΗΡΩΜΗΣ</td><td class="num">870</td><td>Payment finalizations</td></tr>
+      <tr><td>ΣΥΜΒΑΣΗ</td><td class="num">50</td><td>28 ΙΔΟΧ physician employment contracts (COVID period) + administrative</td></tr>
+      <tr><td>ΠΕΡΙΛΗΨΗ ΔΙΑΚΗΡΥΞΗΣ</td><td class="num">65</td><td>Tender notices (routed through ΕΠΥ)</td></tr>
+      <tr><td>ΑΝΑΘΕΣΗ ΕΡΓΩΝ / ΠΡΟΜΗΘΕΙΩΝ</td><td class="num" style="color:var(--amber)">10</td><td>Direct awards — the only visible procurement, extremely limited</td></tr>
+    </tbody>
+  </table>
+
+</div>
+
+<!-- ═══════════════ T8 ═══════════════ -->
+<div class="pane" id="pane-t8">
+  <div class="notice notice-indigo">
+    <b>T8 — Single-source monopoly:</b> Detects when a single supplier accounts for ≥70% of annual direct-award spend. At ΓΝΑ ΣΙΣΜΑΝΟΓΛΕΙΟ: 1 finding, year 2020 only. AFM 997516863 represents 100% of 2020 direct-award spend — but this is the only year where any ΑΝΑΘΕΣΗ has a supplier_tax_id populated, making the 100% concentration an artifact of sparse data rather than a genuine monopoly pattern.
+  </div>
+
+  <div class="notice notice-amber">
+    <b>Data context:</b> 10 ΑΝΑΘΕΣΗ total across 2019–2026. Only 2 have amounts, only 1 has supplier_tax_id. The T8 signal fires on a denominator of €241,475 (a single security service contract), not the hospital's actual total procurement. The signal is mechanically correct but analytically marginal.
+  </div>
+
+  <table>
+    <thead><tr><th>Year</th><th>AFM</th><th>Amount</th><th>Share</th><th>ADA</th><th>Subject</th><th>Assessment</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>2020</td>
+        <td class="ada">997516863</td>
+        <td class="num">€241,475</td>
+        <td class="num" style="color:var(--amber)">100%</td>
+        <td><a class="ada" href="https://diavgeia.gov.gr/doc/9Ε5Ρ4690Ω5-ΕΙΓ" target="_blank">9Ε5Ρ4690Ω5-ΕΙΓ</a></td>
+        <td>"ΑΠΕΥΘΕΙΑΣ ΑΝΑΘΕΣΗ ΓΙΑ ΤΗΝ ΠΑΡΟΧΗ ΥΠΗΡΕΣΙΩΝ ΦΥΛΑΞΗΣ ΕΩΣ 14/9/2020 / ΕΓΚΡΙΣΗ ΑΝΤΙΣΤΟΙΧΗΣ ΔΑΠΑΝΗΣ"</td>
+        <td>Security guard services, COVID period extension (to Sep 14 2020). Single source in COVID conditions with reduced market activity. GEMI lookup pending for AFM 997516863.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="section-title">All ΑΝΑΘΕΣΗ decisions (2019–2026)</div>
+  <table>
+    <thead><tr><th>Date</th><th>ADA</th><th>Subject</th><th>Amount</th><th>AFM</th></tr></thead>
+    <tbody>
+      <tr><td>2020-04-29</td><td><a class="ada" href="https://diavgeia.gov.gr/doc/9Ε5Ρ4690Ω5-ΕΙΓ" target="_blank">9Ε5Ρ4690Ω5-ΕΙΓ</a></td><td>Φύλαξη ΕΩΣ 14/9/2020</td><td class="num">€241,475</td><td>997516863</td></tr>
+      <tr><td>2023-05-23</td><td><a class="ada" href="https://diavgeia.gov.gr/doc/6Ι6Π4690Ω5-Υ18" target="_blank">6Ι6Π4690Ω5-Υ18</a></td><td>ΑΗΔ 4/2022 ΥΛΙΚΑ ΑΙΟΔΥΝΑΜΙΚΟΥ</td><td class="num">—</td><td>—</td></tr>
+      <tr><td>2023-05-23</td><td><a class="ada" href="https://diavgeia.gov.gr/doc/ΨΜΗΛ4690Ω5-ΟΔΨ" target="_blank">ΨΜΗΛ4690Ω5-ΟΔΨ</a></td><td>ΑΗΔ 5/2022 ΒΗΜΑΤΟΔΟΤΕΣ</td><td class="num">€542,000</td><td>—</td></tr>
+      <tr><td>2023-07-19</td><td><a class="ada" href="https://diavgeia.gov.gr/doc/6ΑΟΩ4690Ω5-8ΜΦ" target="_blank">6ΑΟΩ4690Ω5-8ΜΦ</a></td><td>Πλειοδοτικός Διαγωνισμός ΑΑ 3/2023 Απομάκρυνση SCRAP</td><td class="num">—</td><td>—</td></tr>
+      <tr><td>2023-10-17</td><td><a class="ada" href="https://diavgeia.gov.gr/doc/63ΡΠ4690Ω5-ΜΓΦ" target="_blank">63ΡΠ4690Ω5-ΜΓΦ</a></td><td>ΑΗΔ 16/2023 Συντήρηση αναισθησιολογικών</td><td class="num">—</td><td>—</td></tr>
+      <tr><td>2023-10-17</td><td><a class="ada" href="https://diavgeia.gov.gr/doc/96ΗΠ4690Ω5-Γ4Λ" target="_blank">96ΗΠ4690Ω5-Γ4Λ</a></td><td>ΑΗΔ 17/2023 Συντήρηση αναπνευστήρων</td><td class="num">—</td><td>—</td></tr>
+      <tr><td>2024-02-22</td><td><a class="ada" href="https://diavgeia.gov.gr/doc/ΨΕΕΦ4690Ω5-ΓΣ2" target="_blank">ΨΕΕΦ4690Ω5-ΓΣ2</a></td><td>Προμήθεια απολυμαντικών</td><td class="num">—</td><td>—</td></tr>
+      <tr><td>2024-09-24</td><td><a class="ada" href="https://diavgeia.gov.gr/doc/6Η7Ο4690Ω5-025" target="_blank">6Η7Ο4690Ω5-025</a></td><td>Προμήθεια συστήματος μέτρησης διαχυτικής ικανότητας</td><td class="num">—</td><td>—</td></tr>
+      <tr><td>2024-09-24</td><td><a class="ada" href="https://diavgeia.gov.gr/doc/9ΗΝ44690Ω5-3ΛΚ" target="_blank">9ΗΝ44690Ω5-3ΛΚ</a></td><td>Διακήρυξη Προμήθειας EBUS</td><td class="num">—</td><td>—</td></tr>
+      <tr><td>2026-02-06</td><td><a class="ada" href="https://diavgeia.gov.gr/doc/ΡΩΤΔ4690Ω5-2ΣΕ" target="_blank">ΡΩΤΔ4690Ω5-2ΣΕ</a></td><td>ΑΑ1525 Επέκταση Συστήματος Μεταφοράς Βιολογικών Υγρών</td><td class="num">—</td><td>—</td></tr>
+    </tbody>
+  </table>
+
+  <div class="notice notice-green" style="margin-top:16px">
+    <b>Assessment:</b> The T8 signal at ΓΝΑ ΣΙΣΜΑΝΟΓΛΕΙΟ is marginal and context-dependent. The single security guard company (AFM 997516863) was awarded a COVID-period extension for a service that cannot easily be tendered under emergency conditions. The 100% share is a mathematical artifact of there being only 1 direct award with a supplier_tax_id that year. Without ΕΠΥ-routed procurement data, it is not possible to assess the hospital's actual supplier concentration.
+  </div>
+</div>
+
+</body>
+</html>
