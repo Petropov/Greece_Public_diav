@@ -170,6 +170,10 @@ SUPPLIER_TAX_ID_KEYS = (
     "tin",
 )
 EXTRA_FIELD_LABEL_KEYS = ("label", "name", "field", "fieldName", "fieldLabel", "field_label", "key", "title")
+# In Diavgeia's extraFieldValues schema, "org" always refers to the issuing organization (payer),
+# never a counterparty/supplier. Recursing into it would capture the hospital's own AFM as supplier_tax_id
+# on Β.2.2 (ΟΡΙΣΤΙΚΟΠΟΙΗΣΗ ΠΛΗΡΩΜΗΣ) decisions, where the actual payee is in sponsor[].sponsorAFMName.
+ISSUER_SELF_KEYS = frozenset({"org"})
 EXTRA_FIELD_VALUE_KEYS = ("value", "fieldValue", "field_value", "values", "amount")
 AMOUNT_LABEL_TOKENS = ("ποσο", "amount", "paymentamount", "expenseamount")
 SUPPLIER_NAME_LABEL_TOKENS = (
@@ -544,7 +548,9 @@ def extract_supplier_fields(source: Any) -> tuple[str | None, str | None]:
                 tax_id = normalize_tax_id(value)
             if name and tax_id:
                 return name, tax_id
-        for value in source.values():
+        for key, value in source.items():
+            if key in ISSUER_SELF_KEYS:
+                continue
             if isinstance(value, (dict, list)):
                 nested_name, nested_tax_id = extract_supplier_fields(value)
                 name = name or nested_name

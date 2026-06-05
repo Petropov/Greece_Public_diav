@@ -117,7 +117,9 @@ T6_EMPLOYMENT_KEYWORDS = (
     "ΕΦΗΜΕΡΙ",           # on-call shifts (ΕΦΗΜΕΡΙΕΣ doctors)
     # Employment contract language
     "ΕΡΓΑΣΙΑΣ",          # genitive "of employment" (≠ ΕΡΓΑΣΙΕΣ/ΕΡΓΑΣΙΩΝ = construction works)
-    "ΙΔΙΩΤ",             # ΙΔΙΩΤΗΣ/ΙΔΙΩΤΩΝ/ΙΔΙΩΤΗ/ΙΔΙΩΤΙΚΟΥ — private doctors
+    # NOTE: bare "ΙΔΙΩΤ" removed — too broad; matches ΙΔΙΩΤΙΚΟ ΣΥΜΦΩΝΗΤΙΚΟ (private-agreement
+    # procurement contracts for construction/pipeline works).  Private-doctor employment records
+    # are caught by ΕΡΓΑΣΙΑΣ, ΙΔΟΧ, ΟΡΙΣΜΕΝΟΥ ΧΡΟΝΟΥ, or ΙΑΤΡΟΥ above.
     r"ΤΡΟΠΟΠΟΙΗΣ.{0,20}ΣΥΜΒΑΣ.{0,5}ΙΔ",
     # Contract extension patterns (incl. common spelling mistakes in hospital data)
     "ΠΑΡΑΤΑΣΗ ΣΥΜΒΑΣΗΣ",
